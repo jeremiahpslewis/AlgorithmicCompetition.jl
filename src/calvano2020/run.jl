@@ -29,6 +29,12 @@ function runCalvano(calvano_params::CalvanoParams)
     )
 end
 
+# Use struct `Experiment` ...{Symbol(s)}(ex.policy, ex.env, ex.stop_condition, ex.hook)
+# to collect experiment objects
+# Look into DistributedReinforcementLearning.jl for running grid of experiments
+# Add hook `(hook::YourHook)(::PostExperimentStage, agent, env)` to save profit results!
+
+
 n_iter = Int(5e6)
 convergence_threshold = Int(1e5)
 # Scale up to 500,000, implement stop after convergence signal!
