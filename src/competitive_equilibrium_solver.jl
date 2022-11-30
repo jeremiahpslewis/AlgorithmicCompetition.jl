@@ -1,0 +1,86 @@
+# Parameters from pg 3374 Calvano 2020
+
+
+struct CompetitionParameters
+    μ::Float64
+    a_0::Float64
+    a::Array{Float64, 1}
+    c::Array{Float64, 1}
+    n_firms::Int64
+end
+
+function q_fun(p_1, p_2, params::CompetitionParameters)
+    p = [0, p_1, p_2]
+
+    # Logit demand function from pg 3372 Calvano 2020
+    q_ = softmax((params.a .- params.p) / params.μ)
+end
+
+function π_fun(p_1, p_2, params::CompetitionParameters)
+    p = [0, p_1, p_2]
+
+    # Returns profit due to p_1
+    q_ 	= q_fun(p_1, p_2)
+    π_ = (p[2:3] - params.c) .* q_[2:3]
+    return π_
+end
+
+function p_BR(p_minus_i_, params::CompetitionParameters)
+    # Best response Bertrand price
+    model = Model(Ipopt.Optimizer)
+    register(model, :π_i, 2, π_i, autodiff=true)
+    @variable(model, p_minus_i)
+    @variable(model, p_i)
+    @constraint(model, p_minus_i == p_minus_i_)
+    @NLobjective(model, Max, π_i(p_i, p_minus_i, params))
+
+    optimize!(model)
+
+    return value(p_i)
+end
+
+π_i(p_i, p_minus_i, params::CompetitionParameters) = π_fun(p_i, p_minus_i, params::CompetitionParameters)[1]
+π_bertrand(p_1, params::CompetitionParameters) = π_fun(p_1, p_BR(p_1), params::CompetitionParameters)[1]
+π_monop(p_1, p_2, params::CompetitionParameters) = sum(π_fun(p_1, p_2, params::CompetitionParameters)) / 2 # per-firm
+
+function solve_monopolist(params::CompetitionParameters)
+    model = Model(Ipopt.Optimizer)
+    register(model, :π_monop, 2, π_monop, autodiff=true)
+    @variable(model, p[i = 1:params.n_firms])
+    @NLobjective(model, Max, π_monop(p[1], p[2], params))
+
+    optimize!(model)
+
+    return model, p
+end
+
+function solve_bertrand(params::CompetitionParameters)
+    model = Model(Ipopt.Optimizer)
+    register(model, :π_i, 2, π_i, autodiff=true)
+
+    @variable(model, p_i)
+    @NLparameter(model, p_min_i[i = 1:(params.n_firms-1)] == 1)
+    @NLobjective(model, Max, π_i(p_i, p_min_i[1], params::CompetitionParameters))
+
+    optimize!(model)
+    i = 0
+    while !isapprox(value(p_i), value(p_min_i[1]))
+        i += 1
+        set_value(p_min_i[1], value(p_i))
+        optimize!(model)
+    end
+
+    return model, [p_i, p_min_i...], i
+end
+
+function Q_0_i(p, p_vect, δ)
+    @chain p begin
+        π_i.(_, price_options)
+        mean()
+        _ / (1-δ)
+    end
+end
+
+function Q_0(p_vect, δ)
+    Q_0_i.(p_vect, (p_vect,), δ)
+end
