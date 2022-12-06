@@ -47,10 +47,10 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
     end
 end
 
-function CalvanoHook(env::CalvanoEnv, convergence_check::ConvergenceCheck)
+function CalvanoHook(env::CalvanoEnv)
     MultiAgentHook(
     (
-        p => ComposedHook(TotalRewardPerEpisode(), convergence_check)
+        p => ComposedHook(TotalRewardPerEpisode(), env.params.convergence_check)
         for p in players(env)
     )...
     )

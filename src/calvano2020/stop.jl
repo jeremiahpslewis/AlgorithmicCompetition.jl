@@ -1,9 +1,9 @@
 using ReinforcementLearning
 
-function CalvanoStop(convergence_check::ConvergenceCheck, n_iter::Int, convergence_threshold::Int)
+function CalvanoStop(calvano_params::CalvanoParams)
     ComposedStopCondition(
-        StopAfterEpisode(n_iter),
+        StopAfterEpisode(calvano_params.n_iter),
         StopAfterNoImprovement(
-            () -> convergence_check.convergence_metric,
-        convergence_threshold)
+            () -> calvano_params.convergence_check.convergence_metric,
+            calvano_params.convergence_threshold)
 end
