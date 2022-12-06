@@ -18,7 +18,9 @@ function runCalvano(
         β::Float64,
         δ::Float64,
         price_options::Base.AbstractVecOrTuple{Float64},
-        competition_params::CompetitionParameters,
+        competition_params::CompetitionParameters;
+        max_iter::Int = Int(1e9),
+        convergence_threshold::Int = Int(1e5),
     )
     env = CalvanoEnv(
         α=α,
@@ -27,8 +29,8 @@ function runCalvano(
         n_players=2,
         memory_length=2,
         price_options=price_options,
-        max_iter=Int(1e9),
-        convergence_threshold=Int(1e5),
+        max_iter=max_iter,
+        convergence_threshold=convergence_threshold,
         profit_function=(p_1, p_2) -> π_fun(p_1, p_2, competition_params)
     )
     return runCalvano(env)
