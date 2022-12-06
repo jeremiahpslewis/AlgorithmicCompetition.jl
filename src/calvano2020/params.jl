@@ -1,10 +1,10 @@
-struct CalvanoParams
-    α::Float
-    β::Float
-    δ::Float
+Base.@kwdef mutable struct CalvanoParams
+    α::Float64
+    β::Float64
+    δ::Float64
     n_players::Int
     memory_length::Int
-    price_options::Vector{Float64}
+    price_options::Base.AbstractVecOrTuple{Float64}
     max_iter::Int
     convergence_threshold::Int
     n_prices::Int
@@ -12,7 +12,7 @@ struct CalvanoParams
     convergence_check::ConvergenceCheck
     calvano_init_matrix::Matrix{Float64}
 
-    function CalvanoParams(α::Float, β::Float, δ::Float, n_players::Int, memory_length::Int, price_options::Vector{Float64}, max_iter::Int, convergence_threshold::Int)
+    function CalvanoParams(; α::Float64, β::Float64, δ::Float64, n_players::Int, memory_length::Int, price_options::Base.AbstractVecOrTuple{Float64}, max_iter::Int, convergence_threshold::Int)
         n_prices = length(price_options)
         price_index = 1:n_prices
         convergence_check = ConvergenceCheck(n_state_space=n_prices, n_players=n_players)

@@ -2,13 +2,22 @@ using ReinforcementLearning
 
 Base.@kwdef mutable struct CalvanoEnv <: AbstractEnv
     params::CalvanoParams
-    reward::Tuple{Float64,Float64} = (0.0, 0.0)
+    memory::Array{Int64,2}
+    is_converged::Base.AbstractVecOrTuple{Bool}
+    reward::Tuple{Float64,Float64} = (0.0, 0.0) # Placeholder
     is_done::Bool = false
-    # TODO: add back type signature::Tuple{Array{Union{Int64, Missing}, 2}, Array{Union{Int64, Missing}, 2}}
-    # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
-    memory::Array{Int64, 2} = fill(1, memory_length, n_players) # Randomly assign initial memory
-    is_converged::Vector{Bool} = fill(false, n_players)
+
+    function CalvanoEnv(params::CalvanoParams)
+        # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
+        # TODO: Think about how initial memory should be assigned
+        new(params,
+            fill(1, params.memory_length, params.n_players),
+            ntuple((i) -> false, params.n_players)
+        )
+    end
 end
+
+
 
 function (env::CalvanoEnv)((p_1, p_2))
     # Convert from price indices to price level, compute profit
@@ -28,10 +37,10 @@ end
 RLBase.action_space(env::CalvanoEnv, ::Int) = env.params.price_index # Choice of price
 
 RLBase.action_space(::CalvanoEnv, ::SimultaneousPlayer) =
-Tuple((i, j) for i in env.params.price_index for j in env.params.price_index)
+    Tuple((i, j) for i in env.params.price_index for j in env.params.price_index)
 
 RLBase.legal_action_space(env::CalvanoEnv, p) =
-is_terminated(env) ? () : action_space(env, p)
+    is_terminated(env) ? () : action_space(env, p)
 
 RLBase.action_space(env::CalvanoEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 

@@ -10,9 +10,9 @@ end
 Base.@kwdef mutable struct ConvergenceCheck <: AbstractHook
     n_state_space::Int
     n_players::Int
-       approximator_table__state_argmax::Matrix{Int} = Matrix{Int}(fill(0, n_players, n_state_space))
+    approximator_table__state_argmax::Matrix{Int} = Matrix{Int}(fill(0, n_players, n_state_space))
     # Number of steps where no change has happened to argmax
-       convergence_duration::Vector{Int} = fill(0, n_players)
+    convergence_duration::Vector{Int} = fill(0, n_players)
     convergence_metric::Int = 0
     iterations_until_convergence::Int = 0
 end
@@ -47,7 +47,7 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
     end
 end
 
-function CalvanoHook(env::CalvanoEnv)
+function CalvanoHook(env::AbstractEnv)
     MultiAgentHook(
     (
         p => ComposedHook(TotalRewardPerEpisode(), env.params.convergence_check)

@@ -5,5 +5,6 @@ function CalvanoStop(calvano_params::CalvanoParams)
         StopAfterEpisode(calvano_params.n_iter),
         StopAfterNoImprovement(
             () -> calvano_params.convergence_check.convergence_metric,
-            calvano_params.convergence_threshold)
+            calvano_params.convergence_threshold),
+    )
 end

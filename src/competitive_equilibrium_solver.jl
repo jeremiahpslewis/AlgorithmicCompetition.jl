@@ -1,7 +1,10 @@
 # Parameters from pg 3374 Calvano 2020
+using JuMP
+using Chain
+using Ipopt
+using Flux
 
-
-struct CompetitionParameters
+Base.@kwdef mutable struct CompetitionParameters
     μ::Float64
     a_0::Float64
     a::Array{Float64, 1}
@@ -13,14 +16,14 @@ function q_fun(p_1, p_2, params::CompetitionParameters)
     p = [0, p_1, p_2]
 
     # Logit demand function from pg 3372 Calvano 2020
-    q_ = softmax((params.a .- params.p) / params.μ)
+    q_ = softmax((params.a .- p) / params.μ)
 end
 
 function π_fun(p_1, p_2, params::CompetitionParameters)
     p = [0, p_1, p_2]
 
     # Returns profit due to p_1
-    q_ 	= q_fun(p_1, p_2)
+    q_ 	= q_fun(p_1, p_2, params)
     π_ = (p[2:3] - params.c) .* q_[2:3]
     return π_
 end
@@ -39,28 +42,31 @@ function p_BR(p_minus_i_, params::CompetitionParameters)
     return value(p_i)
 end
 
-π_i(p_i, p_minus_i, params::CompetitionParameters) = π_fun(p_i, p_minus_i, params::CompetitionParameters)[1]
-π_bertrand(p_1, params::CompetitionParameters) = π_fun(p_1, p_BR(p_1), params::CompetitionParameters)[1]
-π_monop(p_1, p_2, params::CompetitionParameters) = sum(π_fun(p_1, p_2, params::CompetitionParameters)) / 2 # per-firm
+π_i(p_i, p_minus_i, params::CompetitionParameters) = π_fun(p_i, p_minus_i, params)[1]
+π_bertrand(p_1, params::CompetitionParameters) = π_fun(p_1, p_BR(p_1), params)[1]
+π_monop(p_1, p_2, params::CompetitionParameters) = sum(π_fun(p_1, p_2, params)) / 2 # per-firm
 
 function solve_monopolist(params::CompetitionParameters)
     model = Model(Ipopt.Optimizer)
-    register(model, :π_monop, 2, π_monop, autodiff=true)
+    π_monop_(p_1, p_2) = π_monop(p_1, p_2, params)
+    register(model, :π_monop, 2, π_monop_, autodiff=true)
     @variable(model, p[i = 1:params.n_firms])
-    @NLobjective(model, Max, π_monop(p[1], p[2], params))
+    @NLobjective(model, Max, π_monop(p[1], p[2]))
 
     optimize!(model)
 
-    return model, p
+    return model, value.(p)
 end
 
 function solve_bertrand(params::CompetitionParameters)
     model = Model(Ipopt.Optimizer)
-    register(model, :π_i, 2, π_i, autodiff=true)
+    π_i_(p_1, p_2) = π_i(p_1, p_2, params)
+
+    register(model, :π_i, 2, π_i_, autodiff=true)
 
     @variable(model, p_i)
     @NLparameter(model, p_min_i[i = 1:(params.n_firms-1)] == 1)
-    @NLobjective(model, Max, π_i(p_i, p_min_i[1], params::CompetitionParameters))
+    @NLobjective(model, Max, π_i_(p_i, p_min_i[1]))
 
     optimize!(model)
     i = 0
@@ -70,7 +76,7 @@ function solve_bertrand(params::CompetitionParameters)
         optimize!(model)
     end
 
-    return model, [p_i, p_min_i...], i
+    return model, value.([p_i, p_min_i...]), i
 end
 
 function Q_0_i(p, p_vect, δ)
