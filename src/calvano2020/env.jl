@@ -21,7 +21,7 @@ end
 
 function (env::CalvanoEnv)((p_1, p_2))
     # Convert from price indices to price level, compute profit
-    env.reward = π_fun(env.params.price_options[p_1], env.params.price_options[p_2]) |> Tuple
+    env.reward = env.params.profit_function(env.params.price_options[p_1], env.params.price_options[p_2]) |> Tuple
 
     env.memory = circshift(env.memory, -1)
     env.memory[end, :] = [p_1, p_2]
