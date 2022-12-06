@@ -1,12 +1,10 @@
 using ReinforcementLearning
 
-function runCalvano(calvano_params::CalvanoParams)
-    env = CalvanoEnv(calvano_params) 
-
+function runCalvano(env::CalvanoEnv)
     calvano_experiment = Experiment(
         policy=CalvanoPolicy(env),
-        env=env |> SequentialEnv,
-        stop_condition=CalvanoStop(env.params),
+        env=SequentialEnv(env),
+        stop_condition=CalvanoStop(env),
         hook=CalvanoHook(env),
     )
     return run(calvano_experiment)
@@ -22,7 +20,7 @@ function runCalvano(
         price_options::Base.AbstractVecOrTuple{Float64},
         competition_params::CompetitionParameters,
     )
-    calvano_params = CalvanoParams(
+    env = CalvanoEnv(
         α=α,
         β=β,
         δ=δ,
@@ -33,5 +31,5 @@ function runCalvano(
         convergence_threshold=Int(1e5),
         profit_function=(p_1, p_2) -> π_fun(p_1, p_2, competition_params)
     )
-    return runCalvano(calvano_params)        
+    return runCalvano(env)
 end

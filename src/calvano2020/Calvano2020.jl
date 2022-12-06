@@ -1,5 +1,4 @@
 include("hooks.jl")
-include("params.jl")
 include("env.jl")
 include("explorer.jl")
 include("policy.jl")

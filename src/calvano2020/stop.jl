@@ -1,10 +1,10 @@
 using ReinforcementLearning
 
-function CalvanoStop(calvano_params::CalvanoParams)
+function CalvanoStop(env::CalvanoEnv)
     ComposedStopCondition(
-        StopAfterEpisode(calvano_params.max_iter),
+        StopAfterEpisode(env.max_iter),
         StopAfterNoImprovement(
-            () -> calvano_params.convergence_check.convergence_metric,
-            calvano_params.convergence_threshold),
+            () -> env.convergence_check.convergence_metric,
+            env.convergence_threshold),
     )
 end

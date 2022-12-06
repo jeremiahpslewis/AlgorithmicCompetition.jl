@@ -7,15 +7,15 @@ CalvanoPolicy(env::CalvanoEnv) = MultiAgentManager(
             learner=TDLearner(;
                 # TabularQApproximator with specified init matrix
                 approximator=TabularApproximator( # Renamed LinearApproximator on master branch
-                    env.params.init_matrix,
-                    Descent(env.params.α)
+                    env.init_matrix,
+                    Descent(env.α)
                 ),
                 # For param info: https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/f97747923c6d7bbc5576f81664ed7b05a2ab8f1e/src/ReinforcementLearningZoo/src/algorithms/tabular/td_learner.jl#L15
                 method=:SARS,
-                γ=env.params.δ,
+                γ=env.δ,
                 n=0,					
             ),
-            explorer=EpsilonGreedyExplorer(1//Int(round(1 / env.params.β))))
+            explorer=EpsilonGreedyExplorer(1//Int(round(1 / env.β))))
         ), trajectory=VectorSARTTrajectory(;
                 state=Int,
                 action=Union{Int, NoOp},
