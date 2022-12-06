@@ -14,7 +14,7 @@ Base.@kwdef mutable struct CalvanoEnv <: AbstractEnv
     convergence_check::ConvergenceCheck
     init_matrix::Matrix{Float64}
     profit_function::Function
-
+    n_state_space::Int
     memory::Array{Int64,2}
     is_converged::Base.AbstractVecOrTuple{Bool}
     reward::Tuple{Float64,Float64} = (0.0, 0.0) # Placeholder
@@ -35,8 +35,10 @@ Base.@kwdef mutable struct CalvanoEnv <: AbstractEnv
         # TODO: Think about how initial memory should be assigned
         n_prices = length(price_options)
         price_index = 1:n_prices
-        convergence_check = ConvergenceCheck(n_state_space=n_prices, n_players=n_players)
-        init_matrix = zeros(n_prices, n_prices)
+        n_state_space = n_prices^(memory_length * n_players)
+        convergence_check = ConvergenceCheck(n_state_space=n_state_space, n_players=n_players)
+        init_matrix = zeros(n_prices, n_state_space)
+
         new(
             α,
             β,
@@ -51,7 +53,7 @@ Base.@kwdef mutable struct CalvanoEnv <: AbstractEnv
             convergence_check,
             init_matrix,
             profit_function,
-
+            n_state_space,
             fill(1, memory_length, n_players), # Memory
             ntuple((i) -> false, n_players), # Is converged
             (0.0, 0.0), # Reward
@@ -90,7 +92,7 @@ RLBase.action_space(env::CalvanoEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 RLBase.reward(env::CalvanoEnv) = env.is_done ? env.reward : (0, 0)
 RLBase.reward(env::CalvanoEnv, p::Int) = reward(env)[p]
 
-RLBase.state_space(::CalvanoEnv, ::Observation, p) = Base.OneTo(n_state_space)
+RLBase.state_space(::CalvanoEnv, ::Observation, p) = Base.OneTo(env.n_state_space)
 
 function RLBase.state(env::CalvanoEnv, ::Observation, p)
     map_memory_to_state(env.memory, env.n_prices)
