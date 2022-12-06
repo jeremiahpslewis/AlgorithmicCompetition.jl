@@ -20,7 +20,7 @@ Base.@kwdef mutable struct CalvanoEnv <: AbstractEnv
     reward::Tuple{Float64,Float64} = (0.0, 0.0) # Placeholder
     is_done::Bool = false
 
-    function CalvanoEnv(
+    function CalvanoEnv(;
         α::Float64,
         β::Float64,
         δ::Float64,
