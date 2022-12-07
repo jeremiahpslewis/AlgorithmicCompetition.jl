@@ -5,6 +5,7 @@ function CalvanoStop(env::CalvanoEnv)
         StopAfterEpisode(env.max_iter),
         StopAfterNoImprovement(
             () -> env.convergence_check.convergence_metric,
-            env.convergence_threshold),
+            env.convergence_threshold,
+        ),
     )
 end

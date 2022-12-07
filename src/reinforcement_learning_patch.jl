@@ -9,7 +9,7 @@ function ReinforcementLearningZoo._update!(
     ::Val{:SARS},
     t::VectorSARTTrajectory,
     ::PreActStage,
-)	
+)
     S = t[:state]
     A = t[:action]
     R = t[:reward]
@@ -18,10 +18,12 @@ function ReinforcementLearningZoo._update!(
 
     if length(R) >= n + 1
         s, a, s′ = S[end-n-1], A[end-n-1], S[end]
-		if !(a isa NoOp)
-	        G = discount_rewards_reduced(@view(R[end-n:end]), γ) + γ^(n + 1) * maximum(Q(s′))
-	        ReinforcementLearning.update!(Q, (s, a) => Q(s, a) - G)
-		end
+        if !(a isa NoOp)
+            G =
+                discount_rewards_reduced(@view(R[end-n:end]), γ) +
+                γ^(n + 1) * maximum(Q(s′))
+            ReinforcementLearning.update!(Q, (s, a) => Q(s, a) - G)
+        end
     end
 end
 
@@ -38,11 +40,11 @@ function ReinforcementLearningZoo._update!(
     n, γ, Q = L.n, L.γ, L.approximator
     G = 0.0
 
-	for i in 1:min(n + 1, length(R))
-		G = R[end-i+1] + γ * G
-		s, a = S[end-i], A[end-i]
-		if !(a isa NoOp)
-			ReinforcementLearning.update!(Q, (s, a) => Q(s, a) - G)
-		end
-	end
+    for i = 1:min(n + 1, length(R))
+        G = R[end-i+1] + γ * G
+        s, a = S[end-i], A[end-i]
+        if !(a isa NoOp)
+            ReinforcementLearning.update!(Q, (s, a) => Q(s, a) - G)
+        end
+    end
 end
