@@ -7,8 +7,8 @@ using Flux
 Base.@kwdef mutable struct CompetitionParameters
     μ::Float64
     a_0::Float64
-    a::Array{Float64, 1}
-    c::Array{Float64, 1}
+    a::Array{Float64,1}
+    c::Array{Float64,1}
     n_firms::Int64
 end
 
@@ -23,7 +23,7 @@ function π_fun(p_1, p_2, params::CompetitionParameters)
     p = [0, p_1, p_2]
 
     # Returns profit due to p_1
-    q_ 	= q_fun(p_1, p_2, params)
+    q_ = q_fun(p_1, p_2, params)
     π_ = (p[2:3] - params.c) .* q_[2:3]
     return π_
 end
@@ -31,7 +31,7 @@ end
 function p_BR(p_minus_i_, params::CompetitionParameters)
     # Best response Bertrand price
     model = Model(Ipopt.Optimizer)
-    register(model, :π_i, 2, π_i, autodiff=true)
+    register(model, :π_i, 2, π_i, autodiff = true)
     @variable(model, p_minus_i)
     @variable(model, p_i)
     @constraint(model, p_minus_i == p_minus_i_)
@@ -49,7 +49,7 @@ end
 function solve_monopolist(params::CompetitionParameters)
     model = Model(Ipopt.Optimizer)
     π_monop_(p_1, p_2) = π_monop(p_1, p_2, params)
-    register(model, :π_monop, 2, π_monop_, autodiff=true)
+    register(model, :π_monop, 2, π_monop_, autodiff = true)
     @variable(model, p[i = 1:params.n_firms])
     @NLobjective(model, Max, π_monop(p[1], p[2]))
 
@@ -62,7 +62,7 @@ function solve_bertrand(params::CompetitionParameters)
     model = Model(Ipopt.Optimizer)
     π_i_(p_1, p_2) = π_i(p_1, p_2, params)
 
-    register(model, :π_i, 2, π_i_, autodiff=true)
+    register(model, :π_i, 2, π_i_, autodiff = true)
 
     @variable(model, p_i)
     @NLparameter(model, p_min_i[i = 1:(params.n_firms-1)] == 1)
@@ -83,7 +83,7 @@ function Q_0_i(p, p_vect, δ)
     @chain p begin
         π_i.(_, price_options)
         mean()
-        _ / (1-δ)
+        _ / (1 - δ)
     end
 end
 

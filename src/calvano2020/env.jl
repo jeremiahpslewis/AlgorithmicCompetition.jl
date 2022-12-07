@@ -30,13 +30,14 @@ Base.@kwdef mutable struct CalvanoEnv <: AbstractEnv
         max_iter::Int,
         convergence_threshold::Int,
         profit_function::Function,
-)
+    )
         # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
         # TODO: Think about how initial memory should be assigned
         n_prices = length(price_options)
         price_index = 1:n_prices
         n_state_space = n_prices^(memory_length * n_players)
-        convergence_check = ConvergenceCheck(n_state_space=n_state_space, n_players=n_players)
+        convergence_check =
+            ConvergenceCheck(n_state_space = n_state_space, n_players = n_players)
         init_matrix = zeros(n_prices, n_state_space)
 
         new(
@@ -66,7 +67,8 @@ end
 
 function (env::CalvanoEnv)((p_1, p_2))
     # Convert from price indices to price level, compute profit
-    env.reward = env.profit_function(env.price_options[p_1], env.price_options[p_2]) |> Tuple
+    env.reward =
+        env.profit_function(env.price_options[p_1], env.price_options[p_2]) |> Tuple
 
     env.memory = circshift(env.memory, -1)
     env.memory[end, :] = [p_1, p_2]
