@@ -13,3 +13,6 @@ JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
 ReinforcementLearning = "158674fc-8238-5cab-b5ba-03dfc80d1318"
 ReinforcementLearningZoo = "d607f57d-ee1e-4ba7-bcf2-7734c1e31854"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+
+[compat]
+DataFrameMacros = "0.4"
