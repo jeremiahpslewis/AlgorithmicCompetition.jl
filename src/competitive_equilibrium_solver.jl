@@ -4,11 +4,11 @@ using Chain
 using Ipopt
 using Flux
 
-Base.@kwdef mutable struct CompetitionParameters
+Base.@kwdef struct CompetitionParameters
     μ::Float64
     a_0::Float64
-    a::Array{Float64,1}
-    c::Array{Float64,1}
+    a::Vector{Float64}
+    c::Vector{Float64}
     n_firms::Int64
 end
 
