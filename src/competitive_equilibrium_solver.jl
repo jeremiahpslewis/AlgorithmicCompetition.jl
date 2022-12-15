@@ -13,12 +13,12 @@ Base.@kwdef struct CompetitionParameters
     n_firms::Int64
 end
 
-function q_fun(p::Vector{Float64}, params::CompetitionParameters)
+function q_fun(p, params::CompetitionParameters)
     # Logit demand function from pg 3372 Calvano 2020
-    q_ = softmax((params.a .- p) / params.μ)
+    q_ = softmax((params.a .- p) ./ params.μ)
 end
 
-function π_fun(p::Vector{Float64}, params::CompetitionParameters)
+function π_fun(p, params::CompetitionParameters)
     # Returns profit due to p_1
     q_ = q_fun(p, params)
     π_ = (p - params.c) .* q_
