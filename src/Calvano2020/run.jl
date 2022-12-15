@@ -2,10 +2,10 @@ using ReinforcementLearning
 
 function setupCalvanoExperiment(env::CalvanoEnv)
     Experiment(
-        policy = CalvanoPolicy(env),
-        env = SequentialEnv(env),
-        stop_condition = CalvanoStop(env),
-        hook = CalvanoHook(env),
+        policy=CalvanoPolicy(env),
+        env=SequentialEnv(env),
+        stop_condition=CalvanoStop(env),
+        hook=CalvanoHook(env),
     )
 end
 
@@ -15,24 +15,24 @@ function setupCalvanoExperiment(
     δ::Float64,
     price_options::Base.AbstractVecOrTuple{Float64},
     competition_params::CompetitionParameters;
-    max_iter::Int = Int(1e9),
-    convergence_threshold::Int = Int(1e5),
+    max_iter::Int=Int(1e9),
+    convergence_threshold::Int=Int(1e5)
 )
     env = CalvanoEnv(
-        α = α,
-        β = β,
-        δ = δ,
-        n_players = 2,
-        memory_length = 2,
-        price_options = price_options,
-        max_iter = max_iter,
-        convergence_threshold = convergence_threshold,
-        profit_function = (p_1, p_2) -> π_fun(p_1, p_2, competition_params),
+        α=α,
+        β=β,
+        δ=δ,
+        n_players=2,
+        memory_length=2,
+        price_options=price_options,
+        max_iter=max_iter,
+        convergence_threshold=convergence_threshold,
+        profit_function=(p_1, p_2) -> π_fun(p_1, p_2, competition_params),
     )
     return setupCalvanoExperiment(env)
 end
 
-runCalvano(env::CalvanoEnv) = setupCalvanoExperiment(env) |> run()
+runCalvano(env::CalvanoEnv) = setupCalvanoExperiment(env) |> run(; describe=false)
 
 # Look into DistributedReinforcementLearning.jl for running grid of experiments
 # Add hook `(hook::YourHook)(::PostExperimentStage, agent, env)` to save profit results!
@@ -43,8 +43,8 @@ function runCalvano(
     δ::Float64,
     price_options::Base.AbstractVecOrTuple{Float64},
     competition_params::CompetitionParameters;
-    max_iter::Int = Int(1e9),
-    convergence_threshold::Int = Int(1e5),
+    max_iter::Int=Int(1e9),
+    convergence_threshold::Int=Int(1e5)
 )
     experiment = setupCalvanoExperiment(
         α,
@@ -52,8 +52,8 @@ function runCalvano(
         δ,
         price_options,
         competition_params,
-        max_iter = max_iter,
-        convergence_threshold = convergence_threshold,
+        max_iter=max_iter,
+        convergence_threshold=convergence_threshold,
     )
-    return run(experiment)
+    return run(experiment; describe=false)
 end
