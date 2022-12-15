@@ -16,7 +16,7 @@ CalvanoPolicy(env::CalvanoEnv) = MultiAgentManager(
                         γ = env.δ,
                         n = 0,
                     ),
-                    explorer = EpsilonGreedyExplorer(1 // Int(round(1 / env.β))),
+                    explorer = EpsilonGreedyExplorer(Int(round(1 / env.β))),
                 ),
             ),
             trajectory = VectorSARTTrajectory(;
