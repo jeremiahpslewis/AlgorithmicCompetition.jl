@@ -59,9 +59,9 @@ function solve_monopolist(params::CompetitionParameters)
 end
 
 function solve_bertrand(params::CompetitionParameters)
-    model = Model(Ipopt.Optimizer)
     π_i_(p_1, p_2) = π_i(p_1, p_2, params)
 
+    model = Model(Ipopt.Optimizer)
     register(model, :π_i, 2, π_i_, autodiff = true)
 
     @variable(model, p_i)
