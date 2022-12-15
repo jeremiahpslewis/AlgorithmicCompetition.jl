@@ -3,6 +3,7 @@ using JuMP
 using Chain
 using Ipopt
 using Flux
+using StaticArrays
 
 Base.@kwdef struct CompetitionParameters
     μ::Float64
@@ -12,19 +13,15 @@ Base.@kwdef struct CompetitionParameters
     n_firms::Int64
 end
 
-function q_fun(p_1, p_2, params::CompetitionParameters)
-    p = [0, p_1, p_2]
-
+function q_fun(p::Vector{Float64}, params::CompetitionParameters)
     # Logit demand function from pg 3372 Calvano 2020
     q_ = softmax((params.a .- p) / params.μ)
 end
 
-function π_fun(p_1, p_2, params::CompetitionParameters)
-    p = [0, p_1, p_2]
-
+function π_fun(p::Vector{Float64}, params::CompetitionParameters)
     # Returns profit due to p_1
-    q_ = q_fun(p_1, p_2, params)
-    π_ = (p[2:3] - params.c) .* q_[2:3]
+    q_ = q_fun(p, params)
+    π_ = (p - params.c) .* q_
     return π_
 end
 
@@ -42,9 +39,9 @@ function p_BR(p_minus_i_, params::CompetitionParameters)
     return value(p_i)
 end
 
-π_i(p_i, p_minus_i, params::CompetitionParameters) = π_fun(p_i, p_minus_i, params)[1]
-π_bertrand(p_1, params::CompetitionParameters) = π_fun(p_1, p_BR(p_1), params)[1]
-π_monop(p_1, p_2, params::CompetitionParameters) = sum(π_fun(p_1, p_2, params)) / 2 # per-firm
+π_i(p_i, p_minus_i, params::CompetitionParameters) = π_fun(SA[p_i, p_minus_i], params)[1]
+π_bertrand(p_1, params::CompetitionParameters) = π_fun(SA[p_1, p_BR(p_1)], params)[1]
+π_monop(p_1, p_2, params::CompetitionParameters) = sum(π_fun(SA[p_1, p_2], params)) / 2 # per-firm
 
 function solve_monopolist(params::CompetitionParameters)
     model = Model(Ipopt.Optimizer)
