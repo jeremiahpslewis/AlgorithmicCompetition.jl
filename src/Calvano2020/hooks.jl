@@ -52,7 +52,7 @@ function CalvanoHook(env::AbstractEnv)
     MultiAgentHook(
         (
             p => ComposedHook(
-                TotalRewardPerEpisode(;is_display_on_exit=false)),
+                TotalRewardPerEpisode(;is_display_on_exit=false),
                 env.convergence_check
                 ) for
             p in players(env)
