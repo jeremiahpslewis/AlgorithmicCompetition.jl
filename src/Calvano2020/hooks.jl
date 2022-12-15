@@ -1,6 +1,6 @@
 using ReinforcementLearning
 
-function _convergence_check(q_table::Matrix{Float64}, convergence_table::Vector, state::Int)
+function _convergence_check(q_table::Matrix{Float64}, convergence_table::SubArray{Int64}, state::Int)
     best_action = argmax(q_table[:, state])
     is_converged = convergence_table[state] == best_action
 
@@ -26,7 +26,7 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
     # Only update best action for the state space which was played
     if policy.policy.name == current_player_id
         q_table = policy.policy.policy.learner.approximator.table
-        convergence_table = h.approximator_table__state_argmax[current_player_id, :]
+        convergence_table = @view h.approximator_table__state_argmax[current_player_id, :]
         state = RLBase.state(env)
         best_action, is_converged = _convergence_check(q_table, convergence_table, state)
 

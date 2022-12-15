@@ -1,4 +1,5 @@
 using ReinforcementLearning
+using StaticArrays
 
 Base.@kwdef mutable struct CalvanoEnv <: AbstractEnv
     α::Float64
@@ -55,7 +56,7 @@ Base.@kwdef mutable struct CalvanoEnv <: AbstractEnv
             init_matrix,
             profit_function,
             n_state_space,
-            @SMatrix fill(1, memory_length, n_players), # Memory
+            (@SMatrix fill(1, memory_length, n_players)), # Memory
             ntuple((i) -> false, n_players), # Is converged
             (0.0, 0.0), # Reward
             false, # Is done
@@ -68,7 +69,7 @@ end
 function (env::CalvanoEnv)((p_1, p_2))
     # Convert from price indices to price level, compute profit
     env.reward =
-        env.profit_function(env.price_options[p_1], env.price_options[p_2]) |> Tuple
+        env.profit_function(@view env.price_options[p_1], @view env.price_options[p_2]) |> Tuple
 
     env.memory = circshift(env.memory, -1)
     env.memory[end, :] = [p_1, p_2]
