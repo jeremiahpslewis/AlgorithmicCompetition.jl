@@ -10,13 +10,13 @@ struct CalvanoEnv <: AbstractEnv
     price_options::Vector{Float64}
     max_iter::Int
     convergence_threshold::Int
-    n_prices::Int
+    n_prices::UInt8
     price_index::Vector{Int}
     convergence_check::ConvergenceCheck
     init_matrix::Matrix{Float64}
     profit_function::Function
     n_state_space::Int
-    memory::Matrix{Int64}
+    memory::Matrix{UInt8}
     is_converged::Vector{Bool}
     reward::Vector{Float64}
     is_done::Vector
@@ -56,7 +56,7 @@ struct CalvanoEnv <: AbstractEnv
             init_matrix,
             profit_function,
             n_state_space,
-            ones(Int64, memory_length, n_players), # Memory
+            ones(UInt8, memory_length, n_players), # Memory, note max of 256 prices with UInt8
             fill(false, n_players), # Is converged
             [0.0, 0.0], # Reward
             [false], # Is done
