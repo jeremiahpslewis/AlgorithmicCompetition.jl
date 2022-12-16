@@ -4,7 +4,7 @@ function CalvanoStop(env::CalvanoEnv)
     ComposedStopCondition(
         StopAfterEpisode(env.max_iter, is_show_progress=false),
         StopAfterNoImprovement(
-            () -> env.convergence_check.convergence_metric,
+            () -> sum(env.convergence_check.convergence_metric) / 2,
             env.convergence_threshold,
         ),
     )

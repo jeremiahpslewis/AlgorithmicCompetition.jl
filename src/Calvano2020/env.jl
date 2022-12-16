@@ -16,7 +16,7 @@ Base.@kwdef mutable struct CalvanoEnv <: AbstractEnv
     init_matrix::Matrix{Float64}
     profit_function::Function
     n_state_space::Int
-    memory::Array{Int64,2}
+    memory::AbstractMatrix{Int64}
     is_converged::Base.AbstractVecOrTuple{Bool}
     reward::Tuple{Float64,Float64} = (0.0, 0.0) # Placeholder
     is_done::Bool = false
@@ -56,7 +56,7 @@ Base.@kwdef mutable struct CalvanoEnv <: AbstractEnv
             init_matrix,
             profit_function,
             n_state_space,
-            (@SMatrix fill(1, memory_length, n_players)), # Memory
+            (zeros(SMatrix{memory_length,n_players, Int64}) .+ 1), # Memory
             ntuple((i) -> false, n_players), # Is converged
             (0.0, 0.0), # Reward
             false, # Is done

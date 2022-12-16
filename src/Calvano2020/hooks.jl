@@ -7,15 +7,14 @@ function _convergence_check(q_table::Matrix{Float64}, convergence_table::SubArra
     return best_action, is_converged
 end
 
-Base.@kwdef mutable struct ConvergenceCheck <: AbstractHook
+Base.@kwdef struct ConvergenceCheck <: AbstractHook
     n_state_space::Int
     n_players::Int
-    approximator_table__state_argmax::Matrix{Int} =
-        Matrix{Int}(fill(0, n_players, n_state_space))
+    approximator_table__state_argmax::AbstractMatrix{2, Int} = zeros(SMatrix{n_players, n_state_space, Int})
     # Number of steps where no change has happened to argmax
-    convergence_duration::Vector{Int} = fill(0, n_players)
-    convergence_metric::Int = 0
-    iterations_until_convergence::Int = 0
+    convergence_duration::Vector{Int} = zeros(SVector{n_players, Int})
+    convergence_metric::Vector{Int} = zeros(SVector{n_players, Int})
+    iterations_until_convergence::Vector{Int} = zeros(SVector{n_players, Int})
 end
 
 function (h::ConvergenceCheck)(::PostActStage, policy, env)
@@ -34,16 +33,15 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
         # Increment duration whenever argmax action is stable (convergence criteria)
         # Increment convergence metric (e.g. convergence not reached)
         # and update argmax matrix
-        if current_player_id == 1
-            h.iterations_until_convergence += 1
-        end
+        # Keep track of number of iterations it takes until convergence
+        h.iterations_until_convergence[current_player_id] += 1
 
         if is_converged
             h.convergence_duration[current_player_id] += 1
         else
             h.convergence_duration[current_player_id] = 0
             h.approximator_table__state_argmax[current_player_id, state] = best_action
-            h.convergence_metric += 1
+            h.convergence_metric[current_player_id] += 1
         end
     end
 end
@@ -52,7 +50,7 @@ function CalvanoHook(env::AbstractEnv)
     MultiAgentHook(
         (
             p => ComposedHook(
-                TotalRewardPerEpisode(;is_display_on_exit=false),
+                # TotalRewardPerEpisode(;is_display_on_exit=false),
                 env.convergence_check
                 ) for
             p in players(env)
