@@ -12,9 +12,9 @@ struct ConvergenceCheck <: AbstractHook
     n_players::Int
     approximator_table__state_argmax::AbstractMatrix{Int}
     # Number of steps where no change has happened to argmax
-    convergence_duration::Vector{Int}
-    convergence_metric::Vector{Int}
-    iterations_until_convergence::Vector{Int}
+    convergence_duration::AbstractVector{Int}
+    convergence_metric::AbstractVector{Int}
+    iterations_until_convergence::AbstractVector{Int}
 
     function ConvergenceCheck(
         n_state_space::Int,
