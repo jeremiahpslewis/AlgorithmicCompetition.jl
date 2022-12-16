@@ -18,8 +18,8 @@ Base.@kwdef struct CalvanoEnv <: AbstractEnv
     n_state_space::Int
     memory::AbstractMatrix{Int64}
     is_converged::AbstractVector{Bool}
-    reward::AbstractVector{Float64} = SA[0.0, 0.0] # Placeholder
-    is_done::AbstractVector = [false]
+    reward::AbstractVector{Float64}
+    is_done::AbstractVector
 
     function CalvanoEnv(;
         α::Float64,
