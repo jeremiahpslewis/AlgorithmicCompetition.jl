@@ -7,7 +7,7 @@ Base.@kwdef struct CalvanoEnv <: AbstractEnv
     δ::Float64
     n_players::Int
     memory_length::Int
-    price_options::Base.AbstractVecOrTuple{Float64}
+    price_options::Vector{Float64}
     max_iter::Int
     convergence_threshold::Int
     n_prices::Int
@@ -58,8 +58,8 @@ Base.@kwdef struct CalvanoEnv <: AbstractEnv
             n_state_space,
             (@SMatrix ones(Int64, memory_length, n_players)), # Memory
             ntuple((i) -> false, n_players), # Is converged
-            (0.0, 0.0), # Reward
-            false, # Is done
+            SA[0.0, 0.0], # Reward
+            [false], # Is done
         )
     end
 end
