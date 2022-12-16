@@ -19,16 +19,17 @@ function setupCalvanoExperiment(
     convergence_threshold::Int=Int(1e5),
     profit_function=(p_1, p_2) -> π_fun(SA[p_1, p_2], competition_params),
 )
+
     env = CalvanoEnv(
-        α=α,
-        β=β,
-        δ=δ,
-        n_players=2,
-        memory_length=2,
-        price_options=price_options,
-        max_iter=max_iter,
-        convergence_threshold=convergence_threshold,
-        profit_function=profit_function,
+        α,
+        β,
+        δ,
+        2, # n_players
+        2, # memory_length
+        price_options,
+        max_iter,
+        convergence_threshold,
+        profit_function,
     )
     return setupCalvanoExperiment(env)
 end
