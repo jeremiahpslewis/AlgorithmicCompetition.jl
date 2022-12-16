@@ -7,27 +7,27 @@ struct CalvanoEnv <: AbstractEnv
     δ::Float64
     n_players::Int
     memory_length::Int
-    price_options::AbstractVector{Float64}
+    price_options::Vector{Float64}
     max_iter::Int
     convergence_threshold::Int
     n_prices::Int
-    price_index::AbstractVector{Int}
+    price_index::Vector{Int}
     convergence_check::ConvergenceCheck
     init_matrix::Matrix{Float64}
     profit_function::Function
     n_state_space::Int
-    memory::AbstractMatrix{Int64}
-    is_converged::AbstractVector{Bool}
-    reward::AbstractVector{Float64}
-    is_done::AbstractVector
+    memory::Matrix{Int64}
+    is_converged::Vector{Bool}
+    reward::Vector{Float64}
+    is_done::Vector
 
-    function CalvanoEnv(;
+    function CalvanoEnv(
         α::Float64,
         β::Float64,
         δ::Float64,
         n_players::Int,
         memory_length::Int,
-        price_options::AbstractVector{Float64},
+        price_options::Vector{Float64},
         max_iter::Int,
         convergence_threshold::Int,
         profit_function::Function,
