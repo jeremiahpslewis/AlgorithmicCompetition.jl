@@ -10,7 +10,7 @@ end
 Base.@kwdef struct ConvergenceCheck <: AbstractHook
     n_state_space::Int
     n_players::Int
-    approximator_table__state_argmax::AbstractMatrix{2, Int} = zeros(SMatrix{n_players, n_state_space, Int})
+    approximator_table__state_argmax::AbstractMatrix{Int} = (@SMatrix zeros(Int, n_players, n_state_space))
     # Number of steps where no change has happened to argmax
     convergence_duration::Vector{Int} = zeros(SVector{n_players, Int})
     convergence_metric::Vector{Int} = zeros(SVector{n_players, Int})

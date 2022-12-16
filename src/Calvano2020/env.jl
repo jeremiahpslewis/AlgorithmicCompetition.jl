@@ -56,7 +56,7 @@ Base.@kwdef mutable struct CalvanoEnv <: AbstractEnv
             init_matrix,
             profit_function,
             n_state_space,
-            (zeros(SMatrix{memory_length,n_players, Int64}) .+ 1), # Memory
+            (@SMatrix ones(Int64, memory_length, n_players)), # Memory
             ntuple((i) -> false, n_players), # Is converged
             (0.0, 0.0), # Reward
             false, # Is done
