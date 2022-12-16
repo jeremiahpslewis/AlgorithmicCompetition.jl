@@ -1,7 +1,7 @@
 using ReinforcementLearning
 using StaticArrays
 
-Base.@kwdef struct CalvanoEnv <: AbstractEnv
+struct CalvanoEnv <: AbstractEnv
     α::Float64
     β::Float64
     δ::Float64
@@ -27,7 +27,7 @@ Base.@kwdef struct CalvanoEnv <: AbstractEnv
         δ::Float64,
         n_players::Int,
         memory_length::Int,
-        price_options::Base.AbstractVecOrTuple{Float64},
+        price_options::Vector{Float64},
         max_iter::Int,
         convergence_threshold::Int,
         profit_function::Function,
@@ -57,7 +57,7 @@ Base.@kwdef struct CalvanoEnv <: AbstractEnv
             profit_function,
             n_state_space,
             (@SMatrix ones(Int64, memory_length, n_players)), # Memory
-            ntuple((i) -> false, n_players), # Is converged
+            (@SVector fill(false, n_players)), # Is converged
             SA[0.0, 0.0], # Reward
             [false], # Is done
         )
@@ -69,7 +69,7 @@ end
 function (env::CalvanoEnv)((p_1, p_2))
     # Convert from price indices to price level, compute profit
     env.reward =
-        env.profit_function(env.price_options[p_1], env.price_options[p_2]) |> Tuple
+        env.profit_function(SA[env.price_options[p_1], env.price_options[p_2]])
 
     env.memory = circshift(env.memory, -1)
     env.memory[end, :] = [p_1, p_2]

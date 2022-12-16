@@ -13,7 +13,7 @@ function setupCalvanoExperiment(
     α::Float64,
     β::Float64,
     δ::Float64,
-    price_options::Base.AbstractVecOrTuple{Float64},
+    price_options::AbstractVector{Float64},
     competition_params::CompetitionParameters;
     max_iter::Int=Int(1e9),
     convergence_threshold::Int=Int(1e5),
@@ -42,7 +42,7 @@ function runCalvano(
     α::Float64,
     β::Float64,
     δ::Float64,
-    price_options::Base.AbstractVecOrTuple{Float64},
+    price_options::AbstractVector{Float64},
     competition_params::CompetitionParameters;
     max_iter::Int=Int(1e9),
     convergence_threshold::Int=Int(1e5),
