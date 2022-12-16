@@ -8,8 +8,8 @@ using StaticArrays
 Base.@kwdef struct CompetitionParameters
     μ::Float64
     a_0::Float64
-    a::Vector{Float64}
-    c::Vector{Float64}
+    a::AbstractVector{Float64}
+    c::AbstractVector{Float64}
     n_firms::Int64
 end
 
