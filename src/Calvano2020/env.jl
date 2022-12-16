@@ -38,7 +38,7 @@ Base.@kwdef struct CalvanoEnv <: AbstractEnv
         price_index = 1:n_prices
         n_state_space = n_prices^(memory_length * n_players)
         convergence_check =
-            ConvergenceCheck(n_state_space = n_state_space, n_players = n_players)
+            ConvergenceCheck(n_state_space, n_players)
         init_matrix = zeros(n_prices, n_state_space)
 
         new(

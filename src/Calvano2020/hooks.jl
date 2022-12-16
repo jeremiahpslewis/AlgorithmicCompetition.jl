@@ -7,7 +7,7 @@ function _convergence_check(q_table::Matrix{Float64}, convergence_table::SubArra
     return best_action, is_converged
 end
 
-Base.@kwdef struct ConvergenceCheck <: AbstractHook
+struct ConvergenceCheck <: AbstractHook
     n_state_space::Int
     n_players::Int
     approximator_table__state_argmax::AbstractMatrix{Int}
