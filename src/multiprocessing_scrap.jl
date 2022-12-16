@@ -1,6 +1,12 @@
 using Distributed
 using ParallelDataTransfer
+
 addprocs(6, topology=:master_worker, exeflags=["--threads=1", "--project=$(Base.active_project())"])
+
+@everywhere begin
+    using Pkg; Pkg.instantiate()
+    using AlgorithmicCompetition   
+end
 
 α = 0.125
 β = 1e-5
@@ -19,16 +25,13 @@ p_monop_opt = AlgorithmicCompetition.solve_monopolist(competition_params)[2][1]
 
 # p_monop defined above
 p_range_pad = ξ * (p_monop_opt - p_Bert_nash_equilibrium)
-price_options = range(p_Bert_nash_equilibrium, p_monop_opt, n_prices) |> Tuple
+price_options = range(p_Bert_nash_equilibrium, p_monop_opt, n_prices)
 profit_function = (p_1, p_2) -> π_fun(p_1, p_2, competition_params)
 
 # Transfer Data to Workers
 sendto(workers(), α=α, β=β, δ=δ, price_options=price_options, competition_params=competition_params, profit_function=profit_function)
 
-@everywhere begin
-    using Pkg; Pkg.instantiate()
-    using AlgorithmicCompetition   
-end
+
 
 function pmap_experiments(n)
     status = pmap(1:n) do i
