@@ -53,8 +53,8 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
         if is_converged
             h.convergence_duration[current_player_id] += 1
         else
-            h.convergence_duration[current_player_id] = 0
-            h.approximator_table__state_argmax[current_player_id, state] = best_action
+            h.convergence_duration[current_player_id] .= 0
+            h.approximator_table__state_argmax[current_player_id, state] .= best_action
             h.convergence_metric[current_player_id] += 1
         end
     end
