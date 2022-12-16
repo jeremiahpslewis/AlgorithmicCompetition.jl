@@ -18,7 +18,7 @@ struct CalvanoEnv <: AbstractEnv
     n_state_space::Int
     memory::Matrix{Int64}
     is_converged::Vector{Bool}
-    reward::Tuple{Float64, Float64}
+    reward::Vector{Float64}
     is_done::Vector
 
     function CalvanoEnv(
@@ -58,7 +58,7 @@ struct CalvanoEnv <: AbstractEnv
             n_state_space,
             ones(Int64, memory_length, n_players), # Memory
             fill(false, n_players), # Is converged
-            (0.0, 0.0), # Reward
+            [0.0, 0.0], # Reward
             [false], # Is done
         )
     end
@@ -66,11 +66,10 @@ end
 
 function (env::CalvanoEnv)((p_1, p_2))
     # Convert from price indices to price level, compute profit
-    env.reward =
-        env.profit_function([env.price_options[p_1], env.price_options[p_2]]) |> Tuple
+    env.reward .= env.profit_function([env.price_options[p_1], env.price_options[p_2]])
 
-    env.memory = circshift(env.memory, -1)
-    env.memory[end, :] = [p_1, p_2]
+    env.memory .= circshift(env.memory, -1)
+    env.memory[end, :] .= [p_1, p_2]
 
     env.is_done[1] = true
 end
@@ -90,7 +89,7 @@ RLBase.legal_action_space(env::CalvanoEnv, p) =
 
 RLBase.action_space(env::CalvanoEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
-RLBase.reward(env::CalvanoEnv) = env.is_done[1] ? env.reward : (0, 0)
+RLBase.reward(env::CalvanoEnv) = env.is_done[1] ? env.reward : [0, 0]
 RLBase.reward(env::CalvanoEnv, p::Int) = reward(env)[p]
 
 RLBase.state_space(::CalvanoEnv, ::Observation, p) = Base.OneTo(env.n_state_space)
