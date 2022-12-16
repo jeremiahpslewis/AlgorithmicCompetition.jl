@@ -1,7 +1,7 @@
 using ReinforcementLearning
 using StaticArrays
 
-Base.@kwdef mutable struct CalvanoEnv <: AbstractEnv
+Base.@kwdef struct CalvanoEnv <: AbstractEnv
     α::Float64
     β::Float64
     δ::Float64
@@ -17,9 +17,9 @@ Base.@kwdef mutable struct CalvanoEnv <: AbstractEnv
     profit_function::Function
     n_state_space::Int
     memory::AbstractMatrix{Int64}
-    is_converged::Base.AbstractVecOrTuple{Bool}
-    reward::Tuple{Float64,Float64} = (0.0, 0.0) # Placeholder
-    is_done::Bool = false
+    is_converged::AbstractVector{Bool}
+    reward::AbstractVector{Float64} = SA[0.0, 0.0] # Placeholder
+    is_done::AbstractVector = [false]
 
     function CalvanoEnv(;
         α::Float64,
@@ -74,7 +74,7 @@ function (env::CalvanoEnv)((p_1, p_2))
     env.memory = circshift(env.memory, -1)
     env.memory[end, :] = [p_1, p_2]
 
-    env.is_done = true
+    env.is_done[1] = true
 end
 
 function map_memory_to_state(v, n_prices)
@@ -92,7 +92,7 @@ RLBase.legal_action_space(env::CalvanoEnv, p) =
 
 RLBase.action_space(env::CalvanoEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
-RLBase.reward(env::CalvanoEnv) = env.is_done ? env.reward : (0, 0)
+RLBase.reward(env::CalvanoEnv) = env.is_done[1] ? env.reward : (0, 0)
 RLBase.reward(env::CalvanoEnv, p::Int) = reward(env)[p]
 
 RLBase.state_space(::CalvanoEnv, ::Observation, p) = Base.OneTo(env.n_state_space)
@@ -101,9 +101,9 @@ function RLBase.state(env::CalvanoEnv, ::Observation, p)
     map_memory_to_state(env.memory, env.n_prices)
 end
 
-RLBase.is_terminated(env::CalvanoEnv) = env.is_done
+RLBase.is_terminated(env::CalvanoEnv) = env.is_done[1]
 # TODO: Expand reset function to other params
-RLBase.reset!(env::CalvanoEnv) = env.is_done = false
+RLBase.reset!(env::CalvanoEnv) = env.is_done[1] = false
 RLBase.players(::CalvanoEnv) = (1, 2)
 RLBase.current_player(::CalvanoEnv) = SIMULTANEOUS_PLAYER
 RLBase.NumAgentStyle(::CalvanoEnv) = MultiAgent(2)
