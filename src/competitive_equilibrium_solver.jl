@@ -39,9 +39,9 @@ function p_BR(p_minus_i_, params::CompetitionParameters)
     return value(p_i)
 end
 
-π_i(p_i, p_minus_i, params::CompetitionParameters) = π_fun(SA[p_i, p_minus_i], params)[1]
-π_bertrand(p_1, params::CompetitionParameters) = π_fun(SA[p_1, p_BR(p_1)], params)[1]
-π_monop(p_1, p_2, params::CompetitionParameters) = sum(π_fun(SA[p_1, p_2], params)) / 2 # per-firm
+π_i(p_i, p_minus_i, params::CompetitionParameters) = π_fun([p_i, p_minus_i], params)[1]
+π_bertrand(p_1, params::CompetitionParameters) = π_fun([p_1, p_BR(p_1)], params)[1]
+π_monop(p_1, p_2, params::CompetitionParameters) = sum(π_fun([p_1, p_2], params)) / 2 # per-firm
 
 function solve_monopolist(params::CompetitionParameters)
     model = Model(Ipopt.Optimizer)

@@ -47,7 +47,7 @@ function runCalvano(
     competition_params::CompetitionParameters;
     max_iter::Int=Int(1e9),
     convergence_threshold::Int=Int(1e5),
-    profit_function=(p_1, p_2) -> π_fun(SA[p_1, p_2], competition_params)
+    profit_function=(p_1, p_2) -> π_fun([p_1, p_2], competition_params)
 )
     experiment = setupCalvanoExperiment(
         α,

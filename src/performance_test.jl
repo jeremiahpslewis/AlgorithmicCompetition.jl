@@ -24,7 +24,7 @@ p_monop_opt = AlgorithmicCompetition.solve_monopolist(competition_params)[2][1]
 
 # p_monop defined above
 p_range_pad = ξ * (p_monop_opt - p_Bert_nash_equilibrium)
-price_options = [range(p_Bert_nash_equilibrium, p_monop_opt, n_prices)...]# SVector(_...)
+price_options = [range(p_Bert_nash_equilibrium, p_monop_opt, n_prices)...]
 
 # AlgorithmicCompetition.runCalvano(α, β, δ, price_options, competition_params, max_iter=1000)
 

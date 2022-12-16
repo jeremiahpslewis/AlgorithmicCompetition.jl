@@ -23,10 +23,10 @@ struct ConvergenceCheck <: AbstractHook
         new(
             n_state_space,
             n_players,
-            (@SMatrix zeros(Int, n_players, n_state_space)),
-            zeros(SVector{n_players, Int}),
-            zeros(SVector{n_players, Int}),
-            zeros(SVector{n_players, Int}),
+            zeros(Int, n_players, n_state_space),
+            zeros(n_players),
+            zeros(n_players),
+            zeros(n_players),
     )
     end
 end

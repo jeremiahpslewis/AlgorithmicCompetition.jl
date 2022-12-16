@@ -56,9 +56,9 @@ struct CalvanoEnv <: AbstractEnv
             init_matrix,
             profit_function,
             n_state_space,
-            (@SMatrix ones(Int64, memory_length, n_players)), # Memory
-            (@SVector fill(false, n_players)), # Is converged
-            SA[0.0, 0.0], # Reward
+            ones(Int64, memory_length, n_players), # Memory
+            fill(false, n_players), # Is converged
+            [0.0, 0.0], # Reward
             [false], # Is done
         )
     end
@@ -69,7 +69,7 @@ end
 function (env::CalvanoEnv)((p_1, p_2))
     # Convert from price indices to price level, compute profit
     env.reward =
-        env.profit_function(SA[env.price_options[p_1], env.price_options[p_2]])
+        env.profit_function([env.price_options[p_1], env.price_options[p_2]])
 
     env.memory = circshift(env.memory, -1)
     env.memory[end, :] = [p_1, p_2]
