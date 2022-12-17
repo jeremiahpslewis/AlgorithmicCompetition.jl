@@ -1,6 +1,6 @@
 using ReinforcementLearning
 
-function _convergence_check(q_table::Matrix{Float64}, convergence_table::SubArray{UInt8}, state::Int)
+function _convergence_check(q_table::Matrix{Float32}, convergence_table::SubArray{UInt8}, state::Int)
     best_action = argmax(q_table[:, state])
     is_converged = convergence_table[state] == best_action
 

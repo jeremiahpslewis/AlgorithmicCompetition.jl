@@ -10,7 +10,7 @@ Base.@kwdef struct CompetitionParameters
     a_0::Float64
     a::Vector{Float64}
     c::Vector{Float64}
-    n_firms::Int64
+    n_firms::UInt8
 end
 
 function q_fun(p, params::CompetitionParameters)

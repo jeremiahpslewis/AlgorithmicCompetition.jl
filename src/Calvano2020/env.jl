@@ -13,7 +13,7 @@ struct CalvanoEnv <: AbstractEnv
     n_prices::UInt8
     price_index::Vector{Int}
     convergence_check::ConvergenceCheck
-    init_matrix::Matrix{Float64}
+    init_matrix::Matrix{Float32}
     profit_function::Function
     n_state_space::UInt16
     memory::Matrix{UInt16}
@@ -39,7 +39,7 @@ struct CalvanoEnv <: AbstractEnv
         n_state_space = n_prices^(memory_length * n_players)
         convergence_check =
             ConvergenceCheck(n_state_space, n_players)
-        init_matrix = zeros(n_prices, n_state_space)
+        init_matrix = zeros(Float32, n_prices, n_state_space)
 
         new(
             α,
