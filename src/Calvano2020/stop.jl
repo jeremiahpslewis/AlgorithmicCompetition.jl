@@ -3,8 +3,9 @@ using ReinforcementLearning
 function CalvanoStop(env::CalvanoEnv)
     ComposedStopCondition(
         StopAfterEpisode(env.max_iter, is_show_progress=false),
+        # TODO: For n_players > 3
         StopAfterNoImprovement(
-            () -> sum(env.convergence_check.convergence_metric) / 2,
+            () -> env.convergence_check.convergence_meta_tuple[1].convergence_metric + env.convergence_check.convergence_meta_tuple[2].convergence_metric,
             env.convergence_threshold,
         ),
     )

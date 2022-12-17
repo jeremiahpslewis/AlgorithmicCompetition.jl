@@ -33,7 +33,7 @@ struct ConvergenceCheck <: AbstractHook
     end
 end
 
-function update_convergence_meta(
+function calculate_convergence_meta(
     c_meta::ConvergenceMeta,
     q_table::Matrix{Float32},
     convergence_table::SubArray{UInt8},
@@ -50,7 +50,7 @@ function update_convergence_meta(
     convergence_duration = is_converged ? c_meta.convergence_duration + 1 : 0
     convergence_metric = is_converged ? c_meta.convergence_metric : c_meta.convergence_metric + 1
 
-    return ConvergenceMeta(convergence_duration, convergence_metric, iterations_until_convergence), is_converged
+    return ConvergenceMeta(convergence_duration, convergence_metric, iterations_until_convergence), is_converged, best_action
 
 end
 
@@ -67,12 +67,14 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
     convergence_table = @view h.approximator_table__state_argmax[current_player_id, :]
     state = RLBase.state(env)
     
-    c_meta, is_converged = update_convergence_meta(
+    c_meta, is_converged, best_action = calculate_convergence_meta(
         h.convergence_meta_tuple[current_player_id],
         q_table,
         convergence_table,
         state
     )
+
+    h.convergence_meta_tuple[current_player_id] = c_meta
 
     # Update argmax matrix
     if ~is_converged
