@@ -5,8 +5,8 @@ struct CalvanoEnv <: AbstractEnv
     α::Float64
     β::Float64
     δ::Float64
-    n_players::Int
-    memory_length::Int
+    n_players::UInt8
+    memory_length::UInt8
     price_options::Vector{Float64}
     max_iter::Int
     convergence_threshold::Int
@@ -15,8 +15,8 @@ struct CalvanoEnv <: AbstractEnv
     convergence_check::ConvergenceCheck
     init_matrix::Matrix{Float64}
     profit_function::Function
-    n_state_space::Int
-    memory::Matrix{UInt8}
+    n_state_space::UInt16
+    memory::Matrix{UInt16}
     is_converged::Vector{Bool}
     reward::Vector{Float64}
     is_done::Vector
@@ -30,7 +30,7 @@ struct CalvanoEnv <: AbstractEnv
         price_options::Vector{Float64},
         max_iter::Int,
         convergence_threshold::Int,
-        profit_function::Function,
+        profit_function,
     )
         # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
         # TODO: Think about how initial memory should be assigned
@@ -46,17 +46,17 @@ struct CalvanoEnv <: AbstractEnv
             β,
             δ,
             n_players,
-            memory_length,
-            (@SVector price_options),
+            convert(UInt8, memory_length),
+            price_options,
             max_iter,
             convergence_threshold,
-            n_prices,
+            convert(UInt32, n_prices),
             price_index,
             convergence_check,
             init_matrix,
             profit_function,
-            n_state_space,
-            ones(UInt8, memory_length, n_players), # Memory, note max of 256 prices with UInt8
+            convert(UInt16, n_state_space),
+            ones(UInt16, memory_length, n_players), # Memory, note max of 256 prices with UInt8
             fill(false, n_players), # Is converged
             [0.0, 0.0], # Reward
             [false], # Is done

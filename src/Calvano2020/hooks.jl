@@ -1,6 +1,6 @@
 using ReinforcementLearning
 
-function _convergence_check(q_table::Matrix{Float64}, convergence_table::SubArray{Int64}, state::Int)
+function _convergence_check(q_table::Matrix{Float64}, convergence_table::SubArray{UInt8}, state::Int)
     best_action = argmax(q_table[:, state])
     is_converged = convergence_table[state] == best_action
 
@@ -8,9 +8,9 @@ function _convergence_check(q_table::Matrix{Float64}, convergence_table::SubArra
 end
 
 struct ConvergenceCheck <: AbstractHook
-    n_state_space::Int
-    n_players::Int
-    approximator_table__state_argmax::Matrix{Int}
+    n_state_space::UInt16
+    n_players::UInt8
+    approximator_table__state_argmax::Matrix{UInt8}
     # Number of steps where no change has happened to argmax
     convergence_duration::Vector{Int}
     convergence_metric::Vector{Int}
@@ -21,9 +21,9 @@ struct ConvergenceCheck <: AbstractHook
         n_players::Int,
     )
         new(
-            n_state_space,
-            n_players,
-            zeros(Int, n_players, n_state_space),
+            convert(UInt16, n_state_space),
+            convert(UInt8, n_players),
+            zeros(UInt8, n_players, n_state_space),
             zeros(n_players),
             zeros(n_players),
             zeros(n_players),
