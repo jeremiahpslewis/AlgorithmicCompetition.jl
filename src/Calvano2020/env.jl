@@ -47,7 +47,7 @@ struct CalvanoEnv <: AbstractEnv
             δ,
             n_players,
             memory_length,
-            price_options,
+            (@SVector price_options),
             max_iter,
             convergence_threshold,
             n_prices,
