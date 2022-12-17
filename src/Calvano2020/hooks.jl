@@ -18,7 +18,7 @@ struct ConvergenceCheck <: AbstractHook
     n_players::UInt8
     approximator_table__state_argmax::Matrix{UInt8}
     # Number of steps where no change has happened to argmax
-    convergence_meta_tuple::Vector[ConvergenceMeta])
+    convergence_meta_tuple::Vector{ConvergenceMeta}
 
     function ConvergenceCheck(
         n_state_space::Int,
@@ -75,7 +75,9 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
     )
 
     # Update argmax matrix
-    is_converged && h.approximator_table__state_argmax[current_player_id, state] = best_action
+    if is_converged
+        h.approximator_table__state_argmax[current_player_id, state] = best_action
+    end
     return
 
 end

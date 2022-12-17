@@ -59,5 +59,6 @@ using BenchmarkTools
 # 15.725 ms (185835 allocations: 16.63 MiB)
 # 15.130 ms (185794 allocations: 15.40 MiB) # UInt8
 # 15.456 ms (185787 allocations: 12.41 MiB)
+# 15.283 ms (185782 allocations: 12.41 MiB)
 # TODO:
 # - [ ] Figure out why n_state_space is 5k not ~200
