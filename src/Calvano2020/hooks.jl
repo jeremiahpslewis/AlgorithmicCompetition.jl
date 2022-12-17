@@ -75,7 +75,7 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
     )
 
     # Update argmax matrix
-    if is_converged
+    if ~is_converged
         h.approximator_table__state_argmax[current_player_id, state] = best_action
     end
     return
