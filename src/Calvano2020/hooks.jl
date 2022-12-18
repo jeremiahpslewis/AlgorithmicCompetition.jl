@@ -8,14 +8,12 @@ function _convergence_check(q_table::Matrix{Float32}, convergence_table::SubArra
 end
 
 struct ConvergenceMeta
-    convergence_duration::UInt16
-    convergence_metric::UInt16
-    iterations_until_convergence::UInt16
+    convergence_duration::UInt32
+    convergence_metric::UInt32
+    iterations_until_convergence::UInt32
 end
 
 struct ConvergenceCheck <: AbstractHook
-    n_state_space::UInt16
-    n_players::UInt8
     approximator_table__state_argmax::Matrix{UInt8}
     # Number of steps where no change has happened to argmax
     convergence_meta_tuple::Vector{ConvergenceMeta}
