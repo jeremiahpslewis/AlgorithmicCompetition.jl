@@ -1,6 +1,10 @@
 using ReinforcementLearning
 
-function _convergence_check(q_table::Matrix{Float32}, convergence_table::SubArray{UInt8}, state::Int)
+function _convergence_check(
+    q_table::Matrix{Float32},
+    convergence_table::SubArray{UInt8},
+    state::Int,
+)
     best_action = argmax(q_table[:, state])
     is_converged = convergence_table[state] == best_action
 
@@ -16,10 +20,7 @@ struct ConvergenceCheck <: AbstractHook
     convergence_metric::Vector{UInt16}
     iterations_until_convergence::Vector{UInt16}
 
-    function ConvergenceCheck(
-        n_state_space::Int,
-        n_players::Int,
-    )
+    function ConvergenceCheck(n_state_space::Int, n_players::Int)
         new(
             convert(UInt16, n_state_space),
             convert(UInt8, n_players),
@@ -27,7 +28,7 @@ struct ConvergenceCheck <: AbstractHook
             zeros(UInt16, n_players),
             zeros(UInt16, n_players),
             zeros(UInt16, n_players),
-    )
+        )
     end
 end
 
@@ -61,13 +62,8 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
 end
 
 function CalvanoHook(env::AbstractEnv)
-    MultiAgentHook(
-        (
-            p => ComposedHook(
-                # TotalRewardPerEpisode(;is_display_on_exit=false),
-                env.convergence_check
-                ) for
-            p in players(env)
-        )...,
-    )
+    MultiAgentHook((p => ComposedHook(
+        # TotalRewardPerEpisode(;is_display_on_exit=false),
+        env.convergence_check,
+    ) for p in players(env))...)
 end
