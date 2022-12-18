@@ -2,10 +2,10 @@ using ReinforcementLearning
 
 function setupCalvanoExperiment(env::CalvanoEnv)
     Experiment(
-        policy=CalvanoPolicy(env),
-        env=SequentialEnv(env),
-        stop_condition=CalvanoStop(env),
-        hook=CalvanoHook(env),
+        policy = CalvanoPolicy(env),
+        env = SequentialEnv(env),
+        stop_condition = CalvanoStop(env),
+        hook = CalvanoHook(env),
     )
 end
 
@@ -15,9 +15,9 @@ function setupCalvanoExperiment(
     δ::Float64,
     price_options::Vector{Float64},
     competition_params::CompetitionParameters;
-    max_iter::Int=Int(1e9),
-    convergence_threshold::Int=Int(1e5),
-    profit_function=p -> π_fun(p, competition_params),
+    max_iter::Int = Int(1e9),
+    convergence_threshold::Int = Int(1e5),
+    profit_function = p -> π_fun(p, competition_params),
 )
 
     env = CalvanoEnv(
@@ -34,7 +34,7 @@ function setupCalvanoExperiment(
     return setupCalvanoExperiment(env)
 end
 
-runCalvano(env::CalvanoEnv) = setupCalvanoExperiment(env) |> run(; describe=false)
+runCalvano(env::CalvanoEnv) = setupCalvanoExperiment(env) |> run(; describe = false)
 
 # Look into DistributedReinforcementLearning.jl for running grid of experiments
 # Add hook `(hook::YourHook)(::PostExperimentStage, agent, env)` to save profit results!
@@ -45,9 +45,9 @@ function runCalvano(
     δ::Float64,
     price_options::Vector{Float64},
     competition_params::CompetitionParameters;
-    max_iter::Int=Int(1e9),
-    convergence_threshold::Int=Int(1e5),
-    profit_function=p -> π_fun(p, competition_params)
+    max_iter::Int = Int(1e9),
+    convergence_threshold::Int = Int(1e5),
+    profit_function = p -> π_fun(p, competition_params),
 )
     experiment = setupCalvanoExperiment(
         α,
@@ -55,9 +55,9 @@ function runCalvano(
         δ,
         price_options,
         competition_params,
-        max_iter=max_iter,
-        convergence_threshold=convergence_threshold,
-        profit_function=profit_function,
+        max_iter = max_iter,
+        convergence_threshold = convergence_threshold,
+        profit_function = profit_function,
     )
-    return run(experiment; describe=false)
+    return run(experiment; describe = false)
 end

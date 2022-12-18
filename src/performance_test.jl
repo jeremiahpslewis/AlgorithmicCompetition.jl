@@ -11,12 +11,12 @@ const n_prices = 15
 const price_index = 1:n_prices
 
 competition_params = AlgorithmicCompetition.CompetitionParameters(
-        μ = 0.25,
-        a_0 = 0,
-        a = [2, 2],
-        c = [1, 1],
-        n_firms = 2,
-    )
+    μ = 0.25,
+    a_0 = 0,
+    a = [2, 2],
+    c = [1, 1],
+    n_firms = 2,
+)
 
 model_monop, p_monop = AlgorithmicCompetition.solve_monopolist(competition_params)
 
@@ -47,7 +47,14 @@ price_options = [range(p_Bert_nash_equilibrium, p_monop_opt, n_prices)...]
 using JET
 using BenchmarkTools
 # @time AlgorithmicCompetition.runCalvano(α, β, δ, price_options, competition_params)
-@btime AlgorithmicCompetition.runCalvano(α, β, δ, price_options, competition_params, max_iter=1000)
+@btime AlgorithmicCompetition.runCalvano(
+    α,
+    β,
+    δ,
+    price_options,
+    competition_params,
+    max_iter = 1000,
+)
 # @report_opt AlgorithmicCompetition.runCalvano(α, β, δ, price_options, competition_params)#, max_iter=1000)
 
 
