@@ -23,8 +23,6 @@ struct ConvergenceCheck <: AbstractHook
         n_players::Int,
     )
         new(
-            convert(UInt16, n_state_space),
-            convert(UInt8, n_players),
             zeros(UInt8, n_players, n_state_space),
             [ConvergenceMeta(0,0,0), ConvergenceMeta(0,0,0)]
     )
