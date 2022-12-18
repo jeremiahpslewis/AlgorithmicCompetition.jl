@@ -26,3 +26,12 @@ end
     # Best response function matches Calvano 2020
     @assert isapprox(p_BR(1.47293), 1.47293; atol = 1e6)
 end
+
+@testset "map_memory_to_state" begin
+    n_prices = 15
+    n_players = 2
+    memory_length = 1
+    n_state_space = n_prices ^ (n_players * memory_length)
+    @test map_memory_to_state(repeat([n_prices], n_players), n_prices) == n_state_space
+    @test map_memory_to_state(Array{Int,2}(repeat([n_prices], n_players)'), n_prices) == n_state_space
+end
