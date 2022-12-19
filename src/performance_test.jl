@@ -47,7 +47,7 @@ price_options = [range(p_Bert_nash_equilibrium, p_monop_opt, n_prices)...]
 using JET
 using BenchmarkTools
 # @time AlgorithmicCompetition.runCalvano(α, β, δ, price_options, competition_params)
-@btime AlgorithmicCompetition.runCalvano(α, β, δ, price_options, competition_params, max_iter=1000)
+@btime AlgorithmicCompetition.runCalvano(α, β, δ, price_options, competition_params)#, max_iter=1000)
 # @report_opt AlgorithmicCompetition.runCalvano(α, β, δ, price_options, competition_params)#, max_iter=1000)
 
 
@@ -60,5 +60,18 @@ using BenchmarkTools
 # 15.130 ms (185794 allocations: 15.40 MiB) # UInt8
 # 15.456 ms (185787 allocations: 12.41 MiB)
 # 15.283 ms (185782 allocations: 12.41 MiB)
+# 15.081 ms (184958 allocations: 11.85 MiB)
+# 15.484 ms (184960 allocations: 11.85 MiB)
+# 15.769 ms (184936 allocations: 11.85 MiB)
+# 16.473 ms (188974 allocations: 12.32 MiB) # Tuple instead of vect in hook
+# 15.738 ms (184943 allocations: 11.85 MiB) # drop custom stop condition
+# 11.940 ms (116933 allocations: 8.64 MiB) # drop custom hook
+# 14.745 ms (184952 allocations: 11.85 MiB)
+# Fail ## Use column-based instead of row based index
+# Fail ## Use q-table view
+# 15.470 ms (164960 allocations: 11.09 MiB) ## Simplify map_memory_to_state
+# drop stop condition
+## Make mutable...
 # TODO:
 # - [ ] Figure out why n_state_space is 5k not ~200
+# - [ ] Add tests
