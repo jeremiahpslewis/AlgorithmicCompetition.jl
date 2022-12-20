@@ -1,7 +1,7 @@
 using Distributed
 using ParallelDataTransfer
 
-addprocs(6, topology=:master_worker, exeflags=["--threads=1", "--project=$(Base.active_project())"])
+addprocs(7, topology=:master_worker, exeflags=["--threads=1", "--project=$(Base.active_project())"])
 
 @everywhere begin
     using Pkg; Pkg.instantiate()
@@ -33,15 +33,24 @@ p_monop_opt = AlgorithmicCompetition.solve_monopolist(competition_params)[2][1]
 p_range_pad = ξ * (p_monop_opt - p_Bert_nash_equilibrium)
 price_options = [range(p_Bert_nash_equilibrium, p_monop_opt, n_prices)...]
 
+
+n_increments = 3 # for full sim, use 100
+α_ = range(0.025, 0.25, n_increments)
+# TODO: Fix this parameterization based on Calvano pg. 12
+β_ = range(0, 2e-5, α = range(0.025, 0.25, n_increments) 
+param_set = [(α, β) for α in α_, β in β_]
+
 # Transfer Data to Workers
-sendto(workers(), α=α, β=β, δ=δ, price_options=price_options, competition_params=competition_params)
+sendto(workers(), α=α, β=β, δ=δ,
+    param_set=param_set,
+    price_options=price_options,
+    competition_params=competition_params
+    )
 
-
-
-function pmap_experiments(n)
-    status = pmap(1:n) do i
+function pmap_experiments()
+    status = pmap(1:length(param_set)) do i
         try
-            AlgorithmicCompetition.runCalvano(α, β, δ, price_options, competition_params)
+            AlgorithmicCompetition.runCalvano(param_set[i][1], param_set[i][2], δ, price_options, competition_params)
         catch e
             @warn "failed to process $(i)"
             false # failure
@@ -49,7 +58,7 @@ function pmap_experiments(n)
     end
 end
 
-@time pmap_experiments(1000)
+@time pmap_experiments()
 
 
 # TODOs
