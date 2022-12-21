@@ -1,7 +1,7 @@
 using Distributed
 using ParallelDataTransfer
 
-addprocs(7, topology=:master_worker, exeflags=["--threads=1", "--project=$(Base.active_project())"])
+_procs = addprocs(7, topology=:master_worker, exeflags=["--threads=1", "--project=$(Base.active_project())"])
 
 @everywhere begin
     using Pkg; Pkg.instantiate()
@@ -34,14 +34,19 @@ p_range_pad = ξ * (p_monop_opt - p_Bert_nash_equilibrium)
 price_options = [range(p_Bert_nash_equilibrium, p_monop_opt, n_prices)...]
 
 
-n_increments = 3 # for full sim, use 100
+n_increments = 2 # for full sim, use 100
 α_ = range(0.025, 0.25, n_increments)
 # TODO: Fix this parameterization based on Calvano pg. 12
-β_ = range(0, 2e-5, α = range(0.025, 0.25, n_increments) 
-param_set = [(α, β) for α in α_, β in β_]
+β_ = range(1.25e-8, 2e-5, n_increments) 
+param_set = [(α, β) for α in α_ for β in β_]
+
+# ν function from Calvano pg. 12
+ν(β, k, m, n) = (m - 1)^n / ((m^(k * n * (n + 1))) * (1 - exp(- β * (n+1))))
+ν(β, 1, 15, 2) # n = n_firms, m = n_prices, k = memory(?)
+ν(1.25e-8, 1, 15, 2) # Value for ≈ 450
 
 # Transfer Data to Workers
-sendto(workers(), α=α, β=β, δ=δ,
+sendto(workers(), δ=δ,
     param_set=param_set,
     price_options=price_options,
     competition_params=competition_params
@@ -58,9 +63,10 @@ function pmap_experiments()
     end
 end
 
-@time pmap_experiments()
+e_out = pmap_experiments()
+rmprocs(_procs)
 
-
+e_out
 # TODOs
 # - Add hook to save profit results
 # - Get multiprocessing loop running
