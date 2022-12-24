@@ -1,6 +1,6 @@
 function run_pmap(
     i::Int,
-    param_set::Vector{Float64},
+    param_set::Vector{Tuple{Float64, Float64}},
     δ::Float64,
     price_options::Vector{Float64},
     competition_params::CompetitionParameters,
