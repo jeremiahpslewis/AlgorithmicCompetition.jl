@@ -20,6 +20,8 @@ struct CalvanoEnv <: AbstractEnv
     is_converged::Vector{Bool}
     reward::Vector{Float64}
     is_done::Vector
+    p_Bert_nash_equilibrium::Float64
+    p_monop_opt::Float64
 
     function CalvanoEnv(
         α::Float64,
@@ -31,6 +33,8 @@ struct CalvanoEnv <: AbstractEnv
         max_iter::Int,
         convergence_threshold::Int,
         profit_function,
+        p_Bert_nash_equilibrium::Float64,
+        p_monop_opt::Float64,
     )
         # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
         # TODO: Think about how initial memory should be assigned
@@ -60,6 +64,8 @@ struct CalvanoEnv <: AbstractEnv
             fill(false, n_players), # Is converged
             [0.0, 0.0], # Reward
             [false], # Is done
+            p_Bert_nash_equilibrium,
+            p_monop_opt,
         )
     end
 end

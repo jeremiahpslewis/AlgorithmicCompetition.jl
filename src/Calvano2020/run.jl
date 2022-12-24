@@ -14,7 +14,9 @@ function setupCalvanoExperiment(
     β::Float64,
     δ::Float64,
     price_options::Vector{Float64},
-    competition_params::CompetitionParameters;
+    competition_params::CompetitionParameters,
+    p_Bert_nash_equilibrium::Float64,
+    p_monop_opt::Float64;
     max_iter::Int=Int(1e9),
     convergence_threshold::Int=Int(1e5),
     profit_function=p -> π_fun(p, competition_params),
@@ -30,6 +32,8 @@ function setupCalvanoExperiment(
         max_iter,
         convergence_threshold,
         profit_function,
+        p_Bert_nash_equilibrium::Float64,
+        p_monop_opt::Float64,
     )
     return setupCalvanoExperiment(env)
 end
@@ -44,10 +48,12 @@ function runCalvano(
     β::Float64,
     δ::Float64,
     price_options::Vector{Float64},
-    competition_params::CompetitionParameters;
+    competition_params::CompetitionParameters,
+    p_Bert_nash_equilibrium::Float64,
+    p_monop_opt::Float64;
     max_iter::Int=Int(1e9),
     convergence_threshold::Int=Int(1e5),
-    profit_function=p -> π_fun(p, competition_params)
+    profit_function=p -> π_fun(p, competition_params),
 )
     experiment = setupCalvanoExperiment(
         α,
@@ -58,6 +64,8 @@ function runCalvano(
         max_iter=max_iter,
         convergence_threshold=convergence_threshold,
         profit_function=profit_function,
+        p_Bert_nash_equilibrium::Float64,
+        p_monop_opt::Float64,
     )
     return run(experiment; describe=false)
 end

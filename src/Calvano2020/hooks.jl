@@ -50,6 +50,7 @@ function calculate_convergence_meta(
 
 end
 
+
 function (h::ConvergenceCheck)(::PostActStage, policy, env)
     # Convergence is defined over argmax action for each state
     # E.g. best / greedy action
@@ -80,11 +81,12 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
 
 end
 
+# TODO: Figure out why the hook results are identical for both players
 function CalvanoHook(env::AbstractEnv)
     MultiAgentHook(
         (
             p => ComposedHook(
-                # TotalRewardPerEpisode(;is_display_on_exit=false),
+                TotalRewardPerEpisode(;is_display_on_exit=false),
                 env.convergence_check
                 ) for
             p in players(env)
