@@ -9,10 +9,10 @@ end
 function economic_summary(e::Experiment)
     convergence_threshold = e.env.env.convergence_threshold
 
-    π_N = e.env.env.profit_function([p_Bert_nash_equilibrium, p_Bert_nash_equilibrium])[1]
-    π_M = e.env.env.profit_function([p_monop_opt, p_monop_opt])[1]
-    
-    avg_profit = []
+    π_N = e.env.env.profit_function(fill(e.env.env.p_Bert_nash_equilibrium, 2))[1]
+    π_M = e.env.env.profit_function(fill(e.env.env.p_monop_opt, 2))[1]
+
+    avg_profit = Float64[]
 
     for i in [1, 2]
         @chain e.hook.hooks[i][1].rewards[(end - convergence_threshold):end] begin

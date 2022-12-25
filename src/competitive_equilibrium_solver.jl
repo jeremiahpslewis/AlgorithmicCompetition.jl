@@ -4,6 +4,7 @@ using Chain
 using Ipopt
 using Flux
 using StaticArrays
+using Statistics
 
 Base.@kwdef struct CompetitionParameters
     μ::Float64
