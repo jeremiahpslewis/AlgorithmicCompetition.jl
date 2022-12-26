@@ -12,14 +12,14 @@ function run_pmap(
     p_monop_opt::Float64
     )
     o_ = runCalvano(
-            α,
-            β,
-            δ,
-            price_options,
-            competition_params,
-            p_Bert_nash_equilibrium,
-            p_monop_opt,
+        α,
+        β,
+        δ,
+        price_options,
+        competition_params,
+        p_Bert_nash_equilibrium,
+        p_monop_opt,
         )
-    # return o_
+    GC.gc()
     return economic_summary(o_)
 end
