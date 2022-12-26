@@ -1,6 +1,7 @@
 using Revise
 using AlgorithmicCompetition
 using Chain
+using Statistics
 
 const α = 0.125
 const β = 1e-5
@@ -27,9 +28,8 @@ p_monop_opt = AlgorithmicCompetition.solve_monopolist(competition_params)[2][1]
 p_range_pad = ξ * (p_monop_opt - p_Bert_nash_equilibrium)
 price_options = [range(p_Bert_nash_equilibrium, p_monop_opt, n_prices)...]
 
-# AlgorithmicCompetition.runCalvano(α, β, δ, price_options, competition_params, max_iter=1000)
-
-
+@time o_ = AlgorithmicCompetition.runCalvano(α, β, δ, price_options, competition_params, p_Bert_nash_equilibrium, p_monop_opt)
+AlgorithmicCompetition.economic_summary(o_)
 # env = AlgorithmicCompetition.CalvanoEnv(
 #     α,
 #     β,
