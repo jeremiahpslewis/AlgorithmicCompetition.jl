@@ -1,6 +1,6 @@
 using Test
 using JuMP
-using AlgorithmicCompetition: AlgorithmicCompetition, CompetitionParameters, solve_monopolist, solve_bertrand, p_BR, map_memory_to_state, runCalvano
+using AlgorithmicCompetition: AlgorithmicCompetition, CompetitionParameters, solve_monopolist, solve_bertrand, p_BR, map_memory_to_state, runCalvano, q_fun
 
 @testset "Competitive Equilibrium: Monopoly" begin
     params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
