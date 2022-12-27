@@ -1,9 +1,11 @@
 using Test
-
+using JuMP
+using AlgorithmicCompetition: AlgorithmicCompetition, CompetitionParameters, solve_monopolist, solve_bertrand, p_BR, map_memory_to_state, runCalvano
 
 @testset "Competitive Equilibrium: Monopoly" begin
+    a_0 = 0
     params =
-        CompetitionParameters(μ = 0.25, a_0 = 0, a = [a_0, 2, 2], c = [1, 1], n_firms = 2)
+        CompetitionParameters(μ = 0.25, a_0 = 0, a = [2, 2], c = [1, 1], n_firms = 2)
     model_monop, p_monop = solve_monopolist(params)
 
     # symmetric solution found
