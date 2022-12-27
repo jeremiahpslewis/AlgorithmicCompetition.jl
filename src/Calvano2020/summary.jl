@@ -1,9 +1,15 @@
 using Chain
 using ReinforcementLearning
+using JSON
+using UUIDs
+
 profit_measure(π_hat::Vector{Float64}, π_N, π_M) = (mean(π_hat) - π_N) / (π_M - π_N)
 
 struct CalvanoSummary
-    avg_profit::Vector{Float64}
+    player::Int64
+    α::Float64
+    β::Float64
+    avg_profit::Vector{Float64}    
 end
 
 function economic_summary(e::Experiment)
@@ -20,5 +26,14 @@ function economic_summary(e::Experiment)
         end
     end
 
-    return CalvanoSummary(avg_profit)
+    if !isdir("out")
+        mkdir("out/")
+    end
+
+    f_name = UUID.uuid4()
+    open("out/$f_name.txt","a") do io
+        println(io, JSON.print(CalvanoSummary(e.env.env.α, e.env.env.β, avg_profit)))
+     end
+
+    return 
 end

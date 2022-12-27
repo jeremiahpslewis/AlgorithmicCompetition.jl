@@ -20,6 +20,5 @@ function run_pmap(
         p_Bert_nash_equilibrium,
         p_monop_opt,
         )
-    GC.gc()
-    return economic_summary(o_)
+    return
 end
