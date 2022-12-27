@@ -3,10 +3,7 @@ using JuMP
 using AlgorithmicCompetition: AlgorithmicCompetition, CompetitionParameters, solve_monopolist, solve_bertrand, p_BR, map_memory_to_state, runCalvano
 
 @testset "Competitive Equilibrium: Monopoly" begin
-    a_0 = 0
-    params = CompetitionParameters(μ = 0.25, a_0 = 0,
-                                   a = [2, 2], c = [1, 1],
-                                   n_firms = 2)
+    params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
     model_monop, p_monop = solve_monopolist(params)
 
     # symmetric solution found
@@ -18,6 +15,8 @@ using AlgorithmicCompetition: AlgorithmicCompetition, CompetitionParameters, sol
 end
 
 @testset "Competitive Equilibrium: Bertrand" begin
+    params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+
     p_Bertrand_ = value.(solve_bertrand(params)[2])
     p_Bertrand = p_Bertrand_[1]
 
@@ -25,7 +24,7 @@ end
     @test p_Bertrand_[2] ≈ 1.47293 atol = 1e-3
 
     # Best response function matches Calvano 2020
-    @test p_BR(1.47293) ≈ 1.47293 atol = 1e6
+    @test p_BR(1.47293, params) ≈ 1.47293 atol = 1e6
 end
 
 @testset "map_memory_to_state" begin
@@ -69,7 +68,7 @@ end
 
 @testset "CompetitionParameters" begin
     @test CompetitionParameters(1, 1, [1.0, 1], [1.0, 1], 2) isa CompetitionParameters
-    @test_throws DimensionMismatch CompetitionParameters(1, 1, [1.0, 1], [1.0], 2)
+    @test_throws DimensionMismatch CompetitionParameters(1, 1, [1.0, 1], [1.0])
 end
 
 @testset "q_fun" begin
