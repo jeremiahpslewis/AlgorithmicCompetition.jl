@@ -13,7 +13,7 @@ using AlgorithmicCompetition: AlgorithmicCompetition, CompetitionParameters, sol
     @test value(p_monop[1]) ≈ value(p_monop[2])
 
     # Match Calvano 2020 parameterization
-    @test isapprox(value(p_monop[1]), 1.92498; atol = 0.0001)
+    @test value(p_monop[1]) ≈ 1.92498 atol = 0.0001
     p_monop_opt = value(p_monop[2])
 end
 
@@ -22,10 +22,10 @@ end
     p_Bertrand = p_Bertrand_[1]
 
     # Parameter recovery
-    @assert isapprox(p_Bertrand_[2], 1.47293; atol = 1e-3)
+    @test p_Bertrand_[2] ≈ 1.47293 atol = 1e-3
 
     # Best response function matches Calvano 2020
-    @assert isapprox(p_BR(1.47293), 1.47293; atol = 1e6)
+    @test p_BR(1.47293) ≈ 1.47293 atol = 1e6
 end
 
 @testset "map_memory_to_state" begin
@@ -65,4 +65,14 @@ end
         p_Bert_nash_equilibrium,
         p_monop_opt,
     )
+end
+
+@testset "CompetitionParameters" begin
+    @test CompetitionParameters(1, 1, [1.0, 1], [1.0, 1], 2) isa CompetitionParameters
+    @test_throws DimensionMismatch CompetitionParameters(1, 1, [1.0, 1], [1.0], 2)
+end
+
+@testset "q_fun" begin
+    @test q_fun([1.47293, 1.47293], CompetitionParameters(0.25, 0, [2, 2], [1, 1])) ≈ fill(0.47138, 2) atol=0.01
+    @test q_fun([1.92498, 1.92498], CompetitionParameters(0.25, 0, [2, 2], [1, 1])) ≈ fill(0.36486, 2) atol=0.01
 end
