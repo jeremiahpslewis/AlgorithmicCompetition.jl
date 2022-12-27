@@ -29,7 +29,8 @@ end
 function p_BR(p_minus_i_, params::CompetitionParameters)
     # Best response Bertrand price
     model = Model(Ipopt.Optimizer)
-    register(model, :π_i_, 2, π_i_; autodiff = true)
+    set_silent(model)
+    register(model, :π_i, 2, π_i; autodiff = true)
     @variable(model, p_minus_i)
     @variable(model, p_i)
     @constraint(model, p_minus_i == p_minus_i_)
@@ -47,10 +48,9 @@ end
 function solve_monopolist(params::CompetitionParameters)
     model = Model(Ipopt.Optimizer)
     set_silent(model)
-    π_monop_(p_1, p_2) = π_monop(p_1, p_2, params)
     register(model, :π_monop, 2, π_monop_; autodiff = true)
     @variable(model, p[i = 1:params.n_firms])
-    @NLobjective(model, Max, π_monop(p[1], p[2]))
+    @NLobjective(model, Max, π_monop_(p[1], p[2]))
 
     optimize!(model)
 
@@ -62,13 +62,14 @@ function solve_bertrand(params::CompetitionParameters)
 
     model = Model(Ipopt.Optimizer)
     set_silent(model)
-    register(model, :π_i, 2, π_i_, autodiff = true)
+    register(model, :π_i_, 2, π_i_, autodiff = true)
 
     @variable(model, p_i)
     @NLparameter(model, p_min_i[i = 1:(params.n_firms-1)] == 1)
     @NLobjective(model, Max, π_i_(p_i, p_min_i[1]))
 
     optimize!(model)
+
     i = 0
     while !isapprox(value(p_i), value(p_min_i[1]))
         i += 1

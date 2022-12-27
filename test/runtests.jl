@@ -4,8 +4,9 @@ using AlgorithmicCompetition: AlgorithmicCompetition, CompetitionParameters, sol
 
 @testset "Competitive Equilibrium: Monopoly" begin
     a_0 = 0
-    params =
-        CompetitionParameters(μ = 0.25, a_0 = 0, a = [2, 2], c = [1, 1], n_firms = 2)
+    params = CompetitionParameters(μ = 0.25, a_0 = 0,
+                                   a = [2, 2], c = [1, 1],
+                                   n_firms = 2)
     model_monop, p_monop = solve_monopolist(params)
 
     # symmetric solution found
@@ -15,8 +16,6 @@ using AlgorithmicCompetition: AlgorithmicCompetition, CompetitionParameters, sol
     @test isapprox(value(p_monop[1]), 1.92498; atol = 0.0001)
     p_monop_opt = value(p_monop[2])
 end
-
-
 
 @testset "Competitive Equilibrium: Bertrand" begin
     p_Bertrand_ = value.(solve_bertrand(params)[2])
