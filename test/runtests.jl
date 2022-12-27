@@ -61,7 +61,7 @@ end
 end
 
 @testset "CompetitionParameters" begin
-    @test CompetitionParameters(1, 1, [1.0, 1], [1.0, 1], 2) isa CompetitionParameters
+    @test CompetitionParameters(1, 1, [1.0, 1], [1.0, 1]) isa CompetitionParameters
     @test_throws DimensionMismatch CompetitionParameters(1, 1, [1.0, 1], [1.0])
 end
 
