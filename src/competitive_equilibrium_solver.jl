@@ -6,7 +6,7 @@ using Flux
 using StaticArrays
 using Statistics
 
-Base.@kwdef struct CompetitionParameters
+struct CompetitionParameters
     μ::Float64
     a_0::Float64
     a::Vector{Float64}
@@ -43,7 +43,7 @@ function p_BR(p_minus_i_, params::CompetitionParameters)
     @variable(model, p_minus_i)
     @variable(model, p_i)
     @constraint(model, p_minus_i == p_minus_i_)
-    @NLobjective(model, Max, π_i_(p_i, p_minus_i, params))
+    @NLobjective(model, Max, π_i_(p_i, p_minus_i))
 
     optimize!(model)
 
@@ -51,7 +51,7 @@ function p_BR(p_minus_i_, params::CompetitionParameters)
 end
 
 π_i(p_i, p_minus_i, params::CompetitionParameters) = π_fun([p_i, p_minus_i], params)[1]
-π_bertrand(p_1, params::CompetitionParameters) = π_fun([p_1, p_BR(p_1)], params)[1]
+π_bertrand(p_1, params::CompetitionParameters) = π_fun([p_1, p_BR(p_1, params)], params)[1]
 π_monop(p_1, p_2, params::CompetitionParameters) = sum(π_fun([p_1, p_2], params)) / 2 # per-firm
 
 function solve_monopolist(params::CompetitionParameters)
