@@ -70,13 +70,17 @@ function runCalvano(
     return run(experiment; describe = false)
 end
 
-function buildParameterSet(n_increments = 100)
+function buildParameterSet(; n_increments=100)
     # TODO: Fix this parameterization based on Calvano pg. 12
     α_ = range(0.025, 0.25, n_increments)
     β_ = range(1.25e-8, 2e-5, n_increments)
 
-    competition_params =
-        CompetitionParameters(μ = 0.25, a_0 = 0, a = [2, 2], c = [1, 1], n_firms = 2)
+    competition_params = CompetitionParameters(
+        0.25,
+        0,
+        [2, 2],
+        [1, 1],
+    )
     ξ = 0.1
     δ = 0.95
     n_prices = 15
@@ -89,8 +93,6 @@ function buildParameterSet(n_increments = 100)
     # p_monop defined above
     p_range_pad = ξ * (p_monop_opt - p_Bert_nash_equilibrium)
     price_options = [range(p_Bert_nash_equilibrium, p_monop_opt, n_prices)...]
-
-    GC.gc()
 
     return [
         (α, β, δ, price_options, competition_params, p_Bert_nash_equilibrium, p_monop_opt)
