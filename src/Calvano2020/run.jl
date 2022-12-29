@@ -1,4 +1,6 @@
 using ReinforcementLearning
+using Distributed
+using ParallelDataTransfer
 
 function setupCalvanoExperiment(env::CalvanoEnv)
     Experiment(
@@ -98,4 +100,18 @@ function buildParameterSet(; n_increments=100)
         (α, β, δ, price_options, competition_params, p_Bert_nash_equilibrium, p_monop_opt)
         for α in α_ for β in β_
     ]
+end
+
+function run(experiments::Vector{ReinforcementLearningCore.Experiment})
+    sendto(workers(),
+        experiments=experiments,
+    )
+    status = pmap(1:length(experiments)) do i
+        # try
+            run(experiments[i]; describe=false)
+        # catch e
+        #     @warn "failed to process $(i)"
+        #     false # failure
+        # end
+    end
 end
