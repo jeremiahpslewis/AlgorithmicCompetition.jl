@@ -5,6 +5,7 @@ using Ipopt
 using Flux
 using StaticArrays
 using Statistics
+using Memoization
 
 struct CompetitionParameters
     μ::Float64
@@ -55,7 +56,8 @@ end
 π_bertrand(p_1, params::CompetitionParameters) = π_fun([p_1, p_BR(p_1, params)], params)[1]
 π_monop(p_1, p_2, params::CompetitionParameters) = sum(π_fun([p_1, p_2], params)) / 2 # per-firm
 
-function solve_monopolist(params::CompetitionParameters)
+
+@memoize function solve_monopolist(params::CompetitionParameters)
     model = Model(Ipopt.Optimizer)
     π_monop_(p_1, p_2) = π_monop(p_1, p_2, params)
     set_silent(model)
@@ -68,7 +70,8 @@ function solve_monopolist(params::CompetitionParameters)
     return model, value.(p)
 end
 
-function solve_bertrand(params::CompetitionParameters)
+
+@memoize function solve_bertrand(params::CompetitionParameters)
     π_i_(p_1, p_2) = π_i(p_1, p_2, params)
 
     model = Model(Ipopt.Optimizer)
