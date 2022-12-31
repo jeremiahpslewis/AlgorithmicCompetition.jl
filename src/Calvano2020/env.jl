@@ -39,8 +39,8 @@ struct CalvanoEnv <: AbstractEnv
             p.α,
             p.β,
             p.δ,
-            n_players,
-            convert(UInt8, memory_length),
+            p.n_players,
+            convert(UInt8, p.memory_length),
             p.price_options,
             p.max_iter,
             p.convergence_threshold,
@@ -50,7 +50,7 @@ struct CalvanoEnv <: AbstractEnv
             init_matrix,
             p.profit_function,
             convert(UInt16, n_state_space),
-            ones(UInt16, memory_length, p.n_players), # Memory, note max of 256 prices with UInt8
+            ones(UInt16, p.memory_length, p.n_players), # Memory, note max of 256 prices with UInt8
             fill(false, p.n_players), # Is converged
             [0.0, 0.0], # Reward
             [false], # Is done
