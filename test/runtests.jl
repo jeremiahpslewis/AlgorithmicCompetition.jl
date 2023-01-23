@@ -1,6 +1,14 @@
 using Test
 using JuMP
-using AlgorithmicCompetition: AlgorithmicCompetition, CompetitionParameters, solve_monopolist, solve_bertrand, p_BR, map_memory_to_state, runCalvano, q_fun
+using AlgorithmicCompetition:
+    AlgorithmicCompetition,
+    CompetitionParameters,
+    solve_monopolist,
+    solve_bertrand,
+    p_BR,
+    map_memory_to_state,
+    runCalvano,
+    q_fun
 
 @testset "Competitive Equilibrium: Monopoly" begin
     params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
@@ -31,9 +39,10 @@ end
     n_prices = 15
     n_players = 2
     memory_length = 1
-    n_state_space = n_prices ^ (n_players * memory_length)
+    n_state_space = n_prices^(n_players * memory_length)
     @test map_memory_to_state(repeat([n_prices], n_players), n_prices) == n_state_space
-    @test map_memory_to_state(Array{Int,2}(repeat([n_prices], n_players)'), n_prices) == n_state_space
+    @test map_memory_to_state(Array{Int,2}(repeat([n_prices], n_players)'), n_prices) ==
+          n_state_space
 end
 
 @testset "runCalvano full simulation" begin
@@ -52,7 +61,10 @@ end
     p_range_pad = ξ * (p_monop_opt - p_Bert_nash_equilibrium)
     price_options = [range(p_Bert_nash_equilibrium, p_monop_opt, n_prices)...]
 
-    runCalvano(α, β, δ,
+    runCalvano(
+        α,
+        β,
+        δ,
         price_options,
         competition_params,
         p_Bert_nash_equilibrium,
@@ -66,6 +78,8 @@ end
 end
 
 @testset "q_fun" begin
-    @test q_fun([1.47293, 1.47293], CompetitionParameters(0.25, 0, [2, 2], [1, 1])) ≈ fill(0.47138, 2) atol=0.01
-    @test q_fun([1.92498, 1.92498], CompetitionParameters(0.25, 0, [2, 2], [1, 1])) ≈ fill(0.36486, 2) atol=0.01
+    @test q_fun([1.47293, 1.47293], CompetitionParameters(0.25, 0, [2, 2], [1, 1])) ≈
+          fill(0.47138, 2) atol = 0.01
+    @test q_fun([1.92498, 1.92498], CompetitionParameters(0.25, 0, [2, 2], [1, 1])) ≈
+          fill(0.36486, 2) atol = 0.01
 end

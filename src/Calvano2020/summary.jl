@@ -9,7 +9,7 @@ struct CalvanoSummary
     player::Int64
     α::Float64
     β::Float64
-    avg_profit::Vector{Float64}    
+    avg_profit::Vector{Float64}
 end
 
 function economic_summary(e::Experiment)
@@ -21,7 +21,7 @@ function economic_summary(e::Experiment)
     avg_profit = Float64[]
 
     for i in [1, 2]
-        @chain e.hook.hooks[i][1].rewards[(end - convergence_threshold):end] begin
+        @chain e.hook.hooks[i][1].rewards[(end-convergence_threshold):end] begin
             push!(avg_profit, profit_measure(_, π_N, π_M))
         end
     end
@@ -31,9 +31,9 @@ function economic_summary(e::Experiment)
     end
 
     f_name = UUID.uuid4()
-    open("out/$f_name.txt","a") do io
+    open("out/$f_name.txt", "a") do io
         println(io, JSON.print(CalvanoSummary(e.env.env.α, e.env.env.β, avg_profit)))
-     end
+    end
 
-    return 
+    return
 end

@@ -1,6 +1,10 @@
 using ReinforcementLearning
 
-function _convergence_check(q_table::Matrix{Float32}, convergence_table::SubArray{UInt8}, state::Int)
+function _convergence_check(
+    q_table::Matrix{Float32},
+    convergence_table::SubArray{UInt8},
+    state::Int,
+)
     best_action = argmax(q_table[:, state])
     is_converged = convergence_table[state] == best_action
 
@@ -18,14 +22,11 @@ struct ConvergenceCheck <: AbstractHook
     # Number of steps where no change has happened to argmax
     convergence_meta_tuple::Vector{ConvergenceMeta}
 
-    function ConvergenceCheck(
-        n_state_space::Int,
-        n_players::Int,
-    )
+    function ConvergenceCheck(n_state_space::Int, n_players::Int)
         new(
             zeros(UInt8, n_players, n_state_space),
-            [ConvergenceMeta(0,0,0), ConvergenceMeta(0,0,0)]
-    )
+            [ConvergenceMeta(0, 0, 0), ConvergenceMeta(0, 0, 0)],
+        )
     end
 end
 
@@ -33,8 +34,8 @@ function calculate_convergence_meta(
     c_meta::ConvergenceMeta,
     q_table::Matrix{Float32},
     convergence_table::SubArray{UInt8},
-    state::Int
-    )
+    state::Int,
+)
     # Increment duration whenever argmax action is stable (convergence criteria)
     # Increment convergence metric (e.g. convergence not reached)
     # Keep track of number of iterations it takes until convergence
@@ -44,9 +45,16 @@ function calculate_convergence_meta(
     iterations_until_convergence = c_meta.iterations_until_convergence + 1
 
     convergence_duration = is_converged ? c_meta.convergence_duration + 1 : 0
-    convergence_metric = is_converged ? c_meta.convergence_metric : c_meta.convergence_metric + 1
+    convergence_metric =
+        is_converged ? c_meta.convergence_metric : c_meta.convergence_metric + 1
 
-    return ConvergenceMeta(convergence_duration, convergence_metric, iterations_until_convergence), is_converged, best_action
+    return ConvergenceMeta(
+        convergence_duration,
+        convergence_metric,
+        iterations_until_convergence,
+    ),
+    is_converged,
+    best_action
 
 end
 
@@ -63,12 +71,12 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
     q_table = policy.policy.policy.learner.approximator.table
     convergence_table = @view h.approximator_table__state_argmax[current_player_id, :]
     state = RLBase.state(env)
-    
+
     c_meta, is_converged, best_action = calculate_convergence_meta(
         h.convergence_meta_tuple[current_player_id],
         q_table,
         convergence_table,
-        state
+        state,
     )
 
     h.convergence_meta_tuple[current_player_id] = c_meta
@@ -92,7 +100,7 @@ function (h::TotalRewardPerEpisode)(::PostExperimentStage, agent, env)
     avg_profit = Float64[]
 
     for i in [1, 2]
-        @chain h.rewards[(end - convergence_threshold):end] begin
+        @chain h.rewards[(end-convergence_threshold):end] begin
             push!(avg_profit, profit_measure(_, π_N, π_M))
         end
     end
@@ -104,8 +112,11 @@ function (h::TotalRewardPerEpisode)(::PostExperimentStage, agent, env)
 
     f_name = UUIDs.uuid4()
     open(out_dir * "/" * string(f_name) * ".txt", "a") do io
-        println(io, JSON.print(CalvanoSummary(current_player_id, env.env.α, env.env.β, avg_profit)))
-     end
+        println(
+            io,
+            JSON.print(CalvanoSummary(current_player_id, env.env.α, env.env.β, avg_profit)),
+        )
+    end
 
 end
 
@@ -114,10 +125,9 @@ function CalvanoHook(env::AbstractEnv)
     MultiAgentHook(
         (
             p => ComposedHook(
-                TotalRewardPerEpisode(;is_display_on_exit=false),
-                env.convergence_check
-                ) for
-            p in players(env)
+                TotalRewardPerEpisode(; is_display_on_exit = false),
+                env.convergence_check,
+            ) for p in players(env)
         )...,
     )
 end

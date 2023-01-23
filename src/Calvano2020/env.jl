@@ -41,8 +41,7 @@ struct CalvanoEnv <: AbstractEnv
         n_prices = length(price_options)
         price_index = 1:n_prices
         n_state_space = n_prices^(memory_length * n_players)
-        convergence_check =
-            ConvergenceCheck(n_state_space, n_players)
+        convergence_check = ConvergenceCheck(n_state_space, n_players)
         init_matrix = zeros(Float32, n_prices, n_state_space)
 
         new(
