@@ -14,7 +14,8 @@ struct CompetitionParameters
     n_firms::Int64
 
     function CompetitionParameters(μ, a_0, a, c)
-        length(a) != length(c) && throw(DimensionMismatch("a and c must be the same length."))
+        length(a) != length(c) &&
+            throw(DimensionMismatch("a and c must be the same length."))
         n_firms = length(a)
         new(μ, a_0, a, c, n_firms)
     end
@@ -39,7 +40,7 @@ function p_BR(p_minus_i_, params::CompetitionParameters)
     π_i_(p_i_, p_minus_i_) = π_fun([p_i_, p_minus_i_], params)[1]
     model = Model(Ipopt.Optimizer)
     set_silent(model)
-    register(model, :π_i_, 2, π_i_; autodiff=true)
+    register(model, :π_i_, 2, π_i_; autodiff = true)
     @variable(model, p_minus_i)
     @variable(model, p_i)
     @constraint(model, p_minus_i == p_minus_i_)
@@ -58,8 +59,8 @@ function solve_monopolist(params::CompetitionParameters)
     model = Model(Ipopt.Optimizer)
     π_monop_(p_1, p_2) = π_monop(p_1, p_2, params)
     set_silent(model)
-    register(model, :π_monop_, 2, π_monop_; autodiff=true)
-    @variable(model, p[i=1:params.n_firms])
+    register(model, :π_monop_, 2, π_monop_; autodiff = true)
+    @variable(model, p[i = 1:params.n_firms])
     @NLobjective(model, Max, π_monop_(p[1], p[2]))
 
     optimize!(model)
@@ -72,10 +73,10 @@ function solve_bertrand(params::CompetitionParameters)
 
     model = Model(Ipopt.Optimizer)
     set_silent(model)
-    register(model, :π_i_, 2, π_i_, autodiff=true)
+    register(model, :π_i_, 2, π_i_, autodiff = true)
 
     @variable(model, p_i)
-    @NLparameter(model, p_min_i[i=1:(params.n_firms-1)] == 1)
+    @NLparameter(model, p_min_i[i = 1:(params.n_firms-1)] == 1)
     @NLobjective(model, Max, π_i_(p_i, p_min_i[1]))
 
     optimize!(model)

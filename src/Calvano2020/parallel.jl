@@ -9,8 +9,8 @@ function run_pmap(
     price_options::Vector{Float64},
     competition_params::CompetitionParameters,
     p_Bert_nash_equilibrium::Float64,
-    p_monop_opt::Float64
-    )
+    p_monop_opt::Float64,
+)
     o_ = runCalvano(
         α,
         β,
@@ -19,6 +19,6 @@ function run_pmap(
         competition_params,
         p_Bert_nash_equilibrium,
         p_monop_opt,
-        )
+    )
     return
 end

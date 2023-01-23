@@ -2,10 +2,10 @@ using ReinforcementLearning
 
 function setupCalvanoExperiment(env::CalvanoEnv)
     Experiment(
-        policy=CalvanoPolicy(env),
-        env=SequentialEnv(env),
-        stop_condition=CalvanoStop(env),
-        hook=CalvanoHook(env),
+        policy = CalvanoPolicy(env),
+        env = SequentialEnv(env),
+        stop_condition = CalvanoStop(env),
+        hook = CalvanoHook(env),
     )
 end
 
@@ -17,9 +17,9 @@ function setupCalvanoExperiment(
     competition_params::CompetitionParameters,
     p_Bert_nash_equilibrium::Float64,
     p_monop_opt::Float64;
-    max_iter::Int=Int(1e9),
-    convergence_threshold::Int=Int(1e5),
-    profit_function=p -> π_fun(p, competition_params),
+    max_iter::Int = Int(1e9),
+    convergence_threshold::Int = Int(1e5),
+    profit_function = p -> π_fun(p, competition_params),
 )
 
     env = CalvanoEnv(
@@ -38,7 +38,7 @@ function setupCalvanoExperiment(
     return setupCalvanoExperiment(env)
 end
 
-runCalvano(env::CalvanoEnv) = setupCalvanoExperiment(env) |> run(; describe=false)
+runCalvano(env::CalvanoEnv) = setupCalvanoExperiment(env) |> run(; describe = false)
 
 # TODO: Look into DistributedReinforcementLearning.jl for running grid of experiments
 # Add hook `(hook::YourHook)(::PostExperimentStage, agent, env)` to save profit results!
@@ -51,9 +51,9 @@ function runCalvano(
     competition_params::CompetitionParameters,
     p_Bert_nash_equilibrium::Float64,
     p_monop_opt::Float64;
-    max_iter::Int=Int(1e9),
-    convergence_threshold::Int=Int(1e5),
-    profit_function=p -> π_fun(p, competition_params),
+    max_iter::Int = Int(1e9),
+    convergence_threshold::Int = Int(1e5),
+    profit_function = p -> π_fun(p, competition_params),
 )
     experiment = setupCalvanoExperiment(
         α,
@@ -61,27 +61,22 @@ function runCalvano(
         δ,
         price_options,
         competition_params,
-        max_iter=max_iter,
-        convergence_threshold=convergence_threshold,
-        profit_function=profit_function,
+        max_iter = max_iter,
+        convergence_threshold = convergence_threshold,
+        profit_function = profit_function,
         p_Bert_nash_equilibrium::Float64,
         p_monop_opt::Float64,
     )
-    return run(experiment; describe=false)
+    return run(experiment; describe = false)
 end
 
-function buildParameterSet(n_increments=100)
+function buildParameterSet(n_increments = 100)
     # TODO: Fix this parameterization based on Calvano pg. 12
     α_ = range(0.025, 0.25, n_increments)
-    β_ = range(1.25e-8, 2e-5, n_increments) 
+    β_ = range(1.25e-8, 2e-5, n_increments)
 
-    competition_params = CompetitionParameters(
-        μ = 0.25,
-        a_0 = 0,
-        a = [2, 2],
-        c = [1, 1],
-        n_firms = 2,
-    )
+    competition_params =
+        CompetitionParameters(μ = 0.25, a_0 = 0, a = [2, 2], c = [1, 1], n_firms = 2)
     ξ = 0.1
     δ = 0.95
     n_prices = 15
@@ -98,11 +93,7 @@ function buildParameterSet(n_increments=100)
     GC.gc()
 
     return [
-    (α, β, δ,
-     price_options,
-     competition_params,
-     p_Bert_nash_equilibrium,
-     p_monop_opt
-    ) for α in α_ for β in β_
+        (α, β, δ, price_options, competition_params, p_Bert_nash_equilibrium, p_monop_opt)
+        for α in α_ for β in β_
     ]
 end

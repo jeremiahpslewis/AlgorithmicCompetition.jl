@@ -14,14 +14,11 @@ struct ConvergenceCheck <: AbstractHook
     # Number of steps where no change has happened to argmax
     convergence_meta_tuple::ConvergenceMeta
 
-    function ConvergenceCheck(
-        n_state_space::Int,
-        n_players::Int,
-    )
+    function ConvergenceCheck(n_state_space::Int, n_players::Int)
         new(
             (@SArray zeros(UInt8, n_players, n_state_space)),
-            ConvergenceMeta((0,0),(0,0),(0,0)),
-    )
+            ConvergenceMeta((0, 0), (0, 0), (0, 0)),
+        )
     end
 end
 
