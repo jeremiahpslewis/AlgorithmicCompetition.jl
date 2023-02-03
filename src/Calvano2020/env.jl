@@ -23,16 +23,13 @@ struct CalvanoEnv <: AbstractEnv
     p_Bert_nash_equilibrium::Float64
     p_monop_opt::Float64
 
-    function CalvanoEnv(
-        p::CalvanoHyperParameters
-    )
+    function CalvanoEnv(p::CalvanoHyperParameters)
         # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
         # TODO: Think about how initial memory should be assigned
         n_prices = length(p.price_options)
         price_index = 1:n_prices
         n_state_space = n_prices^(p.memory_length * p.n_players)
-        convergence_check =
-            ConvergenceCheck(n_state_space, p.n_players)
+        convergence_check = ConvergenceCheck(n_state_space, p.n_players)
         init_matrix = zeros(Float32, n_prices, n_state_space)
 
         new(
