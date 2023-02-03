@@ -22,3 +22,29 @@
 | 18.111 ms (205607 allocations: 17.04 MiB) |
 | 17.791 ms (207607 allocations: 17.38 MiB) |
 | 17.900 ms (205609 allocations: 17.04 MiB) |
+
+
+15.775 ms (186059 allocations: 16.66 MiB)
+15.430 ms (186076 allocations: 16.66 MiB)
+15.072 ms (185833 allocations: 16.63 MiB)
+18.628 ms (208519 allocations: 16.97 MiB)
+15.904 ms (185829 allocations: 16.63 MiB) # UInt8 seems to help!
+15.725 ms (185835 allocations: 16.63 MiB)
+15.130 ms (185794 allocations: 15.40 MiB) # UInt8
+15.456 ms (185787 allocations: 12.41 MiB)
+15.283 ms (185782 allocations: 12.41 MiB)
+15.081 ms (184958 allocations: 11.85 MiB)
+15.484 ms (184960 allocations: 11.85 MiB)
+15.769 ms (184936 allocations: 11.85 MiB)
+16.473 ms (188974 allocations: 12.32 MiB) # Tuple instead of vect in hook
+15.738 ms (184943 allocations: 11.85 MiB) # drop custom stop condition
+11.940 ms (116933 allocations: 8.64 MiB) # drop custom hook
+14.745 ms (184952 allocations: 11.85 MiB)
+Fail ## Use column-based instead of row based index
+Fail ## Use q-table view
+15.470 ms (164960 allocations: 11.09 MiB) ## Simplify map_memory_to_state
+drop stop condition
+# Make mutable...
+TODO:
+- [ ] Figure out why n_state_space is 5k not ~200
+- [ ] Add tests

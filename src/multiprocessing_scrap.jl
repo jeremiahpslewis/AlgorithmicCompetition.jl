@@ -23,6 +23,6 @@ max_iter = Int(1e6) # Should be 1e9
 β_ = range(1.25e-8, 2e-5, n_increments) 
 δ = 0.95
 
-hyperparameter_vect = [CalvanoHyperParameters.(α,  β, δ, max_iter) for α in α_ for β in β_]
+hyperparameter_vect = [CalvanoHyperParameters(α,  β, δ, max_iter) for α in α_ for β in β_]
 
-pmap(AlgorithmicCompetition.run, param_set)
+pmap(AlgorithmicCompetition.run, hyperparameter_vect[1:10])

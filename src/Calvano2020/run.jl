@@ -24,3 +24,11 @@ function run(experiments::Vector{ReinforcementLearningCore.Experiment})
         # end
     end
 end
+
+function run(hyperparameter_vect::Vector{CalvanoHyperParameters})
+    pmap(run, hyperparameters)
+end
+
+function run(hyperparameters::CalvanoHyperParameters)
+    CalvanoEnv() |> Experiment()
+end
