@@ -83,3 +83,13 @@ end
     @test q_fun([1.92498, 1.92498], CompetitionParameters(0.25, 0, [2, 2], [1, 1])) ≈
           fill(0.36486, 2) atol = 0.01
 end
+
+@testset "Run a set of experiments." begin
+    n_increments = 10
+    α_ = range(0.025, 0.25, n_increments)
+    β_ = range(1.25e-8, 2e-5, n_increments) 
+    δ = 0.95
+
+    exps = CalvanoHyperParameters.(α_, β_, (δ,), (max_iter,)) |> CalvanoEnv.() |> Experiment.()
+    @test exps[1] isa Experiment
+end

@@ -3,11 +3,11 @@ using Distributed
 using ParallelDataTransfer
 
 function Experiment(env::CalvanoEnv)
-    Experiment(
-        policy = CalvanoPolicy(env),
-        env = SequentialEnv(env),
-        stop_condition = CalvanoStop(env),
-        hook = CalvanoHook(env),
+    ReinforcementLearning.Experiment(
+        policy=CalvanoPolicy(env),
+        env=SequentialEnv(env),
+        stop_condition=CalvanoStop(env),
+        hook=CalvanoHook(env),
     )
 end
 
