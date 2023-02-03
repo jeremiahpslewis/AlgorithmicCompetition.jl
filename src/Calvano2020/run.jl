@@ -28,5 +28,11 @@ function run(hyperparameter_vect::Vector{CalvanoHyperParameters})
 end
 
 function run(hyperparameters::CalvanoHyperParameters)
-    hyperparameters |> CalvanoEnv() |> Experiment()
+    env = CalvanoEnv(hyperparameters)
+    experiment = Experiment(env)
+    return Base.run(experiment)
+end
+
+function run_and_extract(hyperparameters::CalvanoHyperParameters)
+    economic_summary(run(hyperparameters))
 end
