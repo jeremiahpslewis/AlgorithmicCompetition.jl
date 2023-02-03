@@ -57,7 +57,7 @@ end
 π_monop(p_1, p_2, params::CompetitionParameters) = sum(π_fun([p_1, p_2], params)) / 2 # per-firm
 
 
-@memoize function solve_monopolist(params::CompetitionParameters)
+function solve_monopolist(params::CompetitionParameters)
     model = Model(Ipopt.Optimizer)
     π_monop_(p_1, p_2) = π_monop(p_1, p_2, params)
     set_silent(model)
@@ -71,7 +71,7 @@ end
 end
 
 
-@memoize function solve_bertrand(params::CompetitionParameters)
+function solve_bertrand(params::CompetitionParameters)
     π_i_(p_1, p_2) = π_i(p_1, p_2, params)
 
     model = Model(Ipopt.Optimizer)
