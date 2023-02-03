@@ -14,7 +14,7 @@ multiproc = true
 using ParallelDataTransfer
 
 _procs = addprocs(
-    1,
+    7,
     topology = :master_worker,
     exeflags = ["--threads=1", "--project=$(Base.active_project())"],
 )
@@ -40,4 +40,4 @@ hyperparameter_vect = [
     CalvanoHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_ for β in β_
 ]
 
-pmap(AlgorithmicCompetition.run, hyperparameter_vect[1:10])
+exp_list = pmap(AlgorithmicCompetition.run_and_extract, hyperparameter_vect)
