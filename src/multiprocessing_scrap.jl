@@ -8,6 +8,10 @@ using AlgorithmicCompetition:
     Experiment
 using ReinforcementLearning
 using Chain
+using Statistics
+using DataFrames
+using GLMakie
+using DataFrameMacros
 
 multiproc = true
 
@@ -41,3 +45,16 @@ hyperparameter_vect = [
 ]
 
 exp_list = pmap(AlgorithmicCompetition.run_and_extract, hyperparameter_vect)
+
+
+# TODO: Figure out why both players have identical average profits ALWAYS and add test?
+mean([ex.avg_profit[1] == ex.avg_profit[2] for ex in exp_list])
+
+α_result = [ex.α for ex in exp_list]
+β_result = [ex.β for ex in exp_list]
+avg_profit_result = [ex.avg_profit[1] for ex in exp_list]
+
+
+df = DataFrame(α = α_result, β = β_result, π_bar = avg_profit_result)
+
+plt_ = @chain df @combine(heatmap(:α, :β, :π_bar))
