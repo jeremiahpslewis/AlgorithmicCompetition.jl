@@ -20,7 +20,7 @@ function economic_summary(e::ReinforcementLearningCore.Experiment)
     avg_profit = Float64[]
 
     for i in [1, 2]
-        @chain e.hook.hooks[i][1].rewards[(end - convergence_threshold):end] begin
+        @chain e.hook.hooks[i][1].rewards[(end-convergence_threshold):end] begin
             push!(avg_profit, profit_measure(_, π_N, π_M))
         end
     end
