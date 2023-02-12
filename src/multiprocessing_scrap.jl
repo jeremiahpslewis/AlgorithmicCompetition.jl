@@ -10,7 +10,7 @@ using ReinforcementLearning
 using Chain
 using Statistics
 using DataFrames
-using GLMakie
+using CairoMakie
 using DataFrameMacros
 using CSV
 using ProgressMeter
