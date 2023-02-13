@@ -1,4 +1,5 @@
 using ReinforcementLearning
+using Dates
 
 function _convergence_check(
     q_table::Matrix{Float32},
@@ -43,6 +44,11 @@ function calculate_convergence_meta(
     best_action, is_converged = _convergence_check(q_table, convergence_table, state)
 
     iterations_until_convergence = c_meta.iterations_until_convergence + 1
+
+    # Log every 1 million iterations
+    if iterations_until_convergence % 1e7 == 0
+        println("[$(now(UTC))] Iterations so far: $(iterations_until_convergence)")
+    end
 
     convergence_duration = is_converged ? c_meta.convergence_duration + 1 : 0
     convergence_metric =
