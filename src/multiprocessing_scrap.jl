@@ -46,7 +46,15 @@ hyperparameter_vect = [
     CalvanoHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_ for β in β_
 ]
 
-exp_list = @showprogress pmap(AlgorithmicCompetition.run_and_extract, hyperparameter_vect)
+exp_list = @showprogress pmap(AlgorithmicCompetition.run_and_extract, hyperparameter_vect; on_error=identity)
+
+# TODO: Figure out why both players have identical average profits ALWAYS and add test?
+mean([ex.avg_profit[1] == ex.avg_profit[2] for ex in exp_list])
+
+α_result = [ex.α for ex in exp_list if !(ex isa Exception)]
+β_result = [ex.β for ex in exp_list if !(ex isa Exception)]
+avg_profit_result = [ex.avg_profit[1] for ex in exp_list if !(ex isa Exception)]
+
 
 
 # TODO: Figure out why both players have identical average profits ALWAYS and add test?
