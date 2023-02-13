@@ -6,7 +6,7 @@ function Experiment(env::CalvanoEnv)
     ReinforcementLearning.Experiment(
         policy = CalvanoPolicy(env),
         env = SequentialEnv(env),
-        stop_condition = CalvanoStop(env),
+        stop_condition = CalvanoStop(env; stop_on_convergence=false), # TODO: reactivate stop on convergence
         hook = CalvanoHook(env),
     )
 end
