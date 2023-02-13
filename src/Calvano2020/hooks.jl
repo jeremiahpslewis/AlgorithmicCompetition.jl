@@ -1,16 +1,4 @@
 using ReinforcementLearning
-using Dates
-
-function _convergence_check(
-    q_table::Matrix{Float32},
-    prev_best_action::UInt8,
-    state::Int,
-)
-    best_action = argmax(q_table[:, state])
-    is_converged = prev_best_action == best_action
-
-    return best_action, is_converged
-end
 
 struct ConvergenceMeta
     convergence_duration::UInt32
@@ -33,22 +21,15 @@ end
 
 function calculate_convergence_meta(
     c_meta::ConvergenceMeta,
-    q_table::Matrix{Float32},
+    best_action::UInt8,
     prev_best_action::UInt8,
-    state::Int,
 )
     # Increment duration whenever argmax action is stable (convergence criteria)
     # Increment convergence metric (e.g. convergence not reached)
     # Keep track of number of iterations it takes until convergence
 
-    best_action, is_converged = _convergence_check(q_table, prev_best_action, state)
-
+    is_converged = prev_best_action == best_action
     iterations_until_convergence = c_meta.iterations_until_convergence + 1
-
-    # Log every 1 million iterations
-    # if iterations_until_convergence % 1e7 == 0
-    #     println("[$(now(UTC))] Iterations so far: $(iterations_until_convergence)")
-    # end
 
     convergence_duration = is_converged ? c_meta.convergence_duration + 1 : 0
     convergence_metric =
@@ -74,15 +55,14 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
         return
     end
 
-    q_table = policy.policy.policy.learner.approximator.table
     state = RLBase.state(env)
+    best_action = argmax(@view policy.policy.policy.learner.approximator.table[:, state])
     prev_best_action = (@view h.approximator_table__state_argmax[current_player_id, state])[1]
 
     c_meta, is_converged, best_action = calculate_convergence_meta(
         h.convergence_meta_tuple[current_player_id],
-        q_table,
+        best_action,
         prev_best_action,
-        state,
     )
 
     h.convergence_meta_tuple[current_player_id] = c_meta

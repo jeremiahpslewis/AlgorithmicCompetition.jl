@@ -176,5 +176,8 @@ end
 
 44.820 ns (1 allocation: 48 bytes)
 
+using BenchmarkTools
 using ReinforcementLearning
 @btime ConvergenceCheck(Int(env.n_state_space), Int(env.n_players))((ReinforcementLearning.PostActStage, policies, env))
+
+# 1.238 μs (7 allocations: 99.44 KiB)
