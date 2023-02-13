@@ -5,7 +5,8 @@ using AlgorithmicCompetition:
     CompetitionSolution,
     CalvanoHyperParameters,
     CalvanoEnv,
-    Experiment
+    Experiment,
+    run_and_extract
 using ReinforcementLearning
 using Chain
 using Statistics
@@ -46,7 +47,9 @@ hyperparameter_vect = [
     CalvanoHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_ for β in β_
 ]
 
-exp_list = @showprogress pmap(AlgorithmicCompetition.run_and_extract, hyperparameter_vect; on_error=identity)
+run_and_extract(hyperparameter_vect[1])
+
+exp_list = @showprogress pmap(run_and_extract, hyperparameter_vect; on_error=identity)
 
 # TODO: Figure out why both players have identical average profits ALWAYS and add test?
 mean([ex.avg_profit[1] == ex.avg_profit[2] for ex in exp_list])
