@@ -56,7 +56,7 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
     end
 
     state = RLBase.state(env)
-    best_action = argmax(@view policy.policy.policy.learner.approximator.table[state, :])
+    best_action = convert(argmax(@view policy.policy.policy.learner.approximator.table[:, state]), UInt8)
     prev_best_action = (@view h.approximator_table__state_argmax[state, current_player_id])[1]
 
     c_meta, is_converged, best_action = calculate_convergence_meta(
