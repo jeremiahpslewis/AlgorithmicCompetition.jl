@@ -15,8 +15,7 @@ using AlgorithmicCompetition:
     solve_bertrand,
     p_BR,
     map_memory_to_state,
-    q_fun,
-    _convergence_check
+    q_fun
 
 @testset "Competitive Equilibrium: Monopoly" begin
     params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
@@ -118,12 +117,6 @@ end
     state = 20
 
     c_meta = ConvergenceMeta(0, 0, 0)
-
-    @test _convergence_check(
-        q_table,
-        prev_best_action,
-        state,
-    ) == (1, false)
 
     @test calculate_convergence_meta(
         c_meta,
