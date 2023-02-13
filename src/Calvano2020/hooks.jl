@@ -13,7 +13,7 @@ struct ConvergenceCheck <: AbstractHook
 
     function ConvergenceCheck(n_state_space::Int, n_players::Int)
         new(
-            zeros(UInt8, n_players, n_state_space),
+            zeros(UInt8, n_state_space, n_players),
             [ConvergenceMeta(0, 0, 0), ConvergenceMeta(0, 0, 0)],
         )
     end
@@ -56,8 +56,8 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
     end
 
     state = RLBase.state(env)
-    best_action = argmax(@view policy.policy.policy.learner.approximator.table[:, state])
-    prev_best_action = (@view h.approximator_table__state_argmax[current_player_id, state])[1]
+    best_action = argmax(@view policy.policy.policy.learner.approximator.table[state, :])
+    prev_best_action = (@view h.approximator_table__state_argmax[state, current_player_id])[1]
 
     c_meta, is_converged, best_action = calculate_convergence_meta(
         h.convergence_meta_tuple[current_player_id],
@@ -69,7 +69,7 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
 
     # Update argmax matrix
     if ~is_converged
-        h.approximator_table__state_argmax[current_player_id, state] = best_action
+        h.approximator_table__state_argmax[state, current_player_id] = best_action
     end
     return
 

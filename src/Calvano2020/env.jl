@@ -11,7 +11,7 @@ struct CalvanoEnv <: AbstractEnv
     max_iter::Int
     convergence_threshold::Int
     n_prices::UInt8
-    price_index::Vector{Int}
+    price_index::Vector{UInt8}
     convergence_check::ConvergenceCheck
     init_matrix::Matrix{Float32}
     profit_function::Function
@@ -27,7 +27,7 @@ struct CalvanoEnv <: AbstractEnv
         # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
         # TODO: Think about how initial memory should be assigned
         n_prices = length(p.price_options)
-        price_index = 1:n_prices
+        price_index = convert.(UInt8, 1:n_prices)
         n_state_space = n_prices^(p.memory_length * p.n_players)
         convergence_check = ConvergenceCheck(n_state_space, p.n_players)
         init_matrix = zeros(Float32, n_prices, n_state_space)
@@ -46,8 +46,8 @@ struct CalvanoEnv <: AbstractEnv
             convergence_check,
             init_matrix,
             p.profit_function,
-            convert(UInt16, n_state_space),
-            ones(UInt16, p.memory_length, p.n_players), # Memory, note max of 256 prices with UInt8
+            convert(UInt8, n_state_space),
+            ones(UInt8, p.memory_length, p.n_players), # Memory, note max of 256 prices with UInt8
             fill(false, p.n_players), # Is converged
             [0.0, 0.0], # Reward
             [false], # Is done
@@ -67,6 +67,7 @@ function (env::CalvanoEnv)((p_1, p_2))
     env.is_done[1] = true
 end
 
+# map combination of prices to state
 function map_memory_to_state(v, n_prices)
     v = vec(v)
     sum((v .- 1) .* n_prices .^ ((1:length(v)) .- 1)) + 1
