@@ -74,7 +74,7 @@ end
 
 RLBase.action_space(env::CalvanoEnv, ::Int) = env.price_index # Choice of price
 
-RLBase.action_space(::CalvanoEnv, ::SimultaneousPlayer) =
+RLBase.action_space(env::CalvanoEnv, ::SimultaneousPlayer) =
     Tuple((i, j) for i in env.price_index for j in env.price_index)
 
 RLBase.legal_action_space(env::CalvanoEnv, p) =
@@ -85,7 +85,7 @@ RLBase.action_space(env::CalvanoEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 RLBase.reward(env::CalvanoEnv) = env.is_done[1] ? env.reward : [0, 0]
 RLBase.reward(env::CalvanoEnv, p::Int) = reward(env)[p]
 
-RLBase.state_space(::CalvanoEnv, ::Observation, p) = Base.OneTo(env.n_state_space)
+RLBase.state_space(env::CalvanoEnv, ::Observation, p) = Base.OneTo(env.n_state_space)
 
 function RLBase.state(env::CalvanoEnv, ::Observation, p)
     map_memory_to_state(env.memory, env.n_prices)

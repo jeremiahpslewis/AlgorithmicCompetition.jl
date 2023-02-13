@@ -3,11 +3,11 @@ using Dates
 
 function _convergence_check(
     q_table::Matrix{Float32},
-    convergence_table::SubArray{UInt8},
+    prev_best_action::UInt8,
     state::Int,
 )
     best_action = argmax(q_table[:, state])
-    is_converged = convergence_table[state] == best_action
+    is_converged = prev_best_action == best_action
 
     return best_action, is_converged
 end
@@ -34,21 +34,21 @@ end
 function calculate_convergence_meta(
     c_meta::ConvergenceMeta,
     q_table::Matrix{Float32},
-    convergence_table::SubArray{UInt8},
+    prev_best_action::UInt8,
     state::Int,
 )
     # Increment duration whenever argmax action is stable (convergence criteria)
     # Increment convergence metric (e.g. convergence not reached)
     # Keep track of number of iterations it takes until convergence
 
-    best_action, is_converged = _convergence_check(q_table, convergence_table, state)
+    best_action, is_converged = _convergence_check(q_table, prev_best_action, state)
 
     iterations_until_convergence = c_meta.iterations_until_convergence + 1
 
     # Log every 1 million iterations
-    if iterations_until_convergence % 1e7 == 0
-        println("[$(now(UTC))] Iterations so far: $(iterations_until_convergence)")
-    end
+    # if iterations_until_convergence % 1e7 == 0
+    #     println("[$(now(UTC))] Iterations so far: $(iterations_until_convergence)")
+    # end
 
     convergence_duration = is_converged ? c_meta.convergence_duration + 1 : 0
     convergence_metric =
@@ -75,13 +75,13 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
     end
 
     q_table = policy.policy.policy.learner.approximator.table
-    convergence_table = @view h.approximator_table__state_argmax[current_player_id, :]
     state = RLBase.state(env)
+    prev_best_action = (@view h.approximator_table__state_argmax[current_player_id, state])[1]
 
     c_meta, is_converged, best_action = calculate_convergence_meta(
         h.convergence_meta_tuple[current_player_id],
         q_table,
-        convergence_table,
+        prev_best_action,
         state,
     )
 
@@ -94,33 +94,6 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
     return
 
 end
-
-# function (h::TotalRewardPerEpisode)(::PostExperimentStage, agent, env)
-#     convergence_threshold = env.env.convergence_threshold
-#     current_player_id = env.current_player_idx
-
-#     π_N = env.env.profit_function(fill(env.env.p_Bert_nash_equilibrium, 2))[1]
-#     π_M = env.env.profit_function(fill(env.env.p_monop_opt, 2))[1]
-
-#     avg_profit = Float64[]
-
-#     for i in [1, 2]
-#         @chain h.rewards[(end - convergence_threshold):end] begin
-#             push!(avg_profit, profit_measure(_, π_N, π_M))
-#         end
-#     end
-
-#     out_dir = "out"
-#     if !isdir(out_dir)
-#         mkdir(out_dir)
-#     end
-
-#     f_name = UUIDs.uuid4()
-#     open(out_dir * "/" * string(f_name) * ".txt", "a") do io
-#         println(io, JSON.print(CalvanoSummary(current_player_id, env.env.α, env.env.β, avg_profit)))
-#      end
-
-# end
 
 # TODO: Figure out why the hook results are identical for both players
 function CalvanoHook(env::AbstractEnv)

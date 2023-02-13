@@ -48,3 +48,14 @@ drop stop condition
 TODO:
 - [ ] Figure out why n_state_space is 5k not ~200
 - [ ] Add tests
+
+
+
+# new round of performance tuning
+
+10 mio iterations -> 4 minutes
+
+ 1e6 rounds with hook  22.088 s (230879256 allocations: 10.29 GiB)
+ 1e6 rounds without custom hook 1.810 s (18688628 allocations: 819.79 MiB)
+
+ ...so need to fix the custom hook!!!
