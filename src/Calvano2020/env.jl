@@ -29,7 +29,7 @@ struct CalvanoEnv <: AbstractEnv
         n_prices = length(p.price_options)
         price_index = convert.(Int, 1:n_prices)
         n_state_space = n_prices^(p.memory_length * p.n_players)
-        convergence_check = ConvergenceCheck(n_prices, p.n_players)
+        convergence_check = ConvergenceCheck(p.n_players)
         init_matrix = zeros(Float32, n_prices, n_state_space)
 
         new(
@@ -67,10 +67,13 @@ function (env::CalvanoEnv)((p_1, p_2))
     env.is_done[1] = true
 end
 
-# map combination of prices to state
-function map_memory_to_state(v, n_prices)
-    v = vec(v)
-    sum((v .- 1) .* n_prices .^ ((1:length(v)) .- 1)) + 1
+# map price vector to state
+function map_vect_to_int(vect_, base)
+    sum(vect_[k]*base^(k-1) for k=1:length(vect_)) # From Julia help / docs
+end
+
+function map_int_to_vect(int_val, base, vect_length)
+    return digits(Int8, int_val, base=base, pad=vect_length)
 end
 
 RLBase.action_space(env::CalvanoEnv, ::Int) = env.price_index # Choice of price
@@ -89,7 +92,7 @@ RLBase.reward(env::CalvanoEnv, p::Int) = reward(env)[p]
 RLBase.state_space(env::CalvanoEnv, ::Observation, p) = Base.OneTo(env.n_state_space)
 
 function RLBase.state(env::CalvanoEnv, ::Observation, p)
-    map_memory_to_state(env.memory, env.n_prices)
+    map_vect_to_int(env.memory .- 1, env.n_prices) + 1
 end
 
 RLBase.is_terminated(env::CalvanoEnv) = env.is_done[1]

@@ -14,7 +14,7 @@ using AlgorithmicCompetition:
     solve_monopolist,
     solve_bertrand,
     p_BR,
-    map_memory_to_state,
+    map_vect_to_int,
     q_fun,
     get_best_action,
     update_best_action!
@@ -44,13 +44,13 @@ end
     @test p_BR(1.47293, params) ≈ 1.47293 atol = 1e6
 end
 
-@testset "map_memory_to_state" begin
+@testset "map_vect_to_int" begin
     n_prices = 15
     n_players = 2
     memory_length = 1
     n_state_space = n_prices^(n_players * memory_length)
-    @test map_memory_to_state(repeat([n_prices], n_players), n_prices) == n_state_space
-    @test map_memory_to_state(Array{Int,2}(repeat([n_prices], n_players)'), n_prices) ==
+    @test map_vect_to_int(repeat([n_prices], n_players), n_prices) + 1 == n_state_space
+    @test map_vect_to_int(Array{Int,2}(repeat([n_prices], n_players)'), n_prices) + 1 ==
           n_state_space
 end
 
@@ -184,4 +184,15 @@ using ReinforcementLearning
     update_best_action!(d_, Int16(9), Int16(9), Int16(11))
     @test d_[11] == Set([9, 11])
     @test d_[9] == Set()
+end
+
+@testset "map_vect_to_int, map_int_to_vect" begin
+    vect_ = [1, 2, 3]
+    base = 24
+    i_num = map_vect_to_int(vect_, base)
+    @test [vect_..., 0, 0] == map_int_to_vect(i_num, base, 5)
+
+    int_ = 720
+    vect_1 = map_int_to_vect(int_, base, 6)
+    @test int_ == map_vect_to_int(vect_1, base)
 end
