@@ -39,7 +39,7 @@ struct CalvanoHyperParameters
         δ = 0.95
         n_prices = 15
         n_players = 2
-        memory_length = 2
+        memory_length = 1
 
         # p_monop defined above
         p_range_pad =

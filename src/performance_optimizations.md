@@ -44,9 +44,10 @@ Fail ## Use column-based instead of row based index
 Fail ## Use q-table view
 15.470 ms (164960 allocations: 11.09 MiB) ## Simplify map_memory_to_state
 drop stop condition
+
 # Make mutable...
 TODO:
-- [ ] Figure out why n_state_space is 5k not ~200
+- [x] Figure out why n_state_space is 5k not ~200 (memory 1 -> ~200, 2 -> 5k)
 - [ ] Add tests
 
 
@@ -69,5 +70,10 @@ TODO:
 21.616 s (227980158 allocations: 10.53 GiB)
 21.946 s (228980298 allocations: 10.05 GiB)
 20.889 s (203980129 allocations: 9.28 GiB)
-
+22.657 s (240660005 allocations: 10.35 GiB)
+21.545 s (228980633 allocations: 10.05 GiB)
+22.265 s (228979920 allocations: 10.59 GiB)
+21.267 s (228980556 allocations: 10.59 GiB)
+21.761 s (228980508 allocations: 9.87 GiB)
+22.346 s (227000637 allocations: 10.41 GiB)
 2.125 s (22898642 allocations: 1.01 GiB)

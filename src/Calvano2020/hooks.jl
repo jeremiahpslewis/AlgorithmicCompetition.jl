@@ -1,19 +1,34 @@
 using ReinforcementLearning
 
+function get_best_action(d::Dict{Int8, BitSet}, state::Int16)
+    for (k, v) in d
+        if state in v
+            return k
+        else
+            return Int8(0)
+        end
+    end
+end
+
+function update_best_action!(d::Dict{Int8, BitSet}, state::Int16, prev_best_action::Int8, best_action::Int8)
+    delete!(d[prev_best_action], state)
+    push!(d[best_action], state)
+end
+
 mutable struct ConvergenceMeta
-    convergence_duration::UInt32
-    convergence_metric::UInt32
-    iterations_until_convergence::UInt32
+    convergence_duration::Int32
+    convergence_metric::Int32
+    iterations_until_convergence::Int32
 end
 
 struct ConvergenceCheck <: AbstractHook
-    approximator_table__state_argmax::Matrix{UInt8}
+    best_response_lookup::Tuple{Dict{Int8, BitSet}, Dict{Int8, BitSet}}
     # Number of steps where no change has happened to argmax
     convergence_meta_tuple::Vector{ConvergenceMeta}
 
-    function ConvergenceCheck(n_state_space::Int, n_players::Int)
+    function ConvergenceCheck(n_prices::Int, n_players::Int)
         new(
-            zeros(UInt8, n_state_space, n_players),
+            (Dict(Int8(i) => BitSet(Int16(0)) for i in 0:n_prices), Dict(Int8(i) => BitSet(Int16(0)) for i in 0:n_prices)),
             [ConvergenceMeta(0, 0, 0), ConvergenceMeta(0, 0, 0)],
         )
     end
@@ -22,9 +37,9 @@ end
 function update!(
     h::ConvergenceCheck,
     current_player_id::Int,
-    state::Int,
-    best_action::UInt8,
-    prev_best_action::UInt8,
+    state::Int16,
+    best_action::Int8,
+    prev_best_action::Int8,
 )
     # Increment duration whenever argmax action is stable (convergence criteria)
     # Increment convergence metric (e.g. convergence not reached)
@@ -40,9 +55,9 @@ function update!(
 
     # Update argmax matrix
     
-    # if ~is_converged
-    #     h.approximator_table__state_argmax[state, current_player_id] = best_action
-    # end
+    if ~is_converged
+        update_best_action!(h.best_response_lookup[current_player_id], state, prev_best_action, best_action)
+    end
 
 end
 
@@ -56,9 +71,9 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
         return
     end
 
-    state = RLBase.state(env)
-    best_action = convert(UInt8, argmax(@view policy.policy.policy.learner.approximator.table[:, state]))
-    prev_best_action = (@view h.approximator_table__state_argmax[state, current_player_id])[1]
+    state = convert(Int16, RLBase.state(env))
+    best_action = convert(Int8, argmax(@view policy.policy.policy.learner.approximator.table[:, state]))
+    prev_best_action = get_best_action(h.best_response_lookup[current_player_id], state)
 
     update!(
         h,

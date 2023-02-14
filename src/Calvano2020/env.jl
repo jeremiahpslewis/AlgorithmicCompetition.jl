@@ -16,7 +16,7 @@ struct CalvanoEnv <: AbstractEnv
     init_matrix::Matrix{Float32}
     profit_function::Function
     n_state_space::Int
-    memory::Matrix{UInt16}
+    memory::Matrix{Int16}
     is_converged::Vector{Bool}
     reward::Vector{Float64}
     is_done::Vector
@@ -29,7 +29,7 @@ struct CalvanoEnv <: AbstractEnv
         n_prices = length(p.price_options)
         price_index = convert.(Int, 1:n_prices)
         n_state_space = n_prices^(p.memory_length * p.n_players)
-        convergence_check = ConvergenceCheck(n_state_space, p.n_players)
+        convergence_check = ConvergenceCheck(n_prices, p.n_players)
         init_matrix = zeros(Float32, n_prices, n_state_space)
 
         new(
@@ -47,7 +47,7 @@ struct CalvanoEnv <: AbstractEnv
             init_matrix,
             p.profit_function,
             n_state_space,
-            ones(UInt16, p.memory_length, p.n_players), # Memory, note max of 256 prices with Int
+            ones(Int16, p.memory_length, p.n_players), # Memory, note max of 256 prices with Int
             fill(false, p.n_players), # Is converged
             [0.0, 0.0], # Reward
             [false], # Is done

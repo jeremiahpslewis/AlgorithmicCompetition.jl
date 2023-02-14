@@ -15,7 +15,9 @@ using AlgorithmicCompetition:
     solve_bertrand,
     p_BR,
     map_memory_to_state,
-    q_fun
+    q_fun,
+    get_best_action,
+    update_best_action!
 
 @testset "Competitive Equilibrium: Monopoly" begin
     params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
@@ -174,3 +176,12 @@ using ReinforcementLearning
 @btime ConvergenceCheck(Int(env.n_state_space), Int(env.n_players))((ReinforcementLearning.PostActStage, policies, env))
 
 # 1.238 μs (7 allocations: 99.44 KiB)
+
+@testset "get_best_action, update_best_action" begin
+    d_ = Dict(i => Set(Int16(i)) for i in 1:20)
+    @test get_best_action(d_, 10) == 10#|> sum
+    
+    update_best_action!(d_, Int16(9), Int16(9), Int16(11))
+    @test d_[11] == Set([9, 11])
+    @test d_[9] == Set()
+end
