@@ -5,17 +5,17 @@ struct CalvanoEnv <: AbstractEnv
     α::Float64
     β::Float64
     δ::Float64
-    n_players::UInt8
-    memory_length::UInt8
+    n_players::Int
+    memory_length::Int
     price_options::Vector{Float64}
     max_iter::Int
     convergence_threshold::Int
-    n_prices::UInt8
-    price_index::Vector{UInt8}
+    n_prices::Int
+    price_index::Vector{Int}
     convergence_check::ConvergenceCheck
     init_matrix::Matrix{Float32}
     profit_function::Function
-    n_state_space::UInt16
+    n_state_space::Int
     memory::Matrix{UInt16}
     is_converged::Vector{Bool}
     reward::Vector{Float64}
@@ -27,7 +27,7 @@ struct CalvanoEnv <: AbstractEnv
         # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
         # TODO: Think about how initial memory should be assigned
         n_prices = length(p.price_options)
-        price_index = convert.(UInt8, 1:n_prices)
+        price_index = convert.(Int, 1:n_prices)
         n_state_space = n_prices^(p.memory_length * p.n_players)
         convergence_check = ConvergenceCheck(n_state_space, p.n_players)
         init_matrix = zeros(Float32, n_prices, n_state_space)
@@ -37,17 +37,17 @@ struct CalvanoEnv <: AbstractEnv
             p.β,
             p.δ,
             p.n_players,
-            convert(UInt8, p.memory_length),
+            p.memory_length,
             p.price_options,
             p.max_iter,
             p.convergence_threshold,
-            convert(UInt8, n_prices),
+            n_prices,
             price_index,
             convergence_check,
             init_matrix,
             p.profit_function,
-            convert(UInt32, n_state_space),
-            ones(UInt8, p.memory_length, p.n_players), # Memory, note max of 256 prices with UInt8
+            n_state_space,
+            ones(UInt16, p.memory_length, p.n_players), # Memory, note max of 256 prices with Int
             fill(false, p.n_players), # Is converged
             [0.0, 0.0], # Reward
             [false], # Is done

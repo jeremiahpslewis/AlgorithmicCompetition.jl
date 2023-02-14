@@ -1,6 +1,6 @@
 using ReinforcementLearning
 
-struct ConvergenceMeta
+mutable struct ConvergenceMeta
     convergence_duration::UInt32
     convergence_metric::UInt32
     iterations_until_convergence::UInt32
@@ -19,8 +19,10 @@ struct ConvergenceCheck <: AbstractHook
     end
 end
 
-function calculate_convergence_meta(
-    c_meta::ConvergenceMeta,
+function update!(
+    h::ConvergenceCheck,
+    current_player_id::Int,
+    state::Int,
     best_action::UInt8,
     prev_best_action::UInt8,
 )
@@ -29,19 +31,18 @@ function calculate_convergence_meta(
     # Keep track of number of iterations it takes until convergence
 
     is_converged = prev_best_action == best_action
-    iterations_until_convergence = c_meta.iterations_until_convergence + 1
+    h.convergence_meta_tuple[current_player_id].iterations_until_convergence += 1
 
-    convergence_duration = is_converged ? c_meta.convergence_duration + 1 : 0
-    convergence_metric =
-        is_converged ? c_meta.convergence_metric : c_meta.convergence_metric + 1
+    if is_converged
+        h.convergence_meta_tuple[current_player_id].convergence_duration += 1
+        h.convergence_meta_tuple[current_player_id].convergence_metric += 1
+    end
 
-    return ConvergenceMeta(
-        convergence_duration,
-        convergence_metric,
-        iterations_until_convergence,
-    ),
-    is_converged,
-    best_action
+    # Update argmax matrix
+    
+    # if ~is_converged
+    #     h.approximator_table__state_argmax[state, current_player_id] = best_action
+    # end
 
 end
 
@@ -56,23 +57,18 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
     end
 
     state = RLBase.state(env)
-    best_action = convert(argmax(@view policy.policy.policy.learner.approximator.table[:, state]), UInt8)
+    best_action = convert(UInt8, argmax(@view policy.policy.policy.learner.approximator.table[:, state]))
     prev_best_action = (@view h.approximator_table__state_argmax[state, current_player_id])[1]
 
-    c_meta, is_converged, best_action = calculate_convergence_meta(
-        h.convergence_meta_tuple[current_player_id],
+    update!(
+        h,
+        current_player_id,
+        state,
         best_action,
         prev_best_action,
     )
 
-    h.convergence_meta_tuple[current_player_id] = c_meta
-
-    # Update argmax matrix
-    if ~is_converged
-        h.approximator_table__state_argmax[state, current_player_id] = best_action
-    end
     return
-
 end
 
 # TODO: Figure out why the hook results are identical for both players

@@ -28,9 +28,9 @@
 15.430 ms (186076 allocations: 16.66 MiB)
 15.072 ms (185833 allocations: 16.63 MiB)
 18.628 ms (208519 allocations: 16.97 MiB)
-15.904 ms (185829 allocations: 16.63 MiB) # UInt8 seems to help!
+15.904 ms (185829 allocations: 16.63 MiB) # Int seems to help!
 15.725 ms (185835 allocations: 16.63 MiB)
-15.130 ms (185794 allocations: 15.40 MiB) # UInt8
+15.130 ms (185794 allocations: 15.40 MiB) # Int
 15.456 ms (185787 allocations: 12.41 MiB)
 15.283 ms (185782 allocations: 12.41 MiB)
 15.081 ms (184958 allocations: 11.85 MiB)
@@ -57,5 +57,17 @@ TODO:
 
  1e6 rounds with hook  22.088 s (230879256 allocations: 10.29 GiB)
  1e6 rounds without custom hook 1.810 s (18688628 allocations: 819.79 MiB)
+  1.861 s (18698670 allocations: 825.20 MiB)
+  
+21.831 s (228980420 allocations: 10.10 GiB)
+21.897 s (228980169 allocations: 10.05 GiB)
+21.617 s (228980170 allocations: 10.05 GiB)
 
+2.132 s (22898696 allocations: 1.01 GiB) # Dropping the meta tuple assignment:
  ...so need to fix the custom hook!!!
+21.148 s (203980035 allocations: 9.28 GiB) drop vectorization
+21.616 s (227980158 allocations: 10.53 GiB)
+21.946 s (228980298 allocations: 10.05 GiB)
+20.889 s (203980129 allocations: 9.28 GiB)
+
+2.125 s (22898642 allocations: 1.01 GiB)
