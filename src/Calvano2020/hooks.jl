@@ -1,13 +1,13 @@
 using ReinforcementLearning
+using StaticArrays
 
 mutable struct ConvergenceCheck <: AbstractHook
     convergence_duration::Int32
     convergence_metric::Int32
     iterations_until_convergence::Int32
-    best_response_matrix::Matrix{Bool} # state x action
-
+    best_response_vector#::MVector{225, Int8} # state x action # TODO: Fix hardcoding of n_states
     function ConvergenceCheck()
-        new(0, 0, 0, fill(false, 225, 15)) # TODO: Fix hardcoding of n_states and n_actions
+        new(0, 0, 0, MVector{225, Int8}(zeros(Int8, 225))) # TODO: Fix hardcoding of n_states
     end
 end
 
@@ -28,14 +28,12 @@ function update!(
         h.convergence_duration += 1
         h.convergence_metric += 1
     else
-        h.best_response_matrix[state_, best_action] .= true
-        h.best_response_matrix[state_, prev_best_action] .= false
+        @inbounds h.best_response_vector[state_] = best_action
     end
-
 end
+ 
 
-
-function (h::ConvergenceCheck)(::PostEpisodeStage, policy::NamedPolicy, env)
+function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env)
     # Convergence is defined over argmax action for each state 
     # E.g. best / greedy action
     current_player_id = nameof(policy)
@@ -43,7 +41,7 @@ function (h::ConvergenceCheck)(::PostEpisodeStage, policy::NamedPolicy, env)
     
     state_ = convert(Int16, RLBase.state(env))
     best_action = convert(Int8, argmax(@view policy.policy.policy.learner.approximator.table[:, state_]))
-    prev_best_action = argmax(@view h.best_response_matrix[state_, :])
+    prev_best_action = argmax(h.best_response_vector[state_])
 
     update!(
         h,
