@@ -12,7 +12,6 @@ struct CalvanoEnv <: AbstractEnv
     convergence_threshold::Int
     n_prices::Int
     price_index::Vector{Int}
-    convergence_check::ConvergenceCheck
     init_matrix::Matrix{Float32}
     profit_function::Function
     n_state_space::Int
@@ -22,6 +21,7 @@ struct CalvanoEnv <: AbstractEnv
     is_done::Vector
     p_Bert_nash_equilibrium::Float64
     p_monop_opt::Float64
+    convergence_metric::Vector{Int}
 
     function CalvanoEnv(p::CalvanoHyperParameters)
         # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
@@ -29,7 +29,6 @@ struct CalvanoEnv <: AbstractEnv
         n_prices = length(p.price_options)
         price_index = convert.(Int, 1:n_prices)
         n_state_space = n_prices^(p.memory_length * p.n_players)
-        convergence_check = ConvergenceCheck(p.n_players)
         init_matrix = zeros(Float32, n_prices, n_state_space)
 
         new(
@@ -43,7 +42,6 @@ struct CalvanoEnv <: AbstractEnv
             p.convergence_threshold,
             n_prices,
             price_index,
-            convergence_check,
             init_matrix,
             p.profit_function,
             n_state_space,
@@ -53,6 +51,7 @@ struct CalvanoEnv <: AbstractEnv
             [false], # Is done
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,
+            [0, 0], # Convergence metric
         )
     end
 end

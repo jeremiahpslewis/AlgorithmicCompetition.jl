@@ -7,14 +7,14 @@ mutable struct ConvergenceMeta
     best_response_int::Int
 end
 
-struct ConvergenceCheck <: AbstractHook
-    # Number of steps where no change has happened to argmax
-    convergence_meta_tuple::Vector{ConvergenceMeta}
+mutable struct ConvergenceCheck <: AbstractHook
+    convergence_duration::Int32
+    convergence_metric::Int32
+    iterations_until_convergence::Int32
+    best_response_int::Int
 
-    function ConvergenceCheck(n_players::Int)
-        new(
-            [ConvergenceMeta(0, 0, 0, 0) for i in 1:n_players],
-        )
+    function ConvergenceCheck()
+        new(0, 0, 0, 0)
     end
 end
 
@@ -31,37 +31,29 @@ function update!(
     # Keep track of number of iterations it takes until convergence
 
     is_converged = prev_best_action_vect[state_] == best_action
-    h.convergence_meta_tuple[current_player_id].iterations_until_convergence += 1
+    h.iterations_until_convergence += 1
 
     if is_converged
-        h.convergence_meta_tuple[current_player_id].convergence_duration += 1
-        h.convergence_meta_tuple[current_player_id].convergence_metric += 1
-    end
-
-    # Update argmax matrix
-    
-    if ~is_converged
+        h.convergence_duration += 1
+        h.convergence_metric += 1
+    else
         prev_best_action_vect[state_] = best_action
-        h.convergence_meta_tuple[current_player_id].best_response_int = map_vect_to_int(prev_best_action_vect, n_prices)
+        h.best_response_int += 1000
+        # map_vect_to_int(prev_best_action_vect, n_prices)
     end
 
 end
 
 
-function (h::ConvergenceCheck)(::PostActStage, policy, env)
+function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env)
     # Convergence is defined over argmax action for each state
     # E.g. best / greedy action
-    current_player_id = env.current_player_idx
+    current_player_id = nameof(policy)
     n_prices = env.env.n_prices
-
-    # Only update best action for the state space which was played
-    if policy.policy.name != current_player_id
-        return
-    end
-
+    
     state_ = convert(Int16, RLBase.state(env))
     best_action = convert(Int8, argmax(@view policy.policy.policy.learner.approximator.table[:, state_]))
-    prev_best_action_vect = map_int_to_vect(h.convergence_meta_tuple[current_player_id].best_response_int, n_prices, state_)
+    prev_best_action_vect = map_int_to_vect(h.best_response_int, n_prices, state_)
 
     update!(
         h,
@@ -71,7 +63,7 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
         best_action,
         prev_best_action_vect,
     )
-
+    env.env.convergence_metric[current_player_id] = h.convergence_metric
     return
 end
 
@@ -81,7 +73,7 @@ function CalvanoHook(env::AbstractEnv)
         (
             p => ComposedHook(
                 TotalRewardPerEpisode(; is_display_on_exit = false),
-                env.convergence_check,
+                ConvergenceCheck(),
             ) for p in players(env)
         )...,
     )
