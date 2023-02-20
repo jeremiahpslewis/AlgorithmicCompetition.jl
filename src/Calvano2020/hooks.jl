@@ -1,67 +1,55 @@
 using ReinforcementLearning
 
-mutable struct ConvergenceMeta
-    convergence_duration::Int32
-    convergence_metric::Int32
-    iterations_until_convergence::Int32
-    best_response_int::Int
-end
-
 mutable struct ConvergenceCheck <: AbstractHook
     convergence_duration::Int32
     convergence_metric::Int32
     iterations_until_convergence::Int32
-    best_response_int::Int
+    best_response_matrix::Matrix{Bool} # state x action
 
     function ConvergenceCheck()
-        new(0, 0, 0, 0)
+        new(0, 0, 0, fill(false, 225, 15)) # TODO: Fix hardcoding of n_states and n_actions
     end
 end
 
 function update!(
     h::ConvergenceCheck,
-    current_player_id::Int,
     state_::Int16,
-    n_prices::Int,
     best_action::Int8,
-    prev_best_action_vect::Vector{Int8},
+    prev_best_action::Int,
 )
     # Increment duration whenever argmax action is stable (convergence criteria)
     # Increment convergence metric (e.g. convergence not reached)
     # Keep track of number of iterations it takes until convergence
 
-    is_converged = prev_best_action_vect[state_] == best_action
+    is_converged = prev_best_action == best_action
     h.iterations_until_convergence += 1
 
     if is_converged
         h.convergence_duration += 1
         h.convergence_metric += 1
     else
-        prev_best_action_vect[state_] = best_action
-        h.best_response_int += 1000
-        # map_vect_to_int(prev_best_action_vect, n_prices)
+        h.best_response_matrix[state_, best_action] .= true
+        h.best_response_matrix[state_, prev_best_action] .= false
     end
 
 end
 
 
-function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env)
-    # Convergence is defined over argmax action for each state
+function (h::ConvergenceCheck)(::PostEpisodeStage, policy::NamedPolicy, env)
+    # Convergence is defined over argmax action for each state 
     # E.g. best / greedy action
     current_player_id = nameof(policy)
     n_prices = env.env.n_prices
     
     state_ = convert(Int16, RLBase.state(env))
     best_action = convert(Int8, argmax(@view policy.policy.policy.learner.approximator.table[:, state_]))
-    prev_best_action_vect = map_int_to_vect(h.best_response_int, n_prices, state_)
+    prev_best_action = argmax(@view h.best_response_matrix[state_, :])
 
     update!(
         h,
-        current_player_id,
         state_,
-        n_prices,
         best_action,
-        prev_best_action_vect,
+        prev_best_action,
     )
     env.env.convergence_metric[current_player_id] = h.convergence_metric
     return
