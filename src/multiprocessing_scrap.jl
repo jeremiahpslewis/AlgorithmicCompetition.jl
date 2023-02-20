@@ -6,7 +6,8 @@ using AlgorithmicCompetition:
     CalvanoHyperParameters,
     CalvanoEnv,
     Experiment,
-    run_and_extract
+    run_and_extract,
+    run
 using ReinforcementLearning
 using Chain
 using Statistics
@@ -52,6 +53,8 @@ hyperparameter_vect = [
 ]
 
 @btime run_and_extract(hyperparameter_vect[1]; stop_on_convergence=false)
+
+a = run(hyperparameter_vect[1]; stop_on_convergence=false)
 
 
 
