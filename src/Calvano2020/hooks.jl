@@ -15,13 +15,12 @@ function update!(
     h::ConvergenceCheck,
     state_::Int16,
     best_action::Int8,
-    prev_best_action::Int,
+    is_converged::Bool,
 )
     # Increment duration whenever argmax action is stable (convergence criteria)
     # Increment convergence metric (e.g. convergence not reached)
     # Keep track of number of iterations it takes until convergence
 
-    is_converged = prev_best_action == best_action
     h.iterations_until_convergence += 1
 
     if is_converged
@@ -41,15 +40,15 @@ function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env)
     
     state_ = convert(Int16, RLBase.state(env))
     best_action = convert(Int8, argmax(@view policy.policy.policy.learner.approximator.table[:, state_]))
-    prev_best_action = argmax(h.best_response_vector[state_])
+    is_converged = (@view h.best_response_vector[state_]) == best_action
 
     update!(
         h,
         state_,
         best_action,
-        prev_best_action,
+        is_converged,
     )
-    env.env.convergence_metric[current_player_id] = h.convergence_metric
+    @inbounds env.env.convergence_metric[current_player_id] = h.convergence_metric
     return
 end
 
