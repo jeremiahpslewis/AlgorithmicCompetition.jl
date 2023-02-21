@@ -17,7 +17,6 @@ struct CalvanoEnv <: AbstractEnv
     n_state_space::Int
     memory::MMatrix{1, 2, Int}
     is_converged::MVector{2, Bool}
-    reward::MVector{2, Float32}
     is_done::MVector{1, Bool}
     p_Bert_nash_equilibrium::Float32
     p_monop_opt::Float32
@@ -59,7 +58,6 @@ struct CalvanoEnv <: AbstractEnv
             n_state_space,
             MMatrix{1, 2, Int}(ones(Int, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
             MVector{2, Bool}(fill(false, p.n_players)), # Is converged
-            MVector{2, Float32}([0.0, 0.0]), # Reward
             MVector{1, Bool}([false]), # Is done
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,
@@ -70,12 +68,12 @@ struct CalvanoEnv <: AbstractEnv
 end
 
 function (env::CalvanoEnv)((p_1, p_2))
-    # Convert from price indices to price level, compute profit
-    env.reward .= env.profit_array[p_1, p_2, :]
-
-    env.memory .= circshift(env.memory, -1)
-    env.memory[end, :] .= [p_1, p_2]
-
+    if env.memory_length > 1
+        env.memory .= circshift(env.memory, -1)
+        env.memory[end, :] .= [p_1, p_2]
+    else
+        env.memory[1, :] .= [p_1, p_2]
+    end
     env.is_done[1] = true
 end
 
@@ -97,7 +95,10 @@ RLBase.legal_action_space(env::CalvanoEnv, p) =
 
 RLBase.action_space(env::CalvanoEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
-RLBase.reward(env::CalvanoEnv) = env.is_done[1] ? env.reward : SA[0, 0]
+function RLBase.reward(env::CalvanoEnv)
+    env.is_done[1] ? (@view env.profit_array[env.memory[end, 1], env.memory[end, 2], :]) : SA[0, 0]
+end
+
 RLBase.reward(env::CalvanoEnv, p::Int) = reward(env)[p]
 
 RLBase.state_space(env::CalvanoEnv, ::Observation, p) = Base.OneTo(env.n_state_space)
@@ -106,9 +107,12 @@ function RLBase.state(env::CalvanoEnv, ::Observation, p)
     map_vect_to_int(env.memory .- 1, env.n_prices) + 1
 end
 
-RLBase.is_terminated(env::CalvanoEnv) = env.is_done[1]
+RLBase.is_terminated(env::CalvanoEnv) = env.is_done
 # TODO: Expand reset function to other params
-RLBase.reset!(env::CalvanoEnv) = env.is_done[1] = false
+function RLBase.reset!(env::CalvanoEnv)
+    env.is_done[1] = false
+end
+
 RLBase.players(::CalvanoEnv) = (1, 2)
 RLBase.current_player(::CalvanoEnv) = SIMULTANEOUS_PLAYER
 RLBase.NumAgentStyle(::CalvanoEnv) = MultiAgent(2)

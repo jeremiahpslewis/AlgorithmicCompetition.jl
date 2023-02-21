@@ -23,7 +23,7 @@ hyperparameter_vect = [
 CalvanoHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_ for β in β_
 ]
 
-@btime run_and_extract(hyperparameter_vect[1]; stop_on_convergence=false)
+@btime run(hyperparameter_vect[1]; stop_on_convergence=false)
 
 # a = run(hyperparameter_vect[1]; stop_on_convergence=false)
 
@@ -31,3 +31,4 @@ CalvanoHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_
 
 
 # Trying half-precision
+# Try cutting out action space calls
