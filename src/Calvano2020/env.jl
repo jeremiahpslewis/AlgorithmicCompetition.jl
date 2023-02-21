@@ -5,17 +5,17 @@ struct CalvanoEnv <: AbstractEnv
     α::Float64
     β::Float64
     δ::Float64
-    n_players::Int8
-    memory_length::Int8
+    n_players::Int
+    memory_length::Int
     price_options::SVector{15, Float64}
-    max_iter::Int32
-    convergence_threshold::Int32
-    n_prices::Int8
-    price_index::SVector{15, Int8}
+    max_iter::Int
+    convergence_threshold::Int
+    n_prices::Int
+    price_index::SVector{15, Int}
     init_matrix::MMatrix{15, 225, Float32}
     profit_function::Function
     n_state_space::Int
-    memory::MMatrix{1, 2, Int8}
+    memory::MMatrix{1, 2, Int}
     is_converged::MVector{2, Bool}
     reward::MVector{2, Float64}
     is_done::MVector{1, Bool}
@@ -26,10 +26,10 @@ struct CalvanoEnv <: AbstractEnv
         # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
         # TODO: Think about how initial memory should be assigned
         price_options = SVector{15, Float64}(p.price_options)
-        n_prices = convert(Int8, length(p.price_options))
-        price_index = SVector{15, Int8}(convert.(Int8, 1:n_prices))
-        n_players = convert(Int8, p.n_players)
-        n_state_space = convert(Int16, n_prices)^(convert(Int16, p.memory_length) * convert(Int16, n_players))
+        n_prices = length(p.price_options)
+        price_index = SVector{15, Int}(1:n_prices)
+        n_players = p.n_players
+        n_state_space = n_prices^(p.memory_length * n_players)
         init_matrix = MMatrix{15, 225, Float32}(zeros(Float32, n_prices, n_state_space))
 
         new(
@@ -39,14 +39,14 @@ struct CalvanoEnv <: AbstractEnv
             n_players,
             p.memory_length,
             p.price_options,
-            convert(Int32, p.max_iter),
-            convert(Int32, p.convergence_threshold),
+            p.max_iter,
+            p.convergence_threshold,
             n_prices,
             price_index,
             init_matrix,
             p.profit_function,
             n_state_space,
-            MMatrix{1, 2, Int8}(ones(Int8, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
+            MMatrix{1, 2, Int}(ones(Int, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
             MVector{2, Bool}(fill(false, p.n_players)), # Is converged
             MVector{2, Float64}([0.0, 0.0]), # Reward
             MVector{1, Bool}([false]), # Is done
@@ -72,7 +72,7 @@ function map_vect_to_int(vect_, base)
 end
 
 function map_int_to_vect(int_val, base, vect_length)
-    return digits(Int8, int_val, base=base, pad=vect_length)
+    return digits(Int, int_val, base=base, pad=vect_length)
 end
 
 RLBase.action_space(env::CalvanoEnv, ::Int) = env.price_index # Choice of price

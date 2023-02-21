@@ -91,3 +91,5 @@ TODO:
 
 2.022 s (18400651 allocations: 868.88 MiB)
 1.985 s (17900644 allocations: 836.83 MiB)
+2.402 s (20300702 allocations: 881.10 MiB)
+2.445 s (20300701 allocations: 882.62 MiB)

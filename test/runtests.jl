@@ -114,7 +114,7 @@ end
     # q_table = policies.agents[1].policy.policy.learner.approximator.table
     q_table = zeros(Float32, 15, 50625)
 
-    approximator_table__state_argmax = zeros(UInt8, env.n_players, env.n_state_space)
+    approximator_table__state_argmax = zeros(UInt, env.n_players, env.n_state_space)
     prev_best_action = (@view approximator_table__state_argmax[1, :])[1]
     state = 20
 
@@ -150,7 +150,7 @@ using BenchmarkTools
 
 
 
-approximator_table__state_argmax = zeros(UInt8, env.n_state_space, env.n_players)
+approximator_table__state_argmax = zeros(UInt, env.n_state_space, env.n_players)
 is_converged = convergence_table[state] == best_action
 
 function a(approximator_table__state_argmax)
