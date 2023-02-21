@@ -95,4 +95,5 @@ TODO:
 21.765 s (185013689 allocations: 7.54 GiB) # Stop recalculating profits!
 20.325 s (174013689 allocations: 7.47 GiB)
 19.466 s (173014763 allocations: 7.44 GiB)
+14.491 s (149013687 allocations: 6.66 GiB) # MVector instead of MMatrix
 # See if views reduce allocations
