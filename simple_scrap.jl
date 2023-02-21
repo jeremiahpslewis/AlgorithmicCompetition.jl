@@ -1,12 +1,12 @@
 using AlgorithmicCompetition:
-    AlgorithmicCompetition,
-    CompetitionParameters,
-    CompetitionSolution,
-    CalvanoHyperParameters,
-    CalvanoEnv,
-    Experiment,
-    run_and_extract,
-    run
+AlgorithmicCompetition,
+CompetitionParameters,
+CompetitionSolution,
+CalvanoHyperParameters,
+CalvanoEnv,
+Experiment,
+run_and_extract,
+run
 using BenchmarkTools
 
 competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
@@ -20,7 +20,7 @@ max_iter = Int(1e6) # Should be 1e9
 δ = 0.95
 
 hyperparameter_vect = [
-    CalvanoHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_ for β in β_
+CalvanoHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_ for β in β_
 ]
 
 @btime run_and_extract(hyperparameter_vect[1]; stop_on_convergence=false)
