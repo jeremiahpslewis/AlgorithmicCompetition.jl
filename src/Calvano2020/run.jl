@@ -33,5 +33,5 @@ function run(hyperparameters::CalvanoHyperParameters; stop_on_convergence=true)
 end
 
 function run_and_extract(hyperparameters::CalvanoHyperParameters; stop_on_convergence=true)
-    economic_summary(run(hyperparameters))
+    economic_summary(run(hyperparameters; stop_on_convergence=stop_on_convergence))
 end

@@ -16,7 +16,7 @@ function update!(
     env::AbstractEnv,
     current_player_id,
     state_::Int16,
-    best_action::Int,
+    best_action::Int8,
     iter_converged::Bool,
 )
     # Increment duration whenever argmax action is stable (convergence criteria)
@@ -45,7 +45,7 @@ function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env)
     n_prices = env.env.n_prices
     
     state_ = convert(Int16, RLBase.state(env))
-    best_action = argmax(@view policy.policy.policy.learner.approximator.table[:, state_])
+    best_action = convert(Int8, argmax(@view policy.policy.policy.learner.approximator.table[:, state_]))
     iter_converged = (@view h.best_response_vector[state_]) == best_action
 
     update!(
