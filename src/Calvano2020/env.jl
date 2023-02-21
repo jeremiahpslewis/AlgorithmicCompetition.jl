@@ -21,7 +21,6 @@ struct CalvanoEnv <: AbstractEnv
     is_done::Vector
     p_Bert_nash_equilibrium::Float64
     p_monop_opt::Float64
-    convergence_metric::Vector{Int}
 
     function CalvanoEnv(p::CalvanoHyperParameters)
         # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
@@ -51,7 +50,6 @@ struct CalvanoEnv <: AbstractEnv
             [false], # Is done
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,
-            [0, 0], # Convergence metric
         )
     end
 end

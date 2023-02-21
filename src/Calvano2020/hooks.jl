@@ -1,5 +1,6 @@
 using ReinforcementLearning
 using StaticArrays
+using Accessors
 
 mutable struct ConvergenceCheck <: AbstractHook
     convergence_duration::Int32
@@ -16,7 +17,7 @@ function update!(
     current_player_id,
     state_::Int16,
     best_action::Int8,
-    is_converged::Bool,
+    iter_converged::Bool,
 )
     # Increment duration whenever argmax action is stable (convergence criteria)
     # Increment convergence metric (e.g. convergence not reached)
@@ -24,12 +25,15 @@ function update!(
 
     h.iterations_until_convergence += 1
 
-    if is_converged
+    if iter_converged
         h.convergence_duration += 1
     else
         (h.convergence_duration != 0) && (h.convergence_duration *= 0)
-        # env.env.convergence_metric[current_player_id] += 1
         @inbounds h.best_response_vector[state_] = best_action
+    end
+
+    if h.convergence_duration >= env.env.convergence_threshold
+        @set env.env.is_converged[current_player_id] = true
     end
 end
  
@@ -42,7 +46,7 @@ function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env)
     
     state_ = convert(Int16, RLBase.state(env))
     best_action = convert(Int8, argmax(@view policy.policy.policy.learner.approximator.table[:, state_]))
-    is_converged = (@view h.best_response_vector[state_]) == best_action
+    iter_converged = (@view h.best_response_vector[state_]) == best_action
 
     update!(
         h,
@@ -50,7 +54,7 @@ function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env)
         current_player_id,
         state_,
         best_action,
-        is_converged,
+        iter_converged,
     )
     return
 end
