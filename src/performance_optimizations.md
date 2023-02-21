@@ -100,7 +100,15 @@ TODO:
 14.700 s (149016255 allocations: 6.62 GiB) # use tuple instead of vector
 14.916 s (149013687 allocations: 6.62 GiB) # Int16 state object
 14.351 s (149013689 allocations: 6.62 GiB)
-14.075 s (145013687 allocations: 6.38 GiB)
-# try to speed up reward function with player attribute
-# Store state space as it's fixed
+14.075 s (145013687 allocations: 6.38 GiB) # BEST SO FAR.
+14.631 s (145013706 allocations: 6.38 GiB) # few steps back (type instability?)
+14.253 s (145013689 allocations: 6.38 GiB)
+14.360 s (145013687 allocations: 6.38 GiB)
+14.588 s (145013687 allocations: 6.38 GiB)
+14.425 s (145013687 allocations: 6.38 GiB)
+16.287 s (147013688 allocations: 13.06 GiB) # cartesianaxis boondoggle
+14.783 s (145013687 allocations: 6.38 GiB)   # back, but slower (.= assignment?)
+14.229 s (145013688 allocations: 6.38 GiB) # yep, .= assignment is slower...
+# use cartesian coordinates for memory object
+# actually fix type stability?
 

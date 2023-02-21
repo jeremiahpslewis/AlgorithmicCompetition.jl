@@ -25,6 +25,10 @@ CalvanoHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_
 
 @btime run(hyperparameter_vect[1]; stop_on_convergence=false)
 
+a = run(hyperparameter_vect[1]; stop_on_convergence=false)
+
+# using ReinforcementLearning
+# @report_opt RLBase.reward(a.env.env)
 # a = run(hyperparameter_vect[1]; stop_on_convergence=false)
 
 # a
@@ -32,3 +36,20 @@ CalvanoHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_
 
 # Trying half-precision
 # Try cutting out action space calls
+
+
+
+# function reward1(env::CalvanoEnv)
+#     @views env.is_done[1] ? (env.profit_array[env.memory, :]) : [Float32(0), Float32(0)]
+# end
+
+# @btime reward1(a.env.env)
+# 322.022 ns (9 allocations: 464 bytes)
+# 113.926 ns (2 allocations: 288 bytes)
+# 111.879 ns (2 allocations: 288 bytes)
+
+# function reward1(env::CalvanoEnv, p::Int)
+#     env.is_done[1] ? env.profit_array[env.memory[1], env.memory[2], p] : 0
+# end
+
+# @btime reward1(a.env.env)
