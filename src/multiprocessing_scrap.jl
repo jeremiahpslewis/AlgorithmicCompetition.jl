@@ -52,12 +52,10 @@ hyperparameter_vect = [
     CalvanoHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_ for β in β_
 ]
 
-# @btime run_and_extract(hyperparameter_vect[1]; stop_on_convergence=false)
-
-@time a = run(hyperparameter_vect[1]; stop_on_convergence=true)
+@btime run_and_extract(hyperparameter_vect[1]; stop_on_convergence=false)
 
 # @test all(a.env.env.convergence_metric .== max_iter)
-
+# @test sum(a.hook.hooks[1][2].best_response_vector .== 0) == 0 # all states explored
 
 # if multiproc
 #     exp_list = @showprogress pmap(run_and_extract, hyperparameter_vect; on_error=identity)

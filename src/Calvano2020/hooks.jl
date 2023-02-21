@@ -3,16 +3,17 @@ using StaticArrays
 
 mutable struct ConvergenceCheck <: AbstractHook
     convergence_duration::Int32
-    convergence_metric::Int32
     iterations_until_convergence::Int32
     best_response_vector#::MVector{225, Int8} # state x action # TODO: Fix hardcoding of n_states
     function ConvergenceCheck()
-        new(0, 0, 0, MVector{225, Int8}(zeros(Int8, 225))) # TODO: Fix hardcoding of n_states
+        new(0, 0, MVector{225, Int8}(zeros(Int8, 225))) # TODO: Fix hardcoding of n_states
     end
 end
 
 function update!(
     h::ConvergenceCheck,
+    env::AbstractEnv,
+    current_player_id,
     state_::Int16,
     best_action::Int8,
     is_converged::Bool,
@@ -26,8 +27,8 @@ function update!(
     if is_converged
         h.convergence_duration += 1
     else
-        h.convergence_duration *= 0
-        h.convergence_metric += 1
+        (h.convergence_duration != 0) && h.convergence_duration *= 0
+        env.env.convergence_metric[current_player_id] += 1
         @inbounds h.best_response_vector[state_] = best_action
     end
 end
@@ -45,11 +46,12 @@ function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env)
 
     update!(
         h,
+        env,
+        current_player_id,
         state_,
         best_action,
         is_converged,
     )
-    env.env.convergence_metric[current_player_id] = h.convergence_metric
     return
 end
 
