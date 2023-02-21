@@ -89,3 +89,4 @@ TODO:
 23.618 s (203000500 allocations: 8.60 GiB)
 24.456 s (208005856 allocations: 8.89 GiB) # gets worse if smaller ints are not used, but not significantly...
 24.158 s (203000500 allocations: 8.57 GiB)
+23.958 s (203000500 allocations: 8.47 GiB) # Float32s help a bit

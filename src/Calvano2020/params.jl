@@ -16,8 +16,8 @@ struct CompetitionSolution
 end
 
 struct CalvanoHyperParameters
-    α::Float64
-    β::Float64
+    α::Float32
+    β::Float32
     δ::Float64
     price_options::Vector{Float64}
     memory_length::Int64
@@ -29,8 +29,8 @@ struct CalvanoHyperParameters
     p_monop_opt::Float64
 
     function CalvanoHyperParameters(
-        α::Float64,
-        β::Float64,
+        α::Float32,
+        β::Float32,
         δ::Float64,
         max_iter::Int64,
         competition_solution::CompetitionSolution,

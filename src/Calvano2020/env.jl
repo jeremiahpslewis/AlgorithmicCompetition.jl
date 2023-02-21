@@ -2,12 +2,12 @@ using ReinforcementLearning
 using StaticArrays
 
 struct CalvanoEnv <: AbstractEnv
-    α::Float64
-    β::Float64
+    α::Float32
+    β::Float32
     δ::Float64
     n_players::Int
     memory_length::Int
-    price_options::SVector{15, Float64}
+    price_options::SVector{15, Float32}
     max_iter::Int
     convergence_threshold::Int
     n_prices::Int
@@ -17,15 +17,15 @@ struct CalvanoEnv <: AbstractEnv
     n_state_space::Int
     memory::MMatrix{1, 2, Int}
     is_converged::MVector{2, Bool}
-    reward::MVector{2, Float64}
+    reward::MVector{2, Float32}
     is_done::MVector{1, Bool}
-    p_Bert_nash_equilibrium::Float64
-    p_monop_opt::Float64
+    p_Bert_nash_equilibrium::Float32
+    p_monop_opt::Float32
 
     function CalvanoEnv(p::CalvanoHyperParameters)
         # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
         # TODO: Think about how initial memory should be assigned
-        price_options = SVector{15, Float64}(p.price_options)
+        price_options = SVector{15, Float32}(p.price_options)
         n_prices = length(p.price_options)
         price_index = SVector{15, Int8}(1:n_prices)
         n_players = p.n_players
@@ -48,7 +48,7 @@ struct CalvanoEnv <: AbstractEnv
             n_state_space,
             MMatrix{1, 2, Int}(ones(Int, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
             MVector{2, Bool}(fill(false, p.n_players)), # Is converged
-            MVector{2, Float64}([0.0, 0.0]), # Reward
+            MVector{2, Float32}([0.0, 0.0]), # Reward
             MVector{1, Bool}([false]), # Is done
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,

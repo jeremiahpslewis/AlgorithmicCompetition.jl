@@ -53,3 +53,11 @@ end
 # Support Int < 64...
 (app::TabularQApproximator)(s::Int16) = @views app.table[:, s]
 (app::TabularQApproximator)(s::Int16, a::Int8) = app.table[a, s]
+
+
+# Base.@kwdef struct ReinforcementLearningZoo.TDLearner{A} <: AbstractLearner
+#     approximator::A
+#     γ::Float32 = 1.0
+#     method::Symbol
+#     n::Int = 0
+# end
