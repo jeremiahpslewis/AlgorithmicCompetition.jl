@@ -14,7 +14,8 @@ struct CalvanoEnv <: AbstractEnv
     price_index::SVector{15, Int8}
     init_matrix::MMatrix{15, 225, Float32}
     profit_function::Function
-    n_state_space::Int
+    n_state_space::Int16
+    state_space::Base.OneTo{Int16}
     memory::MVector{2, Int}
     is_converged::MVector{2, Bool}
     is_done::MVector{1, Bool}
@@ -31,6 +32,7 @@ struct CalvanoEnv <: AbstractEnv
         price_index = SVector{15, Int8}(1:n_prices)
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
+        state_space = Base.OneTo(Int16(n_state_space))
         init_matrix = MMatrix{15, 225, Float32}(zeros(Float32, n_prices, n_state_space))
         action_space = Tuple((i, j) for i in price_index for j in price_index)
 
@@ -56,6 +58,7 @@ struct CalvanoEnv <: AbstractEnv
             init_matrix,
             p.profit_function,
             n_state_space,
+            state_space,
             MVector{2, Int}(ones(Int, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
             MVector{2, Bool}(fill(false, p.n_players)), # Is converged
             MVector{1, Bool}([false]), # Is done
@@ -75,7 +78,7 @@ end
 
 # map price vector to state
 function map_vect_to_int(vect_, base)
-    sum(vect_[k] * base^(k-1) for k=1:length(vect_)) # From Julia help / docs
+    convert(Int16, sum(vect_[k] * base^(k-1) for k=1:length(vect_))) # From Julia help / docs
 end
 
 function map_int_to_vect(int_val, base, vect_length)
@@ -95,9 +98,11 @@ function RLBase.reward(env::CalvanoEnv)
     env.is_done[1] ? (@view env.profit_array[env.memory[1], env.memory[2], :]) : SA[0, 0]
 end
 
-RLBase.reward(env::CalvanoEnv, p::Int) = reward(env)[p]
+function RLBase.reward(env::CalvanoEnv, p::Int)
+     env.is_done[1] ? env.profit_array[env.memory[1], env.memory[2], p] : 0
+end
 
-RLBase.state_space(env::CalvanoEnv, ::Observation, p) = Base.OneTo(env.n_state_space)
+RLBase.state_space(env::CalvanoEnv, ::Observation, p) = env.state_space
 
 function RLBase.state(env::CalvanoEnv, ::Observation, p)
     map_vect_to_int(env.memory .- 1, env.n_prices) + 1
@@ -115,7 +120,7 @@ RLBase.NumAgentStyle(::CalvanoEnv) = MultiAgent(2)
 RLBase.DynamicStyle(::CalvanoEnv) = SIMULTANEOUS
 RLBase.ActionStyle(::CalvanoEnv) = MINIMAL_ACTION_SET
 RLBase.InformationStyle(::CalvanoEnv) = IMPERFECT_INFORMATION
-RLBase.StateStyle(::CalvanoEnv) = Observation{Int}()
+RLBase.StateStyle(::CalvanoEnv) = Observation{Int16}()
 RLBase.RewardStyle(::CalvanoEnv) = STEP_REWARD
 RLBase.UtilityStyle(::CalvanoEnv) = GENERAL_SUM
 RLBase.ChanceStyle(::CalvanoEnv) = DETERMINISTIC

@@ -98,4 +98,9 @@ TODO:
 14.491 s (149013687 allocations: 6.66 GiB) # MVector instead of MMatrix
 14.821 s (149017914 allocations: 6.67 GiB) # Drop circ call
 14.700 s (149016255 allocations: 6.62 GiB) # use tuple instead of vector
-# See if views reduce allocations
+14.916 s (149013687 allocations: 6.62 GiB) # Int16 state object
+14.351 s (149013689 allocations: 6.62 GiB)
+14.075 s (145013687 allocations: 6.38 GiB)
+# try to speed up reward function with player attribute
+# Store state space as it's fixed
+
