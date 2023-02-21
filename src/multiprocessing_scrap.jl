@@ -52,11 +52,11 @@ hyperparameter_vect = [
     CalvanoHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_ for β in β_
 ]
 
-@btime run_and_extract(hyperparameter_vect[1]; stop_on_convergence=false)
+# @btime run_and_extract(hyperparameter_vect[1]; stop_on_convergence=false)
 
-a = run(hyperparameter_vect[1]; stop_on_convergence=false)
+@time a = run(hyperparameter_vect[1]; stop_on_convergence=true)
 
-
+# @test all(a.env.env.convergence_metric .== max_iter)
 
 
 # if multiproc

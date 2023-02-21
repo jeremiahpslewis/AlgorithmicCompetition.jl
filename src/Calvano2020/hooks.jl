@@ -25,8 +25,9 @@ function update!(
 
     if is_converged
         h.convergence_duration += 1
-        h.convergence_metric += 1
     else
+        h.convergence_duration *= 0
+        h.convergence_metric += 1
         @inbounds h.best_response_vector[state_] = best_action
     end
 end
@@ -48,7 +49,7 @@ function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env)
         best_action,
         is_converged,
     )
-    @inbounds env.env.convergence_metric[current_player_id] = h.convergence_metric
+    env.env.convergence_metric[current_player_id] = h.convergence_metric
     return
 end
 
