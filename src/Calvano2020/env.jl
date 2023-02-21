@@ -15,7 +15,7 @@ struct CalvanoEnv <: AbstractEnv
     init_matrix::MMatrix{15, 225, Float32}
     profit_function::Function
     n_state_space::Int
-    memory::MMatrix{1, 2Int8}
+    memory::MMatrix{1, 2, Int8}
     is_converged::MVector{2, Bool}
     reward::MVector{2, Float64}
     is_done::MVector{1, Bool}
@@ -46,7 +46,7 @@ struct CalvanoEnv <: AbstractEnv
             init_matrix,
             p.profit_function,
             n_state_space,
-            MMatrix(Int8, 1, 2)(ones(Int8, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
+            MMatrix{Int8, 1, 2}(ones(Int8, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
             MVector{2, Bool}(fill(false, p.n_players)), # Is converged
             MVector{2, Float64}([0.0, 0.0]), # Reward
             MVector{1, Bool}([false]), # Is done
@@ -68,7 +68,7 @@ end
 
 # map price vector to state
 function map_vect_to_int(vect_, base)
-    sum(vect_[k]*base^(k-1) for k=1:length(vect_)) # From Julia help / docs
+    sum(vect_[k] * base^(k-1) for k=1:length(vect_)) # From Julia help / docs
 end
 
 function map_int_to_vect(int_val, base, vect_length)
