@@ -116,4 +116,6 @@ TODO:
 14.018 s (143013687 allocations: 6.29 GiB) # try splatting memory vector. Fails.
 14.086 s (143013687 allocations: 6.29 GiB) # try alternate update method. Fails.
 14.691 s (143013687 allocations: 6.29 GiB)
-14.296 s (143013687 allocations: 6.29 GiB)
+14.296 s (143013687 allocations: 6.29 GiB) # clean assignment
+13.972 s (143013687 allocations: 6.29 GiB)
+13.788 s (143013687 allocations: 6.29 GiB)

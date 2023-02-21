@@ -17,7 +17,7 @@ struct CalvanoEnv <: AbstractEnv
     n_state_space::Int16
     state_space::Base.OneTo{Int}
     memory::MVector{2, Int}
-    is_converged::MVector{2, Bool}
+    convergence_int::MVector{1, Int}
     is_done::MVector{1, Bool}
     p_Bert_nash_equilibrium::Float32
     p_monop_opt::Float32
@@ -60,7 +60,7 @@ struct CalvanoEnv <: AbstractEnv
             n_state_space,
             state_space,
             MVector{2, Int}(ones(Int, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
-            MVector{2, Bool}(fill(false, p.n_players)), # Is converged
+            MVector{1, Int}([0]), # Convergence counter
             MVector{1, Bool}([false]), # Is done
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,
