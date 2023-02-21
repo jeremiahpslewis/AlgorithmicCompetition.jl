@@ -111,5 +111,5 @@ TODO:
 14.229 s (145013688 allocations: 6.38 GiB) # yep, .= assignment is slower...
 14.590 s (145013687 allocations: 6.38 GiB)
 14.156 s (145013687 allocations: 6.38 GiB) # try dropping convert statements. It helps
-
+13.823 s (143013687 allocations: 6.29 GiB)
 

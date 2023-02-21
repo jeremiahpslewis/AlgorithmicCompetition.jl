@@ -5,7 +5,7 @@ using Accessors
 mutable struct ConvergenceCheck <: AbstractHook
     convergence_duration::Int32
     iterations_until_convergence::Int32
-    best_response_vector#::MVector{225, Int} # state x action # TODO: Fix hardcoding of n_states
+    best_response_vector::MVector{225, Int} # state x action # TODO: Fix hardcoding of n_states
     function ConvergenceCheck()
         new(0, 0, MVector{225, Int}(zeros(Int, 225))) # TODO: Fix hardcoding of n_states
     end
@@ -16,7 +16,7 @@ function update!(
     env::AbstractEnv,
     current_player_id,
     state_::Int,
-    best_action::Int8,
+    best_action::Int,
     iter_converged::Bool,
 )
     # Increment duration whenever argmax action is stable (convergence criteria)
@@ -45,7 +45,7 @@ function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env)
     n_prices = env.env.n_prices
     
     state_ = RLBase.state(env)
-    best_action = convert(Int8, argmax(@view policy.policy.policy.learner.approximator.table[:, state_]))
+    best_action = argmax(@view policy.policy.policy.learner.approximator.table[:, state_])
     iter_converged = (@view h.best_response_vector[state_]) == best_action
 
     update!(
