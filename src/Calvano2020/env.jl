@@ -6,7 +6,7 @@ struct CalvanoEnv <: AbstractEnv
     β::Float64
     δ::Float64
     n_players::Int8
-    memory_length::Int
+    memory_length::Int8
     price_options::SVector{15, Float64}
     max_iter::Int32
     convergence_threshold::Int32
@@ -29,7 +29,7 @@ struct CalvanoEnv <: AbstractEnv
         n_prices = convert(Int8, length(p.price_options))
         price_index = SVector{15, Int8}(convert.(Int8, 1:n_prices))
         n_players = convert(Int8, p.n_players)
-        n_state_space = convert(Int16, n_prices)^(p.memory_length * n_players)
+        n_state_space = convert(Int16, n_prices)^(convert(Int16, p.memory_length) * convert(Int16, n_players))
         init_matrix = MMatrix{15, 225, Float32}(zeros(Float32, n_prices, n_state_space))
 
         new(
