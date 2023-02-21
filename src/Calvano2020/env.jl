@@ -69,12 +69,7 @@ end
 
 function (env::CalvanoEnv)((p_1, p_2))
     # TODO: Fix support for longer memories
-    # if env.memory_length > 1
-    #     env.memory .= circshift(env.memory, -1)
-    #     env.memory[end, :] .= [p_1, p_2]
-    # else
-    env.memory .= [p_1, p_2]
-    # end
+    env.memory .= (p_1, p_2)
     env.is_done[1] = true
 end
 

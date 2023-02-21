@@ -96,4 +96,6 @@ TODO:
 20.325 s (174013689 allocations: 7.47 GiB)
 19.466 s (173014763 allocations: 7.44 GiB)
 14.491 s (149013687 allocations: 6.66 GiB) # MVector instead of MMatrix
+14.821 s (149017914 allocations: 6.67 GiB) # Drop circ call
+14.700 s (149016255 allocations: 6.62 GiB) # use tuple instead of vector
 # See if views reduce allocations
