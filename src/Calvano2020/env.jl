@@ -15,7 +15,7 @@ struct CalvanoEnv <: AbstractEnv
     init_matrix::MMatrix{15, 225, Float32}
     profit_function::Function
     n_state_space::Int
-    memory::MMatrix{1, 2, Int}
+    memory::MVector{2, Int}
     is_converged::MVector{2, Bool}
     is_done::MVector{1, Bool}
     p_Bert_nash_equilibrium::Float32
@@ -56,7 +56,7 @@ struct CalvanoEnv <: AbstractEnv
             init_matrix,
             p.profit_function,
             n_state_space,
-            MMatrix{1, 2, Int}(ones(Int, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
+            MVector{2, Int}(ones(Int, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
             MVector{2, Bool}(fill(false, p.n_players)), # Is converged
             MVector{1, Bool}([false]), # Is done
             p.p_Bert_nash_equilibrium,
@@ -68,11 +68,12 @@ struct CalvanoEnv <: AbstractEnv
 end
 
 function (env::CalvanoEnv)((p_1, p_2))
+    # TODO: Fix support for longer memories
     if env.memory_length > 1
         env.memory .= circshift(env.memory, -1)
         env.memory[end, :] .= [p_1, p_2]
     else
-        env.memory[1, :] .= [p_1, p_2]
+        env.memory .= [p_1, p_2]
     end
     env.is_done[1] = true
 end
@@ -96,7 +97,7 @@ RLBase.legal_action_space(env::CalvanoEnv, p) =
 RLBase.action_space(env::CalvanoEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
 function RLBase.reward(env::CalvanoEnv)
-    env.is_done[1] ? (@view env.profit_array[env.memory[end, 1], env.memory[end, 2], :]) : SA[0, 0]
+    env.is_done[1] ? (@view env.profit_array[env.memory[1], env.memory[2], :]) : SA[0, 0]
 end
 
 RLBase.reward(env::CalvanoEnv, p::Int) = reward(env)[p]
