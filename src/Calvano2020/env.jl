@@ -46,7 +46,7 @@ struct CalvanoEnv <: AbstractEnv
             init_matrix,
             p.profit_function,
             n_state_space,
-            MMatrix{Int8, 1, 2}(ones(Int8, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
+            MMatrix{1, 2, Int8}(ones(Int8, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
             MVector{2, Bool}(fill(false, p.n_players)), # Is converged
             MVector{2, Float64}([0.0, 0.0]), # Reward
             MVector{1, Bool}([false]), # Is done
