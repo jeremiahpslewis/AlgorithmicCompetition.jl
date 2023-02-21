@@ -5,7 +5,6 @@ using Ipopt
 using Flux
 using StaticArrays
 using Statistics
-using Memoization
 
 struct CompetitionParameters
     μ::Float64

@@ -1,7 +1,5 @@
 using Chain
 using ReinforcementLearning
-using JSON
-using UUIDs
 
 profit_measure(π_hat::Vector{Float64}, π_N, π_M) = (mean(π_hat) - π_N) / (π_M - π_N)
 

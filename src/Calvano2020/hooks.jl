@@ -27,8 +27,8 @@ function update!(
     if is_converged
         h.convergence_duration += 1
     else
-        (h.convergence_duration != 0) && h.convergence_duration *= 0
-        env.env.convergence_metric[current_player_id] += 1
+        (h.convergence_duration != 0) && (h.convergence_duration *= 0)
+        # env.env.convergence_metric[current_player_id] += 1
         @inbounds h.best_response_vector[state_] = best_action
     end
 end
