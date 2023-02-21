@@ -15,7 +15,7 @@ struct CalvanoEnv <: AbstractEnv
     init_matrix::MMatrix{15, 225, Float32}
     profit_function::Function
     n_state_space::Int16
-    state_space::Base.OneTo{Int16}
+    state_space::Base.OneTo{Int}
     memory::MVector{2, Int}
     is_converged::MVector{2, Bool}
     is_done::MVector{1, Bool}
@@ -32,7 +32,7 @@ struct CalvanoEnv <: AbstractEnv
         price_index = SVector{15, Int8}(1:n_prices)
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
-        state_space = Base.OneTo(Int16(n_state_space))
+        state_space = Base.OneTo(n_state_space)
         init_matrix = MMatrix{15, 225, Float32}(zeros(Float32, n_prices, n_state_space))
         action_space = Tuple((i, j) for i in price_index for j in price_index)
 
@@ -78,7 +78,7 @@ end
 
 # map price vector to state
 function map_vect_to_int(vect_, base)
-    convert(Int16, sum(vect_[k] * base^(k-1) for k=1:length(vect_))) # From Julia help / docs
+    sum(vect_[k] * base^(k-1) for k=1:length(vect_)) # From Julia help / docs
 end
 
 function map_int_to_vect(int_val, base, vect_length)

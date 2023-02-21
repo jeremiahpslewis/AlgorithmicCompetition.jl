@@ -15,7 +15,7 @@ function update!(
     h::ConvergenceCheck,
     env::AbstractEnv,
     current_player_id,
-    state_::Int16,
+    state_::Int,
     best_action::Int8,
     iter_converged::Bool,
 )
@@ -44,7 +44,7 @@ function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env)
     current_player_id = nameof(policy)
     n_prices = env.env.n_prices
     
-    state_ = convert(Int16, RLBase.state(env))
+    state_ = RLBase.state(env)
     best_action = convert(Int8, argmax(@view policy.policy.policy.learner.approximator.table[:, state_]))
     iter_converged = (@view h.best_response_vector[state_]) == best_action
 

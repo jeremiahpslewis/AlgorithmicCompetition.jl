@@ -109,6 +109,7 @@ TODO:
 16.287 s (147013688 allocations: 13.06 GiB) # cartesianaxis boondoggle
 14.783 s (145013687 allocations: 6.38 GiB)   # back, but slower (.= assignment?)
 14.229 s (145013688 allocations: 6.38 GiB) # yep, .= assignment is slower...
-# use cartesian coordinates for memory object
-# actually fix type stability?
+14.590 s (145013687 allocations: 6.38 GiB)
+14.156 s (145013687 allocations: 6.38 GiB) # try dropping convert statements. It helps
+
 
