@@ -33,7 +33,7 @@ function update!(
     end
 
     if h.convergence_duration >= env.env.convergence_threshold
-        @set env.env.is_converged[current_player_id] = true
+        env.env.is_converged[current_player_id] = true
     end
 end
  

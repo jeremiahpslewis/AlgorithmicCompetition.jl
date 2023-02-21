@@ -5,49 +5,51 @@ struct CalvanoEnv <: AbstractEnv
     α::Float64
     β::Float64
     δ::Float64
-    n_players::Int
+    n_players::Int8
     memory_length::Int
-    price_options::Vector{Float64}
-    max_iter::Int
-    convergence_threshold::Int
-    n_prices::Int
-    price_index::Vector{Int8}
-    init_matrix::Matrix{Float32}
+    price_options::SVector{15, Float64}
+    max_iter::Int32
+    convergence_threshold::Int32
+    n_prices::Int8
+    price_index::SVector{15, Int8}
+    init_matrix::MMatrix{15, 225, Float32}
     profit_function::Function
     n_state_space::Int
-    memory::Matrix{Int16}
-    is_converged::Vector{Bool}
-    reward::Vector{Float64}
-    is_done::Vector
+    memory::MMatrix{1, 2Int8}
+    is_converged::MVector{2, Bool}
+    reward::MVector{2, Float64}
+    is_done::MVector{1, Bool}
     p_Bert_nash_equilibrium::Float64
     p_monop_opt::Float64
 
     function CalvanoEnv(p::CalvanoHyperParameters)
         # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
         # TODO: Think about how initial memory should be assigned
-        n_prices = length(p.price_options)
-        price_index = convert.(Int8, 1:n_prices)
-        n_state_space = n_prices^(p.memory_length * p.n_players)
-        init_matrix = zeros(Float32, n_prices, n_state_space)
+        price_options = SVector{15, Float64}(p.price_options)
+        n_prices = convert(Int8, length(p.price_options))
+        price_index = SVector{15, Int8}(convert.(Int8, 1:n_prices))
+        n_players = convert(Int8, p.n_players)
+        n_state_space = convert(Int16, n_prices)^(p.memory_length * n_players)
+        init_matrix = MMatrix{15, 225, Float32}(zeros(Float32, n_prices, n_state_space))
 
         new(
             p.α,
             p.β,
             p.δ,
-            p.n_players,
+            n_players,
             p.memory_length,
             p.price_options,
-            p.max_iter,
-            p.convergence_threshold,
+            convert(Int32, p.max_iter),
+            convert(Int32, p.convergence_threshold),
             n_prices,
             price_index,
             init_matrix,
             p.profit_function,
             n_state_space,
-            ones(Int16, p.memory_length, p.n_players), # Memory, note max of 256 prices with Int
-            fill(false, p.n_players), # Is converged
-            [0.0, 0.0], # Reward
-            [false], # Is done
+            MMatrix(Int8, 1, 2)(ones(Int8, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
+            MVector{2, Bool}(fill(false, p.n_players)), # Is converged
+            MVector{2, Float64}([0.0, 0.0]), # Reward
+            MVector{1 Bool}([false]), # Is done
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,
         )
