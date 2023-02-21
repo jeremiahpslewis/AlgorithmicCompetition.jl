@@ -48,3 +48,8 @@ function ReinforcementLearningZoo._update!(
         end
     end
 end
+
+
+# Support Int < 64...
+(app::TabularQApproximator)(s::Int16) = @views app.table[:, s]
+(app::TabularQApproximator)(s::Int16, a::Int8) = app.table[a, s]

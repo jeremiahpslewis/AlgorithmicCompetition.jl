@@ -11,7 +11,7 @@ struct CalvanoEnv <: AbstractEnv
     max_iter::Int
     convergence_threshold::Int
     n_prices::Int
-    price_index::Vector{Int}
+    price_index::Vector{Int8}
     init_matrix::Matrix{Float32}
     profit_function::Function
     n_state_space::Int
@@ -26,7 +26,7 @@ struct CalvanoEnv <: AbstractEnv
         # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
         # TODO: Think about how initial memory should be assigned
         n_prices = length(p.price_options)
-        price_index = convert.(Int, 1:n_prices)
+        price_index = convert.(Int8, 1:n_prices)
         n_state_space = n_prices^(p.memory_length * p.n_players)
         init_matrix = zeros(Float32, n_prices, n_state_space)
 

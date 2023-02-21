@@ -20,9 +20,9 @@ CalvanoPolicy(env::CalvanoEnv) = MultiAgentManager(
                 ),
             ),
             trajectory = VectorSARTTrajectory(;
-                state = Int64,
-                action = Union{Int64,NoOp},
-                reward = Float64,
+                state = Int16,
+                action = Union{Int8,NoOp},
+                reward = Float32,
                 terminal = Bool,
             ),
         ) for p in players(env)
