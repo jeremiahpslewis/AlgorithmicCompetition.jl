@@ -90,3 +90,8 @@ TODO:
 24.456 s (208005856 allocations: 8.89 GiB) # gets worse if smaller ints are not used, but not significantly...
 24.158 s (203000500 allocations: 8.57 GiB)
 23.958 s (203000500 allocations: 8.47 GiB) # Float32s help a bit
+24.012 s (203000406 allocations: 8.47 GiB)
+23.594 s (203000638 allocations: 8.47 GiB) # Stop recalculating action space
+21.765 s (185013689 allocations: 7.54 GiB) # Stop recalculating profits!
+  20.325 s (174013689 allocations: 7.47 GiB)
+# See if views reduce allocations
