@@ -49,7 +49,7 @@ struct CalvanoEnv <: AbstractEnv
             MMatrix(Int8, 1, 2)(ones(Int8, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
             MVector{2, Bool}(fill(false, p.n_players)), # Is converged
             MVector{2, Float64}([0.0, 0.0]), # Reward
-            MVector{1 Bool}([false]), # Is done
+            MVector{1, Bool}([false]), # Is done
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,
         )
