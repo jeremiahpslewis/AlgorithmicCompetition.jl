@@ -11,7 +11,7 @@ struct CompetitionParameters
     a_0::Float64
     a::Vector{Float64}
     c::Vector{Float64}
-    n_firms::Int64
+    n_firms::Int
 
     function CompetitionParameters(μ, a_0, a, c)
         length(a) != length(c) &&

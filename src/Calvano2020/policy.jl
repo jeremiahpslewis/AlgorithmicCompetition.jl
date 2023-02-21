@@ -21,7 +21,7 @@ CalvanoPolicy(env::CalvanoEnv) = MultiAgentManager(
             ),
             trajectory = VectorSARTTrajectory(;
                 state = Int16,
-                action = Union{Int,NoOp},
+                action = Union{Int8,NoOp},
                 reward = Float32,
                 terminal = Bool,
             ),

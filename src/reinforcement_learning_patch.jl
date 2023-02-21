@@ -52,4 +52,4 @@ end
 
 # Support Int < 64...
 (app::TabularQApproximator)(s::Int16) = @views app.table[:, s]
-(app::TabularQApproximator)(s::Int16, a::Int) = app.table[a, s]
+(app::TabularQApproximator)(s::Int16, a::Int8) = app.table[a, s]

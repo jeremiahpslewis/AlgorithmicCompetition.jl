@@ -87,3 +87,5 @@ TODO:
 20.131 s (184000474 allocations: 8.44 GiB)
 
 23.618 s (203000500 allocations: 8.60 GiB)
+24.456 s (208005856 allocations: 8.89 GiB) # gets worse if smaller ints are not used, but not significantly...
+24.158 s (203000500 allocations: 8.57 GiB)

@@ -11,7 +11,7 @@ struct CalvanoEnv <: AbstractEnv
     max_iter::Int
     convergence_threshold::Int
     n_prices::Int
-    price_index::SVector{15, Int}
+    price_index::SVector{15, Int8}
     init_matrix::MMatrix{15, 225, Float32}
     profit_function::Function
     n_state_space::Int
@@ -27,7 +27,7 @@ struct CalvanoEnv <: AbstractEnv
         # TODO: Think about how initial memory should be assigned
         price_options = SVector{15, Float64}(p.price_options)
         n_prices = length(p.price_options)
-        price_index = SVector{15, Int}(1:n_prices)
+        price_index = SVector{15, Int8}(1:n_prices)
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
         init_matrix = MMatrix{15, 225, Float32}(zeros(Float32, n_prices, n_state_space))
