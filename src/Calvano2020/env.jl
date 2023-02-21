@@ -107,7 +107,7 @@ function RLBase.state(env::CalvanoEnv, ::Observation, p)
     map_vect_to_int(env.memory .- 1, env.n_prices) + 1
 end
 
-RLBase.is_terminated(env::CalvanoEnv) = env.is_done
+RLBase.is_terminated(env::CalvanoEnv) = env.is_done[1]
 # TODO: Expand reset function to other params
 function RLBase.reset!(env::CalvanoEnv)
     env.is_done[1] = false

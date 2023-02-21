@@ -94,4 +94,5 @@ TODO:
 23.594 s (203000638 allocations: 8.47 GiB) # Stop recalculating action space
 21.765 s (185013689 allocations: 7.54 GiB) # Stop recalculating profits!
 20.325 s (174013689 allocations: 7.47 GiB)
+19.466 s (173014763 allocations: 7.44 GiB)
 # See if views reduce allocations
