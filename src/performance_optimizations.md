@@ -111,5 +111,9 @@ TODO:
 14.229 s (145013688 allocations: 6.38 GiB) # yep, .= assignment is slower...
 14.590 s (145013687 allocations: 6.38 GiB)
 14.156 s (145013687 allocations: 6.38 GiB) # try dropping convert statements. It helps
-13.823 s (143013687 allocations: 6.29 GiB)
-
+13.823 s (143013687 allocations: 6.29 GiB) # dropped another convert statement
+13.748 s (143013687 allocations: 6.29 GiB) # try sprinkling inbounds absolutely everywhere
+14.018 s (143013687 allocations: 6.29 GiB) # try splatting memory vector. Fails.
+14.086 s (143013687 allocations: 6.29 GiB) # try alternate update method. Fails.
+14.691 s (143013687 allocations: 6.29 GiB)
+14.296 s (143013687 allocations: 6.29 GiB)

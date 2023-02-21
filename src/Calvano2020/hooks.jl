@@ -28,7 +28,7 @@ function update!(
     if iter_converged
         h.convergence_duration += 1
     else
-        (h.convergence_duration != 0) && (h.convergence_duration *= 0)
+        (h.convergence_duration != 0) && (h.convergence_duration = 0)
         @inbounds h.best_response_vector[state_] = best_action
     end
 
