@@ -21,6 +21,8 @@ struct CalvanoEnv <: AbstractEnv
     is_done::MVector{1, Bool}
     p_Bert_nash_equilibrium::Float32
     p_monop_opt::Float32
+    action_space::Tuple
+    profit_array::Array{Float32, 3}
 
     function CalvanoEnv(p::CalvanoHyperParameters)
         # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
@@ -31,6 +33,15 @@ struct CalvanoEnv <: AbstractEnv
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
         init_matrix = MMatrix{15, 225, Float32}(zeros(Float32, n_prices, n_state_space))
+        action_space = Tuple((i, j) for i in price_index for j in price_index)
+
+        # TODO: Carve out into separate function:
+        profit_array = zeros(Float32, n_prices, n_prices, n_players)
+        for k in 1:n_players
+            for (i,j) in action_space
+                profit_array[i, j, k] = p.profit_function([price_options[i], price_options[j]])[k]
+            end
+        end
 
         new(
             p.α,
@@ -52,13 +63,15 @@ struct CalvanoEnv <: AbstractEnv
             MVector{1, Bool}([false]), # Is done
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,
+            action_space,
+            profit_array,
         )
     end
 end
 
 function (env::CalvanoEnv)((p_1, p_2))
     # Convert from price indices to price level, compute profit
-    env.reward .= env.profit_function([env.price_options[p_1], env.price_options[p_2]])
+    env.reward .= env.profit_array[p_1, p_2, :]
 
     env.memory .= circshift(env.memory, -1)
     env.memory[end, :] .= [p_1, p_2]
@@ -77,15 +90,14 @@ end
 
 RLBase.action_space(env::CalvanoEnv, ::Int) = env.price_index # Choice of price
 
-RLBase.action_space(env::CalvanoEnv, ::SimultaneousPlayer) =
-    Tuple((i, j) for i in env.price_index for j in env.price_index)
-
+RLBase.action_space(env::CalvanoEnv, ::SimultaneousPlayer) = env.action_space
+    
 RLBase.legal_action_space(env::CalvanoEnv, p) =
     is_terminated(env) ? () : action_space(env, p)
 
 RLBase.action_space(env::CalvanoEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
-RLBase.reward(env::CalvanoEnv) = env.is_done[1] ? env.reward : [0, 0]
+RLBase.reward(env::CalvanoEnv) = env.is_done[1] ? env.reward : SA[0, 0]
 RLBase.reward(env::CalvanoEnv, p::Int) = reward(env)[p]
 
 RLBase.state_space(env::CalvanoEnv, ::Observation, p) = Base.OneTo(env.n_state_space)
