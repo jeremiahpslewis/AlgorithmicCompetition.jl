@@ -1,6 +1,5 @@
 using ReinforcementLearning
 using Distributed
-using ParallelDataTransfer
 
 function Experiment(env::CalvanoEnv; stop_on_convergence=true)
     ReinforcementLearning.Experiment(
