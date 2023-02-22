@@ -7,14 +7,15 @@ mutable struct ConvergenceCheck <: AbstractHook
     iterations_until_convergence::Int32
     best_response_vector::MVector{225, Int} # state x action # TODO: Fix hardcoding of n_states
     is_converged::Bool
-    function ConvergenceCheck()
-        new(0, 0, MVector{225, Int}(zeros(Int, 225)), false) # TODO: Fix hardcoding of n_states
+    convergence_threshold::Int64
+
+    function ConvergenceCheck(convergence_threshold::Int64)
+        new(0, 0, MVector{225, Int}(zeros(Int, 225)), false, convergence_threshold) # TODO: Fix hardcoding of n_states
     end
 end
 
 function update!(
     h::ConvergenceCheck,
-    env::AbstractEnv,
     current_player_id,
     state_::Int,
     best_action::Int,
@@ -33,12 +34,7 @@ function update!(
         @inbounds h.best_response_vector[state_] = best_action
     end
 
-    # If not 'finally' converged, then increment
-    if ~h.is_converged
-        env.env.convergence_int[1] += 1
-    end
-
-    if h.convergence_duration == env.env.convergence_threshold
+    if h.convergence_duration == h.convergence_threshold
         h.is_converged = true
     end
 end
@@ -56,12 +52,17 @@ function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env)
 
     update!(
         h,
-        env,
         current_player_id,
         state_,
         best_action,
         iter_converged,
     )
+
+    # If not 'finally' converged, then increment
+    if ~h.is_converged
+        env.env.convergence_int[1] += 1
+    end
+
     return
 end
 
@@ -71,7 +72,7 @@ function CalvanoHook(env::AbstractEnv)
         (
             p => ComposedHook(
                 TotalRewardPerEpisode(; is_display_on_exit = false),
-                ConvergenceCheck(),
+                ConvergenceCheck(env.convergence_threshold),
             ) for p in players(env)
         )...,
     )
