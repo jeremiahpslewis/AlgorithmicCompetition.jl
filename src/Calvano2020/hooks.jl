@@ -16,8 +16,8 @@ end
 
 function update!(
     h::ConvergenceCheck,
-    current_player_id,
-    state_::Int,
+    current_player_id::Int,
+    state_::Int16,
     best_action::Int,
     iter_converged::Bool,
 )

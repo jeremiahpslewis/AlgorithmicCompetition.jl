@@ -16,6 +16,7 @@ struct CalvanoEnv <: AbstractEnv
     profit_function::Function
     n_state_space::Int16
     state_space::Base.OneTo{Int}
+    state_space_lookup::Array{Int16, 2}
     memory::MVector{2, Int}
     convergence_int::MVector{1, Int}
     is_done::MVector{1, Bool}
@@ -44,6 +45,11 @@ struct CalvanoEnv <: AbstractEnv
             end
         end
 
+        state_space_lookup = zeros(Int16, n_prices, n_prices)
+        for (i,j) in action_space
+            state_space_lookup[i, j] = map_vect_to_int([i,j], n_prices) - n_prices
+        end
+
         new(
             p.α,
             p.β,
@@ -59,6 +65,7 @@ struct CalvanoEnv <: AbstractEnv
             p.profit_function,
             n_state_space,
             state_space,
+            state_space_lookup,
             MVector{2, Int}(ones(Int, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
             MVector{1, Int}([0]), # Convergence counter
             MVector{1, Bool}([false]), # Is done
@@ -105,7 +112,7 @@ end
 RLBase.state_space(env::CalvanoEnv, ::Observation, p) = env.state_space
 
 function RLBase.state(env::CalvanoEnv, ::Observation, p)
-    map_vect_to_int(env.memory .- 1, env.n_prices) + 1
+    env.state_space_lookup[env.memory[1], env.memory[2]]
 end
 
 RLBase.is_terminated(env::CalvanoEnv) = env.is_done[1]
