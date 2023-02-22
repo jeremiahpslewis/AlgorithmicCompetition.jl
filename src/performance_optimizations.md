@@ -121,4 +121,5 @@ TODO:
 13.788 s (143013687 allocations: 6.29 GiB)
 14.061 s (143013687 allocations: 6.29 GiB)
 13.370 s (133014833 allocations: 5.99 GiB) # use state lookup
+13.594 s (133013911 allocations: 5.99 GiB) # EpsilonGreedyExplorer has almost no performance penalty vs GreedyExplorer
 # rework convergence logic, reduce env calls
