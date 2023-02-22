@@ -120,5 +120,5 @@ TODO:
 13.972 s (143013687 allocations: 6.29 GiB)
 13.788 s (143013687 allocations: 6.29 GiB)
 14.061 s (143013687 allocations: 6.29 GiB)
-13.370 s (133014833 allocations: 5.99 GiB)
+13.370 s (133014833 allocations: 5.99 GiB) # use state lookup
 # rework convergence logic, reduce env calls
