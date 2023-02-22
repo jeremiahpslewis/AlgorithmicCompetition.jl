@@ -5,7 +5,7 @@ function CalvanoStop(env::CalvanoEnv; stop_on_convergence=true)
     push!(stop_conditions, StopAfterEpisode(env.max_iter, is_show_progress = false))
     if stop_on_convergence
         stop_converged = StopAfterNoImprovement(
-            () -> env.convergence_int,
+            () -> env.convergence_int[1],
             5,
         )
         push!(stop_conditions, stop_converged)
