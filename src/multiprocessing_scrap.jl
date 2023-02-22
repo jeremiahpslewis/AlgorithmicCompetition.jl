@@ -16,10 +16,9 @@ using CairoMakie
 using DataFrameMacros
 using CSV
 using ProgressMeter
-using JET
 using BenchmarkTools
 
-multiproc = false
+multiproc = true
 
 using ParallelDataTransfer
 
@@ -43,23 +42,23 @@ competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
 competition_solution = CompetitionSolution(competition_params)
 
 n_increments = 100
-max_iter = Int(1e6) # Should be 1e9
-α_ = range(0.025, 0.25, n_increments)
-β_ = range(1.25e-8, 2e-5, n_increments)
+max_iter = Int(1e9) # Should be 1e9
+α_ = Float32.(range(0.025, 0.25, n_increments))
+β_ = Float32.(range(1.25e-8, 2e-5, n_increments))
 δ = 0.95
 
 hyperparameter_vect = [
     CalvanoHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_ for β in β_
 ]
 
-@btime run_and_extract(hyperparameter_vect[1]; stop_on_convergence=false)
+# @btime run_and_extract(hyperparameter_vect[1]; stop_on_convergence=false)
 
 # @test all(a.env.env.convergence_metric .== max_iter)
 # @test sum(a.hook.hooks[1][2].best_response_vector .== 0) == 0 # all states explored
 
-# if multiproc
-#     exp_list = @showprogress pmap(run_and_extract, hyperparameter_vect; on_error=identity)
-# end
+if multiproc
+    exp_list = @showprogress pmap(run, hyperparameter_vect; on_error=identity)
+end
 
 # # TODO: Figure out why both players have identical average profits ALWAYS and add test?
 # mean([ex.avg_profit[1] == ex.avg_profit[2] for ex in exp_list])
