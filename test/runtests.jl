@@ -8,9 +8,7 @@ using AlgorithmicCompetition:
     CalvanoPolicy,
     CalvanoEnv,
     CompetitionSolution,
-    ConvergenceMeta,
     ConvergenceCheck,
-    calculate_convergence_meta,
     solve_monopolist,
     solve_bertrand,
     p_BR,
@@ -112,70 +110,12 @@ end
     env = CalvanoHyperParameters(0.1, 1e-4, 0.95, Int(1e7), competition_solution) |> CalvanoEnv
     policies = env |> CalvanoPolicy
     # q_table = policies.agents[1].policy.policy.learner.approximator.table
-    q_table = zeros(Float32, 15, 50625)
+    q_table = zeros(Float64, 15, 50625)
 
     approximator_table__state_argmax = zeros(UInt, env.n_players, env.n_state_space)
     prev_best_action = (@view approximator_table__state_argmax[1, :])[1]
     state = 20
-
-    c_meta = ConvergenceMeta(0, 0, 0)
-
-    @test calculate_convergence_meta(
-        c_meta,
-        q_table,
-        prev_best_action,
-        state,
-    ) == (ConvergenceMeta(0x00000000, 0x00000001, 0x00000001), false, 1)
 end
-
-
-using BenchmarkTools
-@btime _convergence_check(
-        q_table,
-        prev_best_action,
-        state,
-    )
-119.316 ns (2 allocations: 160 bytes)
-
-
-@btime calculate_convergence_meta(
-        c_meta,
-        q_table,
-        prev_best_action,
-        state,
-    ) 
-125.698 ns (2 allocations: 160 bytes)
-
-
-
-
-
-approximator_table__state_argmax = zeros(UInt, env.n_state_space, env.n_players)
-is_converged = convergence_table[state] == best_action
-
-function a(approximator_table__state_argmax)
-    return (@view approximator_table__state_argmax[1, 1])[1]
-        # is_converged = convergence_table[state] == best_action
-end
-
-function b(approximator_table__state_argmax)
-    return (@view approximator_table__state_argmax[1, 1])
-end
-
-
-
-
-@btime a(approximator_table__state_argmax)
-
-@btime b(approximator_table__state_argmax)
-
-44.820 ns (1 allocation: 48 bytes)
-
-using BenchmarkTools
-using ReinforcementLearning
-@btime ConvergenceCheck(Int(env.n_state_space), Int(env.n_players))((ReinforcementLearning.PostActStage, policies, env))
-
-# 1.238 μs (7 allocations: 99.44 KiB)
 
 @testset "get_best_action, update_best_action" begin
     d_ = Dict(i => Set(Int16(i)) for i in 1:20)
