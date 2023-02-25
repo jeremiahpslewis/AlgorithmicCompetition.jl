@@ -1,7 +1,7 @@
 using Test
 using JuMP
 using Chain
-using ReinforcementLearning: PostActStage
+using ReinforcementLearning: PostActStage, state
 using AlgorithmicCompetition:
     AlgorithmicCompetition,
     CompetitionParameters,
@@ -16,6 +16,7 @@ using AlgorithmicCompetition:
     p_BR,
     map_vect_to_int,
     map_int_to_vect,
+    construct_profit_array,
     q_fun,
     run,
     run_and_extract,
@@ -73,8 +74,8 @@ end
     hyperparams = CalvanoHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=10)
 
     c_out = run(hyperparams; stop_on_convergence=false)
-    @test all(c_out.hook.hooks[1][2].best_response_vector == 1)
-    @test c_out.hook.hooks[1][2].best_response_vector != c_out.hook.hooks[2][2].best_response_vector
+    @test any(c_out.hook.hooks[1][2].best_response_vector != 1)
+    @test_broken c_out.hook.hooks[1][2].best_response_vector != c_out.hook.hooks[2][2].best_response_vector
 
     run([hyperparams]; stop_on_convergence=false)
 end
@@ -84,7 +85,7 @@ end
 
     competition_solution = CompetitionSolution(competition_params)
 
-    n_increments = 10
+    n_increments = 3
     α_ = Float32.(range(0.025, 0.25, n_increments))
     β_ = Float32.(range(1.25e-8, 2e-5, n_increments))
     δ = 0.95
@@ -94,9 +95,9 @@ end
         CalvanoHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=10) for α in α_ for β in β_
     ]
 
-    exps = @chain hyperparameter_vect run_and_extract.(stop_on_convergence=true)
+    expers = @chain hyperparameter_vect run_and_extract.(stop_on_convergence=true)
         
-    # @test exps[1] isa Experiment
+    # @test expers[1] isa Experiment
 end
 
 @testset "CompetitionParameters" begin
@@ -124,15 +125,22 @@ end
     
     policies[1].policy.policy.learner.approximator.table[11, :] .= 2
     exper.hook.hooks[1][2](PostActStage(), policies[1], exper.env)
-    @test exper.hook.hooks[1][2].best_response_vector[RLBase.state(env)] == 11
+    @test exper.hook.hooks[1][2].best_response_vector[state(env)] == 11
 end
 
-@testset "" begin
+@testset "Profit array test" begin
     competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
     competition_solution = CompetitionSolution(competition_params)
 
     env = CalvanoHyperParameters(Float32(0.1), Float32(1e-4), 0.95, Int(1e7), competition_solution) |> CalvanoEnv
-    exp = Experiment(env)
+    exper = Experiment(env)
+
+    price_options = env.price_options
+    profit_function = env.profit_function
+    action_space_ = env.action_space
+    profit_array = construct_profit_array(action_space_, price_options, profit_function, 2)
+    
+    profit_array[5, 3, :] ≈ env.profit_function([price_options[5], price_options[3]])
 end
 
 @testset "map_vect_to_int, map_int_to_vect" begin

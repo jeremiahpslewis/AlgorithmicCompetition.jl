@@ -37,14 +37,7 @@ struct CalvanoEnv <: AbstractEnv
         init_matrix = MMatrix{15, 225, Float32}(zeros(Float32, n_prices, n_state_space))
         action_space = Tuple((i, j) for i in price_index for j in price_index)
 
-        # TODO: Carve out into separate function:
-        profit_array = zeros(Float32, n_prices, n_prices, n_players)
-        for k in 1:n_players
-            for (i,j) in action_space
-                profit_array[i, j, k] = p.profit_function([price_options[i], price_options[j]])[k]
-            end
-        end
-
+        profit_array = construct_profit_array(action_space, price_options, p.profit_function, n_players)
         state_space_lookup = zeros(Int16, n_prices, n_prices)
         for (i,j) in action_space
             state_space_lookup[i, j] = map_vect_to_int([i,j], n_prices) - n_prices
@@ -90,6 +83,19 @@ end
 
 function map_int_to_vect(int_val, base, vect_length)
     return digits(Int, int_val, base=base, pad=vect_length)
+end
+
+function construct_profit_array(action_space::NTuple, price_options, profit_function, n_players::Int)
+    n_prices = length(price_options)
+    # TODO: Carve out into separate function:
+    profit_array = zeros(Float32, n_prices, n_prices, n_players)
+    for k in 1:n_players
+        for (i,j) in action_space
+            profit_array[i, j, k] = profit_function([price_options[i], price_options[j]])[k]
+        end
+    end
+
+    return profit_array
 end
 
 RLBase.action_space(env::CalvanoEnv, ::Int) = env.price_index # Choice of price
