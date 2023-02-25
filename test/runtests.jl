@@ -14,6 +14,7 @@ using AlgorithmicCompetition:
     solve_monopolist,
     solve_bertrand,
     p_BR,
+    construct_state_space_lookup,
     map_vect_to_int,
     map_int_to_vect,
     construct_profit_array,
@@ -55,6 +56,10 @@ end
     @test map_vect_to_int(repeat([n_prices], n_players), n_prices) - n_prices == n_state_space
     @test map_vect_to_int(Array{Int,2}(repeat([n_prices], n_players)'), n_prices) - n_prices ==
           n_state_space
+end
+
+@testset "construct_state_space_lookup" begin
+    @test construct_state_space_lookup(((1,1), (1,2), (2,1), (2,2)), 2) == [1 3; 2 4]
 end
 
 @testset "run AIAPC full simulation" begin

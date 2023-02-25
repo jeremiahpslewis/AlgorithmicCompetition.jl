@@ -38,10 +38,7 @@ struct AIAPCEnv <: AbstractEnv
         action_space = Tuple((i, j) for i in price_index for j in price_index)
 
         profit_array = construct_profit_array(action_space, price_options, p.profit_function, n_players)
-        state_space_lookup = zeros(Int16, n_prices, n_prices)
-        for (i,j) in action_space
-            state_space_lookup[i, j] = map_vect_to_int([i,j], n_prices) - n_prices
-        end
+        state_space_lookup = construct_state_space_lookup(action_space, n_prices)
 
         new(
             p.α,
@@ -75,6 +72,18 @@ function (env::AIAPCEnv)((p_1, p_2))
     env.memory .= (p_1, p_2)
     env.is_done[1] = true
 end
+
+function construct_state_space_lookup(action_space, n_prices)
+    @assert length(action_space) == n_prices^2
+    state_space_lookup = zeros(Int16, n_prices, n_prices)
+    for (i,j) in action_space
+        state_space_lookup[i, j] = map_vect_to_int([i,j], n_prices) - n_prices
+    end
+    return state_space_lookup
+end
+
+
+
 
 # map price vector to state
 function map_vect_to_int(vect_, base)
