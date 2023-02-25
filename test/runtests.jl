@@ -1,7 +1,7 @@
 using Test
 using JuMP
 using Chain
-using ReinforcementLearning: PostActStage, state
+using ReinforcementLearning: PostActStage, state, reward
 using AlgorithmicCompetition:
     AlgorithmicCompetition,
     CompetitionParameters,
@@ -21,7 +21,8 @@ using AlgorithmicCompetition:
     q_fun,
     run,
     run_and_extract,
-    Experiment
+    Experiment,
+    reward
 
 @testset "Competitive Equilibrium: Monopoly" begin
     params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
@@ -69,17 +70,26 @@ end
     ξ = 0.1
     δ = 0.95
     n_prices = 15
-    max_iter = Int(1e4)
+    max_iter = 1000
     price_index = 1:n_prices
 
     competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
 
     competition_solution = CompetitionSolution(competition_params)
 
-    hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=10)
+    hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=1)
 
     c_out = run(hyperparams; stop_on_convergence=false)
-    @test any(c_out.hook.hooks[1][2].best_response_vector != 1)
+    @test length(reward(c_out.env.env)) == 2
+    @test length(reward(c_out.env.env, 1)) == 1
+
+    c_out.env.env.is_done[1] = false
+    @test reward(c_out.env.env) == [0, 0]
+    @test reward(c_out.env.env, 1) != 0
+
+
+    @test state(c_out.env) != 1
+    @test sum(c_out.hook.hooks[1][2].best_response_vector != 0)
     @test_broken c_out.hook.hooks[1][2].best_response_vector != c_out.hook.hooks[2][2].best_response_vector
 
     run([hyperparams]; stop_on_convergence=false)
@@ -123,6 +133,7 @@ end
 
     env = AIAPCHyperParameters(Float32(0.1), Float32(1e-4), 0.95, Int(1e7), competition_solution) |> AIAPCEnv
     exper = Experiment(env)
+    state(env)
     policies = env |> AIAPCPolicy
     AlgorithmicCompetition.update!(exper.hook.hooks[1][2], Int16(2), 3, false)
     @test exper.hook.hooks[1][2].best_response_vector[2] == 3

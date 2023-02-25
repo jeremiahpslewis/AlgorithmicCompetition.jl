@@ -82,9 +82,6 @@ function construct_state_space_lookup(action_space, n_prices)
     return state_space_lookup
 end
 
-
-
-
 # map price vector to state
 function map_vect_to_int(vect_, base)
     sum(vect_[k] * base^(k-1) for k=1:length(vect_)) # From Julia help / docs
@@ -121,7 +118,7 @@ function RLBase.reward(env::AIAPCEnv)
 end
 
 function RLBase.reward(env::AIAPCEnv, p::Int)
-     env.is_done[1] ? env.profit_array[env.memory[1], env.memory[2], p] : 0
+    (@view env.profit_array[env.memory[1], env.memory[2], p])[1]
 end
 
 RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
