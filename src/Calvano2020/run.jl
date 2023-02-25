@@ -22,8 +22,8 @@ function run(experiments::Vector{ReinforcementLearningCore.Experiment})
     end
 end
 
-function run(hyperparameter_vect::Vector{CalvanoHyperParameters})
-    pmap(run, hyperparameters)
+function run(hyperparameter_vect::Vector{CalvanoHyperParameters}; stop_on_convergence=true)
+    pmap(x -> run(x; stop_on_convergence=stop_on_convergence), hyperparameter_vect)
 end
 
 function run(hyperparameters::CalvanoHyperParameters; stop_on_convergence=true)

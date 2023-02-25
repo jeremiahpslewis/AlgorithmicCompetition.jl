@@ -33,8 +33,10 @@ struct CalvanoHyperParameters
         β::Float32,
         δ::Float64,
         max_iter::Int64,
-        competition_solution::CompetitionSolution,
+        competition_solution::CompetitionSolution;
+        convergence_threshold::Int = Int(1e5)
     )
+        @assert  max_iter > convergence_threshold
         ξ = 0.1
         δ = 0.95
         n_prices = 15
@@ -54,9 +56,7 @@ struct CalvanoHyperParameters
                 n_prices,
             )...,
         ]
-
-        convergence_threshold = Int(1e5)
-
+    
         new(
             α,
             β,

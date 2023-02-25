@@ -1,3 +1,4 @@
 [deps]
+Chain = "8be319e6-bccf-4806-a6f7-6fae938471bc"
 JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

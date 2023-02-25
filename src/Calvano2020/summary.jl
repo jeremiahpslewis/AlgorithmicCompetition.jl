@@ -6,6 +6,7 @@ profit_measure(π_hat::Vector{Float64}, π_N, π_M) = (mean(π_hat) - π_N) / (�
 struct CalvanoSummary
     α::Float32
     β::Float32
+    is_converged::Vector{Bool}
     avg_profit::Vector{Float32}
 end
 
@@ -16,12 +17,15 @@ function economic_summary(e::ReinforcementLearningCore.Experiment)
     π_M = e.env.env.profit_function(fill(e.env.env.p_monop_opt, 2))[1]
 
     avg_profit = Float32[]
+    is_converged = Bool[]
 
     for i in [1, 2]
         @chain e.hook.hooks[i][1].rewards[(end-convergence_threshold):end] begin
             push!(avg_profit, profit_measure(_, π_N, π_M))
         end
+
+        push!(is_converged, e.hook.hooks[i][2].is_converged)
     end
 
-    return CalvanoSummary(e.env.env.α, e.env.env.β, avg_profit)
+    return CalvanoSummary(e.env.env.α, e.env.env.β, is_converged, avg_profit)
 end

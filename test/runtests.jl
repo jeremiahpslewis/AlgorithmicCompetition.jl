@@ -1,5 +1,6 @@
 using Test
 using JuMP
+using Chain
 using AlgorithmicCompetition:
     AlgorithmicCompetition,
     CompetitionParameters,
@@ -13,9 +14,10 @@ using AlgorithmicCompetition:
     solve_bertrand,
     p_BR,
     map_vect_to_int,
+    map_int_to_vect,
     q_fun,
-    get_best_action,
-    update_best_action!
+    run,
+    run_and_extract
 
 @testset "Competitive Equilibrium: Monopoly" begin
     params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
@@ -47,36 +49,52 @@ end
     n_players = 2
     memory_length = 1
     n_state_space = n_prices^(n_players * memory_length)
-    @test map_vect_to_int(repeat([n_prices], n_players), n_prices) + 1 == n_state_space
-    @test map_vect_to_int(Array{Int,2}(repeat([n_prices], n_players)'), n_prices) + 1 ==
+    @test map_vect_to_int(repeat([n_prices], n_players), n_prices) - n_prices == n_state_space
+    @test map_vect_to_int(Array{Int,2}(repeat([n_prices], n_players)'), n_prices) - n_prices ==
           n_state_space
 end
 
-@testset "runCalvano full simulation" begin
+@testset "run Calvano full simulation" begin
     p_monop_opt = 1.92498
     p_Bert_nash_equilibrium = 1.47
 
-    α = 0.125
-    β = 1e-5
+    α = Float32(0.125)
+    β = Float32(1e-5)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
     n_prices = 15
+    max_iter = Int(1e4)
     price_index = 1:n_prices
 
     competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
-    p_range_pad = ξ * (p_monop_opt - p_Bert_nash_equilibrium)
-    price_options = [range(p_Bert_nash_equilibrium, p_monop_opt, n_prices)...]
 
-    runCalvano(
-        α,
-        β,
-        δ,
-        price_options,
-        competition_params,
-        p_Bert_nash_equilibrium,
-        p_monop_opt,
-    )
+    competition_solution = CompetitionSolution(competition_params)
+
+    hyperparams = CalvanoHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=10)
+
+    run([hyperparams]; stop_on_convergence=false)
+    run(hyperparams; stop_on_convergence=false)
+end
+
+@testset "Run a set of experiments." begin
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+
+    competition_solution = CompetitionSolution(competition_params)
+
+    n_increments = 10
+    α_ = Float32.(range(0.025, 0.25, n_increments))
+    β_ = Float32.(range(1.25e-8, 2e-5, n_increments))
+    δ = 0.95
+    max_iter = Int(1e4)
+
+    hyperparameter_vect = [
+        CalvanoHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=10) for α in α_ for β in β_
+    ]
+
+    exps = @chain hyperparameter_vect run_and_extract.(stop_on_convergence=true)
+        
+    # @test exps[1] isa Experiment
 end
 
 @testset "CompetitionParameters" begin
@@ -91,23 +109,11 @@ end
           fill(0.36486, 2) atol = 0.01
 end
 
-@testset "Run a set of experiments." begin
-    n_increments = 10
-    α_ = range(0.025, 0.25, n_increments)
-    β_ = range(1.25e-8, 2e-5, n_increments)
-    δ = 0.95
-
-    exps =
-        CalvanoHyperParameters.(α_, β_, (δ,), (max_iter,)) |> CalvanoEnv.() |> Experiment.()
-    @test exps[1] isa Experiment
-end
-
-
 @testset "Convergence Check Hook" begin
     competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
     competition_solution = CompetitionSolution(competition_params)
 
-    env = CalvanoHyperParameters(0.1, 1e-4, 0.95, Int(1e7), competition_solution) |> CalvanoEnv
+    env = CalvanoHyperParameters(Float32(0.1), Float32(1e-4), 0.95, Int(1e7), competition_solution) |> CalvanoEnv
     policies = env |> CalvanoPolicy
     # q_table = policies.agents[1].policy.policy.learner.approximator.table
     q_table = zeros(Float64, 15, 50625)
@@ -115,15 +121,6 @@ end
     approximator_table__state_argmax = zeros(UInt, env.n_players, env.n_state_space)
     prev_best_action = (@view approximator_table__state_argmax[1, :])[1]
     state = 20
-end
-
-@testset "get_best_action, update_best_action" begin
-    d_ = Dict(i => Set(Int16(i)) for i in 1:20)
-    @test get_best_action(d_, 10) == 10#|> sum
-    
-    update_best_action!(d_, Int16(9), Int16(9), Int16(11))
-    @test d_[11] == Set([9, 11])
-    @test d_[9] == Set()
 end
 
 @testset "map_vect_to_int, map_int_to_vect" begin

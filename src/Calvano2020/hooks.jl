@@ -31,16 +31,16 @@ function update!(
         h.convergence_duration += 1
     else
         (h.convergence_duration != 0) && (h.convergence_duration = 0)
-        @inbounds h.best_response_vector[state_] = best_action
+        h.best_response_vector[state_] = best_action
     end
 
-    if h.convergence_duration == h.convergence_threshold
+    if h.convergence_duration >= h.convergence_threshold
         h.is_converged = true
     end
 end
  
 
-function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env)
+function (h::ConvergenceCheck)(::PostActStage, policy, env)
     # Convergence is defined over argmax action for each state 
     # E.g. best / greedy action
     current_player_id = nameof(policy)
