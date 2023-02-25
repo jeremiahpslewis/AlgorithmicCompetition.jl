@@ -17,7 +17,8 @@ using AlgorithmicCompetition:
     map_int_to_vect,
     q_fun,
     run,
-    run_and_extract
+    run_and_extract,
+    Experiment
 
 @testset "Competitive Equilibrium: Monopoly" begin
     params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
@@ -55,9 +56,6 @@ end
 end
 
 @testset "run Calvano full simulation" begin
-    p_monop_opt = 1.92498
-    p_Bert_nash_equilibrium = 1.47
-
     α = Float32(0.125)
     β = Float32(1e-5)
     δ = 0.95
@@ -73,8 +71,11 @@ end
 
     hyperparams = CalvanoHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=10)
 
+    c_out = run(hyperparams; stop_on_convergence=false)
+    @test all(c_out.hook.hooks[1][2].best_response_vector == 1)
+    @test c_out.hook.hooks[1][2].best_response_vector != c_out.hook.hooks[2][2].best_response_vector
+
     run([hyperparams]; stop_on_convergence=false)
-    run(hyperparams; stop_on_convergence=false)
 end
 
 @testset "Run a set of experiments." begin
@@ -114,13 +115,19 @@ end
     competition_solution = CompetitionSolution(competition_params)
 
     env = CalvanoHyperParameters(Float32(0.1), Float32(1e-4), 0.95, Int(1e7), competition_solution) |> CalvanoEnv
+    exp = Experiment(env)
     policies = env |> CalvanoPolicy
+       
     # q_table = policies.agents[1].policy.policy.learner.approximator.table
+
     q_table = zeros(Float64, 15, 50625)
 
     approximator_table__state_argmax = zeros(UInt, env.n_players, env.n_state_space)
     prev_best_action = (@view approximator_table__state_argmax[1, :])[1]
     state = 20
+
+    AlgorithmicCompetition.update!(exp.hook.hooks[1][2], Int16(2), 3, false)
+    @test exp.hook.hooks[1][2].best_response_vector[2] == 3
 end
 
 @testset "map_vect_to_int, map_int_to_vect" begin
