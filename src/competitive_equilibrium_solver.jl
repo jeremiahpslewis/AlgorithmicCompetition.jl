@@ -1,4 +1,4 @@
-# Parameters from pg 3374 Calvano 2020
+# Parameters from pg 3374 AIAPC 2020
 using JuMP
 using Chain
 using Ipopt
@@ -22,7 +22,7 @@ struct CompetitionParameters
 end
 
 function q_fun(p, params::CompetitionParameters)
-    # Logit demand function from pg 3372 Calvano 2020
+    # Logit demand function from pg 3372 AIAPC 2020
     a_ = [params.a_0, params.a...]
     p_ = [0, p...]
     return softmax((a_ .- p_) ./ params.μ)[2:end]

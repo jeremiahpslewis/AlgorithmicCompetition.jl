@@ -3,8 +3,8 @@ using AlgorithmicCompetition:
     AlgorithmicCompetition,
     CompetitionParameters,
     CompetitionSolution,
-    CalvanoHyperParameters,
-    CalvanoEnv,
+    AIAPCHyperParameters,
+    AIAPCEnv,
     Experiment,
     run_and_extract,
     run
@@ -33,7 +33,7 @@ if multiproc
         using Pkg
         Pkg.instantiate()
         using AlgorithmicCompetition:
-            AlgorithmicCompetition, CalvanoHyperParameters, CalvanoEnv, run
+            AlgorithmicCompetition, AIAPCHyperParameters, AIAPCEnv, run
     end
 end
 
@@ -48,7 +48,7 @@ max_iter = Int(1e6) # Should be 1e9
 δ = 0.95
 
 hyperparameter_vect = [
-    CalvanoHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_ for β in β_
+    AIAPCHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_ for β in β_
 ]
 
 # for param_ in sample(hyperparameter_vect, 1)

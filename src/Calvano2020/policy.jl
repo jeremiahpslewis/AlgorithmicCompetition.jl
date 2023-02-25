@@ -1,6 +1,6 @@
 using ReinforcementLearning
 
-CalvanoPolicy(env::CalvanoEnv) = MultiAgentManager(
+AIAPCPolicy(env::AIAPCEnv) = MultiAgentManager(
     (
         Agent(
             policy = NamedPolicy(

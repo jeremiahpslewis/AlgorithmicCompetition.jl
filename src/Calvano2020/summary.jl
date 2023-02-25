@@ -3,7 +3,7 @@ using ReinforcementLearning
 
 profit_measure(π_hat::Vector{Float64}, π_N, π_M) = (mean(π_hat) - π_N) / (π_M - π_N)
 
-struct CalvanoSummary
+struct AIAPCSummary
     α::Float32
     β::Float32
     is_converged::Vector{Bool}
@@ -27,5 +27,5 @@ function economic_summary(e::ReinforcementLearningCore.Experiment)
         push!(is_converged, e.hook.hooks[i][2].is_converged)
     end
 
-    return CalvanoSummary(e.env.env.α, e.env.env.β, is_converged, avg_profit)
+    return AIAPCSummary(e.env.env.α, e.env.env.β, is_converged, avg_profit)
 end

@@ -15,7 +15,7 @@ struct CompetitionSolution
     end
 end
 
-struct CalvanoHyperParameters
+struct AIAPCHyperParameters
     α::Float32
     β::Float32
     δ::Float64
@@ -28,7 +28,7 @@ struct CalvanoHyperParameters
     p_Bert_nash_equilibrium::Float64
     p_monop_opt::Float64
 
-    function CalvanoHyperParameters(
+    function AIAPCHyperParameters(
         α::Float32,
         β::Float32,
         δ::Float64,

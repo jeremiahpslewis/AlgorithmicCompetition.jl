@@ -1,6 +1,6 @@
 using ReinforcementLearning
 
-function CalvanoStop(env::CalvanoEnv; stop_on_convergence=true)
+function AIAPCStop(env::AIAPCEnv; stop_on_convergence=true)
     stop_conditions = []
     push!(stop_conditions, StopAfterEpisode(env.max_iter, is_show_progress = false))
     if stop_on_convergence

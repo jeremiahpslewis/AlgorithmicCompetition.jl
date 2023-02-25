@@ -6,9 +6,9 @@ using AlgorithmicCompetition:
     AlgorithmicCompetition,
     CompetitionParameters,
     CompetitionParameters,
-    CalvanoHyperParameters,
-    CalvanoPolicy,
-    CalvanoEnv,
+    AIAPCHyperParameters,
+    AIAPCPolicy,
+    AIAPCEnv,
     CompetitionSolution,
     ConvergenceCheck,
     solve_monopolist,
@@ -29,7 +29,7 @@ using AlgorithmicCompetition:
     # symmetric solution found
     @test value(p_monop[1]) ≈ value(p_monop[2])
 
-    # Match Calvano 2020 parameterization
+    # Match AIAPC 2020 parameterization
     @test value(p_monop[1]) ≈ 1.92498 atol = 0.0001
     p_monop_opt = value(p_monop[2])
 end
@@ -43,7 +43,7 @@ end
     # Parameter recovery
     @test p_Bertrand_[2] ≈ 1.47293 atol = 1e-3
 
-    # Best response function matches Calvano 2020
+    # Best response function matches AIAPC 2020
     @test p_BR(1.47293, params) ≈ 1.47293 atol = 1e6
 end
 
@@ -57,7 +57,7 @@ end
           n_state_space
 end
 
-@testset "run Calvano full simulation" begin
+@testset "run AIAPC full simulation" begin
     α = Float32(0.125)
     β = Float32(1e-5)
     δ = 0.95
@@ -71,7 +71,7 @@ end
 
     competition_solution = CompetitionSolution(competition_params)
 
-    hyperparams = CalvanoHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=10)
+    hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=10)
 
     c_out = run(hyperparams; stop_on_convergence=false)
     @test any(c_out.hook.hooks[1][2].best_response_vector != 1)
@@ -92,7 +92,7 @@ end
     max_iter = Int(1e4)
 
     hyperparameter_vect = [
-        CalvanoHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=10) for α in α_ for β in β_
+        AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=10) for α in α_ for β in β_
     ]
 
     expers = @chain hyperparameter_vect run_and_extract.(stop_on_convergence=true)
@@ -116,9 +116,9 @@ end
     competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
     competition_solution = CompetitionSolution(competition_params)
 
-    env = CalvanoHyperParameters(Float32(0.1), Float32(1e-4), 0.95, Int(1e7), competition_solution) |> CalvanoEnv
+    env = AIAPCHyperParameters(Float32(0.1), Float32(1e-4), 0.95, Int(1e7), competition_solution) |> AIAPCEnv
     exper = Experiment(env)
-    policies = env |> CalvanoPolicy
+    policies = env |> AIAPCPolicy
     AlgorithmicCompetition.update!(exper.hook.hooks[1][2], Int16(2), 3, false)
     @test exper.hook.hooks[1][2].best_response_vector[2] == 3
 
@@ -132,7 +132,7 @@ end
     competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
     competition_solution = CompetitionSolution(competition_params)
 
-    env = CalvanoHyperParameters(Float32(0.1), Float32(1e-4), 0.95, Int(1e7), competition_solution) |> CalvanoEnv
+    env = AIAPCHyperParameters(Float32(0.1), Float32(1e-4), 0.95, Int(1e7), competition_solution) |> AIAPCEnv
     exper = Experiment(env)
 
     price_options = env.price_options

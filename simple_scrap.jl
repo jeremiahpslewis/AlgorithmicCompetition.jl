@@ -2,8 +2,8 @@ using AlgorithmicCompetition:
 AlgorithmicCompetition,
 CompetitionParameters,
 CompetitionSolution,
-CalvanoHyperParameters,
-CalvanoEnv,
+AIAPCHyperParameters,
+AIAPCEnv,
 Experiment,
 run_and_extract,
 run
@@ -20,7 +20,7 @@ max_iter = Int(1e6) # Should be 1e9
 δ = 0.95
 
 hyperparameter_vect = [
-CalvanoHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_ for β in β_
+AIAPCHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_ for β in β_
 ]
 
 @btime run(hyperparameter_vect[1]; stop_on_convergence=false)
@@ -39,7 +39,7 @@ CalvanoHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_
 
 
 
-# function reward1(env::CalvanoEnv)
+# function reward1(env::AIAPCEnv)
 #     @views env.is_done[1] ? (env.profit_array[env.memory, :]) : [Float32(0), Float32(0)]
 # end
 
@@ -48,7 +48,7 @@ CalvanoHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_
 # 113.926 ns (2 allocations: 288 bytes)
 # 111.879 ns (2 allocations: 288 bytes)
 
-# function reward1(env::CalvanoEnv, p::Int)
+# function reward1(env::AIAPCEnv, p::Int)
 #     env.is_done[1] ? env.profit_array[env.memory[1], env.memory[2], p] : 0
 # end
 

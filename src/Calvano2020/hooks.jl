@@ -64,7 +64,7 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
 end
 
 # TODO: Figure out why the hook results are identical for both players
-function CalvanoHook(env::AbstractEnv)
+function AIAPCHook(env::AbstractEnv)
     MultiAgentHook(
         (
             p => ComposedHook(

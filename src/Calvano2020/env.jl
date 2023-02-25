@@ -1,7 +1,7 @@
 using ReinforcementLearning
 using StaticArrays
 
-struct CalvanoEnv <: AbstractEnv
+struct AIAPCEnv <: AbstractEnv
     α::Float32
     β::Float32
     δ::Float64
@@ -25,7 +25,7 @@ struct CalvanoEnv <: AbstractEnv
     action_space::Tuple
     profit_array::Array{Float32, 3}
 
-    function CalvanoEnv(p::CalvanoHyperParameters)
+    function AIAPCEnv(p::AIAPCHyperParameters)
         # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
         # TODO: Think about how initial memory should be assigned
         price_options = SVector{15, Float32}(p.price_options)
@@ -70,7 +70,7 @@ struct CalvanoEnv <: AbstractEnv
     end
 end
 
-function (env::CalvanoEnv)((p_1, p_2))
+function (env::AIAPCEnv)((p_1, p_2))
     # TODO: Fix support for longer memories
     env.memory .= (p_1, p_2)
     env.is_done[1] = true
@@ -98,42 +98,42 @@ function construct_profit_array(action_space::NTuple, price_options, profit_func
     return profit_array
 end
 
-RLBase.action_space(env::CalvanoEnv, ::Int) = env.price_index # Choice of price
+RLBase.action_space(env::AIAPCEnv, ::Int) = env.price_index # Choice of price
 
-RLBase.action_space(env::CalvanoEnv, ::SimultaneousPlayer) = env.action_space
+RLBase.action_space(env::AIAPCEnv, ::SimultaneousPlayer) = env.action_space
     
-RLBase.legal_action_space(env::CalvanoEnv, p) =
+RLBase.legal_action_space(env::AIAPCEnv, p) =
     is_terminated(env) ? () : action_space(env, p)
 
-RLBase.action_space(env::CalvanoEnv) = action_space(env, SIMULTANEOUS_PLAYER)
+RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
-function RLBase.reward(env::CalvanoEnv)
+function RLBase.reward(env::AIAPCEnv)
     env.is_done[1] ? (@view env.profit_array[env.memory[1], env.memory[2], :]) : SA[0, 0]
 end
 
-function RLBase.reward(env::CalvanoEnv, p::Int)
+function RLBase.reward(env::AIAPCEnv, p::Int)
      env.is_done[1] ? env.profit_array[env.memory[1], env.memory[2], p] : 0
 end
 
-RLBase.state_space(env::CalvanoEnv, ::Observation, p) = env.state_space
+RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
 
-function RLBase.state(env::CalvanoEnv, ::Observation, p)
+function RLBase.state(env::AIAPCEnv, ::Observation, p)
     env.state_space_lookup[env.memory[1], env.memory[2]]
 end
 
-RLBase.is_terminated(env::CalvanoEnv) = env.is_done[1]
+RLBase.is_terminated(env::AIAPCEnv) = env.is_done[1]
 # TODO: Expand reset function to other params
-function RLBase.reset!(env::CalvanoEnv)
+function RLBase.reset!(env::AIAPCEnv)
     env.is_done[1] = false
 end
 
-RLBase.players(::CalvanoEnv) = (1, 2)
-RLBase.current_player(::CalvanoEnv) = SIMULTANEOUS_PLAYER
-RLBase.NumAgentStyle(::CalvanoEnv) = MultiAgent(2)
-RLBase.DynamicStyle(::CalvanoEnv) = SIMULTANEOUS
-RLBase.ActionStyle(::CalvanoEnv) = MINIMAL_ACTION_SET
-RLBase.InformationStyle(::CalvanoEnv) = IMPERFECT_INFORMATION
-RLBase.StateStyle(::CalvanoEnv) = Observation{Int16}()
-RLBase.RewardStyle(::CalvanoEnv) = STEP_REWARD
-RLBase.UtilityStyle(::CalvanoEnv) = GENERAL_SUM
-RLBase.ChanceStyle(::CalvanoEnv) = DETERMINISTIC
+RLBase.players(::AIAPCEnv) = (1, 2)
+RLBase.current_player(::AIAPCEnv) = SIMULTANEOUS_PLAYER
+RLBase.NumAgentStyle(::AIAPCEnv) = MultiAgent(2)
+RLBase.DynamicStyle(::AIAPCEnv) = SIMULTANEOUS
+RLBase.ActionStyle(::AIAPCEnv) = MINIMAL_ACTION_SET
+RLBase.InformationStyle(::AIAPCEnv) = IMPERFECT_INFORMATION
+RLBase.StateStyle(::AIAPCEnv) = Observation{Int16}()
+RLBase.RewardStyle(::AIAPCEnv) = STEP_REWARD
+RLBase.UtilityStyle(::AIAPCEnv) = GENERAL_SUM
+RLBase.ChanceStyle(::AIAPCEnv) = DETERMINISTIC
