@@ -16,7 +16,6 @@ end
 
 function update!(
     h::ConvergenceCheck,
-    current_player_id::Int,
     state_::Int16,
     best_action::Int,
     iter_converged::Bool,
@@ -43,7 +42,6 @@ end
 function (h::ConvergenceCheck)(::PostActStage, policy, env)
     # Convergence is defined over argmax action for each state 
     # E.g. best / greedy action
-    current_player_id = nameof(policy)
     n_prices = env.env.n_prices
     
     state_ = RLBase.state(env)
@@ -52,7 +50,6 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env)
 
     update!(
         h,
-        current_player_id,
         state_,
         best_action,
         iter_converged,
