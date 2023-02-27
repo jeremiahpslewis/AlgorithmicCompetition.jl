@@ -79,21 +79,14 @@ end
 (app::TabularQApproximator)(s::Int16, a::Int8) = app.table[a, s]
 
 # add missing update! method
-function RLBase.update!(app::TabularVApproximator, correction::Pair{Int16,Float32})
-    s, e = correction
-    x = @view app.table[s]
-    x̄ = @view [e][1]
-    Flux.Optimise.update!(app.optimizer, x, x̄)
-end
-
-function RLBase.update!(app::TabularQApproximator, correction::Pair{Tuple{Int16,Int8},Float32})
+function RLBase.update!(app::TabularQApproximator, correction::Pair{Tuple{Int16,Int8},Float64})
     (s, a), e = correction
     x = @view app.table[a, s]
     x̄ = @view [e][1]
     Flux.Optimise.update!(app.optimizer, x, x̄)
 end
 
-function RLBase.update!(app::TabularQApproximator, correction::Pair{Int16,Vector{Float32}})
+function RLBase.update!(app::TabularQApproximator, correction::Pair{Int16,Vector{Float64}})
     s, errors = correction
     x = @view app.table[:, s]
     Flux.Optimise.update!(app.optimizer, x, errors)
