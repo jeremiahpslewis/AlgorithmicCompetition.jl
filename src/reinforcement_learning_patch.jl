@@ -80,14 +80,32 @@ end
 
 # add missing update! method
 function RLBase.update!(app::TabularQApproximator, correction::Pair{Tuple{Int16,Int8},Float64})
+    println("RLBase.update!(app::TabularQApproximator, correction::Pair{Tuple{Int16,Int8},Float64})")
     (s, a), e = correction
     x = @view app.table[a, s]
     x̄ = @view [e][1]
+    println(x̄)
+
     Flux.Optimise.update!(app.optimizer, x, x̄)
 end
 
 function RLBase.update!(app::TabularQApproximator, correction::Pair{Int16,Vector{Float64}})
+    print("RLBase.update!(app::TabularQApproximator, correction::Pair{Int16,Vector{Float64}})")
     s, errors = correction
     x = @view app.table[:, s]
     Flux.Optimise.update!(app.optimizer, x, errors)
+end
+
+
+function RLBase.update!(
+    trajectory::VectorSARTTrajectory,
+    policy::NamedPolicy,
+    env::SequentialEnv,
+    ::PostActStage,
+)
+    if env.current_player_idx == 1
+        r = policy isa NamedPolicy ? reward(env.env, nameof(policy)) : reward(env)
+        push!(trajectory[:reward], r)
+        push!(trajectory[:terminal], is_terminated(env))
+    end
 end
