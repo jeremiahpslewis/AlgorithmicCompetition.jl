@@ -1,6 +1,12 @@
 using ReinforcementLearning
 using StaticArrays
+"""
+    AIAPCEnv(p::AIAPCHyperParameters)
 
+    Build an environment to reproduce the results of the 2020  Calvano, Calzolari, Denicolò & Pastorello AER Paper
+    
+    Calvano, E., Calzolari, G., Denicolò, V., & Pastorello, S. (2020). Artificial Intelligence, Algorithmic Pricing, and Collusion. American Economic Review, 110(10), 3267–3297. https://doi.org/10.1257/aer.20190623
+"""
 struct AIAPCEnv <: AbstractEnv
     α::Float32
     β::Float32
