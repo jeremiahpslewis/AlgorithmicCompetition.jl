@@ -164,7 +164,7 @@ end
 
     
     policies[1].policy.policy.learner.approximator.table[11, :] .= 2
-    exper.hook.hooks[1][2](PostActStage(), policies[1], exper.env)
+    exper.hook.hooks[1][2](PostEpisodeStage(), policies[1], exper.env)
     @test exper.hook.hooks[1][2].best_response_vector[state(env)] == 11
 end
 
@@ -228,6 +228,9 @@ end
     @test c_out.hook.hooks[1][2].iterations_until_convergence == max_iter
     @test c_out.hook.hooks[2][2].iterations_until_convergence == max_iter
 
+
+    @test c_out.policy.agents[1].trajectory[:reward][1] .!= 0
+    @test c_out.policy.agents[2].trajectory[:reward][1] .!= 0
 
     @test c_out.policy.agents[1].policy.policy.learner.approximator.table != c_out.policy.agents[2].policy.policy.learner.approximator.table
     @test c_out.hook.hooks[1][2].best_response_vector != c_out.hook.hooks[2][2].best_response_vector
