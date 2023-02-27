@@ -18,7 +18,6 @@ struct AIAPCEnv <: AbstractEnv
     convergence_threshold::Int
     n_prices::Int
     price_index::SVector{15, Int8}
-    init_matrix::MMatrix{15, 225, Float32}
     profit_function::Function
     n_state_space::Int16
     state_space::Base.OneTo{Int}
@@ -40,7 +39,6 @@ struct AIAPCEnv <: AbstractEnv
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
         state_space = Base.OneTo(n_state_space)
-        init_matrix = MMatrix{15, 225, Float32}(zeros(Float32, n_prices, n_state_space))
         action_space = Tuple((i, j) for i in price_index for j in price_index)
 
         profit_array = construct_profit_array(action_space, price_options, p.profit_function, n_players)
@@ -57,7 +55,6 @@ struct AIAPCEnv <: AbstractEnv
             p.convergence_threshold,
             n_prices,
             price_index,
-            init_matrix,
             p.profit_function,
             n_state_space,
             state_space,

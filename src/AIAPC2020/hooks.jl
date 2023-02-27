@@ -39,7 +39,7 @@ function update!(
 end
  
 
-function (h::ConvergenceCheck)(::PostActStage, policy, env)
+function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env)
     # Convergence is defined over argmax action for each state 
     # E.g. best / greedy action
     n_prices = env.env.n_prices
