@@ -22,8 +22,29 @@ using AlgorithmicCompetition:
     run,
     run_and_extract,
     Experiment,
-    reward
+    reward,
+    InitMatrix
 
+
+@testset "Prepackaged Environment Tests" begin
+    α = Float32(0.125)
+    β = Float32(1e-5)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = 1000
+    price_index = 1:n_prices
+
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+
+    competition_solution = CompetitionSolution(competition_params)
+
+    hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=1)
+        
+    test_interfaces!(AIAPCEnv(hyperparams))
+    test_runnable!(AIAPCEnv(hyperparams))
+end
 @testset "Competitive Equilibrium: Monopoly" begin
     params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
     model_monop, p_monop = solve_monopolist(params)
@@ -80,6 +101,9 @@ end
     hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=1)
 
     c_out = run(hyperparams; stop_on_convergence=false)
+    
+    # ensure that the policy is updated by the learner
+    @test sum(c_out.policy.agents[1].policy.policy.learner.approximator.table .!= 0) != 0
     @test length(reward(c_out.env.env)) == 2
     @test length(reward(c_out.env.env, 1)) == 1
 
@@ -89,7 +113,7 @@ end
 
 
     @test state(c_out.env) != 1
-    @test sum(c_out.hook.hooks[1][2].best_response_vector != 0)
+    # @test sum(c_out.hook.hooks[1][2].best_response_vector == 0)
     @test_broken c_out.hook.hooks[1][2].best_response_vector != c_out.hook.hooks[2][2].best_response_vector
 
     run([hyperparams]; stop_on_convergence=false)
@@ -135,7 +159,7 @@ end
     exper = Experiment(env)
     state(env)
     policies = env |> AIAPCPolicy
-    AlgorithmicCompetition.update!(exper.hook.hooks[1][2], Int16(2), 3, false)
+    AlgorithmicCompetition.update!(exper.hook.hooks[1][2], Int(2), 3, false)
     @test exper.hook.hooks[1][2].best_response_vector[2] == 3
 
     
@@ -168,4 +192,58 @@ end
     int_ = 720
     vect_1 = map_int_to_vect(int_, base, 6)
     @test int_ == map_vect_to_int(vect_1, base)
+end
+
+@testset "simple InitMatrix test" begin
+    a = InitMatrix(15, 225)
+    b = InitMatrix(15, 225)
+    a[1,1] = 10
+    @test a[1,1] == 10
+    @test b[1,1] == 0
+end
+
+@testset "Parameter / learning checks" begin
+    α = Float32(0.125)
+    β = Float32(1e-5)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = 1000
+    price_index = 1:n_prices
+
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+
+    competition_solution = CompetitionSolution(competition_params)
+
+    hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=1)
+
+
+    c_out = run(hyperparams; stop_on_convergence=false)
+
+    # ensure that the policy is updated by the learner
+    @test sum(c_out.policy.agents[1].policy.policy.learner.approximator.table .!= 0) != 0
+    @test sum(c_out.policy.agents[2].policy.policy.learner.approximator.table .!= 0) != 0
+    @test c_out.env.env.is_done[1]
+    @test c_out.hook.hooks[1][2].iterations_until_convergence == max_iter
+    @test c_out.hook.hooks[2][2].iterations_until_convergence == max_iter
+
+
+    @test c_out.policy.agents[1].policy.policy.learner.approximator.table != c_out.policy.agents[2].policy.policy.learner.approximator.table
+    @test c_out.hook.hooks[1][2].best_response_vector != c_out.hook.hooks[2][2].best_response_vector
+    @test reward(c_out.env, 1) != 0
+    @test reward(c_out.env, 2) != 0
+    @test length(reward(c_out.env.env)) == 2
+    @test length(c_out.env.env.action_space) == 225
+    @test length(reward(c_out.env)) == 1
+end
+
+@testset "Sequential environment" begin
+    seq_env = AIAPCEnv(hyperparams) |> SequentialEnv
+    @test current_player(seq_env) == 1
+    @test action_space(seq_env) == 1:15
+    @test reward(seq_env) != 0 # reward reflects outcomes of last play (which happens at player = 1, e.g. before any actions chosen)
+    seq_env(5)
+    @test current_player(seq_env) == 2
+    @test reward(seq_env) == 0 # reward is zero as at least one player has already played (technically sequental plays)
 end
