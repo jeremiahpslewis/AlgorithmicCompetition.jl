@@ -1,3 +1,26 @@
+# The ReinforcementLearning.jl package is licensed under the MIT "Expat" License:
+
+# > Copyright (c) 2018-2021: Johanni Brea.
+# >
+# > Permission is hereby granted, free of charge, to any person obtaining a copy
+# > of this software and associated documentation files (the "Software"), to deal
+# > in the Software without restriction, including without limitation the rights
+# > to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# > copies of the Software, and to permit persons to whom the Software is
+# > furnished to do so, subject to the following conditions:
+# >
+# > The above copyright notice and this permission notice shall be included in all
+# > copies or substantial portions of the Software.
+# >
+# > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# > IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# > FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# > AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# > SOFTWARE.
+# >
+
 using ReinforcementLearningZoo
 using ReinforcementLearning
 
@@ -50,14 +73,28 @@ function ReinforcementLearningZoo._update!(
 end
 
 
-# Support Int < 64...
+### Patch modified from https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/v0.10.1/src/ReinforcementLearningCore/src/policies/q_based_policies/learners/approximators/tabular_approximator.jl
+### To support smaller ints / floats
 (app::TabularQApproximator)(s::Int16) = @views app.table[:, s]
 (app::TabularQApproximator)(s::Int16, a::Int8) = app.table[a, s]
 
+# add missing update! method
+function RLBase.update!(app::TabularVApproximator, correction::Pair{Int16,Float32})
+    s, e = correction
+    x = @view app.table[s]
+    x̄ = @view [e][1]
+    Flux.Optimise.update!(app.optimizer, x, x̄)
+end
 
-# Base.@kwdef struct ReinforcementLearningZoo.TDLearner{A} <: AbstractLearner
-#     approximator::A
-#     γ::Float32 = 1.0
-#     method::Symbol
-#     n::Int = 0
-# end
+function RLBase.update!(app::TabularQApproximator, correction::Pair{Tuple{Int16,Int8},Float32})
+    (s, a), e = correction
+    x = @view app.table[a, s]
+    x̄ = @view [e][1]
+    Flux.Optimise.update!(app.optimizer, x, x̄)
+end
+
+function RLBase.update!(app::TabularQApproximator, correction::Pair{Int16,Vector{Float32}})
+    s, errors = correction
+    x = @view app.table[:, s]
+    Flux.Optimise.update!(app.optimizer, x, errors)
+end
