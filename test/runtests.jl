@@ -1,7 +1,7 @@
 using Test
 using JuMP
 using Chain
-using ReinforcementLearning: PostActStage, state, reward, PostEpisodeStage, SequentialEnv, current_player, action_space
+using ReinforcementLearning: PostActStage, state, reward, PostEpisodeStage, SequentialEnv, current_player, action_space, VectorSARTTrajectory
 using ReinforcementLearningBase: test_interfaces!, test_runnable!
 using AlgorithmicCompetition:
     AlgorithmicCompetition,
@@ -284,7 +284,7 @@ end
     ξ = 0.1
     δ = 0.95
     n_prices = 15
-    max_iter = Int(1e8)
+    max_iter = Int(1e6)
     price_index = 1:n_prices
 
     competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
