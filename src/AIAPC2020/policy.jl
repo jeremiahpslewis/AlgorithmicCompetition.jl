@@ -21,7 +21,7 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentManager(
                         γ = env.δ,
                         n = 0,
                     ),
-                    explorer = EpsilonGreedyExplorer(Int(round(1 / env.β))),
+                    explorer = AIAPCEpsilonGreedyExplorer(Float32(1e-5)),
                 ),
             ),
             trajectory = VectorSARTTrajectory(;

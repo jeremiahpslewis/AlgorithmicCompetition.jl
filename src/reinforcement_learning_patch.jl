@@ -23,6 +23,7 @@
 
 using ReinforcementLearningZoo
 using ReinforcementLearning
+using Random
 
 # Reduce allocations
 # From https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/2e1de3e5b6b8224f50b3d11bba7e1d2d72c6ef7c/src/ReinforcementLearningZoo/src/algorithms/tabular/td_learner.jl#L130
@@ -79,3 +80,35 @@ end
 
 function (agent::Agent)(stage::PreActStage, env::SequentialEnv, action::ReinforcementLearning.NoOp)
 end
+
+# Epsilon Greedy Explorer for AIAPC Zoo
+mutable struct AIAPCEpsilonGreedyExplorer{R} <: AbstractExplorer
+    β::Float32
+    β_neg::Float32
+    step::Int
+    rng::R
+end
+
+function AIAPCEpsilonGreedyExplorer(
+    β::Float32,
+)
+    AIAPCEpsilonGreedyExplorer{typeof(Random.GLOBAL_RNG)}(
+        β,
+        β * -1,
+        1,
+        Random.GLOBAL_RNG,
+    )
+end
+
+function get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any}, step)
+    exp(s.β_neg * step)
+end
+
+get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any}) = get_ϵ(s, s.step)
+
+function (s::AIAPCEpsilonGreedyExplorer{<:Any})(values)
+    ϵ = get_ϵ(s)
+    s.step += 1
+    rand(s.rng) >= ϵ ? rand(s.rng, find_all_max(values)[2]) : rand(s.rng, 1:length(values))
+end
+

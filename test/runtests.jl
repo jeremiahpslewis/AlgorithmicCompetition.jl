@@ -1,8 +1,9 @@
 using Test
 using JuMP
 using Chain
-using ReinforcementLearning: PostActStage, state, reward, PostEpisodeStage, SequentialEnv, current_player, action_space, VectorSARTTrajectory
+using ReinforcementLearning: PostActStage, state, reward, PostEpisodeStage, SequentialEnv, current_player, action_space, VectorSARTTrajectory, EpsilonGreedyExplorer
 using ReinforcementLearningBase: test_interfaces!, test_runnable!
+import ReinforcementLearningCore
 using AlgorithmicCompetition:
     AlgorithmicCompetition,
     CompetitionParameters,
@@ -24,7 +25,9 @@ using AlgorithmicCompetition:
     run_and_extract,
     Experiment,
     reward,
-    InitMatrix
+    InitMatrix,
+    get_ϵ,
+    AIAPCEpsilonGreedyExplorer
 
 
 @testset "Prepackaged Environment Tests" begin
@@ -300,4 +303,14 @@ end
     t = VectorSARTTrajectory()
     l = TDLearner(TabularQApproximator(n_state=10, n_action=3), 0.5, :SARS, 1)
     _update!(l, l.approximator, Val{:SARS}(), t, PostEpisodeStage())
+end
+
+@testset "EpsilonGreedy" begin
+    explorer = EpsilonGreedyExplorer(kind=:exp, ϵ_init=1, ϵ_stable=0, decay_steps = Int(round(1 / 1e-5)))
+    @test ReinforcementLearningCore.get_ϵ(explorer, 1e5) ≈ 0.36787944117144233
+    @test_broken ReinforcementLearningCore.get_ϵ(explorer, 1e5) ≈ 0.14 # Percentage cited in AIAPC paper
+
+    explorer = AIAPCEpsilonGreedyExplorer(Float32(1e-5))
+    @test get_ϵ(explorer, 1e5) ≈ 0.3678794504648588
+    @test_broken get_ϵ(explorer, 1e5) ≈ 0.14 # Percentage cited in AIAPC paper
 end
