@@ -28,7 +28,7 @@ using ReinforcementLearning
 # From https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/2e1de3e5b6b8224f50b3d11bba7e1d2d72c6ef7c/src/ReinforcementLearningZoo/src/algorithms/tabular/td_learner.jl#L130
 function _update!(
     L::TDLearner,
-    ::Union{TabularQApproximator,LinearQApproximator},
+    ::TabularQApproximator,
     ::Val{:SARS},
     t::VectorSARTTrajectory,
     ::PostEpisodeStage,
@@ -43,8 +43,6 @@ function _update!(
     end
 end
 
-
-
 ### Patch modified from https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/v0.10.1/src/ReinforcementLearningCore/src/policies/q_based_policies/learners/approximators/tabular_approximator.jl
 ### To support smaller ints / floats
 (app::TabularQApproximator)(s::Int16) = @views app.table[:, s]
@@ -54,7 +52,7 @@ end
 function RLBase.update!(app::TabularQApproximator, correction::Pair{Tuple{Int16,Int8},Float64})
     (s, a), e = correction
     x = @view app.table[a, s]
-    x̄ = @view [e][1]
+    x̄ = @view Float64[e][1]
 
     Flux.Optimise.update!(app.optimizer, x, x̄)
 end
