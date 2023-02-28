@@ -2,4 +2,5 @@
 Chain = "8be319e6-bccf-4806-a6f7-6fae938471bc"
 JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
 ReinforcementLearning = "158674fc-8238-5cab-b5ba-03dfc80d1318"
+ReinforcementLearningBase = "e575027e-6cd6-5018-9292-cdc6200d2b44"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

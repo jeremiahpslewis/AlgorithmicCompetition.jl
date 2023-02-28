@@ -20,7 +20,7 @@ struct AIAPCEnv <: AbstractEnv
     price_index::SVector{15, Int8}
     profit_function::Function
     n_state_space::Int16
-    state_space::Base.OneTo{Int}
+    state_space::Base.OneTo{Int16}
     state_space_lookup::Array{Int16, 2}
     memory::MVector{2, Int}
     convergence_int::MVector{1, Int}
@@ -38,7 +38,7 @@ struct AIAPCEnv <: AbstractEnv
         price_index = SVector{15, Int8}(1:n_prices)
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
-        state_space = Base.OneTo(n_state_space)
+        state_space = Base.OneTo(Int16(n_state_space))
         action_space = Tuple((i, j) for i in price_index for j in price_index)
 
         profit_array = construct_profit_array(action_space, price_options, p.profit_function, n_players)

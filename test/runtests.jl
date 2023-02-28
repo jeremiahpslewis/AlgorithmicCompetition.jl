@@ -1,7 +1,8 @@
 using Test
 using JuMP
 using Chain
-using ReinforcementLearning: PostActStage, state, reward
+using ReinforcementLearning: PostActStage, state, reward, PostEpisodeStage, SequentialEnv, current_player, action_space
+using ReinforcementLearningBase: test_interfaces!, test_runnable!
 using AlgorithmicCompetition:
     AlgorithmicCompetition,
     CompetitionParameters,
@@ -114,7 +115,7 @@ end
 
     @test state(c_out.env) != 1
     # @test sum(c_out.hook.hooks[1][2].best_response_vector == 0)
-    @test_broken c_out.hook.hooks[1][2].best_response_vector != c_out.hook.hooks[2][2].best_response_vector
+    @test c_out.hook.hooks[1][2].best_response_vector != c_out.hook.hooks[2][2].best_response_vector
 
     run([hyperparams]; stop_on_convergence=false)
 end
@@ -159,7 +160,7 @@ end
     exper = Experiment(env)
     state(env)
     policies = env |> AIAPCPolicy
-    AlgorithmicCompetition.update!(exper.hook.hooks[1][2], Int(2), 3, false)
+    AlgorithmicCompetition.update!(exper.hook.hooks[1][2], Int16(2), 3, false)
     @test exper.hook.hooks[1][2].best_response_vector[2] == 3
 
     
@@ -242,6 +243,21 @@ end
 end
 
 @testset "Sequential environment" begin
+    α = Float32(0.125)
+    β = Float32(1e-5)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = 1000
+    price_index = 1:n_prices
+
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+
+    competition_solution = CompetitionSolution(competition_params)
+
+    hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=1)
+
     seq_env = AIAPCEnv(hyperparams) |> SequentialEnv
     @test current_player(seq_env) == 1
     @test action_space(seq_env) == 1:15
