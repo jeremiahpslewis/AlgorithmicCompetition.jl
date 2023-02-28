@@ -114,7 +114,7 @@ end
 
 
     @test state(c_out.env) != 1
-    # @test sum(c_out.hook.hooks[1][2].best_response_vector == 0)
+    @test sum(c_out.hook.hooks[1][2].best_response_vector == 0) == 0
     @test c_out.hook.hooks[1][2].best_response_vector != c_out.hook.hooks[2][2].best_response_vector
 
     run([hyperparams]; stop_on_convergence=false)
@@ -235,11 +235,21 @@ end
 
     @test c_out.policy.agents[1].policy.policy.learner.approximator.table != c_out.policy.agents[2].policy.policy.learner.approximator.table
     @test c_out.hook.hooks[1][2].best_response_vector != c_out.hook.hooks[2][2].best_response_vector
+
+    for i in 1:2
+        @test c_out.hook[i][2].convergence_duration == 0
+        @test !c_out.hook[i][2].is_converged
+        @test c_out.hook[i][2].convergence_threshold == 1
+        @test sum(c_out.hook[i][1].rewards .== 0) == 0
+    end
+
     @test reward(c_out.env, 1) != 0
     @test reward(c_out.env, 2) != 0
     @test length(reward(c_out.env.env)) == 2
     @test length(c_out.env.env.action_space) == 225
     @test length(reward(c_out.env)) == 1
+
+
 end
 
 @testset "Sequential environment" begin
@@ -265,4 +275,29 @@ end
     seq_env(5)
     @test current_player(seq_env) == 2
     @test reward(seq_env) == 0 # reward is zero as at least one player has already played (technically sequental plays)
+end
+
+@testset "Convergence stop works" begin
+    α = Float32(0.125)
+    β = Float32(1e-6)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = Int(1e8)
+    price_index = 1:n_prices
+
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+
+    competition_solution = CompetitionSolution(competition_params)
+
+    hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=1)
+
+    c_out = run(hyperparams; stop_on_convergence=false)
+end
+
+@testset "custom tdlearner update, to be upstreamed" begin
+    t = VectorSARTTrajectory()
+    l = TDLearner(TabularQApproximator(n_state=10, n_action=3), 0.5, :SARS, 1)
+    _update!(l, l.approximator, Val{:SARS}(), t, PostEpisodeStage())
 end
