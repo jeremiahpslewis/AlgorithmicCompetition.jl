@@ -82,6 +82,9 @@ function (agent::Agent)(stage::PreActStage, env::SequentialEnv, action::Reinforc
 end
 
 # Epsilon Greedy Explorer for AIAPC Zoo
+# Note: get_ϵ function in RLCore takes: 600.045 ns (6 allocations: 192 bytes)
+# This one has: 59.003 ns (1 allocation: 16 bytes)
+# Well worth looking into optimizations for RLCore
 mutable struct AIAPCEpsilonGreedyExplorer{R} <: AbstractExplorer
     β::Float32
     β_neg::Float32
@@ -112,3 +115,37 @@ function (s::AIAPCEpsilonGreedyExplorer{<:Any})(values)
     rand(s.rng) >= ϵ ? rand(s.rng, find_all_max(values)[2]) : rand(s.rng, 1:length(values))
 end
 
+function (s::AIAPCEpsilonGreedyExplorer{<:Any})(values, mask)
+    ϵ = get_ϵ(s)
+    s.step += 1
+    rand(s.rng) >= ϵ ? rand(s.rng, find_all_max(values, mask)[2]) :
+    rand(s.rng, findall(mask))
+end
+
+function prob(s::AIAPCEpsilonGreedyExplorer{<:Any}, values, mask)
+    ϵ, n = get_ϵ(s), length(values)
+    probs = zeros(n)
+    probs[mask] .= ϵ / sum(mask)
+    max_val_inds = find_all_max(values, mask)[2]
+    for ind in max_val_inds
+        probs[ind] += (1 - ϵ) / length(max_val_inds)
+    end
+    Categorical(probs)
+end
+
+function RLBase.prob(s::AIAPCEpsilonGreedyExplorer{<:Any}, values)
+    ϵ, n = get_ϵ(s), length(values)
+    probs = fill(ϵ / n, n)
+    probs[findmax(values)[2]] += 1 - ϵ
+    Categorical(probs)
+end
+
+function RLBase.prob(s::AIAPCEpsilonGreedyExplorer{<:Any}, values, action::Integer)
+    ϵ, n = get_ϵ(s), length(values)
+    max_val_inds = find_all_max(values)[2]
+    if action in max_val_inds
+        ϵ / n + (1 - ϵ) / length(max_val_inds)
+    else
+        ϵ / n
+    end
+end
