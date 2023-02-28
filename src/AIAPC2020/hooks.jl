@@ -46,7 +46,7 @@ function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env)
     
     state_ = RLBase.state(env)
     best_action = argmax(@view policy.policy.policy.learner.approximator.table[:, state_])
-    iter_converged = (@view h.best_response_vector[state_]) == best_action
+    iter_converged = (@views h.best_response_vector[state_] == best_action)
 
     update!(
         h,

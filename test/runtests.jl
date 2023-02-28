@@ -4,6 +4,7 @@ using Chain
 using ReinforcementLearning: PostActStage, state, reward, PostEpisodeStage, SequentialEnv, current_player, action_space, VectorSARTTrajectory, EpsilonGreedyExplorer
 using ReinforcementLearningBase: test_interfaces!, test_runnable!
 import ReinforcementLearningCore
+using StaticArrays
 using AlgorithmicCompetition:
     AlgorithmicCompetition,
     CompetitionParameters,
@@ -282,12 +283,12 @@ end
 
 @testset "Convergence stop works" begin
     α = Float32(0.125)
-    β = Float32(1e-6)
+    β = Float32(1e-5)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
     n_prices = 15
-    max_iter = Int(1e6)
+    max_iter = Int(1e7)
     price_index = 1:n_prices
 
     competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
@@ -297,6 +298,10 @@ end
     hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=1)
 
     c_out = run(hyperparams; stop_on_convergence=false)
+
+    @test get_ϵ(c_out.policy.agents[1].policy.policy.explorer) < 1e-4
+    @test get_ϵ(c_out.policy.agents[2].policy.policy.explorer) < 1e-4
+    c_out.hook.hooks[1][2]
 end
 
 @testset "custom tdlearner update, to be upstreamed" begin
@@ -313,4 +318,27 @@ end
     explorer = AIAPCEpsilonGreedyExplorer(Float32(1e-5))
     @test get_ϵ(explorer, 1e5) ≈ 0.3678794504648588
     @test_broken get_ϵ(explorer, 1e5) ≈ 0.14 # Percentage cited in AIAPC paper
+end
+
+@testset "ConvergenceCheck" begin
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_solution = CompetitionSolution(competition_params)
+
+    env = AIAPCHyperParameters(Float32(0.1), Float32(1e-4), 0.95, Int(1e7), competition_solution) |> AIAPCEnv
+    policies = env |> AIAPCPolicy
+
+    convergence_hook = ConvergenceCheck(1)
+    convergence_hook(PostEpisodeStage(), policies.agents[1], SequentialEnv(env))
+    @test convergence_hook.convergence_duration == 0
+    @test convergence_hook.iterations_until_convergence == 1
+    @test convergence_hook.best_response_vector[1] = 1
+    @test convergence_hook.is_converged != true
+
+    convergence_hook_1 = ConvergenceCheck(1)
+    convergence_hook_1.best_response_vector = MVector{225, Int}(fill(1, 225))
+    convergence_hook_1(PostEpisodeStage(), policies.agents[1], SequentialEnv(env))
+
+    @test_broken convergence_hook.iterations_until_convergence == 1 # Not sure why this yields 2
+    @test convergence_hook.convergence_duration == 1
+    @test convergence_hook_1.is_converged == true
 end

@@ -25,25 +25,6 @@ using ReinforcementLearningZoo
 using ReinforcementLearning
 using Random
 
-# Reduce allocations
-# From https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/2e1de3e5b6b8224f50b3d11bba7e1d2d72c6ef7c/src/ReinforcementLearningZoo/src/algorithms/tabular/td_learner.jl#L130
-function _update!(
-    L::TDLearner,
-    ::TabularQApproximator,
-    ::Val{:SARS},
-    t::VectorSARTTrajectory,
-    ::PostEpisodeStage,
-)
-    S, A, R, T = (t[x] for x in SART)
-    n, γ, Q = L.n, L.γ, L.approximator
-    G = 0.0
-    for i in 1:min(n + 1, length(R))
-        G = R[end-i+1] + γ * G
-        s, a = S[end-i], A[end-i]
-        update!(Q, (s, a) => Q(s, a) - G)
-    end
-end
-
 ### Patch modified from https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/v0.10.1/src/ReinforcementLearningCore/src/policies/q_based_policies/learners/approximators/tabular_approximator.jl
 ### To support smaller ints / floats
 (app::TabularQApproximator)(s::Int16) = @views app.table[:, s]
@@ -78,6 +59,7 @@ function RLBase.update!(
     end
 end
 
+# Fix NoOp issue for sequential environments
 function (agent::Agent)(stage::PreActStage, env::SequentialEnv, action::ReinforcementLearning.NoOp)
 end
 
@@ -85,6 +67,7 @@ end
 # Note: get_ϵ function in RLCore takes: 600.045 ns (6 allocations: 192 bytes)
 # This one has: 59.003 ns (1 allocation: 16 bytes)
 # Well worth looking into optimizations for RLCore
+# TODO evaluate performance cost of checking all values for max, perhaps only do this in the beginning?
 mutable struct AIAPCEpsilonGreedyExplorer{R} <: AbstractExplorer
     β::Float32
     β_neg::Float32
@@ -112,40 +95,13 @@ get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any}) = get_ϵ(s, s.step)
 function (s::AIAPCEpsilonGreedyExplorer{<:Any})(values)
     ϵ = get_ϵ(s)
     s.step += 1
-    rand(s.rng) >= ϵ ? rand(s.rng, find_all_max(values)[2]) : rand(s.rng, 1:length(values))
-end
-
-function (s::AIAPCEpsilonGreedyExplorer{<:Any})(values, mask)
-    ϵ = get_ϵ(s)
-    s.step += 1
-    rand(s.rng) >= ϵ ? rand(s.rng, find_all_max(values, mask)[2]) :
-    rand(s.rng, findall(mask))
-end
-
-function prob(s::AIAPCEpsilonGreedyExplorer{<:Any}, values, mask)
-    ϵ, n = get_ϵ(s), length(values)
-    probs = zeros(n)
-    probs[mask] .= ϵ / sum(mask)
-    max_val_inds = find_all_max(values, mask)[2]
-    for ind in max_val_inds
-        probs[ind] += (1 - ϵ) / length(max_val_inds)
-    end
-    Categorical(probs)
-end
-
-function RLBase.prob(s::AIAPCEpsilonGreedyExplorer{<:Any}, values)
-    ϵ, n = get_ϵ(s), length(values)
-    probs = fill(ϵ / n, n)
-    probs[findmax(values)[2]] += 1 - ϵ
-    Categorical(probs)
-end
-
-function RLBase.prob(s::AIAPCEpsilonGreedyExplorer{<:Any}, values, action::Integer)
-    ϵ, n = get_ϵ(s), length(values)
-    max_val_inds = find_all_max(values)[2]
-    if action in max_val_inds
-        ϵ / n + (1 - ϵ) / length(max_val_inds)
+    max_vals = find_all_max(values)[2]
+    if rand(s.rng) >= ϵ
+        if length(max_vals) == 1
+            return max_vals[1]
+        end
+        return rand(s.rng, max_vals)
     else
-        ϵ / n
+        return rand(s.rng, 1:length(values))
     end
 end
