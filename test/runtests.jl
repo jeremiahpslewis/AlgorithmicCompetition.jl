@@ -295,13 +295,18 @@ end
 
     competition_solution = CompetitionSolution(competition_params)
 
-    hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=1)
+    hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=10)
 
     c_out = run(hyperparams; stop_on_convergence=false)
 
     @test get_ϵ(c_out.policy.agents[1].policy.policy.explorer) < 1e-4
     @test get_ϵ(c_out.policy.agents[2].policy.policy.explorer) < 1e-4
-    c_out.hook.hooks[1][2]
+
+    c_out = run(hyperparams; stop_on_convergence=true)
+    @test_broken c_out.hook.hooks[2][2].convergence_duration == 10
+    @test c_out.hook.hooks[2][2].convergence_duration >= 10
+    @test c_out.hook.hooks[1][2].convergence_duration >= 10
+    @test c_out.env.env.convergence_int[1] < max_iter
 end
 
 @testset "custom tdlearner update, to be upstreamed" begin
