@@ -28,7 +28,8 @@ using AlgorithmicCompetition:
     reward,
     InitMatrix,
     get_ϵ,
-    AIAPCEpsilonGreedyExplorer
+    AIAPCEpsilonGreedyExplorer,
+    AIAPCSummary
 
 
 @testset "Prepackaged Environment Tests" begin
@@ -139,9 +140,13 @@ end
         AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=10) for α in α_ for β in β_
     ]
 
-    expers = @chain hyperparameter_vect run_and_extract.(stop_on_convergence=true)
+    experiments = @chain hyperparameter_vect run_and_extract.(stop_on_convergence=true)
         
-    # @test expers[1] isa Experiment
+    @test experiments[1] isa AIAPCSummary
+    @test 10 < experiments[1].iterations_until_convergence < max_iter
+    @test all(0 .< experiments[1].avg_profit .< 1)
+    @test experiments[1].avg_profit[1] != experiments[1].avg_profit[2]
+    @test all(experiments[1].is_converged)
 end
 
 @testset "CompetitionParameters" begin
