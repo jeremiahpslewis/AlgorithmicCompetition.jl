@@ -21,4 +21,4 @@ _procs = addprocs(
     using AlgorithmicCompetition
 end
 
-AlgorithmicCompetition.run_apaic(; n_parameter_iterations=1, csv_out_path="", max_iter=Int(100))
+AlgorithmicCompetition.run_aiapc(; n_parameter_iterations=1, csv_out_path="", max_iter=Int(100))
