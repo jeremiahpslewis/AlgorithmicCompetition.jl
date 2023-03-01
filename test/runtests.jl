@@ -1,9 +1,10 @@
 using Test
 using JuMP
 using Chain
-using ReinforcementLearning: PostActStage, state, reward, PostEpisodeStage, SequentialEnv, current_player, action_space, VectorSARTTrajectory, EpsilonGreedyExplorer, TabularQApproximator
+using ReinforcementLearning: PostActStage, state, reward, PostEpisodeStage, SequentialEnv, current_player, action_space, VectorSARTTrajectory, EpsilonGreedyExplorer, TabularQApproximator, TDLearner
 using ReinforcementLearningBase: test_interfaces!, test_runnable!
 import ReinforcementLearningCore
+import ReinforcementLearningZoo
 using StaticArrays
 using AlgorithmicCompetition:
     AlgorithmicCompetition,
@@ -315,12 +316,6 @@ end
     @test c_out.hook.hooks[2][2].convergence_duration >= 0
     @test c_out.hook.hooks[1][2].convergence_duration >= 0
     @test c_out.env.env.convergence_int[1] < max_iter
-end
-
-@testset "custom tdlearner update, to be upstreamed" begin
-    t = VectorSARTTrajectory()
-    l = TDLearner(TabularQApproximator(n_state=10, n_action=3), 0.5, :SARS, 1)
-    _update!(l, l.approximator, Val{:SARS}(), t, PostEpisodeStage())
 end
 
 @testset "EpsilonGreedy" begin
