@@ -4,7 +4,6 @@ using Chain
 using ReinforcementLearning: PostActStage, state, reward, PostEpisodeStage, SequentialEnv, current_player, action_space, VectorSARTTrajectory, EpsilonGreedyExplorer, TabularQApproximator, TDLearner
 using ReinforcementLearningBase: test_interfaces!, test_runnable!
 import ReinforcementLearningCore
-import ReinforcementLearningZoo
 using StaticArrays
 using AlgorithmicCompetition:
     AlgorithmicCompetition,
