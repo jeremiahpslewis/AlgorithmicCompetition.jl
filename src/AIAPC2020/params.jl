@@ -15,31 +15,33 @@ struct CompetitionSolution
     end
 end
 
-struct CalvanoHyperParameters
-    α::Float64
-    β::Float64
+struct AIAPCHyperParameters
+    α::Float32
+    β::Float32
     δ::Float64
     price_options::Vector{Float64}
-    memory_length::Int64
-    n_players::Int64
-    max_iter::Int64
-    convergence_threshold::Int64
+    memory_length::Int
+    n_players::Int
+    max_iter::Int
+    convergence_threshold::Int
     profit_function::Any
     p_Bert_nash_equilibrium::Float64
     p_monop_opt::Float64
 
-    function CalvanoHyperParameters(
-        α::Float64,
-        β::Float64,
+    function AIAPCHyperParameters(
+        α::Float32,
+        β::Float32,
         δ::Float64,
-        max_iter::Int64,
-        competition_solution::CompetitionSolution,
+        max_iter::Int,
+        competition_solution::CompetitionSolution;
+        convergence_threshold::Int = Int(1e5)
     )
+        @assert  max_iter > convergence_threshold
         ξ = 0.1
         δ = 0.95
         n_prices = 15
         n_players = 2
-        memory_length = 2
+        memory_length = 1
 
         # p_monop defined above
         p_range_pad =
@@ -54,9 +56,7 @@ struct CalvanoHyperParameters
                 n_prices,
             )...,
         ]
-
-        convergence_threshold = Int(1e5)
-
+    
         new(
             α,
             β,

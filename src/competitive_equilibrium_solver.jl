@@ -1,18 +1,17 @@
-# Parameters from pg 3374 Calvano 2020
+# Parameters from pg 3374 AIAPC 2020
 using JuMP
 using Chain
 using Ipopt
 using Flux
 using StaticArrays
 using Statistics
-using Memoization
 
 struct CompetitionParameters
     μ::Float64
     a_0::Float64
     a::Vector{Float64}
     c::Vector{Float64}
-    n_firms::Int64
+    n_firms::Int
 
     function CompetitionParameters(μ, a_0, a, c)
         length(a) != length(c) &&
@@ -23,7 +22,7 @@ struct CompetitionParameters
 end
 
 function q_fun(p, params::CompetitionParameters)
-    # Logit demand function from pg 3372 Calvano 2020
+    # Logit demand function from pg 3372 AIAPC 2020
     a_ = [params.a_0, params.a...]
     p_ = [0, p...]
     return softmax((a_ .- p_) ./ params.μ)[2:end]

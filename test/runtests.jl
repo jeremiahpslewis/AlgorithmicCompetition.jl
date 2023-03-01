@@ -1,15 +1,57 @@
 using Test
 using JuMP
+using Chain
+using ReinforcementLearning: PostActStage, state, reward, PostEpisodeStage, SequentialEnv, current_player, action_space, VectorSARTTrajectory, EpsilonGreedyExplorer, TabularQApproximator, TDLearner
+using ReinforcementLearningBase: test_interfaces!, test_runnable!
+import ReinforcementLearningCore
+using StaticArrays
+using Statistics
 using AlgorithmicCompetition:
     AlgorithmicCompetition,
     CompetitionParameters,
+    CompetitionParameters,
+    AIAPCHyperParameters,
+    AIAPCPolicy,
+    AIAPCEnv,
+    CompetitionSolution,
+    ConvergenceCheck,
     solve_monopolist,
     solve_bertrand,
     p_BR,
-    map_memory_to_state,
-    runCalvano,
-    q_fun
+    construct_state_space_lookup,
+    map_vect_to_int,
+    map_int_to_vect,
+    construct_profit_array,
+    q_fun,
+    run,
+    run_and_extract,
+    Experiment,
+    reward,
+    InitMatrix,
+    get_ϵ,
+    AIAPCEpsilonGreedyExplorer,
+    AIAPCSummary
 
+
+@testset "Prepackaged Environment Tests" begin
+    α = Float32(0.125)
+    β = Float32(1e-5)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = 1000
+    price_index = 1:n_prices
+
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+
+    competition_solution = CompetitionSolution(competition_params)
+
+    hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=1)
+        
+    test_interfaces!(AIAPCEnv(hyperparams))
+    test_runnable!(AIAPCEnv(hyperparams))
+end
 @testset "Competitive Equilibrium: Monopoly" begin
     params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
     model_monop, p_monop = solve_monopolist(params)
@@ -17,7 +59,7 @@ using AlgorithmicCompetition:
     # symmetric solution found
     @test value(p_monop[1]) ≈ value(p_monop[2])
 
-    # Match Calvano 2020 parameterization
+    # Match AIAPC 2020 parameterization
     @test value(p_monop[1]) ≈ 1.92498 atol = 0.0001
     p_monop_opt = value(p_monop[2])
 end
@@ -31,45 +73,81 @@ end
     # Parameter recovery
     @test p_Bertrand_[2] ≈ 1.47293 atol = 1e-3
 
-    # Best response function matches Calvano 2020
+    # Best response function matches AIAPC 2020
     @test p_BR(1.47293, params) ≈ 1.47293 atol = 1e6
 end
 
-@testset "map_memory_to_state" begin
+@testset "map_vect_to_int" begin
     n_prices = 15
     n_players = 2
     memory_length = 1
     n_state_space = n_prices^(n_players * memory_length)
-    @test map_memory_to_state(repeat([n_prices], n_players), n_prices) == n_state_space
-    @test map_memory_to_state(Array{Int,2}(repeat([n_prices], n_players)'), n_prices) ==
+    @test map_vect_to_int(repeat([n_prices], n_players), n_prices) - n_prices == n_state_space
+    @test map_vect_to_int(Array{Int,2}(repeat([n_prices], n_players)'), n_prices) - n_prices ==
           n_state_space
 end
 
-@testset "runCalvano full simulation" begin
-    p_monop_opt = 1.92498
-    p_Bert_nash_equilibrium = 1.47
+@testset "construct_state_space_lookup" begin
+    @test construct_state_space_lookup(((1,1), (1,2), (2,1), (2,2)), 2) == [1 3; 2 4]
+end
 
-    α = 0.125
-    β = 1e-5
+@testset "run AIAPC full simulation" begin
+    α = Float32(0.125)
+    β = Float32(1e-5)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
     n_prices = 15
+    max_iter = 1000
     price_index = 1:n_prices
 
     competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
-    p_range_pad = ξ * (p_monop_opt - p_Bert_nash_equilibrium)
-    price_options = [range(p_Bert_nash_equilibrium, p_monop_opt, n_prices)...]
 
-    runCalvano(
-        α,
-        β,
-        δ,
-        price_options,
-        competition_params,
-        p_Bert_nash_equilibrium,
-        p_monop_opt,
-    )
+    competition_solution = CompetitionSolution(competition_params)
+
+    hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=1)
+
+    c_out = run(hyperparams; stop_on_convergence=false)
+    
+    # ensure that the policy is updated by the learner
+    @test sum(c_out.policy.agents[1].policy.policy.learner.approximator.table .!= 0) != 0
+    @test length(reward(c_out.env.env)) == 2
+    @test length(reward(c_out.env.env, 1)) == 1
+
+    c_out.env.env.is_done[1] = false
+    @test reward(c_out.env.env) == [0, 0]
+    @test reward(c_out.env.env, 1) != 0
+
+
+    @test state(c_out.env) != 1
+    @test sum(c_out.hook.hooks[1][2].best_response_vector == 0) == 0
+    @test c_out.hook.hooks[1][2].best_response_vector != c_out.hook.hooks[2][2].best_response_vector
+
+    run([hyperparams]; stop_on_convergence=false)
+end
+
+@testset "Run a set of experiments." begin
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+
+    competition_solution = CompetitionSolution(competition_params)
+
+    n_increments = 3
+    α_ = Float32.(range(0.025, 0.25, n_increments))
+    β_ = Float32.(range(1.25e-8, 2e-5, n_increments))
+    δ = 0.95
+    max_iter = Int(1e4)
+
+    hyperparameter_vect = [
+        AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=10) for α in α_ for β in β_
+    ]
+
+    experiments = @chain hyperparameter_vect run_and_extract.(stop_on_convergence=true)
+        
+    @test experiments[1] isa AIAPCSummary
+    @test 10 < experiments[1].iterations_until_convergence < max_iter
+    @test all(0 .< experiments[1].avg_profit .< 1)
+    @test experiments[1].avg_profit[1] != experiments[1].avg_profit[2]
+    @test all(experiments[1].is_converged)
 end
 
 @testset "CompetitionParameters" begin
@@ -84,13 +162,213 @@ end
           fill(0.36486, 2) atol = 0.01
 end
 
-@testset "Run a set of experiments." begin
-    n_increments = 10
-    α_ = range(0.025, 0.25, n_increments)
-    β_ = range(1.25e-8, 2e-5, n_increments)
-    δ = 0.95
+@testset "Convergence Check Hook" begin
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_solution = CompetitionSolution(competition_params)
 
-    exps =
-        CalvanoHyperParameters.(α_, β_, (δ,), (max_iter,)) |> CalvanoEnv.() |> Experiment.()
-    @test exps[1] isa Experiment
+    env = AIAPCHyperParameters(Float32(0.1), Float32(1e-4), 0.95, Int(1e7), competition_solution) |> AIAPCEnv
+    exper = Experiment(env)
+    state(env)
+    policies = env |> AIAPCPolicy
+    AlgorithmicCompetition.update!(exper.hook.hooks[1][2], Int16(2), 3, false)
+    @test exper.hook.hooks[1][2].best_response_vector[2] == 3
+
+    
+    policies[1].policy.policy.learner.approximator.table[11, :] .= 2
+    exper.hook.hooks[1][2](PostEpisodeStage(), policies[1], exper.env)
+    @test exper.hook.hooks[1][2].best_response_vector[state(env)] == 11
+end
+
+@testset "Profit array test" begin
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_solution = CompetitionSolution(competition_params)
+
+    env = AIAPCHyperParameters(Float32(0.1), Float32(1e-4), 0.95, Int(1e7), competition_solution) |> AIAPCEnv
+    exper = Experiment(env)
+
+    price_options = env.price_options
+    profit_function = env.profit_function
+    action_space_ = env.action_space
+    profit_array = construct_profit_array(action_space_, price_options, profit_function, 2)
+    
+    profit_array[5, 3, :] ≈ env.profit_function([price_options[5], price_options[3]])
+end
+
+@testset "map_vect_to_int, map_int_to_vect" begin
+    vect_ = [1, 2, 3]
+    base = 24
+    i_num = map_vect_to_int(vect_, base)
+    @test [vect_..., 0, 0] == map_int_to_vect(i_num, base, 5)
+
+    int_ = 720
+    vect_1 = map_int_to_vect(int_, base, 6)
+    @test int_ == map_vect_to_int(vect_1, base)
+end
+
+@testset "simple InitMatrix test" begin
+    a = InitMatrix(15, 225)
+    b = InitMatrix(15, 225)
+    a[1,1] = 10
+    @test a[1,1] == 10
+    @test b[1,1] == 0
+end
+
+@testset "Parameter / learning checks" begin
+    α = Float32(0.125)
+    β = Float32(1e-5)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = 5000
+    price_index = 1:n_prices
+
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+
+    competition_solution = CompetitionSolution(competition_params)
+
+    hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=1)
+
+
+    c_out = run(hyperparams; stop_on_convergence=false)
+
+    # ensure that the policy is updated by the learner
+    @test sum(c_out.policy.agents[1].policy.policy.learner.approximator.table .!= 0) != 0
+    @test sum(c_out.policy.agents[2].policy.policy.learner.approximator.table .!= 0) != 0
+    @test c_out.env.env.is_done[1]
+    @test c_out.hook.hooks[1][2].iterations_until_convergence == max_iter
+    @test c_out.hook.hooks[2][2].iterations_until_convergence == max_iter
+
+
+    @test c_out.policy.agents[1].trajectory[:reward][1] .!= 0
+    @test c_out.policy.agents[2].trajectory[:reward][1] .!= 0
+
+    @test c_out.policy.agents[1].policy.policy.learner.approximator.table != c_out.policy.agents[2].policy.policy.learner.approximator.table
+    @test c_out.hook.hooks[1][2].best_response_vector != c_out.hook.hooks[2][2].best_response_vector
+
+
+    @test mean(c_out.hook.hooks[1][1].rewards[(end-2):end] .!= c_out.hook.hooks[2][1].rewards[(end-2):end]) >= 0.8
+
+    for i in 1:2
+        @test c_out.hook[i][2].convergence_duration >= 0
+        @test c_out.hook[i][2].is_converged
+        @test c_out.hook[i][2].convergence_threshold == 1
+        @test sum(c_out.hook[i][1].rewards .== 0) == 0
+    end
+
+    @test reward(c_out.env, 1) != 0
+    @test reward(c_out.env, 2) != 0
+    @test length(reward(c_out.env.env)) == 2
+    @test length(c_out.env.env.action_space) == 225
+    @test length(reward(c_out.env)) == 1
+
+
+end
+
+@testset "Sequential environment" begin
+    α = Float32(0.125)
+    β = Float32(1e-5)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = 1000
+    price_index = 1:n_prices
+
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+
+    competition_solution = CompetitionSolution(competition_params)
+
+    hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=1)
+
+    seq_env = AIAPCEnv(hyperparams) |> SequentialEnv
+    @test current_player(seq_env) == 1
+    @test action_space(seq_env) == 1:15
+    @test reward(seq_env) != 0 # reward reflects outcomes of last play (which happens at player = 1, e.g. before any actions chosen)
+    seq_env(5)
+    @test current_player(seq_env) == 2
+    @test reward(seq_env) == 0 # reward is zero as at least one player has already played (technically sequental plays)
+end
+
+@testset "Convergence stop works" begin
+    α = Float32(0.125)
+    β = Float32(1e-5)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = Int(1e6)
+    price_index = 1:n_prices
+
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+
+    competition_solution = CompetitionSolution(competition_params)
+
+    hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=10)
+    c_out = run(hyperparams; stop_on_convergence=false)
+    @test get_ϵ(c_out.policy.agents[1].policy.policy.explorer) < 1e-4
+    @test get_ϵ(c_out.policy.agents[2].policy.policy.explorer) < 1e-4
+
+    hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=10)
+    c_out = run(hyperparams; stop_on_convergence=true)
+    @test 0.98 < get_ϵ(c_out.policy.agents[1].policy.policy.explorer) < 1
+    @test 0.98 < get_ϵ(c_out.policy.agents[2].policy.policy.explorer) < 1
+
+    @test_broken c_out.hook.hooks[2][2].convergence_duration == 10
+    @test c_out.hook.hooks[2][2].convergence_duration >= 0
+    @test c_out.hook.hooks[1][2].convergence_duration >= 0
+    @test c_out.env.env.convergence_int[1] < max_iter
+end
+
+@testset "EpsilonGreedy" begin
+    explorer = EpsilonGreedyExplorer(kind=:exp, ϵ_init=1, ϵ_stable=0, decay_steps = Int(round(1 / 1e-5)))
+    @test ReinforcementLearningCore.get_ϵ(explorer, 1e5) ≈ 0.36787944117144233
+    @test_broken ReinforcementLearningCore.get_ϵ(explorer, 1e5) ≈ 0.14 # Percentage cited in AIAPC paper
+
+    explorer = AIAPCEpsilonGreedyExplorer(Float32(1e-5))
+    @test get_ϵ(explorer, 1e5) ≈ 0.3678794504648588
+    @test_broken get_ϵ(explorer, 1e5) ≈ 0.14 # Percentage cited in AIAPC paper
+end
+
+@testset "ConvergenceCheck" begin
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_solution = CompetitionSolution(competition_params)
+
+    env = AIAPCHyperParameters(Float32(0.1), Float32(1e-4), 0.95, Int(1e7), competition_solution) |> AIAPCEnv
+    policies = env |> AIAPCPolicy
+
+    convergence_hook = ConvergenceCheck(1)
+    convergence_hook(PostEpisodeStage(), policies.agents[1], SequentialEnv(env))
+    @test convergence_hook.convergence_duration == 0
+    @test convergence_hook.iterations_until_convergence == 1
+    @test convergence_hook.best_response_vector[1] == 1
+    @test convergence_hook.is_converged != true
+
+    convergence_hook_1 = ConvergenceCheck(1)
+    convergence_hook_1.best_response_vector = MVector{225, Int}(fill(1, 225))
+    convergence_hook_1(PostEpisodeStage(), policies.agents[1], SequentialEnv(env))
+
+    @test convergence_hook.iterations_until_convergence == 1
+    @test convergence_hook.convergence_duration ∈ [0, 1]
+    @test convergence_hook_1.is_converged == true
+end
+
+@testset "run multiprocessing code"
+    n_procs_ = 1
+
+    _procs = addprocs(
+        n_procs_,
+        topology = :master_worker,
+        exeflags = ["--threads=1", "--project=$(Base.active_project())"],
+    )
+
+    @everywhere begin
+        using Pkg
+        Pkg.instantiate()
+        using AlgorithmicCompetition
+    end
+
+    AlgorithmicCompetition.run_aiapc(; n_parameter_iterations=1, csv_out_path="", max_iter=Int(100), convergence_threshold=Int(10))
+
+    rmprocs(_procs)
 end

@@ -3,10 +3,11 @@ using AlgorithmicCompetition:
     AlgorithmicCompetition,
     CompetitionParameters,
     CompetitionSolution,
-    CalvanoHyperParameters,
-    CalvanoEnv,
+    AIAPCHyperParameters,
+    AIAPCEnv,
     Experiment,
-    run_and_extract
+    run_and_extract,
+    run
 using ReinforcementLearning
 using Chain
 using Statistics
@@ -15,68 +16,34 @@ using CairoMakie
 using DataFrameMacros
 using CSV
 using ProgressMeter
+using BenchmarkTools
 
-multiproc = false
+multiproc = true
 
 using ParallelDataTransfer
 
-if multiproc
-    _procs = addprocs(
-        7,
-        topology = :master_worker,
-        exeflags = ["--threads=1", "--project=$(Base.active_project())"],
-    )
-
-    @everywhere begin
-        using Pkg
-        Pkg.instantiate()
-        using AlgorithmicCompetition:
-            AlgorithmicCompetition, CalvanoHyperParameters, CalvanoEnv, run
-    end
-end
-
-competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
-
-competition_solution = CompetitionSolution(competition_params)
-
-n_increments = 100
-max_iter = Int(1e9) # Should be 1e9
-α_ = range(0.025, 0.25, n_increments)
-β_ = range(1.25e-8, 2e-5, n_increments)
-δ = 0.95
-
-hyperparameter_vect = [
-    CalvanoHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_ for β in β_
-]
-
-out = run_and_extract(hyperparameter_vect[1]; stop_on_convergence=false)
-
-
-
-if multiproc
-    exp_list = @showprogress pmap(run_and_extract, hyperparameter_vect; on_error=identity)
-end
-
-# TODO: Figure out why both players have identical average profits ALWAYS and add test?
-mean([ex.avg_profit[1] == ex.avg_profit[2] for ex in exp_list])
+# # TODO: Figure out why both players have identical average profits ALWAYS and add test?
+@test mean([ex.avg_profit[1] == ex.avg_profit[2] for ex in exp_list]) < 0.1
 
 α_result = [ex.α for ex in exp_list if !(ex isa Exception)]
 β_result = [ex.β for ex in exp_list if !(ex isa Exception)]
+iterations_until_convergence = [ex.iterations_until_convergence for ex in exp_list if !(ex isa Exception)]
+
 avg_profit_result = [ex.avg_profit[1] for ex in exp_list if !(ex isa Exception)]
 
+# α_result = [ex.α for ex in exp_list]
+# β_result = [ex.β for ex in exp_list]
+# avg_profit_result = [ex.avg_profit[1] for ex in exp_list]
 
-
-# TODO: Figure out why both players have identical average profits ALWAYS and add test?
-mean([ex.avg_profit[1] == ex.avg_profit[2] for ex in exp_list])
-
-α_result = [ex.α for ex in exp_list]
-β_result = [ex.β for ex in exp_list]
-avg_profit_result = [ex.avg_profit[1] for ex in exp_list]
-
-
-df = DataFrame(α = α_result, β = β_result, π_bar = avg_profit_result)
+df = DataFrame(α = α_result, β = β_result, π_bar = avg_profit_result, iterations_until_convergence = iterations_until_convergence)
 
 CSV.write("simulation_results.csv", df)
-plt_ = @chain df @combine(:heatmap = heatmap(:β, :α, :π_bar))
+plt_ = @chain df begin
+    @groupby(:β, :α)
+    @combine(:iterations_until_convergence = mean(:iterations_until_convergence))
+    @combine(:heatmap = heatmap(:β, :α, :iterations_until_convergence)) 
+end
+save("test_convergence.png", plt_[1, :heatmap])
 
-save("test.png", plt_[1, :heatmap])
+plt_ = @chain df @combine(:heatmap = heatmap(:β, :α, :π_bar))
+save("test_profit.png", plt_[1, :heatmap])
