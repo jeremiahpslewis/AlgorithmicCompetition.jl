@@ -105,3 +105,9 @@ function (s::AIAPCEpsilonGreedyExplorer{<:Any})(values)
         return rand(s.rng, 1:length(values))
     end
 end
+
+
+# Patch for SequentialEnv: Hooks are not called for correct player
+function (hook::TotalRewardPerEpisode)(::PostActStage, agent, env::SequentialEnv)
+    hook.reward[1] += reward(env, nameof(agent))
+end

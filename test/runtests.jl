@@ -240,6 +240,9 @@ end
     @test c_out.policy.agents[1].policy.policy.learner.approximator.table != c_out.policy.agents[2].policy.policy.learner.approximator.table
     @test c_out.hook.hooks[1][2].best_response_vector != c_out.hook.hooks[2][2].best_response_vector
 
+
+    @test c_out.hook.hooks[1][1].rewards[end] != c_out.hook.hooks[2][1].rewards[end]
+
     for i in 1:2
         @test c_out.hook[i][2].convergence_duration == 0
         @test !c_out.hook[i][2].is_converged
