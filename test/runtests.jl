@@ -352,3 +352,23 @@ end
     @test convergence_hook.convergence_duration ∈ [0, 1]
     @test convergence_hook_1.is_converged == true
 end
+
+@testset "run multiprocessing code"
+    n_procs_ = 1
+
+    _procs = addprocs(
+        n_procs_,
+        topology = :master_worker,
+        exeflags = ["--threads=1", "--project=$(Base.active_project())"],
+    )
+
+    @everywhere begin
+        using Pkg
+        Pkg.instantiate()
+        using AlgorithmicCompetition
+    end
+
+    AlgorithmicCompetition.run_aiapc(; n_parameter_iterations=1, csv_out_path="", max_iter=Int(100), convergence_threshold=Int(10))
+
+    rmprocs(_procs)
+end
