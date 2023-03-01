@@ -246,7 +246,7 @@ end
     @test c_out.hook.hooks[1][2].best_response_vector != c_out.hook.hooks[2][2].best_response_vector
 
 
-    @test c_out.hook.hooks[1][1].rewards[end] != c_out.hook.hooks[2][1].rewards[end]
+    @test sum(c_out.hook.hooks[1][1].rewards[(end-2):end] .== c_out.hook.hooks[2][1].rewards[(end-2):end]) == 0
 
     for i in 1:2
         @test c_out.hook[i][2].convergence_duration >= 0
