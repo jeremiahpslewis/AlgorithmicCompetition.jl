@@ -109,5 +109,5 @@ end
 
 # Patch for SequentialEnv: Hooks are not called for correct player
 function (hook::TotalRewardPerEpisode)(::PostActStage, agent, env::SequentialEnv)
-    hook.reward[1] += reward(env, nameof(agent))
+    hook.reward += reward(env, nameof(agent))
 end
