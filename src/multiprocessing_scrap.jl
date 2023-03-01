@@ -20,7 +20,6 @@ using BenchmarkTools
 
 multiproc = true
 
-using ParallelDataTransfer
 
 # # TODO: Figure out why both players have identical average profits ALWAYS and add test?
 @test mean([ex.avg_profit[1] == ex.avg_profit[2] for ex in exp_list]) < 0.1
