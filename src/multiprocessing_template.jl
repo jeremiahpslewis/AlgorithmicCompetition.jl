@@ -3,11 +3,10 @@ using Chain
 using Statistics
 using DataFrameMacros
 using CSV
-using ParallelDataTransfer
 using Distributed
 
 @testset "run multiprocessing code"
-    n_procs_ = 7
+    n_procs_ = 4
 
     _procs = addprocs(
         n_procs_,

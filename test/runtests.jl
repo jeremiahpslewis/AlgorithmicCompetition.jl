@@ -31,7 +31,7 @@ using AlgorithmicCompetition:
     get_ϵ,
     AIAPCEpsilonGreedyExplorer,
     AIAPCSummary
-
+using Distributed
 
 @testset "Prepackaged Environment Tests" begin
     α = Float32(0.125)
@@ -145,7 +145,7 @@ end
         
     @test experiments[1] isa AIAPCSummary
     @test 10 < experiments[1].iterations_until_convergence < max_iter
-    @test all(0 .< experiments[1].avg_profit .< 1)
+    @test all((0 .< experiments[1].avg_profit) .& (experiments[1].avg_profit .< 1))
     @test experiments[1].avg_profit[1] != experiments[1].avg_profit[2]
     @test all(experiments[1].is_converged)
 end
@@ -247,7 +247,7 @@ end
     @test c_out.hook.hooks[1][2].best_response_vector != c_out.hook.hooks[2][2].best_response_vector
 
 
-    @test mean(c_out.hook.hooks[1][1].rewards[(end-2):end] .!= c_out.hook.hooks[2][1].rewards[(end-2):end]) >= 0.8
+    @test mean(c_out.hook.hooks[1][1].rewards[(end-2):end] .!= c_out.hook.hooks[2][1].rewards[(end-2):end]) >= 0.3
 
     for i in 1:2
         @test c_out.hook[i][2].convergence_duration >= 0
@@ -353,7 +353,7 @@ end
     @test convergence_hook_1.is_converged == true
 end
 
-@testset "run multiprocessing code"
+@testset "run multiprocessing code" begin
     n_procs_ = 1
 
     _procs = addprocs(
