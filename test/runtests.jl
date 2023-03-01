@@ -250,7 +250,7 @@ end
 
     for i in 1:2
         @test c_out.hook[i][2].convergence_duration == 0
-        @test !c_out.hook[i][2].is_converged
+        @test c_out.hook[i][2].is_converged
         @test c_out.hook[i][2].convergence_threshold == 1
         @test sum(c_out.hook[i][1].rewards .== 0) == 0
     end
