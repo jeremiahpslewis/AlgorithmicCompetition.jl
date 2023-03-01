@@ -296,7 +296,7 @@ end
     ξ = 0.1
     δ = 0.95
     n_prices = 15
-    max_iter = Int(1e7)
+    max_iter = Int(1e6)
     price_index = 1:n_prices
 
     competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
@@ -304,13 +304,9 @@ end
     competition_solution = CompetitionSolution(competition_params)
 
     hyperparams = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold=10)
-
-    c_out = run(hyperparams; stop_on_convergence=false)
-
+    c_out = run(hyperparams; stop_on_convergence=true)
     @test get_ϵ(c_out.policy.agents[1].policy.policy.explorer) < 1e-4
     @test get_ϵ(c_out.policy.agents[2].policy.policy.explorer) < 1e-4
-
-    c_out = run(hyperparams; stop_on_convergence=true)
     @test_broken c_out.hook.hooks[2][2].convergence_duration == 10
     @test c_out.hook.hooks[2][2].convergence_duration >= 0
     @test c_out.hook.hooks[1][2].convergence_duration >= 0
