@@ -1,6 +1,5 @@
 using ReinforcementLearning
 using StaticArrays
-using Accessors
 
 mutable struct ConvergenceCheck <: AbstractHook
     convergence_duration::Int32
