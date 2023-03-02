@@ -13,35 +13,40 @@ struct AIAPCEnv <: AbstractEnv
     δ::Float64
     n_players::Int
     memory_length::Int
-    price_options::SVector{15, Float32}
+    price_options::SVector{15,Float32}
     max_iter::Int
     convergence_threshold::Int
     n_prices::Int
-    price_index::SVector{15, Int8}
+    price_index::SVector{15,Int8}
     profit_function::Function
     n_state_space::Int16
     state_space::Base.OneTo{Int16}
-    state_space_lookup::Array{Int16, 2}
-    memory::MVector{2, Int}
-    convergence_int::MVector{1, Int}
-    is_done::MVector{1, Bool}
+    state_space_lookup::Array{Int16,2}
+    memory::MVector{2,Int}
+    convergence_int::MVector{1,Int}
+    is_done::MVector{1,Bool}
     p_Bert_nash_equilibrium::Float32
     p_monop_opt::Float32
     action_space::Tuple
-    profit_array::Array{Float32, 3}
+    profit_array::Array{Float32,3}
 
     function AIAPCEnv(p::AIAPCHyperParameters)
         # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
         # TODO: Think about how initial memory should be assigned
-        price_options = SVector{15, Float32}(p.price_options)
+        price_options = SVector{15,Float32}(p.price_options)
         n_prices = length(p.price_options)
-        price_index = SVector{15, Int8}(1:n_prices)
+        price_index = SVector{15,Int8}(1:n_prices)
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
         state_space = Base.OneTo(Int16(n_state_space))
         action_space = Tuple((i, j) for i in price_index for j in price_index)
 
-        profit_array = construct_profit_array(action_space, price_options, p.profit_function, n_players)
+        profit_array = construct_profit_array(
+            action_space,
+            price_options,
+            p.profit_function,
+            n_players,
+        )
         state_space_lookup = construct_state_space_lookup(action_space, n_prices)
 
         new(
@@ -59,9 +64,9 @@ struct AIAPCEnv <: AbstractEnv
             n_state_space,
             state_space,
             state_space_lookup,
-            MVector{2, Int}(ones(Int, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
-            MVector{1, Int}([0]), # Convergence counter
-            MVector{1, Bool}([false]), # Is done
+            MVector{2,Int}(ones(Int, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
+            MVector{1,Int}([0]), # Convergence counter
+            MVector{1,Bool}([false]), # Is done
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,
             action_space,
@@ -79,27 +84,32 @@ end
 function construct_state_space_lookup(action_space, n_prices)
     @assert length(action_space) == n_prices^2
     state_space_lookup = zeros(Int16, n_prices, n_prices)
-    for (i,j) in action_space
-        state_space_lookup[i, j] = map_vect_to_int([i,j], n_prices) - n_prices
+    for (i, j) in action_space
+        state_space_lookup[i, j] = map_vect_to_int([i, j], n_prices) - n_prices
     end
     return state_space_lookup
 end
 
 # map price vector to state
 function map_vect_to_int(vect_, base)
-    sum(vect_[k] * base^(k-1) for k=1:length(vect_)) # From Julia help / docs
+    sum(vect_[k] * base^(k - 1) for k = 1:length(vect_)) # From Julia help / docs
 end
 
 function map_int_to_vect(int_val, base, vect_length)
-    return digits(Int, int_val, base=base, pad=vect_length)
+    return digits(Int, int_val, base = base, pad = vect_length)
 end
 
-function construct_profit_array(action_space::NTuple, price_options, profit_function, n_players::Int)
+function construct_profit_array(
+    action_space::NTuple,
+    price_options,
+    profit_function,
+    n_players::Int,
+)
     n_prices = length(price_options)
     # TODO: Carve out into separate function:
     profit_array = zeros(Float32, n_prices, n_prices, n_players)
-    for k in 1:n_players
-        for (i,j) in action_space
+    for k = 1:n_players
+        for (i, j) in action_space
             profit_array[i, j, k] = profit_function([price_options[i], price_options[j]])[k]
         end
     end
@@ -110,9 +120,8 @@ end
 RLBase.action_space(env::AIAPCEnv, ::Int) = env.price_index # Choice of price
 
 RLBase.action_space(env::AIAPCEnv, ::SimultaneousPlayer) = env.action_space
-    
-RLBase.legal_action_space(env::AIAPCEnv, p) =
-    is_terminated(env) ? () : action_space(env, p)
+
+RLBase.legal_action_space(env::AIAPCEnv, p) = is_terminated(env) ? () : action_space(env, p)
 
 RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 

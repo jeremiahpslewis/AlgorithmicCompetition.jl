@@ -1,12 +1,12 @@
 using AlgorithmicCompetition:
-AlgorithmicCompetition,
-CompetitionParameters,
-CompetitionSolution,
-AIAPCHyperParameters,
-AIAPCEnv,
-Experiment,
-run_and_extract,
-run
+    AlgorithmicCompetition,
+    CompetitionParameters,
+    CompetitionSolution,
+    AIAPCHyperParameters,
+    AIAPCEnv,
+    Experiment,
+    run_and_extract,
+    run
 using BenchmarkTools
 
 competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
@@ -19,11 +19,10 @@ max_iter = Int(1e6) # Should be 1e9
 β_ = convert.(Float32, range(1.25e-8, 2e-5, n_increments))
 δ = 0.95
 
-hyperparameter_vect = [
-AIAPCHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_ for β in β_
-]
+hyperparameter_vect =
+    [AIAPCHyperParameters(α, β, δ, max_iter, competition_solution) for α in α_ for β in β_]
 
-@btime run(hyperparameter_vect[1]; stop_on_convergence=false)
+@btime run(hyperparameter_vect[1]; stop_on_convergence = false)
 
 # a = run(hyperparameter_vect[1]; stop_on_convergence=false)
 

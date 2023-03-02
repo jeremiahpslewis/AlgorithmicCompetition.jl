@@ -29,9 +29,11 @@ function economic_summary(e::ReinforcementLearningCore.Experiment)
         push!(is_converged, e.hook.hooks[i][2].is_converged)
     end
 
-    return AIAPCSummary(e.env.env.α,
+    return AIAPCSummary(
+        e.env.env.α,
         e.env.env.β,
         is_converged,
         avg_profit,
-        iterations_until_convergence)
+        iterations_until_convergence,
+    )
 end

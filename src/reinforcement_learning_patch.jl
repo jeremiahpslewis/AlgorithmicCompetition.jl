@@ -31,7 +31,10 @@ using Random
 (app::TabularQApproximator)(s::Int16, a::Int8) = app.table[a, s]
 
 # add missing update! method for smaller Int types
-function RLBase.update!(app::TabularQApproximator, correction::Pair{Tuple{Int16,Int8},Float64})
+function RLBase.update!(
+    app::TabularQApproximator,
+    correction::Pair{Tuple{Int16,Int8},Float64},
+)
     (s, a), e = correction
     x = @view app.table[a, s]
     x̄ = @view Float64[e][1]
@@ -60,8 +63,11 @@ function RLBase.update!(
 end
 
 # Fix NoOp issue for sequential environments
-function (agent::Agent)(stage::PreActStage, env::SequentialEnv, action::ReinforcementLearning.NoOp)
-end
+function (agent::Agent)(
+    stage::PreActStage,
+    env::SequentialEnv,
+    action::ReinforcementLearning.NoOp,
+) end
 
 # Epsilon Greedy Explorer for AIAPC Zoo
 # Note: get_ϵ function in RLCore takes: 600.045 ns (6 allocations: 192 bytes)
@@ -75,15 +81,8 @@ mutable struct AIAPCEpsilonGreedyExplorer{R} <: AbstractExplorer
     rng::R
 end
 
-function AIAPCEpsilonGreedyExplorer(
-    β::Float32,
-)
-    AIAPCEpsilonGreedyExplorer{typeof(Random.GLOBAL_RNG)}(
-        β,
-        β * -1,
-        1,
-        Random.GLOBAL_RNG,
-    )
+function AIAPCEpsilonGreedyExplorer(β::Float32)
+    AIAPCEpsilonGreedyExplorer{typeof(Random.GLOBAL_RNG)}(β, β * -1, 1, Random.GLOBAL_RNG)
 end
 
 function get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any}, step)
