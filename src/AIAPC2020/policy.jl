@@ -2,7 +2,7 @@ using ReinforcementLearning
 using StaticArrays
 
 function InitMatrix(n_prices, n_state_space)
-    return MMatrix{15, 225, Float32}(zeros(Float32, n_prices, n_state_space))
+    return MMatrix{15,225,Float32}(zeros(Float32, n_prices, n_state_space))
 end
 
 AIAPCPolicy(env::AIAPCEnv) = MultiAgentManager(

@@ -21,14 +21,20 @@ _procs = addprocs(
     using AlgorithmicCompetition
 end
 
-exp_list_ = AlgorithmicCompetition.run_aiapc(; n_parameter_iterations=10)
+exp_list_ = AlgorithmicCompetition.run_aiapc(; n_parameter_iterations = 10)
 
 α_result = [ex.α for ex in exp_list if !(ex isa Exception)]
 β_result = [ex.β for ex in exp_list if !(ex isa Exception)]
-iterations_until_convergence = [ex.iterations_until_convergence for ex in exp_list if !(ex isa Exception)]
+iterations_until_convergence =
+    [ex.iterations_until_convergence for ex in exp_list if !(ex isa Exception)]
 
 avg_profit_result = [ex.avg_profit[1] for ex in exp_list if !(ex isa Exception)]
 
-df = DataFrame(α = α_result, β = β_result, π_bar = avg_profit_result, iterations_until_convergence = iterations_until_convergence)
+df = DataFrame(
+    α = α_result,
+    β = β_result,
+    π_bar = avg_profit_result,
+    iterations_until_convergence = iterations_until_convergence,
+)
 
 CSV.write("simulation_results.csv", df)

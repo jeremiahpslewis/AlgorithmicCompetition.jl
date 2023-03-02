@@ -34,9 +34,9 @@ struct AIAPCHyperParameters
         δ::Float64,
         max_iter::Int,
         competition_solution::CompetitionSolution;
-        convergence_threshold::Int = Int(1e5)
+        convergence_threshold::Int = Int(1e5),
     )
-        @assert  max_iter > convergence_threshold
+        @assert max_iter > convergence_threshold
         ξ = 0.1
         δ = 0.95
         n_prices = 15
@@ -56,7 +56,7 @@ struct AIAPCHyperParameters
                 n_prices,
             )...,
         ]
-    
+
         new(
             α,
             β,
