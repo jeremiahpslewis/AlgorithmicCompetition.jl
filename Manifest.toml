@@ -1391,12 +1391,12 @@ version = "0.11.0"
 
 [[deps.ReinforcementLearningCore]]
 deps = ["AbstractTrees", "Adapt", "CUDA", "ChainRulesCore", "CircularArrayBuffers", "Crayons", "Distributions", "FillArrays", "Flux", "Functors", "LinearAlgebra", "Parsers", "ProgressMeter", "Random", "Reexport", "ReinforcementLearningBase", "ReinforcementLearningTrajectories", "Statistics", "StatsBase", "UnicodePlots"]
-git-tree-sha1 = "c0ad098b9b5d67a18df1f49e9d4b84a3fdf5c6b6"
+git-tree-sha1 = "5749b6a7be28d102dc6254d9ff1bf57e242a2339"
 repo-rev = "master"
 repo-subdir = "src/ReinforcementLearningCore"
 repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"
 uuid = "de1b191a-4ae0-4afa-a27b-92d07f46b2d6"
-version = "0.9.2"
+version = "0.9.1"
 
 [[deps.ReinforcementLearningEnvironments]]
 deps = ["DelimitedFiles", "IntervalSets", "LinearAlgebra", "MacroTools", "Markdown", "Pkg", "Random", "ReinforcementLearningBase", "Requires", "SparseArrays", "StatsBase"]
