@@ -1,7 +1,7 @@
 # Code borrowed from RL.jl, only needed during RL.jl refactor, to be dropped once v0.11 is released.
 include("stop_conditions.jl")
-include("policy.jl")
 include("named_policy.jl")
+include("composed_hook.jl")
 include("multi_agent.jl")
 include("multi_agent_hook.jl")
 include("linear_approximator.jl")
