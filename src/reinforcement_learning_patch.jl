@@ -21,7 +21,6 @@
 # > SOFTWARE.
 # >
 
-using ReinforcementLearningZoo
 using ReinforcementLearning
 using Random
 
