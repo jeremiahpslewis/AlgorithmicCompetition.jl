@@ -1,0 +1,16 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: AlgorithmicCompetition.jl
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Jeremiah
+    family-names: Lewis
+    orcid: 'https://orcid.org/0000-0002-7104-4620'
+repository-code: >-
+  https://github.com/jeremiahpslewis/AlgorithmicCompetition.jl
+license: MIT
