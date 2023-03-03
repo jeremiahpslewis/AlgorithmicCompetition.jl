@@ -1,4 +1,4 @@
-using ReinforcementLearning
+using ReinforcementLearningCore
 using StaticArrays
 
 function InitMatrix(n_prices, n_state_space)

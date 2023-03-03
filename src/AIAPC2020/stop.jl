@@ -1,4 +1,4 @@
-using ReinforcementLearning
+using ReinforcementLearningCore
 
 function AIAPCStop(env::AIAPCEnv; stop_on_convergence = true)
     stop_conditions = []

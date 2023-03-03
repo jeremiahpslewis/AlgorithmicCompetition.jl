@@ -1,8 +1,8 @@
-using ReinforcementLearning
+using ReinforcementLearningCore
 using Distributed
 
 function Experiment(env::AIAPCEnv; stop_on_convergence = true)
-    ReinforcementLearning.Experiment(
+    Experiment(
         policy = AIAPCPolicy(env),
         env = SequentialEnv(env),
         stop_condition = AIAPCStop(env; stop_on_convergence = stop_on_convergence),

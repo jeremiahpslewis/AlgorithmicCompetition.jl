@@ -1,4 +1,5 @@
-using ReinforcementLearning
+using ReinforcementLearningCore
+using ReinforcementLearningBase
 using StaticArrays
 """
     AIAPCEnv(p::AIAPCHyperParameters)

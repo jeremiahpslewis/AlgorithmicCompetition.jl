@@ -1,5 +1,5 @@
 using Chain
-using ReinforcementLearning
+using ReinforcementLearningCore
 
 profit_measure(π_hat::Vector{Float64}, π_N, π_M) = (mean(π_hat) - π_N) / (π_M - π_N)
 
@@ -11,7 +11,7 @@ struct AIAPCSummary
     iterations_until_convergence::Int32
 end
 
-function economic_summary(e::ReinforcementLearningCore.Experiment)
+function economic_summary(e::Experiment)
     convergence_threshold = e.env.env.convergence_threshold
     iterations_until_convergence = e.hook.hooks[1][2].iterations_until_convergence
 
