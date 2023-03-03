@@ -11,8 +11,8 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentManager(
             policy = NamedPolicy(
                 p => QBasedPolicy(;
                     learner = TDLearner(;
-                        # TabularQApproximator with specified init matrix
-                        approximator = TabularApproximator( # Renamed LinearApproximator on master branch
+                        # LinearQApproximator with specified init matrix
+                        approximator = LinearApproximator( # Renamed LinearApproximator on master branch
                             InitMatrix(env.n_prices, env.n_state_space),
                             Descent(env.α),
                         ),
@@ -24,11 +24,12 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentManager(
                     explorer = AIAPCEpsilonGreedyExplorer(Float32(1e-5)),
                 ),
             ),
-            trajectory = VectorSARTTrajectory(;
-                state = Int16,
-                action = Union{Int8,NoOp},
-                reward = Float32,
-                terminal = Bool,
+            trajectory = CircularArraySARTTraces(;
+            capacity=3,
+            state=Int16 => (2, 3),
+            action= Union{Int8,NoOp} => (2,),
+            reward=Float32 => (),
+            terminal=Bool => ()
             ),
         ) for p in players(env)
     )...,

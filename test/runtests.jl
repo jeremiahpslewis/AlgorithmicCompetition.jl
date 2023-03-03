@@ -1,18 +1,15 @@
 using Test
 using JuMP
 using Chain
-using ReinforcementLearning:
+using ReinforcementLearningCore:
     PostActStage,
     state,
     reward,
     PostEpisodeStage,
-    SequentialEnv,
     current_player,
     action_space,
-    VectorSARTTrajectory,
-    EpsilonGreedyExplorer,
-    TabularQApproximator,
-    TDLearner
+    EpsilonGreedyExplorer
+using ReinforcementLearningEnvironments: SequentialEnv
 using ReinforcementLearningBase: test_interfaces!, test_runnable!
 import ReinforcementLearningCore
 using StaticArrays
@@ -41,7 +38,8 @@ using AlgorithmicCompetition:
     InitMatrix,
     get_ϵ,
     AIAPCEpsilonGreedyExplorer,
-    AIAPCSummary
+    AIAPCSummary,
+    TDLearner
 using Distributed
 
 @testset "Prepackaged Environment Tests" begin

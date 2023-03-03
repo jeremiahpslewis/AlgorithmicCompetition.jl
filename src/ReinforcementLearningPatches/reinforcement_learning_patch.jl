@@ -21,51 +21,53 @@
 # > SOFTWARE.
 # >
 
-using ReinforcementLearning
+using ReinforcementLearningCore
+using ReinforcementLearningBase
+using ReinforcementLearningEnvironments
 using Random
 
 ### Patch modified from https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/v0.10.1/src/ReinforcementLearningCore/src/policies/q_based_policies/learners/approximators/tabular_approximator.jl
 ### To support smaller ints / floats
-(app::TabularQApproximator)(s::Int16) = @views app.table[:, s]
-(app::TabularQApproximator)(s::Int16, a::Int8) = app.table[a, s]
+# (app::TabularQApproximator)(s::Int16) = @views app.table[:, s]
+# (app::TabularQApproximator)(s::Int16, a::Int8) = app.table[a, s]
 
 # add missing update! method for smaller Int types
-function RLBase.update!(
-    app::TabularQApproximator,
-    correction::Pair{Tuple{Int16,Int8},Float64},
-)
-    (s, a), e = correction
-    x = @view app.table[a, s]
-    x̄ = @view Float64[e][1]
+# function RLBase.update!(
+#     app::TabularQApproximator,
+#     correction::Pair{Tuple{Int16,Int8},Float64},
+# )
+#     (s, a), e = correction
+#     x = @view app.table[a, s]
+#     x̄ = @view Float64[e][1]
 
-    Flux.Optimise.update!(app.optimizer, x, x̄)
-end
+#     Flux.Optimise.update!(app.optimizer, x, x̄)
+# end
 
-function RLBase.update!(app::TabularQApproximator, correction::Pair{Int16,Vector{Float64}})
-    s, errors = correction
-    x = @view app.table[:, s]
-    Flux.Optimise.update!(app.optimizer, x, errors)
-end
+# function RLBase.update!(app::TabularQApproximator, correction::Pair{Int16,Vector{Float64}})
+#     s, errors = correction
+#     x = @view app.table[:, s]
+#     Flux.Optimise.update!(app.optimizer, x, errors)
+# end
 
 
-function RLBase.update!(
-    trajectory::VectorSARTTrajectory,
-    policy::NamedPolicy,
-    env::SequentialEnv,
-    ::PostActStage,
-)
-    if env.current_player_idx == 1
-        r = policy isa NamedPolicy ? reward(env.env, nameof(policy)) : reward(env)
-        push!(trajectory[:reward], r)
-        push!(trajectory[:terminal], is_terminated(env))
-    end
-end
+# function RLBase.update!(
+#     trajectory::VectorSARTTrajectory,
+#     policy::NamedPolicy,
+#     env::SequentialEnv,
+#     ::PostActStage,
+# )
+#     if env.current_player_idx == 1
+#         r = policy isa NamedPolicy ? reward(env.env, nameof(policy)) : reward(env)
+#         push!(trajectory[:reward], r)
+#         push!(trajectory[:terminal], is_terminated(env))
+#     end
+# end
 
 # Fix NoOp issue for sequential environments
 function (agent::Agent)(
     stage::PreActStage,
     env::SequentialEnv,
-    action::ReinforcementLearning.NoOp,
+    action::NoOp,
 ) end
 
 # Epsilon Greedy Explorer for AIAPC Zoo

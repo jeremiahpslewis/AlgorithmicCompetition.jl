@@ -1,4 +1,5 @@
 using ReinforcementLearningCore
+using ReinforcementLearningEnvironments
 using Distributed
 
 function Experiment(env::AIAPCEnv; stop_on_convergence = true)

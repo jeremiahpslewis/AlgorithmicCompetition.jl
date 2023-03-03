@@ -2,7 +2,7 @@
 
 julia_version = "1.9.0-beta4"
 manifest_format = "2.0"
-project_hash = "bbcae7ff45f35f74ab98fea2eefdc3fc598e95c9"
+project_hash = "6254696d34ea5116ab83caed78d0ac2c54b9c431"
 
 [[deps.ASL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -359,12 +359,6 @@ git-tree-sha1 = "9e2f36d3c96a820c678f2f1f1782582fcf685bae"
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 version = "1.9.1"
 
-[[deps.DensityInterface]]
-deps = ["InverseFunctions", "Test"]
-git-tree-sha1 = "80c3e8639e3353e5d2912fb3a1916b8455e2494b"
-uuid = "b429d917-457f-4dbc-8f4c-0cc954292b1d"
-version = "0.4.0"
-
 [[deps.DiffResults]]
 deps = ["StaticArraysCore"]
 git-tree-sha1 = "782dd5f4561f5d267313f23853baaaa4c52ea621"
@@ -382,10 +376,18 @@ deps = ["Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[deps.Distributions]]
-deps = ["ChainRulesCore", "DensityInterface", "FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "Test"]
-git-tree-sha1 = "fb372fc76a20edda014dfc2cdb33f23ef80feda6"
+deps = ["FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "Test"]
+git-tree-sha1 = "da9e1a9058f8d3eec3a8c9fe4faacfb89180066b"
 uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
-version = "0.25.85"
+version = "0.25.86"
+
+    [deps.Distributions.extensions]
+    DistributionsChainRulesCoreExt = "ChainRulesCore"
+    DistributionsDensityInterfaceExt = "DensityInterface"
+
+    [deps.Distributions.weakdeps]
+    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+    DensityInterface = "b429d917-457f-4dbc-8f4c-0cc954292b1d"
 
 [[deps.DocStringExtensions]]
 deps = ["LibGit2"]
@@ -1380,7 +1382,7 @@ version = "1.2.2"
 
 [[deps.ReinforcementLearningBase]]
 deps = ["AbstractTrees", "CommonRLInterface", "CommonRLSpaces", "DomainSets", "Markdown", "Random", "Reexport", "Test"]
-git-tree-sha1 = "3294c9708855f48b75158d4c36abf699c24b2fc3"
+git-tree-sha1 = "189734b0aa291cb5751d6519cc4e6a384db9b4b7"
 repo-rev = "master"
 repo-subdir = "src/ReinforcementLearningBase"
 repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"
@@ -1389,12 +1391,21 @@ version = "0.11.0"
 
 [[deps.ReinforcementLearningCore]]
 deps = ["AbstractTrees", "Adapt", "CUDA", "ChainRulesCore", "CircularArrayBuffers", "Crayons", "Distributions", "FillArrays", "Flux", "Functors", "LinearAlgebra", "Parsers", "ProgressMeter", "Random", "Reexport", "ReinforcementLearningBase", "ReinforcementLearningTrajectories", "Statistics", "StatsBase", "UnicodePlots"]
-git-tree-sha1 = "7e242f2636591dd4021c8054dda0beb0b5c024bf"
+git-tree-sha1 = "c0ad098b9b5d67a18df1f49e9d4b84a3fdf5c6b6"
 repo-rev = "master"
 repo-subdir = "src/ReinforcementLearningCore"
 repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"
 uuid = "de1b191a-4ae0-4afa-a27b-92d07f46b2d6"
 version = "0.9.2"
+
+[[deps.ReinforcementLearningEnvironments]]
+deps = ["DelimitedFiles", "IntervalSets", "LinearAlgebra", "MacroTools", "Markdown", "Pkg", "Random", "ReinforcementLearningBase", "Requires", "SparseArrays", "StatsBase"]
+git-tree-sha1 = "31b699a8a86d153135a8f111c98089f8bd24243c"
+repo-rev = "master"
+repo-subdir = "src/ReinforcementLearningEnvironments"
+repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"
+uuid = "25e41dd2-4622-11e9-1641-f1adca772921"
+version = "0.7.1"
 
 [[deps.ReinforcementLearningTrajectories]]
 deps = ["Adapt", "CircularArrayBuffers", "ElasticArrays", "MacroTools", "OnlineStats", "Random", "StackViews"]
