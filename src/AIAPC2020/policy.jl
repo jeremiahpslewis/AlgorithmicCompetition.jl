@@ -7,7 +7,7 @@ end
 
 AIAPCPolicy(env::AIAPCEnv) = MultiAgentManager(
     (
-        p => Agent(
+        NamedPolicy(p, Agent(
             QBasedPolicy(;
                 learner = TDLearner(;
                     # LinearQApproximator with specified init matrix
@@ -29,6 +29,6 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentManager(
         reward=Float32 => (),
         terminal=Bool => ()
         ), DummySampler()),
-        ) for p in players(env)
+        )) for p in players(env)
     )...,
 )
