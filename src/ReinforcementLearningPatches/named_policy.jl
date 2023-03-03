@@ -2,7 +2,9 @@ export NamedPolicy
 
 import Functors: functor
 using Setfield: @set
-
+using ReinforcementLearningCore: AbstractPolicy, AbstractStage, AbstractEnv, PreActStage, DynamicStyle, Sequential, Simultaneous, current_player
+using ReinforcementLearningBase
+using ReinforcementLearningTrajectories: Trajectory
 """
     NamedPolicy(name=>policy)
 
@@ -23,18 +25,18 @@ function check(agent::NamedPolicy, env::AbstractEnv)
     check(agent.policy, env)
 end
 
-function RLBase.update!(
+function RLBase.optimise!(
     p::NamedPolicy,
-    t::AbstractTrajectory,
+    t::Trajectory,
     e::AbstractEnv,
     s::AbstractStage,
 )
     update!(p.policy, t, e, s)
 end
 
-function RLBase.update!(
+function RLBase.optimise!(
     p::NamedPolicy,
-    t::AbstractTrajectory,
+    t::Trajectory,
     e::AbstractEnv,
     s::PreActStage,
 )

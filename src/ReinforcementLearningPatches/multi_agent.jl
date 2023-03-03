@@ -1,5 +1,9 @@
 export MultiAgentManager, NO_OP, NoOp
 
+using ReinforcementLearningBase
+using ReinforcementLearningCore: AbstractPolicy, AbstractStage, AbstractEnv, PreActStage, DynamicStyle, Sequential, Simultaneous, current_player
+
+
 "Represent no-operation if it's not the agent's turn."
 struct NoOp end
 

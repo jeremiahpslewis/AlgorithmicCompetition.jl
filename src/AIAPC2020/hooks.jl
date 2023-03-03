@@ -1,4 +1,4 @@
-using ReinforcementLearningCore
+using ReinforcementLearningCore, ReinforcementLearningBase
 using StaticArrays
 
 mutable struct ConvergenceCheck <: AbstractHook

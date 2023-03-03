@@ -2,6 +2,9 @@ export TDLearner
 
 using LinearAlgebra: dot
 using Distributions: pdf
+using ReinforcementLearningBase
+using ReinforcementLearningCore
+using ReinforcementLearningTrajectories: Trajectory
 
 Base.@kwdef struct TDLearner{A} <: AbstractLearner
     approximator::A
@@ -17,9 +20,9 @@ end
 
 ## update policies
 
-function RLBase.update!(
+function RLBase.optimise!(
     p::QBasedPolicy{<:TDLearner},
-    t::AbstractTrajectory,
+    t::Trajectory,
     e::AbstractEnv,
     s::AbstractStage,
 )
@@ -32,13 +35,13 @@ function RLBase.update!(
 end
 
 
-function RLBase.update!(L::TDLearner, t::AbstractTrajectory, ::AbstractEnv, s::PreActStage)
+function RLBase.optimise!(L::TDLearner, t::Trajectory, ::AbstractEnv, s::PreActStage)
     _update!(L, L.approximator, Val(L.method), t, s)
 end
 
-function RLBase.update!(
+function RLBase.optimise!(
     L::TDLearner,
-    t::AbstractTrajectory,
+    t::Trajectory,
     ::AbstractEnv,
     s::PostEpisodeStage,
 )
@@ -46,7 +49,7 @@ function RLBase.update!(
 end
 
 # for ExpectedSARSA
-function RLBase.update!(
+function RLBase.optimise!(
     L::TDLearner,
     t::Tuple,
     ::AbstractEnv,
@@ -57,18 +60,18 @@ end
 
 ## update trajectories
 
-function RLBase.update!(
-    t::AbstractTrajectory,
-    ::Union{
-        QBasedPolicy{<:TDLearner},
-        NamedPolicy{<:QBasedPolicy{<:TDLearner}},
-        VBasedPolicy{<:TDLearner},
-    },
-    ::AbstractEnv,
-    ::PreEpisodeStage,
-)
-    empty!(t)
-end
+# function RLBase.optimise!(
+#     t::Trajectory,
+#     ::Union{
+#         QBasedPolicy{<:TDLearner},
+#         NamedPolicy{<:QBasedPolicy{<:TDLearner}},
+#         VBasedPolicy{<:TDLearner},
+#     },
+#     ::AbstractEnv,
+#     ::PreEpisodeStage,
+# )
+#     empty!(t)
+# end
 
 ## implementations
 
@@ -132,7 +135,7 @@ function _update!(
     L::TDLearner,
     ::Union{TabularQApproximator,LinearQApproximator},
     ::Val{:SARS},
-    t::AbstractTrajectory,
+    t::Trajectory,
     ::PreActStage,
 )
     S = t[:state]
@@ -173,7 +176,7 @@ function _update!(
     L::TDLearner,
     ::Union{TabularVApproximator,LinearVApproximator},
     ::Val{:SRS},
-    t::AbstractTrajectory,
+    t::Trajectory,
     ::PreActStage,
 )
     S = t[:state]
@@ -197,10 +200,10 @@ end
 # DynaAgent
 #####
 
-function RLBase.update!(
+function RLBase.optimise!(
     p::QBasedPolicy{<:TDLearner},
     m::Union{ExperienceBasedSamplingModel,TimeBasedSamplingModel},
-    ::AbstractTrajectory,
+    ::Trajectory,
     env::AbstractEnv,
     ::Union{PreActStage,PostEpisodeStage},
 )
@@ -218,10 +221,10 @@ function RLBase.update!(
     end
 end
 
-function RLBase.update!(
+function RLBase.optimise!(
     p::QBasedPolicy{<:TDLearner},
     m::PrioritizedSweepingSamplingModel,
-    ::AbstractTrajectory,
+    ::Trajectory,
     env::AbstractEnv,
     ::Union{PreActStage,PostEpisodeStage},
 )
@@ -276,16 +279,16 @@ end
 (L::TDλReturnLearner)(s) = L.approximator(s)
 (L::TDλReturnLearner)(s, a) = L.approximator(s, a)
 
-function RLBase.update!(
+function RLBase.optimise!(
     L::TDλReturnLearner,
-    t::AbstractTrajectory,
+    t::Trajectory,
     ::AbstractEnv,
     ::PreActStage,
 ) end
 
-function RLBase.update!(
+function RLBase.optimise!(
     L::TDλReturnLearner,
-    t::AbstractTrajectory,
+    t::Trajectory,
     ::AbstractEnv,
     ::PostEpisodeStage,
 )
@@ -310,11 +313,11 @@ function RLBase.update!(
     end
 end
 
-function RLBase.update!(
-    t::AbstractTrajectory,
-    ::VBasedPolicy{<:TDλReturnLearner},
-    ::AbstractEnv,
-    ::PreEpisodeStage,
-)
-    empty!(t)
-end
+# function RLBase.optimise!(
+#     t::Trajectory,
+#     ::VBasedPolicy{<:TDλReturnLearner},
+#     ::AbstractEnv,
+#     ::PreEpisodeStage,
+# )
+#     empty!(t)
+# end

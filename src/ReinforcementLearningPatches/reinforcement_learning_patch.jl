@@ -32,7 +32,7 @@ using Random
 # (app::TabularQApproximator)(s::Int16, a::Int8) = app.table[a, s]
 
 # add missing update! method for smaller Int types
-# function RLBase.update!(
+# function RLBase.optimise!(
 #     app::TabularQApproximator,
 #     correction::Pair{Tuple{Int16,Int8},Float64},
 # )
@@ -43,14 +43,14 @@ using Random
 #     Flux.Optimise.update!(app.optimizer, x, x̄)
 # end
 
-# function RLBase.update!(app::TabularQApproximator, correction::Pair{Int16,Vector{Float64}})
+# function RLBase.optimise!(app::TabularQApproximator, correction::Pair{Int16,Vector{Float64}})
 #     s, errors = correction
 #     x = @view app.table[:, s]
 #     Flux.Optimise.update!(app.optimizer, x, errors)
 # end
 
 
-# function RLBase.update!(
+# function RLBase.optimise!(
 #     trajectory::VectorSARTTrajectory,
 #     policy::NamedPolicy,
 #     env::SequentialEnv,
