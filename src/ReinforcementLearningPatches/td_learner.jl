@@ -111,7 +111,7 @@ end
 
 function _update!(
     L::TDLearner,
-    :LinearQApproximator,
+    ::LinearQApproximator,
     ::Val{:ExpectedSARSA},
     experience,
     ::PreActStage,
