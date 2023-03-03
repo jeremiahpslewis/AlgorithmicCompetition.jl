@@ -77,7 +77,7 @@ end
 
 function _update!(
     L::TDLearner,
-    ::Union{TabularQApproximator,LinearQApproximator},
+    ::Union{LinearQApproximator},
     ::Union{Val{:SARSA},Val{:ExpectedSARSA},Val{:SARS}},
     t::Trajectory,
     ::PostEpisodeStage,
@@ -94,7 +94,7 @@ end
 
 function _update!(
     L::TDLearner,
-    ::Union{TabularQApproximator,LinearQApproximator},
+    ::Union{LinearQApproximator},
     ::Val{:SARSA},
     t::Trajectory,
     ::PreActStage,
@@ -111,7 +111,7 @@ end
 
 function _update!(
     L::TDLearner,
-    ::TabularQApproximator,
+    :LinearQApproximator,
     ::Val{:ExpectedSARSA},
     experience,
     ::PreActStage,
@@ -133,7 +133,7 @@ end
 
 function _update!(
     L::TDLearner,
-    ::Union{TabularQApproximator,LinearQApproximator},
+    ::Union{LinearQApproximator,LinearQApproximator},
     ::Val{:SARS},
     t::Trajectory,
     ::PreActStage,
