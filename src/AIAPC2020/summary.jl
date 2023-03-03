@@ -11,7 +11,7 @@ struct AIAPCSummary
     iterations_until_convergence::Int32
 end
 
-function economic_summary(e::Experiment)
+function economic_summary(e::RLCore.Experiment)
     convergence_threshold = e.env.env.convergence_threshold
     iterations_until_convergence = e.hook.hooks[1][2].iterations_until_convergence
 

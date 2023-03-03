@@ -4,7 +4,7 @@ using LinearAlgebra: dot
 using ReinforcementLearningBase
 
 struct LinearApproximator{N,O}
-    weights::Array{Float64,N}
+    weights::Array{Float32,N}
     optimizer::O
 end
 
