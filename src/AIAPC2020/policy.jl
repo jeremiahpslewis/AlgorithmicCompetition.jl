@@ -10,8 +10,8 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentManager(
         NamedPolicy(p, Agent(
             QBasedPolicy(;
                 learner = TDLearner(;
-                    # LinearQApproximator with specified init matrix
-                    approximator = LinearApproximator( # Renamed LinearApproximator on master branch
+                    # TabularQApproximator with specified init matrix
+                    approximator = TabularApproximator(
                         InitMatrix(env.n_prices, env.n_state_space),
                         Descent(env.α),
                     ),
@@ -24,8 +24,8 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentManager(
             ),
         Trajectory(CircularArraySARTTraces(;
         capacity=3,
-        state=Int16 => (2, 3),
-        action= Union{Int8,NoOp} => (2,),
+        state=Int16 => (225, 15),
+        action=Union{Int8,NoOp} => (225,),
         reward=Float32 => (),
         terminal=Bool => ()
         ), DummySampler()),

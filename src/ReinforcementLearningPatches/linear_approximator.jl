@@ -1,5 +1,3 @@
-export LinearApproximator, LinearVApproximator, LinearQApproximator
-
 using LinearAlgebra: dot
 using ReinforcementLearningBase
 

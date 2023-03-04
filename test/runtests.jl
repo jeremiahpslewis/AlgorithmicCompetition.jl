@@ -108,6 +108,34 @@ end
     @test construct_state_space_lookup(((1, 1), (1, 2), (2, 1), (2, 2)), 2) == [1 3; 2 4]
 end
 
+
+@testset "Policy operation test" begin
+    α = Float32(0.125)
+    β = Float32(1e-5)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = 1000
+    price_index = 1:n_prices
+
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+
+    competition_solution = CompetitionSolution(competition_params)
+
+    hyperparams = AIAPCHyperParameters(
+        α,
+        β,
+        δ,
+        max_iter,
+        competition_solution;
+        convergence_threshold = 1,
+    )
+    seq_env = AIAPCEnv(hyperparams) |> SequentialEnv
+
+    seq_env
+end
+
 @testset "run AIAPC full simulation" begin
     α = Float32(0.125)
     β = Float32(1e-5)
