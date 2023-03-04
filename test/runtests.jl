@@ -133,7 +133,8 @@ end
     )
     seq_env = AIAPCEnv(hyperparams) |> SequentialEnv
 
-    seq_env
+    policy(seq_env)
+
 end
 
 @testset "run AIAPC full simulation" begin

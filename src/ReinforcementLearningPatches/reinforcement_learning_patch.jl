@@ -22,6 +22,7 @@
 # >
 
 using ReinforcementLearningCore
+
 using ReinforcementLearningBase
 using ReinforcementLearningEnvironments
 using Random
@@ -106,6 +107,8 @@ function (s::AIAPCEpsilonGreedyExplorer{<:Any})(values)
     end
 end
 
+# TODO: Fix mask code to work with subarray types?
+(s::AIAPCEpsilonGreedyExplorer{<:Any})(values, mask) = (s::AIAPCEpsilonGreedyExplorer{<:Any})(values)
 
 # Patch for SequentialEnv: Hooks are not called for correct player
 function (hook::TotalRewardPerEpisode)(::PostActStage, agent, env::SequentialEnv)

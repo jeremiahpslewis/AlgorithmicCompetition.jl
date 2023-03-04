@@ -1,3 +1,5 @@
+using ReinforcementLearningBase
+
 """
     TabularApproximator(table<:AbstractArray, opt)
 
@@ -7,7 +9,8 @@ For `table` of 2-d, it will serve as a state-action value approximator.
 !!! warning
     For `table` of 2-d, the first dimension is action and the second dimension is state.
 """
-struct TabularApproximator{N,T<:AbstractArray{Float64},O} <: AbstractApproximator
+# TODO: add back missing AbstractApproximator
+struct TabularApproximator{N,T<:AbstractArray{Float32},O}
     table::T
     optimizer::O
     function TabularApproximator(table::T, opt::O) where {T<:AbstractArray,O}
@@ -27,24 +30,24 @@ TabularQApproximator(; n_state, n_action, init = 0.0, opt = InvDecay(1.0)) =
 
 (app::TabularVApproximator)(s::Int) = @views app.table[s]
 
-(app::TabularQApproximator)(s::Int) = @views app.table[:, s]
-(app::TabularQApproximator)(s::Int, a::Int) = app.table[a, s]
+(app::TabularQApproximator)(s::Int16) = @views app.table[:, s]
+(app::TabularQApproximator)(s::Int16, a::Int8) = app.table[a, s]
 
-function RLBase.update!(app::TabularVApproximator, correction::Pair{Int,Float64})
+function RLBase.optimise!(app::TabularVApproximator, correction::Pair{Int,Float32})
     s, e = correction
     x = @view app.table[s]
     x̄ = @view [e][1]
     Flux.Optimise.update!(app.optimizer, x, x̄)
 end
 
-function RLBase.optimise!(app::TabularQApproximator, correction::Pair{Tuple{Int,Int},Float64})
+function RLBase.optimise!(app::TabularQApproximator, correction::Pair{Tuple{Int,Int},Float32})
     (s, a), e = correction
     x = @view app.table[a, s]
     x̄ = @view [e][1]
     Flux.Optimise.update!(app.optimizer, x, x̄)
 end
 
-function RLBase.optimise!(app::TabularQApproximator, correction::Pair{Int,Vector{Float64}})
+function RLBase.optimise!(app::TabularQApproximator, correction::Pair{Int,Vector{Float32}})
     s, errors = correction
     x = @view app.table[:, s]
     Flux.Optimise.update!(app.optimizer, x, errors)
