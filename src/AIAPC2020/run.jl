@@ -22,7 +22,7 @@ end
 function run(hyperparameters::AIAPCHyperParameters; stop_on_convergence = true)
     env = AIAPCEnv(hyperparameters)
     experiment = Experiment(env; stop_on_convergence = stop_on_convergence)
-    Base.run(experiment)
+    run_fixed(experiment)
     return experiment
 end
 

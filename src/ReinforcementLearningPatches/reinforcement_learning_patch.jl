@@ -118,3 +118,8 @@ end
 function (hook::TotalRewardPerEpisode)(::PostActStage, agent, env::SequentialEnv)
     hook.reward += reward(env, nameof(agent))
 end
+
+function run_fixed(x::Experiment)
+    run(x.policy, x.env, x.stop_condition, x.hook)
+    x
+end
