@@ -27,6 +27,10 @@ using ReinforcementLearningBase
 using ReinforcementLearningEnvironments
 using Random
 
+# Fudge an issue with non Int64 Ints in RL.jl
+using Base
+Base.convert(::Type{Union{AlgorithmicCompetition.NoOp, Int8}}, a::Int64) = Int8(a)
+
 ### Patch modified from https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/v0.10.1/src/ReinforcementLearningCore/src/policies/q_based_policies/learners/approximators/tabular_approximator.jl
 ### To support smaller ints / floats
 # (app::TabularQApproximator)(s::Int16) = @views app.table[:, s]
@@ -103,7 +107,7 @@ function (s::AIAPCEpsilonGreedyExplorer{<:Any})(values)
         end
         return rand(s.rng, max_vals)
     else
-        return rand(s.rng, 1:length(values))
+        return rand(s.rng, Base.OneTo(Int8(length(values))))
     end
 end
 

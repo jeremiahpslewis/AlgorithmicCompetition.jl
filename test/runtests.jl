@@ -133,8 +133,8 @@ end
     )
     seq_env = AIAPCEnv(hyperparams) |> SequentialEnv
 
-    policy(seq_env)
-
+    # Test full policy exploration of states
+    @test sum(unique([policy(seq_env) for i in 1:1e5])) == sum(1:env.n_prices)
 end
 
 @testset "run AIAPC full simulation" begin
