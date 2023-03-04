@@ -131,7 +131,9 @@ end
         competition_solution;
         convergence_threshold = 1,
     )
-    seq_env = AIAPCEnv(hyperparams) |> SequentialEnv
+    env = AIAPCEnv(hyperparams)
+    seq_env = env |> SequentialEnv
+    policy = AIAPCPolicy(env)
 
     # Test full policy exploration of states
     @test sum(unique([policy(seq_env) for i in 1:1e5])) == sum(1:env.n_prices)
