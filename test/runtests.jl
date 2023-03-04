@@ -238,7 +238,7 @@ end
     exper = Experiment(env)
     state(env)
     policies = env |> AIAPCPolicy
-    AlgorithmicCompetition.update!(exper.hook.hooks[1][2], Int16(2), 3, false)
+    AlgorithmicCompetition.optimise!(exper.hook.hooks[1][2], Int16(2), 3, false)
     @test exper.hook.hooks[1][2].best_response_vector[2] == 3
 
 

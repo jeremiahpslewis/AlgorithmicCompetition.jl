@@ -24,8 +24,8 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentManager(
             ),
         Trajectory(CircularArraySARTTraces(;
         capacity=3,
-        state=Int16 => (225, 15),
-        action=Union{Int8,NoOp} => (225,),
+        state=Int16 => (225,),
+        action=Union{Int8,NoOp} => (15,),
         reward=Float32 => (),
         terminal=Bool => ()
         ), DummySampler()),

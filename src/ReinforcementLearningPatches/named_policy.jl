@@ -31,7 +31,7 @@ function RLBase.optimise!(
     e::AbstractEnv,
     s::AbstractStage,
 )
-    update!(p.policy, t, e, s)
+    optimise!(p.policy, t, e, s)
 end
 
 function RLBase.optimise!(
@@ -40,7 +40,7 @@ function RLBase.optimise!(
     e::AbstractEnv,
     s::PreActStage,
 )
-    update!(p.policy, t, e, s)
+    optimise!(p.policy, t, e, s)
 end
 
 

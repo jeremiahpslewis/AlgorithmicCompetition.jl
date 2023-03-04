@@ -43,6 +43,12 @@ function (A::MultiAgentManager)(stage::AbstractStage, env::AbstractEnv)
     end
 end
 
+function RLBase.optimise!(A::MultiAgentManager)
+    for agent in values(A.agents)
+        RLBase.optimise!(agent.policy)
+    end
+end
+
 function (A::MultiAgentManager)(stage::PreActStage, env::AbstractEnv, action)
     A(stage, env, DynamicStyle(env), action)
 end
