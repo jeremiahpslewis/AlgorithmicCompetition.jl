@@ -17,12 +17,12 @@ end
 (L::TDLearner)(s) = L.approximator(s)
 (L::TDLearner)(s, a) = L.approximator(s, a)
 
-function RLBase.optimise!(L::TDLearner, x::NamedTuple)
+function RLBase.optimise!(L::TDLearner, x)
     _optimise!(L, x)
 end
 
-function _optimise!(L::TDLearner, x::NamedTuple)
-    S, A, R, T = (t[x] for x in SART)
+function _optimise!(L::TDLearner, t)
+     S, A, R, T = (t[x][1] for x in SART)
     n, γ, Q = L.n, L.γ, L.approximator
     G = 0.0
     for i in 1:min(n + 1, length(R))

@@ -126,3 +126,5 @@ end
 
 # Patch for QBasedPolicy, not sure why NamedTuple dispatch is not working
 RLBase.optimise!(p::QBasedPolicy, x::CircularArraySARTTraces) = optimise!(p.learner, x)
+
+const SART = (:state, :action, :reward, :terminal)

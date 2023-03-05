@@ -13,7 +13,7 @@ mutable struct ConvergenceCheck <: AbstractHook
     end
 end
 
-function update!(h::ConvergenceCheck, state_::Int16, best_action::Int, iter_converged::Bool)
+function optimise!(h::ConvergenceCheck, state_::Int16, best_action::Int, iter_converged::Bool)
     # Increment duration whenever argmax action is stable (convergence criteria)
     # Increment convergence metric (e.g. convergence not reached)
     # Keep track of number of iterations it takes until convergence

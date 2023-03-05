@@ -33,6 +33,8 @@ TabularQApproximator(; n_state, n_action, init = 0.0, opt = InvDecay(1.0)) =
 (app::TabularQApproximator)(s::Int16) = @views app.table[:, s]
 (app::TabularQApproximator)(s::Int16, a::Int8) = app.table[a, s]
 
+
+
 function RLBase.optimise!(app::TabularVApproximator, correction::Pair{Int,Float32})
     s, e = correction
     x = @view app.table[s]
@@ -40,14 +42,14 @@ function RLBase.optimise!(app::TabularVApproximator, correction::Pair{Int,Float3
     Flux.Optimise.update!(app.optimizer, x, x̄)
 end
 
-function RLBase.optimise!(app::TabularQApproximator, correction::Pair{Tuple{Int,Int},Float32})
+function RLBase.optimise!(app::TabularQApproximator, correction::Pair{Tuple{Int16,Int8},Float64})
     (s, a), e = correction
     x = @view app.table[a, s]
     x̄ = @view [e][1]
     Flux.Optimise.update!(app.optimizer, x, x̄)
 end
 
-function RLBase.optimise!(app::TabularQApproximator, correction::Pair{Int,Vector{Float32}})
+function RLBase.optimise!(app::TabularQApproximator, correction::Pair{Int,Vector{Float64}})
     s, errors = correction
     x = @view app.table[:, s]
     Flux.Optimise.update!(app.optimizer, x, errors)
