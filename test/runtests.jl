@@ -238,7 +238,7 @@ end
     exper = Experiment(env)
     state(env)
     policies = env |> AIAPCPolicy
-    AlgorithmicCompetition.optimise!(exper.hook.hooks[1][2], Int16(2), 3, false)
+    AlgorithmicCompetition.update!(exper.hook.hooks[1][2], Int16(2), 3, false)
     @test exper.hook.hooks[1][2].best_response_vector[2] == 3
 
 
@@ -322,8 +322,8 @@ end
     @test c_out.hook.hooks[2][2].iterations_until_convergence == max_iter
 
 
-    @test c_out.policy.agents[1].trajectory[:reward][1] .!= 0
-    @test c_out.policy.agents[2].trajectory[:reward][1] .!= 0
+    @test c_out.policy.agents[1].policy.trajectory.container[:reward][1] .!= 0
+    @test c_out.policy.agents[2].policy.trajectory.container[:reward][1] .!= 0
 
     @test c_out.policy.agents[1].policy.policy.learner.approximator.table !=
           c_out.policy.agents[2].policy.policy.learner.approximator.table

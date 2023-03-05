@@ -128,3 +128,15 @@ end
 RLBase.optimise!(p::QBasedPolicy, x::CircularArraySARTTraces) = optimise!(p.learner, x)
 
 const SART = (:state, :action, :reward, :terminal)
+
+
+## SequentialEnv patch
+function (agent::Agent)(::PostActStage, env::SequentialEnv)
+    env.actions[env.current_player_idx] = action
+    if env.current_player_idx == length(env.actions)
+        agent.cache = (agent.cache..., reward=reward(env), terminal=is_terminated(env))
+        env.current_player_idx = 1
+    else
+        env.current_player_idx += 1
+    end
+end
