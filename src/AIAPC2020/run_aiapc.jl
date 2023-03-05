@@ -30,7 +30,7 @@ function run_aiapc(;
         println("Running iteration $i of $n_parameter_iterations")
         exp_list = @showprogress pmap(
             run_and_extract,
-            sample(hyperparameter_vect, 1000);
+            hyperparameter_vect;
             on_error = identity,
         )
         append!(exp_list_, exp_list)
