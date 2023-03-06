@@ -26,7 +26,7 @@ function (hook::MultiAgentHook)(
     m::MultiAgentManager,
     env::AbstractEnv,
     args...,
-) where {K}
+)
     for (agent, policy) in m.agents
         update!(hook.agent_hooks[agent], s, policy, env, args...)
     end
