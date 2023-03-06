@@ -134,6 +134,10 @@ function RLBase.reward(env::AIAPCEnv, p::Int)
     (@view env.profit_array[env.memory[1], env.memory[2], p])[1]
 end
 
+
+player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
+RLBase.reward(env::AIAPCEnv, p::Symbol) = reward(env, player_lookup[p])
+
 RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
 
 function RLBase.state(env::AIAPCEnv, ::Observation, p)

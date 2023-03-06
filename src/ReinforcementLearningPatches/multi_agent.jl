@@ -36,13 +36,13 @@ function (A::MultiAgentManager)(env::AbstractEnv, ::Simultaneous)
 end
 
 function (A::MultiAgentManager)(stage::AbstractStage, env::AbstractEnv)
-    for agent in A
+    for agent in A.agent_policies
         agent(stage, env)
     end
 end
 
 function RLBase.optimise!(A::MultiAgentManager)
-    for agent in A
+    for agent in A.agent_policies
         RLBase.optimise!(agent)
     end
 end
@@ -53,7 +53,7 @@ end
 
 function (A::MultiAgentManager)(stage::PreActStage, env::AbstractEnv, ::Sequential, action)
     p = current_player(env)
-    for agent in A
+    for agent in A.agent_policies
         if agent.name == Symbol(player)
             agent(stage, env, action)
         else

@@ -243,7 +243,7 @@ end
     @test exper.hook.hooks[1][2].best_response_vector[2] == 3
 
 
-    policies[1].policy.policy.learner.approximator.table[11, :] .= 2
+    policies[1].policy.policy.policy.learner.approximator.table[11, :] .= 2
     exper.hook.hooks[1][2](PostEpisodeStage(), policies[1], exper.env)
     @test exper.hook.hooks[1][2].best_response_vector[state(env)] == 11
 end
@@ -316,8 +316,8 @@ end
     c_out = run(hyperparams; stop_on_convergence = false)
 
     # ensure that the policy is updated by the learner
-    @test sum(c_out.policy.agent_policies[1].policy.policy.learner.approximator.table .!= 0) != 0
-    @test sum(c_out.policy.agent_policies[2].policy.policy.learner.approximator.table .!= 0) != 0
+    @test sum(c_out.policy.agent_policies[1].policy.policy.policy.learner.approximator.table .!= 0) != 0
+    @test sum(c_out.policy.agent_policies[2].policy.policy.policy.learner.approximator.table .!= 0) != 0
     @test c_out.env.env.is_done[1]
     @test c_out.hook.agent_hooks[1][2].iterations_until_convergence == max_iter
     @test c_out.hook.agent_hooks[2][2].iterations_until_convergence == max_iter
@@ -326,8 +326,8 @@ end
     @test c_out.policy.agent_policies[1].policy.trajectory.container[:reward][1] .!= 0
     @test c_out.policy.agent_policies[2].policy.trajectory.container[:reward][1] .!= 0
 
-    @test c_out.policy.agent_policies[1].policy.policy.learner.approximator.table !=
-          c_out.policy.agent_policies[2].policy.policy.learner.approximator.table
+    @test c_out.policy.agent_policies[1].policy.policy.policy.learner.approximator.table !=
+          c_out.policy.agent_policies[2].policy.policy.policy.learner.approximator.table
     @test c_out.hook.agent_hooks[1][2].best_response_vector !=
           c_out.hook.agent_hooks[2][2].best_response_vector
 
