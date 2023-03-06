@@ -76,3 +76,9 @@ function update!(hook::TotalRewardPerEpisode, s::PostEpisodeStage, policy, env)
     return
 end
 
+
+function update!(hook::TotalRewardPerEpisode, s::PostActStage, policy, env)
+    hook(s, policy, env)
+    return
+end
+

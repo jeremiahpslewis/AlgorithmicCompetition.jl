@@ -166,7 +166,7 @@ end
     c_out = run(hyperparams; stop_on_convergence = false)
 
     # ensure that the policy is updated by the learner
-    @test sum(c_out.policy.agent_policies[1].policy.policy.learner.approximator.table .!= 0) != 0
+    @test sum(c_out.policy.agent_policies[1].policy.learner.approximator.table .!= 0) != 0
     @test length(reward(c_out.env.env)) == 2
     @test length(reward(c_out.env.env, 1)) == 1
 
