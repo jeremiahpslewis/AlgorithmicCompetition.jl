@@ -13,8 +13,8 @@ function MultiAgentHook(player_hook_pair::Pair...)
     agent_hooks = AbstractHook[]
 
     for pair in player_hook_pair
-        push!(agent_names, p.first)
-        push!(agent_hooks, p.second)
+        push!(agent_names, Symbol(pair.first))
+        push!(agent_hooks, pair.second)
     end
     MultiAgentHook(agent_names, agent_hooks)
 end
@@ -27,8 +27,8 @@ function (hook::MultiAgentHook)(
     env::AbstractEnv,
     args...,
 )
-    for (agent, policy) in m.agents
-        update!(hook.agent_hooks[agent], s, policy, env, args...)
+    for i in 1:length(m.agent_policies)
+        update!(hook.agent_hooks[i], s, m.agent_policies[i], env, args...)
     end
 
     return
