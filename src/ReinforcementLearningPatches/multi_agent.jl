@@ -9,8 +9,8 @@ struct NoOp end
 
 const NO_OP = NoOp()
 
-struct MultiAgentManager <: AbstractPolicy
-    agents::Dict{Any,Any}
+struct MultiAgentManager{K,V} <: AbstractPolicy
+    agents::Dict{K,V}
 end
 
 Base.getindex(A::MultiAgentManager, x) = getindex(A.agents, x)
@@ -24,8 +24,8 @@ environments of `SEQUENTIAL` style, agents which are not the current player will
 observe a dummy action of [`NO_OP`](@ref) in the `PreActStage`. For environments
 of `SIMULTANEOUS` style, please wrap it with [`SequentialEnv`](@ref) first.
 """
-MultiAgentManager(policies...) =
-    MultiAgentManager(Dict{Any,Any}(nameof(p) => p for p in policies))
+MultiAgentManager{K,V}(policies...) =
+    MultiAgentManager(Dict{K,V}(nameof(p) => p for p in policies))
 
 RLBase.prob(A::MultiAgentManager, env::AbstractEnv, args...) = prob(A[current_player(env)].policy, env, args...)
 

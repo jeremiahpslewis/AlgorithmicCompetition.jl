@@ -102,7 +102,7 @@ end
 
 function construct_profit_array(
     action_space::NTuple,
-    price_options,
+    price_options::SVector{15,Float32},
     profit_function,
     n_players::Int,
 )
