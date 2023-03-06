@@ -5,7 +5,7 @@ function InitMatrix(n_prices, n_state_space)
     return zeros(Float32, n_prices, n_state_space)
 end
 
-AIAPCPolicy(env::AIAPCEnv) = MultiAgentManager{Int,NamedPolicy}(
+AIAPCPolicy(env::AIAPCEnv) = MultiAgentManager(
     (
         NamedPolicy(p, Agent(
             QBasedPolicy(;

@@ -4,21 +4,31 @@ using ReinforcementLearningCore
     MultiAgentHook(player=>hook...)
 """
 struct MultiAgentHook
-    hooks::NamedTuple{AbstractHook}
+    agent_names::Vector{Symbol}
+    agent_hooks::Vector{AbstractHook}
 end
 
-MultiAgentHook(player_hook_pair::Pair...) = MultiAgentHook(NamedTuple{AbstractHook}(player_hook_pair))
+function MultiAgentHook(player_hook_pair::Pair...)
+    agent_names = Symbol[]
+    agent_hooks = AbstractHook[]
+
+    for pair in player_hook_pair
+        push!(agent_names, p.first)
+        push!(agent_hooks, p.second)
+    end
+    MultiAgentHook(agent_names, agent_hooks)
+end
 
 Base.getindex(h::MultiAgentHook, p) = getindex(h.hooks, p)
 
-function (hook::MultiAgentHook{K})(
+function (hook::MultiAgentHook)(
     s::AbstractStage,
-    m::MultiAgentManager{K},
+    m::MultiAgentManager,
     env::AbstractEnv,
     args...,
 ) where {K}
     for (agent, policy) in m.agents
-        update!(hook.hooks[agent], s, policy, env, args...)
+        update!(hook.agent_hooks[agent], s, policy, env, args...)
     end
 
     return
