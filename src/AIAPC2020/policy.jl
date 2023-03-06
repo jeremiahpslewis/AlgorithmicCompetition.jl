@@ -6,7 +6,7 @@ function InitMatrix(n_prices, n_state_space)
 end
 
 AIAPCPolicy(env::AIAPCEnv) = MultiAgentManager(
-    (
+    [(
         NamedPolicy(p, Agent(
             QBasedPolicy(;
                 learner = TDLearner(;
@@ -30,5 +30,5 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentManager(
         terminal=Bool => ()
         ), DummySampler()),
         )) for p in players(env)
-    )
+    )...]
 )
