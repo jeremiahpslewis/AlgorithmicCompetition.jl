@@ -43,7 +43,7 @@ end
 
 function RLBase.optimise!(A::MultiAgentManager)
     for agent in A.agent_policies
-        RLBase.optimise!(agent)
+        RLBase.optimise!(agent.policy)
     end
 end
 

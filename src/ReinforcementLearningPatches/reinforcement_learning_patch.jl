@@ -116,7 +116,9 @@ end
 
 # Patch for SequentialEnv: Hooks are not called for correct player
 function (hook::TotalRewardPerEpisode)(::PostActStage, agent, env::SequentialEnv)
-    hook.reward += reward(env, nameof(agent))
+    if current_player(env) == 1
+        hook.reward += reward(env, nameof(agent))
+    end
 end
 
 function run_fixed(x::Experiment)
