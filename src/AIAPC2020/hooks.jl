@@ -30,10 +30,12 @@ function update!(h::ConvergenceCheck, state_::Int16, best_action::Int, iter_conv
     if h.convergence_duration >= h.convergence_threshold
         h.is_converged = true
     end
+
+    return
 end
 
 
-function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env)
+function update!(h::ConvergenceCheck, ::PostEpisodeStage, policy, env)
     # Convergence is defined over argmax action for each state 
     # E.g. best / greedy action
     n_prices = env.env.n_prices
@@ -63,3 +65,14 @@ function AIAPCHook(env::AbstractEnv)
         )...,
     )
 end
+
+# Type should be s::AbstractStage, but didn't match the signature
+# update!(hook::TotalRewardPerEpisode, s, policy, env) = nothing
+update!(hook::AbstractHook, s::AbstractStage, policy, env) = nothing
+
+
+function update!(hook::TotalRewardPerEpisode, s::PostEpisodeStage, policy, env)
+    hook(s, policy, env)
+    return
+end
+

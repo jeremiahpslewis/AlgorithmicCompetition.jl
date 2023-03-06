@@ -3,22 +3,22 @@ using ReinforcementLearningCore
 """
     MultiAgentHook(player=>hook...)
 """
-struct MultiAgentHook{K}
-    hooks::Dict{K,AbstractHook}
+struct MultiAgentHook
+    hooks::NamedTuple{AbstractHook}
 end
 
-MultiAgentHook{K}(player_hook_pair::Pair...) where {K} = MultiAgentHook{K}(Dict{K, AbstractHook}(player_hook_pair...))
+MultiAgentHook(player_hook_pair::Pair...) = MultiAgentHook(NamedTuple{AbstractHook}(player_hook_pair))
 
 Base.getindex(h::MultiAgentHook, p) = getindex(h.hooks, p)
 
-function (hook::MultiAgentHook)(
+function (hook::MultiAgentHook{K})(
     s::AbstractStage,
-    m::MultiAgentManager,
+    m::MultiAgentManager{K},
     env::AbstractEnv,
     args...,
-)
-    for (p, h) in zip(values(m.agents), values(hook.hooks))
-        h(s, p, env, args...)
+) where {K}
+    for (agent, policy) in m.agents
+        update!(hook.hooks[agent], s, policy, env, args...)
     end
 
     return

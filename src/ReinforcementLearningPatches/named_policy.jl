@@ -10,12 +10,12 @@ using ReinforcementLearningTrajectories: Trajectory
 
 A policy wrapper to provide a name. Mostly used in multi-agent environments.
 """
-Base.@kwdef struct NamedPolicy{P,N} <: AbstractPolicy
-    name::N
+Base.@kwdef struct NamedPolicy{P} <: AbstractPolicy
+    name::Symbol
     policy::P
 end
 
-NamedPolicy((name, policy)) = NamedPolicy(name, policy)
+NamedPolicy((Symbol(name), policy)) = NamedPolicy(name, policy)
 
 functor(x::NamedPolicy) = (policy = x.policy,), y -> @set x.policy = y.policy
 
