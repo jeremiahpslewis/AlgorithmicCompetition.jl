@@ -8,7 +8,8 @@ using ReinforcementLearningCore:
     PostEpisodeStage,
     current_player,
     action_space,
-    EpsilonGreedyExplorer
+    EpsilonGreedyExplorer,
+    RandomPolicy
 using ReinforcementLearningEnvironments: SequentialEnv
 using ReinforcementLearningBase: test_interfaces!, test_runnable!
 import ReinforcementLearningCore
@@ -495,4 +496,10 @@ end
     )
 
     rmprocs(_procs)
+end
+
+@testset "multiagent manager" begin
+    multi_agent_manager_test = MultiAgentManager((NamedPolicy(1, RandomPolicy()), NamedPolicy(2, RandomPolicy())))
+    @test multi_agent_manager_test.agent_names isa Vector{Symbol}
+    @test multi_agent_manager_test.agent_policies isa Vector{AbstractPolicy}
 end

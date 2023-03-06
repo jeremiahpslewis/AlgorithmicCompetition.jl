@@ -25,16 +25,16 @@ environments of `SEQUENTIAL` style, agents which are not the current player will
 observe a dummy action of [`NO_OP`](@ref) in the `PreActStage`. For environments
 of `SIMULTANEOUS` style, please wrap it with [`SequentialEnv`](@ref) first.
 """
-function MultiAgentManager(policies...)
+function MultiAgentManager(policies)
     agent_names = Symbol[]
     agent_policies = AbstractPolicy[]
 
     for p in policies
-        push!(agent_policies, p)
-        push!(agent_names, nameof(p))
+        push!(agent_names, p.name)
+        push!(agent_policies, p.policy)
     end
 
-    return new(agent_names, agent_policies)
+    return MultiAgentManager(agent_names, agent_policies)
 end
 
 RLBase.prob(A::MultiAgentManager, env::AbstractEnv, args...) = prob(A[current_player(env)].policy, env, args...)

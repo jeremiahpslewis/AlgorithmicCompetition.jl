@@ -30,5 +30,5 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentManager(
         terminal=Bool => ()
         ), DummySampler()),
         )) for p in players(env)
-    )...,
+    )
 )

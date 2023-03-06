@@ -15,7 +15,9 @@ Base.@kwdef struct NamedPolicy{P} <: AbstractPolicy
     policy::P
 end
 
-NamedPolicy((Symbol(name), policy)) = NamedPolicy(name, policy)
+NamedPolicy((name, policy)) = NamedPolicy(Symbol(name), policy)
+
+NamedPolicy(name::Int, policy::AbstractPolicy) = NamedPolicy(Symbol(name), policy)
 
 functor(x::NamedPolicy) = (policy = x.policy,), y -> @set x.policy = y.policy
 
