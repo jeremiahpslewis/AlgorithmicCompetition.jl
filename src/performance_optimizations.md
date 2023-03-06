@@ -123,3 +123,13 @@ TODO:
 13.370 s (133014833 allocations: 5.99 GiB) # use state lookup
 13.594 s (133013911 allocations: 5.99 GiB) # EpsilonGreedyExplorer has almost no performance penalty vs GreedyExplorer
 # rework convergence logic, reduce env calls
+
+
+## Post RLCore refactor
+# 30 Jet warnings
+Convergence stop works |    7       1      8  1m51.0s
+run multiprocessing code | None  2m34.8s
+# 28 jet warnings
+
+Convergence stop works |    7       1      8  1m51.1s
+run multiprocessing code | None  2m51.7s

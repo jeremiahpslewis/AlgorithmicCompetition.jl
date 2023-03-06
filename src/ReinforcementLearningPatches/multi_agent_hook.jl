@@ -3,11 +3,11 @@ using ReinforcementLearningCore
 """
     MultiAgentHook(player=>hook...)
 """
-struct MultiAgentHook <: AbstractHook
-    hooks::Dict{Any,Any}
+struct MultiAgentHook{K}
+    hooks::Dict{K,AbstractHook}
 end
 
-MultiAgentHook(player_hook_pair::Pair...) = MultiAgentHook(Dict(player_hook_pair...))
+MultiAgentHook{K}(player_hook_pair::Pair...) where {K} = MultiAgentHook{K}(Dict{K, AbstractHook}(player_hook_pair...))
 
 Base.getindex(h::MultiAgentHook, p) = getindex(h.hooks, p)
 
@@ -20,4 +20,6 @@ function (hook::MultiAgentHook)(
     for (p, h) in zip(values(m.agents), values(hook.hooks))
         h(s, p, env, args...)
     end
+
+    return
 end

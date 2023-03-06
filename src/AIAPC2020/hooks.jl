@@ -54,7 +54,7 @@ end
 
 # TODO: Figure out why the hook results are identical for both players
 function AIAPCHook(env::AbstractEnv)
-    MultiAgentHook(
+    MultiAgentHook{Int}(
         (
             p => ComposedHook(
                 TotalRewardPerEpisode(; is_display_on_exit = false),
