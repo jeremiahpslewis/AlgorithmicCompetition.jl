@@ -6,7 +6,7 @@ function InitMatrix(n_prices, n_state_space)
 end
 
 AIAPCPolicy(env::AIAPCEnv) = MultiAgentPolicy(
-    (;
+    NamedTuple(
         p => Agent(
             QBasedPolicy(;
                 learner = TDLearner(;
