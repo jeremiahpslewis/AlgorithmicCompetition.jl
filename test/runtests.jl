@@ -135,7 +135,7 @@ end
     policy = AIAPCPolicy(env)
 
     # Test full policy exploration of states
-    @test sum(unique([policy(env) for i in 1:1e5])) == sum(1:env.n_prices)
+    @test sum(unique([policy[Symbol(1)](env) for i in 1:1e5])) == sum(1:env.n_prices)
 end
 
 @testset "run AIAPC full simulation" begin
