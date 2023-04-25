@@ -169,7 +169,7 @@ end
     c_out = run(hyperparams; stop_on_convergence = false)
 
     # ensure that the policy is updated by the learner
-    @test sum(c_out.policy.agent_policies[1].policy.policy.learner.approximator.table .!= 0) != 0
+    @test sum(c_out.policy[Symbol(1)].policy.policy.learner.approximator.table .!= 0) != 0
     @test length(reward(c_out.env)) == 2
     @test length(reward(c_out.env, 1)) == 1
 
@@ -319,18 +319,18 @@ end
     c_out = run(hyperparams; stop_on_convergence = false)
 
     # ensure that the policy is updated by the learner
-    @test sum(c_out.policy.agent_policies[1].policy.policy.learner.approximator.table .!= 0) != 0
-    @test sum(c_out.policy.agent_policies[2].policy.policy.learner.approximator.table .!= 0) != 0
+    @test sum(c_out.policy[Symbol(1)].policy.policy.learner.approximator.table .!= 0) != 0
+    @test sum(c_out.policy[Symbol(2)].policy.policy.learner.approximator.table .!= 0) != 0
     @test c_out.env.is_done[1]
     @test c_out.hook[Symbol(1)][2].iterations_until_convergence == max_iter
     @test c_out.hook[Symbol(2)][2].iterations_until_convergence == max_iter
 
 
-    @test c_out.policy.agent_policies[1].policy.trajectory.container[:reward][1] .!= 0
-    @test c_out.policy.agent_policies[2].policy.trajectory.container[:reward][1] .!= 0
+    @test c_out.policy[Symbol(1)].policy.trajectory.container[:reward][1] .!= 0
+    @test c_out.policy[Symbol(2)].policy.trajectory.container[:reward][1] .!= 0
 
-    @test c_out.policy.agent_policies[1].policy.policy.learner.approximator.table !=
-          c_out.policy.agent_policies[2].policy.policy.learner.approximator.table
+    @test c_out.policy[Symbol(1)].policy.policy.learner.approximator.table !=
+          c_out.policy[Symbol(2)].policy.policy.learner.approximator.table
     @test c_out.hook[Symbol(1)][2].best_response_vector !=
           c_out.hook[Symbol(2)][2].best_response_vector
 
@@ -411,8 +411,8 @@ end
         convergence_threshold = 10,
     )
     c_out = run(hyperparams; stop_on_convergence = false)
-    @test get_ϵ(c_out.policy.agent_policies[1].policy.policy.explorer) < 1e-4
-    @test get_ϵ(c_out.policy.agent_policies[2].policy.policy.explorer) < 1e-4
+    @test get_ϵ(c_out.policy[Symbol(1)].policy.policy.explorer) < 1e-4
+    @test get_ϵ(c_out.policy[Symbol(2)].policy.policy.explorer) < 1e-4
 
     hyperparams = AIAPCHyperParameters(
         α,
@@ -423,8 +423,8 @@ end
         convergence_threshold = 10,
     )
     c_out = run(hyperparams; stop_on_convergence = true)
-    @test 0.98 < get_ϵ(c_out.policy.agent_policies[1].policy.policy.explorer) < 1
-    @test 0.98 < get_ϵ(c_out.policy.agent_policies[2].policy.policy.explorer) < 1
+    @test 0.98 < get_ϵ(c_out.policy[Symbol(1)].policy.policy.explorer) < 1
+    @test 0.98 < get_ϵ(c_out.policy[Symbol(2)].policy.policy.explorer) < 1
 
     @test_broken c_out.hook[Symbol(2)][2].convergence_duration == 10
     @test c_out.hook[Symbol(2)][2].convergence_duration >= 0
@@ -462,7 +462,7 @@ end
     policies = env |> AIAPCPolicy
 
     convergence_hook = ConvergenceCheck(1)
-    AlgorithmicCompetition.update!(convergence_hook, PostEpisodeStage(), policies.agent_policies[1],env)
+    AlgorithmicCompetition.update!(convergence_hook, PostEpisodeStage(), policies[Symbol(1)],env)
     @test convergence_hook.convergence_duration == 0
     @test convergence_hook.iterations_until_convergence == 1
     @test convergence_hook.best_response_vector[1] == 1
@@ -470,7 +470,7 @@ end
 
     convergence_hook_1 = ConvergenceCheck(1)
     convergence_hook_1.best_response_vector = MVector{225,Int}(fill(1, 225))
-    AlgorithmicCompetition.update!(convergence_hook_1, PostEpisodeStage(), policies.agent_policies[1], env)
+    AlgorithmicCompetition.update!(convergence_hook_1, PostEpisodeStage(), policies[Symbol(1)], env)
 
     @test convergence_hook.iterations_until_convergence == 1
     @test convergence_hook.convergence_duration ∈ [0, 1]

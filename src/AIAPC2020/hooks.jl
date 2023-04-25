@@ -66,19 +66,19 @@ function AIAPCHook(env::AbstractEnv)
     )
 end
 
-# Type should be s::AbstractStage, but didn't match the signature
-# update!(hook::TotalRewardPerEpisode, s, policy, env) = nothing
-update!(hook::AbstractHook, s::AbstractStage, policy, env) = nothing
+# # Type should be s::AbstractStage, but didn't match the signature
+# # update!(hook::TotalRewardPerEpisode, s, policy, env) = nothing
+# update!(hook::AbstractHook, s::AbstractStage, policy, env) = nothing
 
 
-function update!(hook::TotalRewardPerEpisode, s::PostEpisodeStage, policy, env)
-    hook(s, policy, env)
-    return
-end
+# function update!(hook::TotalRewardPerEpisode, s::PostEpisodeStage, policy, env)
+#     hook(s, policy, env)
+#     return
+# end
 
 
-function update!(hook::TotalRewardPerEpisode, s::PostActStage, policy, env)
-    hook(s, policy, env)
-    return
-end
+# function update!(hook::TotalRewardPerEpisode, s::PostActStage, policy, env)
+#     hook(s, policy, env)
+#     return
+# end
 
