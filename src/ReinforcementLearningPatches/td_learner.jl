@@ -6,14 +6,14 @@ using ReinforcementLearningBase
 using ReinforcementLearningCore
 using ReinforcementLearningTrajectories: Trajectory
 
-Base.@kwdef struct TDLearner{A} <: AbstractLearner
+Base.@kwdef struct TDLearner{A,F<:AbstractFloat,I<:Integer} <: AbstractLearner
     approximator::A
-    γ::Float64 = 1.0
+    γ::F = 1.0
     method::Symbol
-    n::Int = 0
+    n::I = 0
 end
 
-(L::TDLearner)(env::AbstractEnv) = L.approximator(state(env))
+(L::TDLearner)(env::E) where {E <: AbstractEnv} = L.approximator(state(env))
 (L::TDLearner)(s) = L.approximator(s)
 (L::TDLearner)(s, a) = L.approximator(s, a)
 

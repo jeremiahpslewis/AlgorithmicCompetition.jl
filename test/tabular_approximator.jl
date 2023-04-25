@@ -1,6 +1,7 @@
 using Flux
 using AlgorithmicCompetition: TabularApproximator, TabularVApproximator, TabularQApproximator, TDLearner
 using ReinforcementLearningBase
+using ReinforcementLearningEnvironments
 using Test
 
 @testset "TabularApproximator" begin
@@ -33,16 +34,38 @@ end
 
 
 @testset "TDLearner" begin
+    env = TicTacToeEnv()
     td_learner = TDLearner(;
         # TabularQApproximator with specified init matrix
         approximator = TabularApproximator(
-            zeros(Float32, 10, 200),
+            zeros(Float32, length(action_space(env)), length(state_space(env))),
             Descent(0.125),
         ),
         method = :SARS,
         γ = 0.95,
         n = 0,
     )
+    @test td_learner(env) == zeros(Float32, action_space(env))
+    @test td_learner(10) == zeros(Float32, action_space(env))
+    @test td_learner(10, 1) == Float32(0)
 
-    
+    nt_ = (; state = [fill(2, 2)],
+        action = [fill(2, 2)],
+        reward = 0.31,
+        terminal = true
+    )
+
+    RLBase.optimise!(td_learner, nt_)
+    @test td_learner(2, 2) != 0
+
+    nt_1 = (; state = [fill(3, 3)],
+    action = [fill(3, 3)],
+    reward = 0.31,
+    terminal = true
+    )
+    RLBase.optimise!(td_learner, nt_1)
+    @test td_learner(3, 3) != 0
+
+    transition_ = (1,1,1.0,false,2)
+    @test RLBase.priority(td_learner, transition_) != 0
 end
