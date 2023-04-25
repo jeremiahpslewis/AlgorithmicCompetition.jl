@@ -857,10 +857,10 @@ uuid = "b14d175d-62b4-44ba-8fb7-3064adc8c3ec"
 version = "0.2.4"
 
 [[deps.KernelAbstractions]]
-deps = ["Adapt", "Atomix", "InteractiveUtils", "LinearAlgebra", "MacroTools", "SnoopPrecompile", "SparseArrays", "StaticArrays", "UUIDs", "UnsafeAtomics", "UnsafeAtomicsLLVM"]
-git-tree-sha1 = "976231af02176082fb266a9f96a59da51fcacf20"
+deps = ["Adapt", "Atomix", "InteractiveUtils", "LinearAlgebra", "MacroTools", "PrecompileTools", "SparseArrays", "StaticArrays", "UUIDs", "UnsafeAtomics", "UnsafeAtomicsLLVM"]
+git-tree-sha1 = "1e7e27a144936ed6f1b0a01dbc7b7f86afabeb6e"
 uuid = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
-version = "0.9.2"
+version = "0.9.3"
 
 [[deps.KernelDensity]]
 deps = ["Distributions", "DocStringExtensions", "FFTW", "Interpolations", "StatsBase"]
@@ -1451,7 +1451,7 @@ version = "0.11.0"
 
 [[deps.ReinforcementLearningCore]]
 deps = ["AbstractTrees", "Adapt", "CUDA", "ChainRulesCore", "CircularArrayBuffers", "Crayons", "Distributions", "FillArrays", "Flux", "Functors", "LinearAlgebra", "Parsers", "ProgressMeter", "Random", "Reexport", "ReinforcementLearningBase", "ReinforcementLearningTrajectories", "Statistics", "StatsBase", "UnicodePlots"]
-git-tree-sha1 = "c7bfe99e135512f8485399525e53eade64ead241"
+git-tree-sha1 = "c7e9a0a2cdc6bbf3329262a206945126348b2799"
 repo-rev = "multiplayer-proposal"
 repo-subdir = "src/ReinforcementLearningCore"
 repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"
@@ -1460,7 +1460,7 @@ version = "0.9.2"
 
 [[deps.ReinforcementLearningEnvironments]]
 deps = ["DelimitedFiles", "IntervalSets", "LinearAlgebra", "MacroTools", "Markdown", "Pkg", "Random", "ReinforcementLearningBase", "ReinforcementLearningCore", "Requires", "SparseArrays", "StatsBase"]
-git-tree-sha1 = "8a54cb3b36c28e467afefaab8c5c3b6c2c2682ef"
+git-tree-sha1 = "1245f2171df0f1ebfdd97742933f2cd3878ea20c"
 repo-rev = "multiplayer-proposal"
 repo-subdir = "src/ReinforcementLearningEnvironments"
 repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"

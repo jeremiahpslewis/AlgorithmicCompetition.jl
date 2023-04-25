@@ -1,6 +1,7 @@
 using Flux
-using AlgorithmicCompetition: TabularApproximator, TabularVApproximator, TabularQApproximator, TDLearner
-using ReinforcementLearningBase
+using AlgorithmicCompetition: TabularApproximator, TabularVApproximator, TabularQApproximator, TDLearner, QBasedPolicy
+import ReinforcementLearningBase: RLBase
+using ReinforcementLearningCore
 using ReinforcementLearningEnvironments
 using Test
 
@@ -38,15 +39,15 @@ end
     td_learner = TDLearner(;
         # TabularQApproximator with specified init matrix
         approximator = TabularApproximator(
-            zeros(Float32, length(action_space(env)), length(state_space(env))),
+            zeros(Float32, length(RLBase.action_space(env)), length(state_space(env))),
             Descent(0.125),
         ),
         method = :SARS,
         γ = 0.95,
         n = 0,
     )
-    @test td_learner(env) == zeros(Float32, action_space(env))
-    @test td_learner(10) == zeros(Float32, action_space(env))
+    @test td_learner(env) == zeros(Float32, RLBase.action_space(env))
+    @test td_learner(10) == zeros(Float32, RLBase.action_space(env))
     @test td_learner(10, 1) == Float32(0)
 
     nt_ = (; state = [fill(2, 2)],
@@ -68,4 +69,98 @@ end
 
     transition_ = (1,1,1.0,false,2)
     @test RLBase.priority(td_learner, transition_) != 0
+end
+
+@testset "QBasedPolicy" begin
+    env = TicTacToeEnv()
+
+    q_policy = QBasedPolicy(;
+        learner = TDLearner(;
+            # TabularQApproximator with specified init matrix
+            approximator = TabularApproximator(
+                zeros(Float32, length(RLBase.action_space(env)), length(RLBase.state_space(env))),
+                Descent(0.125),
+            ),
+            method = :SARS,
+            γ = 0.95,
+            n = 0,
+        ),
+        explorer = EpsilonGreedyExplorer(1, is_break_tie=true),
+    )
+    @test any([q_policy(env) != 1 for i in 1:10])
+
+    nt_ = (; state = [fill(2, 2)],
+        action = [fill(2, 2)],
+        reward = 0.31,
+        terminal = true
+    )
+    RLBase.optimise!(q_policy, nt_)
+    @test q_policy.learner(2,2) != 0
+end
+
+@testset "MultiAgentQBasedPolicy" begin
+    env = RockPaperScissorsEnv()
+    multi_q_policy = MultiAgentPolicy(
+        (; Symbol(1) => Agent(QBasedPolicy(;
+            learner = TDLearner(;
+                # TabularQApproximator with specified init matrix
+                approximator = TabularApproximator(
+                    zeros(Float32, length(RLBase.action_space(env)), length(RLBase.state_space(env))),
+                    Descent(0.125),
+                ),
+                method = :SARS,
+                γ = 0.95,
+                n = 0,
+            ),
+            explorer = EpsilonGreedyExplorer(1, is_break_tie=true),
+        ),
+        Trajectory(CircularArraySARTTraces(;
+            capacity=3,
+            state=Int16 => (225,),
+            action=Int8 => (15,),
+            reward=Float32 => (),
+            terminal=Bool => ()
+        ), DummySampler())
+        ),
+        Symbol(2) => Agent(QBasedPolicy(;
+            learner = TDLearner(;
+                # TabularQApproximator with specified init matrix
+                approximator = TabularApproximator(
+                    zeros(Float32, length(RLBase.action_space(env)), length(RLBase.state_space(env))),
+                    Descent(0.125),
+                ),
+                method = :SARS,
+                γ = 0.95,
+                n = 0,
+            ),
+            explorer = EpsilonGreedyExplorer(1, is_break_tie=true),
+        ),
+        Trajectory(CircularArraySARTTraces(;
+            capacity=3,
+            state=Int16 => (225,),
+            action=Int8 => (15,),
+            reward=Float32 => (),
+            terminal=Bool => ()
+        ), DummySampler())
+        ),
+        )
+    )
+
+    @test any([multi_q_policy[Symbol(1)](env) != 1 for i in 1:10])
+    @test any([multi_q_policy[Symbol(2)](env) != 1 for i in 1:10])
+    @test [[multi_q_policy(env)...] for i in 1:10] isa Vector
+
+    for i in 1:2
+        RLBase.reset!(env)
+        multi_q_policy(PreActStage(), env)
+        env(multi_q_policy(env))
+        RLCore.optimise!(multi_q_policy)
+        multi_q_policy(PostActStage(), env)
+    end
+
+    # TODO: Figure out why optimise! fails for MultiAgentPolicy
+    # RLBase.optimise!(multi_q_policy)
+    # RLCore.optimise!(multi_q_policy[Symbol(1)])
+    RLCore.optimise!(multi_q_policy[Symbol(1)].policy.learner, multi_q_policy[Symbol(1)].cache)
+    multi_q_policy.agents[Symbol(1)].policy.learner.approximator.table
 end
