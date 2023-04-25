@@ -179,9 +179,9 @@ end
 
 
     @test state(c_out.env) != 1
-    @test sum(c_out.hook.agent_hooks[1][2].best_response_vector == 0) == 0
-    @test c_out.hook.agent_hooks[1][2].best_response_vector !=
-          c_out.hook.agent_hooks[2][2].best_response_vector
+    @test sum(c_out.hook[Symbol(1)][2].best_response_vector == 0) == 0
+    @test c_out.hook[Symbol(1)][2].best_response_vector !=
+          c_out.hook[Symbol(2)][2].best_response_vector
 end
 
 @testset "Run a set of experiments." begin
@@ -242,13 +242,13 @@ end
     exper = Experiment(env)
     state(env)
     policies = env |> AIAPCPolicy
-    AlgorithmicCompetition.update!(exper.hook.agent_hooks[1][2], Int16(2), 3, false)
-    @test exper.hook.agent_hooks[1][2].best_response_vector[2] == 3
+    AlgorithmicCompetition.update!(exper.hook[Symbol(1)][2], Int16(2), 3, false)
+    @test exper.hook[Symbol(1)][2].best_response_vector[2] == 3
 
 
     policies[1].policy.policy.learner.approximator.table[11, :] .= 2
-    AlgorithmicCompetition.update!(exper.hook.agent_hooks[1][2], PostEpisodeStage(), policies[1], exper.env)
-    @test exper.hook.agent_hooks[1][2].best_response_vector[state(env)] == 11
+    AlgorithmicCompetition.update!(exper.hook[Symbol(1)][2], PostEpisodeStage(), policies[1], exper.env)
+    @test exper.hook[Symbol(1)][2].best_response_vector[state(env)] == 11
 end
 
 @testset "Profit array test" begin
@@ -322,8 +322,8 @@ end
     @test sum(c_out.policy.agent_policies[1].policy.policy.learner.approximator.table .!= 0) != 0
     @test sum(c_out.policy.agent_policies[2].policy.policy.learner.approximator.table .!= 0) != 0
     @test c_out.env.is_done[1]
-    @test c_out.hook.agent_hooks[1][2].iterations_until_convergence == max_iter
-    @test c_out.hook.agent_hooks[2][2].iterations_until_convergence == max_iter
+    @test c_out.hook[Symbol(1)][2].iterations_until_convergence == max_iter
+    @test c_out.hook[Symbol(2)][2].iterations_until_convergence == max_iter
 
 
     @test c_out.policy.agent_policies[1].policy.trajectory.container[:reward][1] .!= 0
@@ -331,20 +331,20 @@ end
 
     @test c_out.policy.agent_policies[1].policy.policy.learner.approximator.table !=
           c_out.policy.agent_policies[2].policy.policy.learner.approximator.table
-    @test c_out.hook.agent_hooks[1][2].best_response_vector !=
-          c_out.hook.agent_hooks[2][2].best_response_vector
+    @test c_out.hook[Symbol(1)][2].best_response_vector !=
+          c_out.hook[Symbol(2)][2].best_response_vector
 
 
     @test mean(
-        c_out.hook.agent_hooks[1][1].rewards[(end-2):end] .!=
-        c_out.hook.agent_hooks[2][1].rewards[(end-2):end],
+        c_out.hook[Symbol(1)][1].rewards[(end-2):end] .!=
+        c_out.hook[Symbol(2)][1].rewards[(end-2):end],
     ) >= 0.3
 
-    for i = 1:2
-        @test c_out.hook.agent_hooks[i][2].convergence_duration >= 0
-        @test c_out.hook.agent_hooks[i][2].is_converged
-        @test c_out.hook.agent_hooks[i][2].convergence_threshold == 1
-        @test sum(c_out.hook.agent_hooks[i][1].rewards .== 0) == 0
+    for i = [Symbol(1), Symbol(2)]
+        @test c_out.hook[i][2].convergence_duration >= 0
+        @test c_out.hook[i][2].is_converged
+        @test c_out.hook[i][2].convergence_threshold == 1
+        @test sum(c_out.hook[i][1].rewards .== 0) == 0
     end
 
     @test reward(c_out.env, 1) != 0
@@ -426,9 +426,9 @@ end
     @test 0.98 < get_ϵ(c_out.policy.agent_policies[1].policy.policy.explorer) < 1
     @test 0.98 < get_ϵ(c_out.policy.agent_policies[2].policy.policy.explorer) < 1
 
-    @test_broken c_out.hook.agent_hooks[2][2].convergence_duration == 10
-    @test c_out.hook.agent_hooks[2][2].convergence_duration >= 0
-    @test c_out.hook.agent_hooks[1][2].convergence_duration >= 0
+    @test_broken c_out.hook[Symbol(2)][2].convergence_duration == 10
+    @test c_out.hook[Symbol(2)][2].convergence_duration >= 0
+    @test c_out.hook[Symbol(1)][2].convergence_duration >= 0
     @test c_out.env.convergence_int[1] < max_iter
 end
 
