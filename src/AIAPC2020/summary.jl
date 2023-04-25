@@ -12,11 +12,11 @@ struct AIAPCSummary
 end
 
 function economic_summary(e::RLCore.Experiment)
-    convergence_threshold = e.env.env.convergence_threshold
+    convergence_threshold = e.env.convergence_threshold
     iterations_until_convergence = e.hook.agent_hooks[1][2].iterations_until_convergence
 
-    π_N = e.env.env.profit_function(fill(e.env.env.p_Bert_nash_equilibrium, 2))[1]
-    π_M = e.env.env.profit_function(fill(e.env.env.p_monop_opt, 2))[1]
+    π_N = e.env.profit_function(fill(e.env.p_Bert_nash_equilibrium, 2))[1]
+    π_M = e.env.profit_function(fill(e.env.p_monop_opt, 2))[1]
 
     avg_profit = Float32[]
     is_converged = Bool[]
@@ -30,8 +30,8 @@ function economic_summary(e::RLCore.Experiment)
     end
 
     return AIAPCSummary(
-        e.env.env.α,
-        e.env.env.β,
+        e.env.α,
+        e.env.β,
         is_converged,
         avg_profit,
         iterations_until_convergence,

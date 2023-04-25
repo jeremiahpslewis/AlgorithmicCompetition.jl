@@ -170,12 +170,12 @@ end
 
     # ensure that the policy is updated by the learner
     @test sum(c_out.policy.agent_policies[1].policy.policy.learner.approximator.table .!= 0) != 0
-    @test length(reward(c_out.env.env)) == 2
-    @test length(reward(c_out.env.env, 1)) == 1
+    @test length(reward(c_out.env)) == 2
+    @test length(reward(c_out.env, 1)) == 1
 
-    c_out.env.env.is_done[1] = false
-    @test reward(c_out.env.env) == [0, 0]
-    @test reward(c_out.env.env, 1) != 0
+    c_out.env.is_done[1] = false
+    @test reward(c_out.env) == [0, 0]
+    @test reward(c_out.env, 1) != 0
 
 
     @test state(c_out.env) != 1
@@ -321,7 +321,7 @@ end
     # ensure that the policy is updated by the learner
     @test sum(c_out.policy.agent_policies[1].policy.policy.learner.approximator.table .!= 0) != 0
     @test sum(c_out.policy.agent_policies[2].policy.policy.learner.approximator.table .!= 0) != 0
-    @test c_out.env.env.is_done[1]
+    @test c_out.env.is_done[1]
     @test c_out.hook.agent_hooks[1][2].iterations_until_convergence == max_iter
     @test c_out.hook.agent_hooks[2][2].iterations_until_convergence == max_iter
 
@@ -349,8 +349,8 @@ end
 
     @test reward(c_out.env, 1) != 0
     @test reward(c_out.env, 2) != 0
-    @test length(reward(c_out.env.env)) == 2
-    @test length(c_out.env.env.action_space) == 225
+    @test length(reward(c_out.env)) == 2
+    @test length(c_out.env.action_space) == 225
     @test length(reward(c_out.env)) == 1
 
 
@@ -429,7 +429,7 @@ end
     @test_broken c_out.hook.agent_hooks[2][2].convergence_duration == 10
     @test c_out.hook.agent_hooks[2][2].convergence_duration >= 0
     @test c_out.hook.agent_hooks[1][2].convergence_duration >= 0
-    @test c_out.env.env.convergence_int[1] < max_iter
+    @test c_out.env.convergence_int[1] < max_iter
 end
 
 @testset "EpsilonGreedy" begin

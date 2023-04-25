@@ -38,7 +38,7 @@ end
 function update!(h::ConvergenceCheck, ::PostEpisodeStage, policy, env)
     # Convergence is defined over argmax action for each state 
     # E.g. best / greedy action
-    n_prices = env.env.n_prices
+    n_prices = env.n_prices
 
     state_ = RLBase.state(env)
     best_action = argmax(@view policy.policy.policy.learner.approximator.table[:, state_])
@@ -48,7 +48,7 @@ function update!(h::ConvergenceCheck, ::PostEpisodeStage, policy, env)
 
     # If not 'finally' converged, then increment
     if ~h.is_converged
-        env.env.convergence_int[1] += 1
+        env.convergence_int[1] += 1
     end
 
     return
