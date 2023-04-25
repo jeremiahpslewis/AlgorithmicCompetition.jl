@@ -5,9 +5,9 @@ function InitMatrix(n_prices, n_state_space)
     return zeros(Float32, n_prices, n_state_space)
 end
 
-AIAPCPolicy(env::AIAPCEnv) = MultiAgentManager(
-    [(
-        NamedPolicy(p, Agent(
+AIAPCPolicy(env::AIAPCEnv) = MultiAgentPolicy(
+    (;
+        p => Agent(
             QBasedPolicy(;
                 learner = TDLearner(;
                     # TabularQApproximator with specified init matrix
@@ -29,6 +29,6 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentManager(
         reward=Float32 => (),
         terminal=Bool => ()
         ), DummySampler()),
-        )) for p in players(env)
-    )...]
+        ) for p in players(env)
+    )
 )
