@@ -57,12 +57,12 @@ end
 # TODO: Figure out why the hook results are identical for both players
 function AIAPCHook(env::AbstractEnv)
     MultiAgentHook(
-        (
+        NamedTuple(
             p => ComposedHook(
                 TotalRewardPerEpisode(; is_display_on_exit = false),
                 ConvergenceCheck(env.convergence_threshold),
             ) for p in players(env)
-        )...,
+        )
     )
 end
 
