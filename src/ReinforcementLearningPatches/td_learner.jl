@@ -22,7 +22,7 @@ function RLBase.optimise!(L::TDLearner, x)
 end
 
 function _optimise!(L::TDLearner, t)
-     S, A, R, T = (t[x][1] for x in SART)
+    S, A, R, T = (t[x][1] for x in SART)
     n, γ, Q = L.n, L.γ, L.approximator
     G = 0.0
     for i in 1:min(n + 1, length(R))
