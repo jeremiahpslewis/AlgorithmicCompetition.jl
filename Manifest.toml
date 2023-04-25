@@ -1432,7 +1432,7 @@ version = "1.2.2"
 
 [[deps.ReinforcementLearningBase]]
 deps = ["AbstractTrees", "CommonRLInterface", "CommonRLSpaces", "DomainSets", "Markdown", "Random", "Reexport", "Test"]
-git-tree-sha1 = "ab176c29a337f0c67122069863476ea89739babe"
+git-tree-sha1 = "2653736c85fcbe1cadab77e7b3fd0631d1996056"
 repo-rev = "multiplayer-proposal"
 repo-subdir = "src/ReinforcementLearningBase"
 repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"
@@ -1441,7 +1441,7 @@ version = "0.11.0"
 
 [[deps.ReinforcementLearningCore]]
 deps = ["AbstractTrees", "Adapt", "CUDA", "ChainRulesCore", "CircularArrayBuffers", "Crayons", "Distributions", "FillArrays", "Flux", "Functors", "LinearAlgebra", "Parsers", "ProgressMeter", "Random", "Reexport", "ReinforcementLearningBase", "ReinforcementLearningTrajectories", "Statistics", "StatsBase", "UnicodePlots"]
-git-tree-sha1 = "f72f31df4fc834764517a585e3ed78ca86af416d"
+git-tree-sha1 = "309fa858d829bb3525b26aa5062a3b5bbcb10f1f"
 repo-rev = "multiplayer-proposal"
 repo-subdir = "src/ReinforcementLearningCore"
 repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"

@@ -118,7 +118,7 @@ function construct_profit_array(
     return profit_array
 end
 
-RLBase.action_space(env::AIAPCEnv, ::Int) = env.price_index # Choice of price
+RLBase.action_space(env::AIAPCEnv, ::Symbol) = env.price_index # Choice of price
 
 RLBase.action_space(env::AIAPCEnv, ::SimultaneousPlayer) = env.action_space
 
@@ -150,7 +150,7 @@ function RLBase.reset!(env::AIAPCEnv)
     env.is_done[1] = false
 end
 
-RLBase.players(::AIAPCEnv) = (1, 2)
+RLBase.players(::AIAPCEnv) = (Symbol(1), Symbol(2))
 RLBase.current_player(::AIAPCEnv) = SIMULTANEOUS_PLAYER
 RLBase.NumAgentStyle(::AIAPCEnv) = MultiAgent(2)
 RLBase.DynamicStyle(::AIAPCEnv) = SIMULTANEOUS
