@@ -9,7 +9,6 @@ using ReinforcementLearningCore:
     current_player,
     action_space,
     EpsilonGreedyExplorer
-using ReinforcementLearningEnvironments: SequentialEnv
 using ReinforcementLearningBase: test_interfaces!, test_runnable!
 import ReinforcementLearningCore
 using StaticArrays

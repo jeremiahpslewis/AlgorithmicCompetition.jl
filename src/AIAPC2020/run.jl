@@ -5,7 +5,7 @@ using Distributed
 function Experiment(env::AIAPCEnv; stop_on_convergence = true)
     RLCore.Experiment(
         AIAPCPolicy(env),
-        SequentialEnv(env),
+        env,
         AIAPCStop(env; stop_on_convergence = stop_on_convergence),
         AIAPCHook(env),
     )

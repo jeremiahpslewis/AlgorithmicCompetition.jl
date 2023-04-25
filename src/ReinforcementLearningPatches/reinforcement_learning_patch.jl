@@ -55,26 +55,6 @@ Base.convert(::Type{Union{AlgorithmicCompetition.NoOp, Int8}}, a::Int64) = Int8(
 # end
 
 
-# function RLBase.optimise!(
-#     trajectory::VectorSARTTrajectory,
-#     policy::NamedPolicy,
-#     env::SequentialEnv,
-#     ::PostActStage,
-# )
-#     if env.current_player_idx == 1
-#         r = policy isa NamedPolicy ? reward(env.env, nameof(policy)) : reward(env)
-#         push!(trajectory[:reward], r)
-#         push!(trajectory[:terminal], is_terminated(env))
-#     end
-# end
-
-# Fix NoOp issue for sequential environments
-function (agent::Agent)(
-    stage::PreActStage,
-    env::SequentialEnv,
-    action::NoOp,
-) end
-
 # Epsilon Greedy Explorer for AIAPC Zoo
 # Note: get_ϵ function in RLCore takes: 600.045 ns (6 allocations: 192 bytes)
 # This one has: 59.003 ns (1 allocation: 16 bytes)
@@ -114,13 +94,6 @@ end
 # TODO: Fix mask code to work with subarray types?
 (s::AIAPCEpsilonGreedyExplorer{<:Any})(values, mask) = (s::AIAPCEpsilonGreedyExplorer{<:Any})(values)
 
-# Patch for SequentialEnv: Hooks are not called for correct player
-function (hook::TotalRewardPerEpisode)(::PostActStage, agent, env::SequentialEnv)
-    if current_player(env) == 1
-        hook.reward += reward(env, nameof(agent))
-    end
-end
-
 function run_fixed(x::Experiment)
     run_fixed(x.policy, x.env, x.stop_condition, x.hook)
     return x
@@ -137,9 +110,3 @@ end
 RLBase.optimise!(p::QBasedPolicy, x::CircularArraySARTTraces) = optimise!(p.learner, x)
 
 const SART = (:state, :action, :reward, :terminal)
-
-
-## SequentialEnv patch
-function (agent::Agent)(::PostActStage, env::SequentialEnv)
-    agent.cache = (agent.cache..., reward=reward(env.env, current_player(env)), terminal=is_terminated(env))
-end

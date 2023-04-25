@@ -10,8 +10,7 @@ using ReinforcementLearningCore:
     action_space,
     EpsilonGreedyExplorer,
     RandomPolicy
-using ReinforcementLearningEnvironments: SequentialEnv
-using ReinforcementLearningBase: test_interfaces!, test_runnable!
+using ReinforcementLearningBase: test_interfaces!, test_runnable!, AbstractPolicy
 import ReinforcementLearningCore
 using StaticArrays
 using Statistics
@@ -133,11 +132,10 @@ end
         convergence_threshold = 1,
     )
     env = AIAPCEnv(hyperparams)
-    seq_env = env |> SequentialEnv
     policy = AIAPCPolicy(env)
 
     # Test full policy exploration of states
-    @test sum(unique([policy(seq_env) for i in 1:1e5])) == sum(1:env.n_prices)
+    @test sum(unique([policy(env) for i in 1:1e5])) == sum(1:env.n_prices)
 end
 
 @testset "run AIAPC full simulation" begin
@@ -376,13 +374,13 @@ end
         convergence_threshold = 1,
     )
 
-    seq_env = AIAPCEnv(hyperparams) |> SequentialEnv
-    @test current_player(seq_env) == 1
-    @test action_space(seq_env) == 1:15
-    @test reward(seq_env) != 0 # reward reflects outcomes of last play (which happens at player = 1, e.g. before any actions chosen)
-    seq_env(5)
-    @test current_player(seq_env) == 2
-    @test reward(seq_env) == 0 # reward is zero as at least one player has already played (technically sequental plays)
+    env = AIAPCEnv(hyperparams)
+    @test current_player(env) == 1
+    @test action_space(env) == 1:15
+    @test reward(env) != 0 # reward reflects outcomes of last play (which happens at player = 1, e.g. before any actions chosen)
+    env(5)
+    @test current_player(env) == 2
+    @test reward(env) == 0 # reward is zero as at least one player has already played (technically sequental plays)
 end
 
 @testset "Convergence stop works" begin
@@ -459,7 +457,7 @@ end
     policies = env |> AIAPCPolicy
 
     convergence_hook = ConvergenceCheck(1)
-    convergence_hook(PostEpisodeStage(), policies.agent_policies[1], SequentialEnv(env))
+    AlgorithmicCompetition.update!(convergence_hook, PostEpisodeStage(), policies.agent_policies[1],env)
     @test convergence_hook.convergence_duration == 0
     @test convergence_hook.iterations_until_convergence == 1
     @test convergence_hook.best_response_vector[1] == 1
@@ -467,7 +465,7 @@ end
 
     convergence_hook_1 = ConvergenceCheck(1)
     convergence_hook_1.best_response_vector = MVector{225,Int}(fill(1, 225))
-    convergence_hook_1(PostEpisodeStage(), policies.agents[1], SequentialEnv(env))
+    AlgorithmicCompetition.update!(convergence_hook_1, PostEpisodeStage(), policies.agent_policies[1], env)
 
     @test convergence_hook.iterations_until_convergence == 1
     @test convergence_hook.convergence_duration ∈ [0, 1]

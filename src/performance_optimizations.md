@@ -138,3 +138,4 @@ run multiprocessing code | None  2m51.7s
 Convergence stop works |    7       1      8  1m49.5s
 run multiprocessing code | None  2m29.3s
 
+Convergence stop works |    7       1      8  6m27.4s

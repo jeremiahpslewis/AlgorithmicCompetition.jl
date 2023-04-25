@@ -9,7 +9,6 @@ using ReinforcementLearningCore:
     current_player,
     action_space,
     EpsilonGreedyExplorer
-using ReinforcementLearningEnvironments: SequentialEnv
 using ReinforcementLearningBase: test_interfaces!, test_runnable!
 import ReinforcementLearningCore
 using StaticArrays
@@ -41,6 +40,7 @@ using AlgorithmicCompetition:
     AIAPCSummary,
     TDLearner
 using Distributed
+using JET
 
 α = Float32(0.125)
 β = Float32(1e-5)
@@ -65,4 +65,4 @@ hyperparams = AIAPCHyperParameters(
 )
 
 
-c_out = run(hyperparams; stop_on_convergence = false)
+@report_opt run(hyperparams; stop_on_convergence = false)

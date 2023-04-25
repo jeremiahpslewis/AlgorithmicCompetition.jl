@@ -78,7 +78,7 @@ end
 
 function (env::AIAPCEnv)((p_1, p_2))
     # TODO: Fix support for longer memories
-    env.memory .= (p_1, p_2)
+    env.memory .= Tuple{Float32, Float32}(p_1, p_2)
     env.is_done[1] = true
 end
 
