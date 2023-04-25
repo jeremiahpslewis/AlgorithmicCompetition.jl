@@ -29,7 +29,7 @@ using Random
 
 # Fudge an issue with non Int64 Ints in RL.jl
 using Base
-Base.convert(::Type{Union{AlgorithmicCompetition.NoOp, Int8}}, a::Int64) = Int8(a)
+Base.convert(::Type{Int8}, a::Int64) = Int8(a)
 
 ### Patch modified from https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/v0.10.1/src/ReinforcementLearningCore/src/policies/q_based_policies/learners/approximators/tabular_approximator.jl
 ### To support smaller ints / floats
