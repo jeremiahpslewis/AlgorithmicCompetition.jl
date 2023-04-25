@@ -54,3 +54,9 @@ function RLBase.optimise!(app::TabularQApproximator, correction::Pair{Int,Vector
     x = @view app.table[:, s]
     Flux.Optimise.update!(app.optimizer, x, errors)
 end
+
+function (p::QBasedPolicy)(env::E, player::Symbol) where {E<:AbstractEnv}
+    legal_action_space_ = RLBase.legal_action_space(env, player)
+    return p.explorer(p.learner(env), legal_action_space_)
+end
+

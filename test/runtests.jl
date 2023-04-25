@@ -9,7 +9,8 @@ using ReinforcementLearningCore:
     current_player,
     action_space,
     EpsilonGreedyExplorer,
-    RandomPolicy
+    RandomPolicy,
+    PreActStage
 using ReinforcementLearningBase: test_interfaces!, test_runnable!, AbstractPolicy
 import ReinforcementLearningCore
 using StaticArrays
@@ -135,7 +136,11 @@ end
     policy = AIAPCPolicy(env)
 
     # Test full policy exploration of states
-    @test sum(unique([policy[Symbol(1)](env) for i in 1:1e5])) == sum(1:env.n_prices)
+    policy(PreActStage(), env)
+    n_ = Int(1e5)
+    policy_runs = [[policy(env)...] for i in 1:n_]
+    checksum_ = [sum(unique(policy_runs[j][i] for j in 1:n_)) for i in 1:2]
+    @test all(checksum_ .== sum(1:env.n_prices))
 end
 
 @testset "run AIAPC full simulation" begin
