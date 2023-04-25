@@ -6,10 +6,9 @@ using Test
 @testset "TabularApproximator" begin
     n_state = 200
     n_action = 10
-    table_q = zeros(Float32, n_action, n_state)
-
     optimizer_ = Descent(0.125)
 
+    table_q = zeros(Float32, n_action, n_state)
     tabular_q_approx = TabularApproximator(table_q, Descent(0.125))
     @test tabular_q_approx.table == table_q
     @test tabular_q_approx.optimizer isa Descent
@@ -33,14 +32,17 @@ using Test
 end
 
 
+@testset "TDLearner" begin
+    td_learner = TDLearner(;
+        # TabularQApproximator with specified init matrix
+        approximator = TabularApproximator(
+            zeros(Float32, 10, 200),
+            Descent(0.125),
+        ),
+        method = :SARS,
+        γ = 0.95,
+        n = 0,
+    )
 
-TDLearner(;
-    # TabularQApproximator with specified init matrix
-    approximator = TabularApproximator(
-        zeros(Float32, 10, 200),
-        Descent(0.125),
-    ),
-    method = :SARS,
-    γ = 0.95,
-    n = 0,
-)
+    
+end
