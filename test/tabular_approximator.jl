@@ -146,9 +146,15 @@ end
         )
     )
 
+    multi_q_policy(PreActStage(), env)
+    env(multi_q_policy(env))
+    multi_q_policy(PostActStage(), env)
+
     @test any([multi_q_policy[Symbol(1)](env) != 1 for i in 1:10])
     @test any([multi_q_policy[Symbol(2)](env) != 1 for i in 1:10])
-    @test [[multi_q_policy(env)...] for i in 1:10] isa Vector
+    @test any([multi_q_policy[Symbol(1)](env) != 1 for i in 1:10])
+    @test any([multi_q_policy[Symbol(2)](env) != 1 for i in 1:10])
+    @test all([length([multi_q_policy(env)...]) for i in 1:10] .== 2)
 
     for i in 1:2
         RLBase.reset!(env)
@@ -158,9 +164,6 @@ end
         multi_q_policy(PostActStage(), env)
     end
 
-    # TODO: Figure out why optimise! fails for MultiAgentPolicy
-    # RLBase.optimise!(multi_q_policy)
-    # RLCore.optimise!(multi_q_policy[Symbol(1)])
-    RLCore.optimise!(multi_q_policy[Symbol(1)].policy.learner, multi_q_policy[Symbol(1)].cache)
-    multi_q_policy.agents[Symbol(1)].policy.learner.approximator.table
+    @test any(multi_q_policy.agents[Symbol(1)].policy.learner.approximator.table .!= 0)
+    @test any(multi_q_policy.agents[Symbol(2)].policy.learner.approximator.table .!= 0)
 end

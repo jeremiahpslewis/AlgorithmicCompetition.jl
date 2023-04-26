@@ -242,12 +242,12 @@ end
     exper = Experiment(env)
     state(env)
     policies = env |> AIAPCPolicy
-    AlgorithmicCompetition.update!(exper.hook[Symbol(1)][2], Int16(2), 3, false)
+    exper.hook[Symbol(1)][2](Int16(2), 3, false)
     @test exper.hook[Symbol(1)][2].best_response_vector[2] == 3
 
 
     policies[1].policy.learner.approximator.table[11, :] .= 2
-    AlgorithmicCompetition.update!(exper.hook[Symbol(1)][2], PostEpisodeStage(), policies[1], exper.env)
+    exper.hook[Symbol(1)][2](PostEpisodeStage(), policies[1], exper.env)
     @test exper.hook[Symbol(1)][2].best_response_vector[state(env)] == 11
 end
 
@@ -462,7 +462,7 @@ end
     policies = env |> AIAPCPolicy
 
     convergence_hook = ConvergenceCheck(1)
-    AlgorithmicCompetition.update!(convergence_hook, PostEpisodeStage(), policies[Symbol(1)],env)
+    convergence_hook(PostEpisodeStage(), policies[Symbol(1)],env)
     @test convergence_hook.convergence_duration == 0
     @test convergence_hook.iterations_until_convergence == 1
     @test convergence_hook.best_response_vector[1] == 1
@@ -470,7 +470,7 @@ end
 
     convergence_hook_1 = ConvergenceCheck(1)
     convergence_hook_1.best_response_vector = MVector{225,Int}(fill(1, 225))
-    AlgorithmicCompetition.update!(convergence_hook_1, PostEpisodeStage(), policies[Symbol(1)], env)
+    convergence_hook_1(PostEpisodeStage(), policies[Symbol(1)], env)
 
     @test convergence_hook.iterations_until_convergence == 1
     @test convergence_hook.convergence_duration ∈ [0, 1]

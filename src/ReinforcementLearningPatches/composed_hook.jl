@@ -10,9 +10,9 @@ struct ComposedHook{T<:Tuple} <: AbstractHook
     ComposedHook(hooks...) = new{typeof(hooks)}(hooks)
 end
 
-function update!(hook::ComposedHook, stage::AbstractStage, args...; kw...)
+function (hook::ComposedHook)(stage::AbstractStage, args...; kw...)
     for h in hook.hooks
-        update!(h, stage, args...; kw...)
+        h(stage, args...; kw...)
     end
     return
 end
