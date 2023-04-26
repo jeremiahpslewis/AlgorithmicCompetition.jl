@@ -78,7 +78,7 @@ end
 
 function (env::AIAPCEnv)((p_1, p_2))
     # TODO: Fix support for longer memories
-    env.memory .= Tuple{Int8, Int8}((p_1, p_2))
+    env.memory .= [p_1, p_2]
     env.is_done[1] = true
 end
 

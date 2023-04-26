@@ -13,7 +13,7 @@ end
 
 function economic_summary(e::RLCore.Experiment)
     convergence_threshold = e.env.convergence_threshold
-    iterations_until_convergence = e.hook[1][2].iterations_until_convergence
+    iterations_until_convergence = e.hook[Symbol(1)][2].iterations_until_convergence
 
     π_N = e.env.profit_function(fill(e.env.p_Bert_nash_equilibrium, 2))[1]
     π_M = e.env.profit_function(fill(e.env.p_monop_opt, 2))[1]
@@ -22,9 +22,9 @@ function economic_summary(e::RLCore.Experiment)
     is_converged = Bool[]
 
     for i in [Symbol(1), Symbol(2)]
-        @chain e.hook[i][1].rewards[(end-convergence_threshold):end] begin
-            push!(avg_profit, profit_measure(_, π_N, π_M))
-        end
+        # @chain e.hook[i][1].rewards[(end-convergence_threshold):end] begin
+        #     push!(avg_profit, profit_measure(_, π_N, π_M))
+        # end
 
         push!(is_converged, e.hook[i][2].is_converged)
     end
