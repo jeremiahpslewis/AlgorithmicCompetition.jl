@@ -22,8 +22,7 @@ end
 function run(hyperparameters::AIAPCHyperParameters; stop_on_convergence = true)
     env = AIAPCEnv(hyperparameters)
     experiment = Experiment(env; stop_on_convergence = stop_on_convergence)
-    run_fixed(experiment)
-    return experiment
+    return run(experiment)
 end
 
 function run_and_extract(hyperparameters::AIAPCHyperParameters; stop_on_convergence = true)

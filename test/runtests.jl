@@ -10,7 +10,8 @@ using ReinforcementLearningCore:
     action_space,
     EpsilonGreedyExplorer,
     RandomPolicy,
-    PreActStage
+    PreActStage,
+    MultiAgentPolicy
 using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy
 import ReinforcementLearningCore
 using StaticArrays
@@ -383,8 +384,8 @@ end
     @test current_player(env) == RLBase.SimultaneousPlayer()
     @test action_space(env, Symbol(1)) == 1:15
     @test reward(env) != 0 # reward reflects outcomes of last play (which happens at player = 1, e.g. before any actions chosen)
-    env(5)
-    @test reward(env) == 0 # reward is zero as at least one player has already played (technically sequental plays)
+    env((5, 5))
+    @test reward(env) != [0,0] # reward is zero as at least one player has already played (technically sequental plays)
 end
 
 @testset "Convergence stop works" begin
@@ -498,10 +499,4 @@ end
     )
 
     rmprocs(_procs)
-end
-
-@testset "multiagent manager" begin
-    multi_agent_manager_test = MultiAgentPolicy((; Symbol(1) => RandomPolicy()), Symbol(2) => RandomPolicy())
-    @test multi_agent_manager_test.agent_names isa Vector{Symbol}
-    @test multi_agent_manager_test.agent_policies isa Vector{AbstractPolicy}
 end

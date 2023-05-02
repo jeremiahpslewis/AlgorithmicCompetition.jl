@@ -94,18 +94,6 @@ end
 # TODO: Fix mask code to work with subarray types?
 (s::AIAPCEpsilonGreedyExplorer{<:Any})(values, mask) = (s::AIAPCEpsilonGreedyExplorer{<:Any})(values)
 
-function run_fixed(x::Experiment)
-    run_fixed(x.policy, x.env, x.stop_condition, x.hook)
-    return x
-end
-
-function run_fixed(policy::AbstractPolicy,
-    env::AbstractEnv,
-    stop::ComposedStopCondition,
-    hook::MultiAgentHook)
-    Base.run(policy, env, stop, hook)
-end
-
 # Patch for QBasedPolicy, not sure why NamedTuple dispatch is not working
 RLBase.optimise!(p::QBasedPolicy, x::CircularArraySARTTraces) = optimise!(p.learner, x)
 
