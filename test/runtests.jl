@@ -462,7 +462,7 @@ end
     policies = env |> AIAPCPolicy
 
     convergence_hook = ConvergenceCheck(1)
-    convergence_hook(PostEpisodeStage(), policies[Symbol(1)],env)
+    convergence_hook(PostEpisodeStage(), policies[Symbol(1)], env, :player_1)
     @test convergence_hook.convergence_duration == 0
     @test convergence_hook.iterations_until_convergence == 1
     @test convergence_hook.best_response_vector[1] == 1
@@ -470,7 +470,7 @@ end
 
     convergence_hook_1 = ConvergenceCheck(1)
     convergence_hook_1.best_response_vector = MVector{225,Int}(fill(1, 225))
-    convergence_hook_1(PostEpisodeStage(), policies[Symbol(1)], env)
+    convergence_hook_1(PostEpisodeStage(), policies[Symbol(1)], env, :player_1)
 
     @test convergence_hook.iterations_until_convergence == 1
     @test convergence_hook.convergence_duration ∈ [0, 1]
