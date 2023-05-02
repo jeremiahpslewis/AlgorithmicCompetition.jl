@@ -1,6 +1,7 @@
 using ReinforcementLearningCore
 using ReinforcementLearningEnvironments
 using Distributed
+import Base
 
 function Experiment(env::AIAPCEnv; stop_on_convergence = true)
     RLCore.Experiment(
@@ -11,7 +12,7 @@ function Experiment(env::AIAPCEnv; stop_on_convergence = true)
     )
 end
 
-function run(experiments::Vector{ReinforcementLearningCore.Experiment})
+function Base.run(experiments::Vector{ReinforcementLearningCore.Experiment})
     sendto(workers(), experiments = experiments)
     status = pmap(1:length(experiments)) do i
         Base.run(experiments[i])
@@ -19,7 +20,7 @@ function run(experiments::Vector{ReinforcementLearningCore.Experiment})
     end
 end
 
-function run(hyperparameters::AIAPCHyperParameters; stop_on_convergence = true)
+function Base.run(hyperparameters::AIAPCHyperParameters; stop_on_convergence = true)
     env = AIAPCEnv(hyperparameters)
     experiment = Experiment(env; stop_on_convergence = stop_on_convergence)
     return run(experiment)
