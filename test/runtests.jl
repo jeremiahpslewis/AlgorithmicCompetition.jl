@@ -243,12 +243,12 @@ end
     exper = Experiment(env)
     state(env)
     policies = env |> AIAPCPolicy
-    exper.hook[Symbol(1)][2](Int16(2), 3, false)
+    exper.hook[Symbol(1)][2](Int16(2), 3, false, :p1)
     @test exper.hook[Symbol(1)][2].best_response_vector[2] == 3
 
 
     policies[Symbol(1)].policy.learner.approximator.table[11, :] .= 2
-    exper.hook[Symbol(1)][2](PostEpisodeStage(), policies[Symbol(1)], exper.env)
+    exper.hook[Symbol(1)][2](PostEpisodeStage(), policies[Symbol(1)], exper.env, :p1)
     @test exper.hook[Symbol(1)][2].best_response_vector[state(env)] == 11
 end
 
