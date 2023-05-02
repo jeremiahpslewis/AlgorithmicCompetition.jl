@@ -76,9 +76,9 @@ struct AIAPCEnv <: AbstractEnv
     end
 end
 
-function (env::AIAPCEnv)((p_1, p_2))
+function (env::AIAPCEnv)(price_tuple)
     # TODO: Fix support for longer memories
-    env.memory .= [p_1, p_2]
+    env.memory .= price_tuple
     env.is_done[1] = true
 end
 
@@ -135,7 +135,8 @@ function RLBase.reward(env::AIAPCEnv, p::Int)
 end
 
 
-player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
+const player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
+
 RLBase.reward(env::AIAPCEnv, p::Symbol) = reward(env, player_lookup[p])
 
 RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
