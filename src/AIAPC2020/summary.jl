@@ -22,9 +22,9 @@ function economic_summary(e::RLCore.Experiment)
     is_converged = Bool[]
 
     for i in [Symbol(1), Symbol(2)]
-        # @chain e.hook[i][1].rewards[(end-convergence_threshold):end] begin
-        #     push!(avg_profit, profit_measure(_, π_N, π_M))
-        # end
+        @chain e.hook[i][1].rewards[(end-convergence_threshold):end] begin
+            push!(avg_profit, profit_measure(_, π_N, π_M))
+        end
 
         push!(is_converged, e.hook[i][2].is_converged)
     end

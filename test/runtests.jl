@@ -211,8 +211,8 @@ end
 
     @test experiments[1] isa AIAPCSummary
     @test 10 < experiments[1].iterations_until_convergence < max_iter  
-    # @test (sum(experiments[1].avg_profit .> 1) + sum(experiments[1].avg_profit .< 0)) == 0
-    # @test experiments[1].avg_profit[1] != experiments[1].avg_profit[2]
+    @test (sum(experiments[1].avg_profit .> 1) + sum(experiments[1].avg_profit .< 0)) == 0
+    @test experiments[1].avg_profit[1] != experiments[1].avg_profit[2]
     @test all(experiments[1].is_converged)
 end
 
