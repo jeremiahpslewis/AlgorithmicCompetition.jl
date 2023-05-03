@@ -144,7 +144,7 @@ end
     @test all(checksum_ .== sum(1:env.n_prices))
 end
 
-@testset "run AIAPC full simulation" begin
+@testset "run full AIAPC simulation" begin
     α = Float32(0.125)
     β = Float32(1e-5)
     δ = 0.95
@@ -430,7 +430,7 @@ end
     @test_broken c_out.hook[Symbol(2)][2].convergence_duration == 10
     @test c_out.hook[Symbol(2)][2].convergence_duration >= 0
     @test c_out.hook[Symbol(1)][2].convergence_duration >= 0
-    @test c_out.env.convergence_tuple[:1] < max_iter
+    @test c_out.env.convergence_dict[:1] < max_iter
 end
 
 @testset "EpsilonGreedy" begin
