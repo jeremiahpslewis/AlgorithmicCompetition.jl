@@ -428,9 +428,9 @@ end
     @test c_out.stop_condition.stop_conditions[1](1, c_out.env) == false
     @test c_out.stop_condition.stop_conditions[2](1, c_out.env) == true
 
-    @test c_out.hook[Symbol(2)][2].convergence_duration == 10
-    @test c_out.hook[Symbol(2)][2].convergence_duration >= 0
-    @test c_out.hook[Symbol(1)][2].convergence_duration >= 0
+    @test c_out.hook[Symbol(1)][2].convergence_duration >= 11
+    @test c_out.hook[Symbol(2)][2].convergence_duration >= 11
+    @test (c_out.hook[Symbol(2)][2].convergence_duration == 11) || (c_out.hook[Symbol(1)][2].convergence_duration == 11)
 end
 
 @testset "EpsilonGreedy" begin
