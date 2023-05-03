@@ -414,6 +414,7 @@ end
     @test get_ϵ(c_out.policy[Symbol(1)].policy.explorer) < 1e-4
     @test get_ϵ(c_out.policy[Symbol(2)].policy.explorer) < 1e-4
 
+    max_iter = Int(1e7)
     hyperparams = AIAPCHyperParameters(
         α,
         β,
@@ -429,7 +430,7 @@ end
     @test_broken c_out.hook[Symbol(2)][2].convergence_duration == 10
     @test c_out.hook[Symbol(2)][2].convergence_duration >= 0
     @test c_out.hook[Symbol(1)][2].convergence_duration >= 0
-    @test c_out.env.convergence_int[1] < max_iter
+    @test c_out.env.convergence_tuple[:1] < max_iter
 end
 
 @testset "EpsilonGreedy" begin

@@ -24,7 +24,7 @@ struct AIAPCEnv <: AbstractEnv
     state_space::Base.OneTo{Int16}
     state_space_lookup::Array{Int16,2}
     memory::MVector{2,Int}
-    convergence_int::MVector{1,Int}
+    convergence_tuple::NamedTuple{(Symbol("1"), Symbol("2")), Tuple{Int64, Int64}}
     is_done::MVector{1,Bool}
     p_Bert_nash_equilibrium::Float32
     p_monop_opt::Float32
@@ -66,7 +66,7 @@ struct AIAPCEnv <: AbstractEnv
             state_space,
             state_space_lookup,
             MVector{2,Int}(ones(Int, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
-            MVector{1,Int}([0]), # Convergence counter
+            (; Symbol(1) => 0, Symbol(2) => 0), # Convergence counter
             MVector{1,Bool}([false]), # Is done
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,
