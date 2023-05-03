@@ -47,7 +47,7 @@ function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env, player::Symbol)
     h(state_, best_action, iter_converged)
 
     # If not 'finally' converged, then increment
-    if ~h.is_converged
+    if h.is_converged
         env.convergence_dict[player] += 1
     else
         env.convergence_dict[player] = 0
