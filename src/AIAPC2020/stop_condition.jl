@@ -4,7 +4,7 @@ struct StopWhenConverged end
 
 function (s::StopWhenConverged)(agent, env)
     # false until converged, then true
-    return env.convergence_dict[Symbol(1)] && env.convergence_dict[Symbol(2)]
+    return (env.convergence_dict[Symbol(1)] && env.convergence_dict[Symbol(2)])
 end
 
 function AIAPCStop(env::AIAPCEnv; stop_on_convergence = true)
