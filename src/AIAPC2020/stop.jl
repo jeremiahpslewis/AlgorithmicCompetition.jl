@@ -3,7 +3,8 @@ using ReinforcementLearningCore
 struct StopWhenConverged end
 
 function (s::StopWhenConverged)(agent, env)
-    return env.convergence_dict[:1] > env.convergence_threshold && env.convergence_dict[:2] > env.convergence_threshold
+    # false until converged, then true
+    return env.convergence_dict[:1] <= env.convergence_threshold || env.convergence_dict[:2] < env.convergence_threshold
 end
 
 function AIAPCStop(env::AIAPCEnv; stop_on_convergence = true)
