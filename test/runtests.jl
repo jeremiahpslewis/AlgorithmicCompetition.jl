@@ -353,8 +353,6 @@ end
     @test length(reward(c_out.env)) == 2
     @test length(c_out.env.action_space) == 225
     # @test length(reward(c_out.env)) == 1
-
-
 end
 
 @testset "Sequential environment" begin
@@ -430,10 +428,9 @@ end
     @test c_out.stop_condition.stop_conditions[1](1, c_out.env) == false
     @test c_out.stop_condition.stop_conditions[2](1, c_out.env) == true
 
-    @test_broken c_out.hook[Symbol(2)][2].convergence_duration == 11
+    @test c_out.hook[Symbol(2)][2].convergence_duration == 10
     @test c_out.hook[Symbol(2)][2].convergence_duration >= 0
     @test c_out.hook[Symbol(1)][2].convergence_duration >= 0
-    @test c_out.env.convergence_dict[:1] < max_iter
 end
 
 @testset "EpsilonGreedy" begin

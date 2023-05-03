@@ -22,13 +22,14 @@ function (h::ConvergenceCheck)(state_::Int16, best_action::Int, iter_converged::
 
     if iter_converged
         h.convergence_duration += 1
-    else
-        (h.convergence_duration != 0) && (h.convergence_duration = 0)
-        h.best_response_vector[state_] = best_action
-    end
 
-    if h.convergence_duration >= h.convergence_threshold
-        h.is_converged = true
+        if h.convergence_duration >= h.convergence_threshold
+            h.is_converged = true
+        end    
+    else
+        h.convergence_duration = 0
+        h.best_response_vector[state_] = best_action
+        h.is_converged = false
     end
 
     return
@@ -40,7 +41,7 @@ function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env, player::Symbol)
     # E.g. best / greedy action
     n_prices = env.n_prices
 
-    state_ = RLBase.state(env)
+    state_ = RLBase.state(env, player)
     best_action = argmax(@view policy.policy.learner.approximator.table[:, state_])
     iter_converged = (@views h.best_response_vector[state_] == best_action)
 
