@@ -384,7 +384,7 @@ end
     @test reward(env) != [0,0] # reward is zero as at least one player has already played (technically sequental plays)
 end
 
-@testset "Convergence stop works" begin
+@testset "No stop on Convergence stop works" begin
     α = Float32(0.125)
     β = Float32(1e-5)
     δ = 0.95
@@ -409,7 +409,9 @@ end
     c_out = run(hyperparams; stop_on_convergence = false)
     @test get_ϵ(c_out.policy[Symbol(1)].policy.explorer) < 1e-4
     @test get_ϵ(c_out.policy[Symbol(2)].policy.explorer) < 1e-4
+end
 
+@testset "Convergence stop works" begin
     max_iter = Int(1e7)
     hyperparams = AIAPCHyperParameters(
         α,
@@ -417,18 +419,19 @@ end
         δ,
         max_iter,
         competition_solution;
-        convergence_threshold = 10,
+        convergence_threshold = 5,
     )
     c_out = run(hyperparams; stop_on_convergence = true)
     @test 0.98 < get_ϵ(c_out.policy[Symbol(1)].policy.explorer) < 1
     @test 0.98 < get_ϵ(c_out.policy[Symbol(2)].policy.explorer) < 1
 
+    @test c_out.stop_condition(1, c_out.env) == true
     @test c_out.stop_condition.stop_conditions[1](1, c_out.env) == false
     @test c_out.stop_condition.stop_conditions[2](1, c_out.env) == true
 
-    @test c_out.hook[Symbol(1)][2].convergence_duration >= 11
-    @test c_out.hook[Symbol(2)][2].convergence_duration >= 11
-    @test (c_out.hook[Symbol(2)][2].convergence_duration == 11) || (c_out.hook[Symbol(1)][2].convergence_duration == 11)
+    @test c_out.hook[Symbol(1)][2].convergence_duration >= 6
+    @test c_out.hook[Symbol(2)][2].convergence_duration >= 6
+    @test (c_out.hook[Symbol(2)][2].convergence_duration == 6) || (c_out.hook[Symbol(1)][2].convergence_duration == 6)
 end
 
 @testset "EpsilonGreedy" begin
