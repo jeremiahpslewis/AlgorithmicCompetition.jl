@@ -334,23 +334,23 @@ end
           c_out.hook[Symbol(2)][2].best_response_vector
 
 
-    # @test mean(
-    #     c_out.hook[Symbol(1)][1].rewards[(end-2):end] .!=
-    #     c_out.hook[Symbol(2)][1].rewards[(end-2):end],
-    # ) >= 0.3
+    @test mean(
+        c_out.hook[Symbol(1)][1].rewards[(end-2):end] .!=
+        c_out.hook[Symbol(2)][1].rewards[(end-2):end],
+    ) >= 0.3
 
     for i = [Symbol(1), Symbol(2)]
         @test c_out.hook[i][2].convergence_duration >= 0
         @test c_out.hook[i][2].is_converged
         @test c_out.hook[i][2].convergence_threshold == 1
-        # @test sum(c_out.hook[i][1].rewards .== 0) == 0
+        @test sum(c_out.hook[i][1].rewards .== 0) == 0
     end
 
     @test reward(c_out.env, 1) != 0
     @test reward(c_out.env, 2) != 0
     @test length(reward(c_out.env)) == 2
     @test length(c_out.env.action_space) == 225
-    # @test length(reward(c_out.env)) == 1
+    @test length(reward(c_out.env)) == 2
 end
 
 @testset "Sequential environment" begin
