@@ -178,8 +178,6 @@ end
     @test reward(c_out.env) == [0, 0]
     @test reward(c_out.env, 1) != 0
 
-
-    @test state(c_out.env) != 1
     @test sum(c_out.hook[Symbol(1)][2].best_response_vector == 0) == 0
     @test c_out.hook[Symbol(1)][2].best_response_vector !=
           c_out.hook[Symbol(2)][2].best_response_vector

@@ -1,12 +1,9 @@
 using ReinforcementLearningCore
 
-struct StopWhenConverged end
+struct StopWhenConverged <: AbstractStopCondition end
 
 function (s::StopWhenConverged)(agent, env)
     # false until converged, then true
-    if (env.convergence_dict[Symbol(1)] && env.convergence_dict[Symbol(2)])
-        print("stopping!")
-    end
     return (env.convergence_dict[Symbol(1)] && env.convergence_dict[Symbol(2)])
 end
 
