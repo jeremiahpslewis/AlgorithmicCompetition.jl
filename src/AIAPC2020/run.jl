@@ -5,7 +5,7 @@ import Base
 
 # Patch to improve type stability and try to speed things up (avoid generator)
 function (multiagent::MultiAgentPolicy)(env::AIAPCEnv)
-    return Tuple(multiagent[player](env, Symbol(:1)), multiagent[player](env, Symbol(:1)))
+    return Tuple(multiagent[Symbol(:1)](env, Symbol(:1)), multiagent[Symbol(:2)](env, Symbol(:1)))
 end
 
 function Experiment(env::AIAPCEnv; stop_on_convergence = true)
