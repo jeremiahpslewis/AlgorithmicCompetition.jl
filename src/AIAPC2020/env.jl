@@ -92,7 +92,7 @@ function construct_state_space_lookup(action_space, n_prices)
 end
 
 # map price vector to state
-function map_vect_to_int_(vect_, base)
+function map_vect_to_int(vect_, base)
     sum(vect_[k] * base^(k - 1) for k = Base.OneTo(length(vect_))) # From Julia help / docs
 end
 

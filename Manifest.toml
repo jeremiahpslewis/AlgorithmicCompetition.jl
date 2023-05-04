@@ -1,6 +1,6 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.9.0-rc2"
+julia_version = "1.9.0-rc3"
 manifest_format = "2.0"
 project_hash = "122f098a519b7060da9526ac5cb0423305f1f661"
 
@@ -863,9 +863,9 @@ version = "1.4.2"
 
 [[deps.PrecompileTools]]
 deps = ["Preferences"]
-git-tree-sha1 = "2e47054ffe7d0a8872e977c0d09eb4b3d162ebde"
+git-tree-sha1 = "0c265aa64283740b9b885348ee52463084de0748"
 uuid = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
-version = "1.0.2"
+version = "1.0.3"
 
 [[deps.Preferences]]
 deps = ["TOML"]
@@ -880,9 +880,9 @@ version = "0.2.0"
 
 [[deps.PrettyTables]]
 deps = ["Crayons", "Formatting", "LaTeXStrings", "Markdown", "Reexport", "StringManipulation", "Tables"]
-git-tree-sha1 = "548793c7859e28ef026dba514752275ee871169f"
+git-tree-sha1 = "213579618ec1f42dea7dd637a42785a608b1ea9c"
 uuid = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
-version = "2.2.3"
+version = "2.2.4"
 
 [[deps.Printf]]
 deps = ["Unicode"]
@@ -949,28 +949,22 @@ version = "1.2.2"
 
 [[deps.ReinforcementLearningBase]]
 deps = ["AbstractTrees", "CommonRLInterface", "CommonRLSpaces", "DomainSets", "Markdown", "Random", "Reexport", "Test"]
-git-tree-sha1 = "2653736c85fcbe1cadab77e7b3fd0631d1996056"
-repo-rev = "main"
-repo-subdir = "src/ReinforcementLearningBase"
-repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"
+git-tree-sha1 = "7859e3dceeea218a0eb0ef1235f83f749bff250b"
 uuid = "e575027e-6cd6-5018-9292-cdc6200d2b44"
-version = "0.11.0"
+version = "0.11.1"
 
 [[deps.ReinforcementLearningCore]]
 deps = ["AbstractTrees", "Adapt", "CUDA", "ChainRulesCore", "CircularArrayBuffers", "Crayons", "Distributions", "FillArrays", "Flux", "Functors", "LinearAlgebra", "Parsers", "ProgressMeter", "Random", "Reexport", "ReinforcementLearningBase", "ReinforcementLearningTrajectories", "Statistics", "StatsBase", "UnicodePlots"]
-git-tree-sha1 = "c90a2c752f6353cdb822bd6d3797604f1b094175"
-repo-rev = "jpsl/composed-stop"
+git-tree-sha1 = "9ff5ccacb844ff8d4dda36db3e0b29cbf05140d3"
+repo-rev = "jpsl/multi-refinements"
 repo-subdir = "src/ReinforcementLearningCore"
 repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"
 uuid = "de1b191a-4ae0-4afa-a27b-92d07f46b2d6"
-version = "0.9.3"
+version = "0.9.4"
 
 [[deps.ReinforcementLearningEnvironments]]
 deps = ["DelimitedFiles", "IntervalSets", "LinearAlgebra", "MacroTools", "Markdown", "Pkg", "Random", "ReinforcementLearningBase", "ReinforcementLearningCore", "Requires", "SparseArrays", "StatsBase"]
-git-tree-sha1 = "506cee801d08f2f0c5242babd311d82ba0ac6dab"
-repo-rev = "main"
-repo-subdir = "src/ReinforcementLearningEnvironments"
-repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"
+git-tree-sha1 = "3d1659be39526269a1f23b4ad1cf690014ef1296"
 uuid = "25e41dd2-4622-11e9-1641-f1adca772921"
 version = "0.7.2"
 
@@ -1274,7 +1268,7 @@ version = "1.0.3"
 [[deps.libblastrampoline_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
-version = "5.4.0+0"
+version = "5.7.0+0"
 
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]

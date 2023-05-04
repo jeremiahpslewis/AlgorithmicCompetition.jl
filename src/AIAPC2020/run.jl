@@ -3,6 +3,11 @@ using ReinforcementLearningEnvironments
 using Distributed
 import Base
 
+# Patch to improve type stability and try to speed things up (avoid generator)
+function (multiagent::MultiAgentPolicy)(env::AIAPCEnv)
+    return Tuple(multiagent[player](env, Symbol(:1)), multiagent[player](env, Symbol(:1)))
+end
+
 function Experiment(env::AIAPCEnv; stop_on_convergence = true)
     RLCore.Experiment(
         AIAPCPolicy(env),
@@ -23,7 +28,11 @@ end
 function Base.run(hyperparameters::AIAPCHyperParameters; stop_on_convergence = true)
     env = AIAPCEnv(hyperparameters)
     experiment = Experiment(env; stop_on_convergence = stop_on_convergence)
-    return run(experiment)
+    return RLCore._run(experiment.policy,
+                       experiment.env,
+                       experiment.stop_condition,
+                       experiment.hook,
+                       ResetAtTerminal())
 end
 
 function run_and_extract(hyperparameters::AIAPCHyperParameters; stop_on_convergence = true)
