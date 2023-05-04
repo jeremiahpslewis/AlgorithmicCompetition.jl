@@ -36,7 +36,7 @@ function (h::ConvergenceCheck)(state_::Int64, best_action::Int, iter_converged::
 end
 
 
-function (h::ConvergenceCheck)(::PostEpisodeStage, policy, env, player::Symbol)
+function (h::ConvergenceCheck)(::PostActStage, policy, env, player::Symbol)
     # Convergence is defined over argmax action for each state 
     # E.g. best / greedy action
     n_prices = env.n_prices
