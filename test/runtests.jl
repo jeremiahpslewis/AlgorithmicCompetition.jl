@@ -201,7 +201,7 @@ end
             δ,
             max_iter,
             competition_solution;
-            convergence_threshold = 10,
+            convergence_threshold = 5,
         ) for α in α_ for β in β_
     ]
 
@@ -412,7 +412,15 @@ end
 end
 
 @testset "Convergence stop works" begin
+    α = Float32(0.125)
+    β = Float32(1e-5)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
     max_iter = Int(1e7)
+    price_index = 1:n_prices
+
     hyperparams = AIAPCHyperParameters(
         α,
         β,
