@@ -151,7 +151,7 @@ end
     ξ = 0.1
     δ = 0.95
     n_prices = 15
-    max_iter = Int(1e3)
+    max_iter = Int(1e6)
     price_index = 1:n_prices
 
     competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
@@ -243,7 +243,7 @@ end
     exper = Experiment(env)
     state(env)
     policies = env |> AIAPCPolicy
-    exper.hook[Symbol(1)][2](Int16(2), 3, false)
+    exper.hook[Symbol(1)][2](Int64(2), 3, false)
     @test exper.hook[Symbol(1)][2].best_response_vector[2] == 3
 
 

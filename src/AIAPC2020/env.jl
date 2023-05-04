@@ -18,11 +18,11 @@ struct AIAPCEnv <: AbstractEnv
     max_iter::Int
     convergence_threshold::Int
     n_prices::Int
-    price_index::SVector{15,Int8}
+    price_index::SVector{15,Int64}
     profit_function::Function
-    n_state_space::Int16
-    state_space::Base.OneTo{Int16}
-    state_space_lookup::Array{Int16,2}
+    n_state_space::Int64
+    state_space::Base.OneTo{Int64}
+    state_space_lookup::Array{Int64,2}
     memory::MVector{2,Int}
     convergence_dict::Dict{Symbol,Bool}
     is_done::MVector{1,Bool}
@@ -36,10 +36,10 @@ struct AIAPCEnv <: AbstractEnv
         # TODO: Think about how initial memory should be assigned
         price_options = SVector{15,Float32}(p.price_options)
         n_prices = length(p.price_options)
-        price_index = SVector{15,Int8}(1:n_prices)
+        price_index = SVector{15,Int64}(1:n_prices)
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
-        state_space = Base.OneTo(Int16(n_state_space))
+        state_space = Base.OneTo(Int64(n_state_space))
         action_space = Tuple((i, j) for i in price_index for j in price_index)
 
         profit_array = construct_profit_array(
@@ -76,7 +76,7 @@ struct AIAPCEnv <: AbstractEnv
     end
 end
 
-function (env::AIAPCEnv)(price_tuple)
+function (env::AIAPCEnv)(price_tuple::Tuple{Int64, Int64})
     # TODO: Fix support for longer memories
     env.memory .= price_tuple
     env.is_done[1] = true
@@ -84,7 +84,7 @@ end
 
 function construct_state_space_lookup(action_space, n_prices)
     @assert length(action_space) == n_prices^2
-    state_space_lookup = zeros(Int16, n_prices, n_prices)
+    state_space_lookup = zeros(Int64, n_prices, n_prices)
     for (i, j) in action_space
         state_space_lookup[i, j] = map_vect_to_int([i, j], n_prices) - n_prices
     end
@@ -92,8 +92,8 @@ function construct_state_space_lookup(action_space, n_prices)
 end
 
 # map price vector to state
-function map_vect_to_int(vect_, base)
-    sum(vect_[k] * base^(k - 1) for k = 1:length(vect_)) # From Julia help / docs
+function map_vect_to_int_(vect_, base)
+    sum(vect_[k] * base^(k - 1) for k = Base.OneTo(length(vect_))) # From Julia help / docs
 end
 
 function map_int_to_vect(int_val, base, vect_length)
@@ -157,7 +157,7 @@ RLBase.NumAgentStyle(::AIAPCEnv) = MultiAgent(2)
 RLBase.DynamicStyle(::AIAPCEnv) = SIMULTANEOUS
 RLBase.ActionStyle(::AIAPCEnv) = MINIMAL_ACTION_SET
 RLBase.InformationStyle(::AIAPCEnv) = IMPERFECT_INFORMATION
-RLBase.StateStyle(::AIAPCEnv) = Observation{Int16}()
+RLBase.StateStyle(::AIAPCEnv) = Observation{Int64}()
 RLBase.RewardStyle(::AIAPCEnv) = STEP_REWARD
 RLBase.UtilityStyle(::AIAPCEnv) = GENERAL_SUM
 RLBase.ChanceStyle(::AIAPCEnv) = DETERMINISTIC

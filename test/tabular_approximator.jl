@@ -116,8 +116,8 @@ end
         ),
         Trajectory(CircularArraySARTTraces(;
             capacity=3,
-            state=Int16 => (225,),
-            action=Int8 => (15,),
+            state=Int64 => (225,),
+            action=Int64 => (15,),
             reward=Float32 => (),
             terminal=Bool => ()
         ), DummySampler())
@@ -137,8 +137,8 @@ end
         ),
         Trajectory(CircularArraySARTTraces(;
             capacity=3,
-            state=Int16 => (225,),
-            action=Int8 => (15,),
+            state=Int64 => (225,),
+            action=Int64 => (15,),
             reward=Float32 => (),
             terminal=Bool => ()
         ), DummySampler())

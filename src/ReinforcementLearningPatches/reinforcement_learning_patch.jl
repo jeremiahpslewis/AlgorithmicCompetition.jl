@@ -29,17 +29,17 @@ using Random
 
 # Fudge an issue with non Int64 Ints in RL.jl
 using Base
-Base.convert(::Type{Int8}, a::Int64) = Int8(a)
+Base.convert(::Type{Int64}, a::Int64) = Int64(a)
 
 ### Patch modified from https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/v0.10.1/src/ReinforcementLearningCore/src/policies/q_based_policies/learners/approximators/tabular_approximator.jl
 ### To support smaller ints / floats
-# (app::TabularQApproximator)(s::Int16) = @views app.table[:, s]
-# (app::TabularQApproximator)(s::Int16, a::Int8) = app.table[a, s]
+# (app::TabularQApproximator)(s::Int64) = @views app.table[:, s]
+# (app::TabularQApproximator)(s::Int64, a::Int64) = app.table[a, s]
 
 # add missing update! method for smaller Int types
 # function RLBase.optimise!(
 #     app::TabularQApproximator,
-#     correction::Pair{Tuple{Int16,Int8},Float64},
+#     correction::Pair{Tuple{Int64,Int64},Float64},
 # )
 #     (s, a), e = correction
 #     x = @view app.table[a, s]
@@ -48,7 +48,7 @@ Base.convert(::Type{Int8}, a::Int64) = Int8(a)
 #     Flux.Optimise.update!(app.optimizer, x, x̄)
 # end
 
-# function RLBase.optimise!(app::TabularQApproximator, correction::Pair{Int16,Vector{Float64}})
+# function RLBase.optimise!(app::TabularQApproximator, correction::Pair{Int64,Vector{Float64}})
 #     s, errors = correction
 #     x = @view app.table[:, s]
 #     Flux.Optimise.update!(app.optimizer, x, errors)
@@ -87,7 +87,7 @@ function (s::AIAPCEpsilonGreedyExplorer{<:Any})(values)
         end
         return rand(s.rng, max_vals)
     else
-        return rand(s.rng, Base.OneTo(Int8(length(values))))
+        return rand(s.rng, Base.OneTo(Int64(length(values))))
     end
 end
 
