@@ -192,7 +192,7 @@ end
     α_ = Float32.(range(0.025, 0.25, n_increments))
     β_ = Float32.(range(1.25e-8, 2e-5, n_increments))
     δ = 0.95
-    max_iter = Int(1e4)
+    max_iter = Int(1e7)
 
     hyperparameter_vect = [
         AIAPCHyperParameters(
@@ -201,7 +201,7 @@ end
             δ,
             max_iter,
             competition_solution;
-            convergence_threshold = 5,
+            convergence_threshold = 10,
         ) for α in α_ for β in β_
     ]
 
@@ -218,7 +218,7 @@ end
     @test CompetitionParameters(1, 1, [1.0, 1], [1.0, 1]) isa CompetitionParameters
     @test_throws DimensionMismatch CompetitionParameters(1, 1, [1.0, 1], [1.0])
 end
-
+ 
 @testset "q_fun" begin
     @test q_fun([1.47293, 1.47293], CompetitionParameters(0.25, 0, [2, 2], [1, 1])) ≈
           fill(0.47138, 2) atol = 0.01
@@ -395,7 +395,6 @@ end
     price_index = 1:n_prices
 
     competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
-
     competition_solution = CompetitionSolution(competition_params)
 
     hyperparams = AIAPCHyperParameters(
@@ -420,6 +419,9 @@ end
     n_prices = 15
     max_iter = Int(1e7)
     price_index = 1:n_prices
+
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_solution = CompetitionSolution(competition_params)
 
     hyperparams = AIAPCHyperParameters(
         α,
