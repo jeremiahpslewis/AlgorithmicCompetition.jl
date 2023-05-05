@@ -1,4 +1,5 @@
-using ReinforcementLearning
+using ReinforcementLearningCore
+using ReinforcementLearningBase
 using StaticArrays
 """
     AIAPCEnv(p::AIAPCHyperParameters)
@@ -17,13 +18,13 @@ struct AIAPCEnv <: AbstractEnv
     max_iter::Int
     convergence_threshold::Int
     n_prices::Int
-    price_index::SVector{15,Int8}
+    price_index::SVector{15,Int64}
     profit_function::Function
-    n_state_space::Int16
-    state_space::Base.OneTo{Int16}
-    state_space_lookup::Array{Int16,2}
+    n_state_space::Int64
+    state_space::Base.OneTo{Int64}
+    state_space_lookup::Array{Int64,2}
     memory::MVector{2,Int}
-    convergence_int::MVector{1,Int}
+    convergence_dict::Dict{Symbol,Bool}
     is_done::MVector{1,Bool}
     p_Bert_nash_equilibrium::Float32
     p_monop_opt::Float32
@@ -35,10 +36,10 @@ struct AIAPCEnv <: AbstractEnv
         # TODO: Think about how initial memory should be assigned
         price_options = SVector{15,Float32}(p.price_options)
         n_prices = length(p.price_options)
-        price_index = SVector{15,Int8}(1:n_prices)
+        price_index = SVector{15,Int64}(1:n_prices)
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
-        state_space = Base.OneTo(Int16(n_state_space))
+        state_space = Base.OneTo(Int64(n_state_space))
         action_space = Tuple((i, j) for i in price_index for j in price_index)
 
         profit_array = construct_profit_array(
@@ -65,7 +66,7 @@ struct AIAPCEnv <: AbstractEnv
             state_space,
             state_space_lookup,
             MVector{2,Int}(ones(Int, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int
-            MVector{1,Int}([0]), # Convergence counter
+            Dict(Symbol(1) => false, Symbol(2) => false), # Convergence counter
             MVector{1,Bool}([false]), # Is done
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,
@@ -75,15 +76,15 @@ struct AIAPCEnv <: AbstractEnv
     end
 end
 
-function (env::AIAPCEnv)((p_1, p_2))
+function (env::AIAPCEnv)(price_tuple::Tuple{Int64, Int64})
     # TODO: Fix support for longer memories
-    env.memory .= (p_1, p_2)
+    env.memory .= price_tuple
     env.is_done[1] = true
 end
 
 function construct_state_space_lookup(action_space, n_prices)
     @assert length(action_space) == n_prices^2
-    state_space_lookup = zeros(Int16, n_prices, n_prices)
+    state_space_lookup = zeros(Int64, n_prices, n_prices)
     for (i, j) in action_space
         state_space_lookup[i, j] = map_vect_to_int([i, j], n_prices) - n_prices
     end
@@ -92,7 +93,7 @@ end
 
 # map price vector to state
 function map_vect_to_int(vect_, base)
-    sum(vect_[k] * base^(k - 1) for k = 1:length(vect_)) # From Julia help / docs
+    sum(vect_[k] * base^(k - 1) for k = Base.OneTo(length(vect_))) # From Julia help / docs
 end
 
 function map_int_to_vect(int_val, base, vect_length)
@@ -101,7 +102,7 @@ end
 
 function construct_profit_array(
     action_space::NTuple,
-    price_options,
+    price_options::SVector{15,Float32},
     profit_function,
     n_players::Int,
 )
@@ -117,7 +118,7 @@ function construct_profit_array(
     return profit_array
 end
 
-RLBase.action_space(env::AIAPCEnv, ::Int) = env.price_index # Choice of price
+RLBase.action_space(env::AIAPCEnv, ::Symbol) = env.price_index # Choice of price
 
 RLBase.action_space(env::AIAPCEnv, ::SimultaneousPlayer) = env.action_space
 
@@ -133,6 +134,11 @@ function RLBase.reward(env::AIAPCEnv, p::Int)
     (@view env.profit_array[env.memory[1], env.memory[2], p])[1]
 end
 
+
+const player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
+
+RLBase.reward(env::AIAPCEnv, p::Symbol) = reward(env, player_lookup[p])
+
 RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
 
 function RLBase.state(env::AIAPCEnv, ::Observation, p)
@@ -145,13 +151,13 @@ function RLBase.reset!(env::AIAPCEnv)
     env.is_done[1] = false
 end
 
-RLBase.players(::AIAPCEnv) = (1, 2)
+RLBase.players(::AIAPCEnv) = (Symbol(1), Symbol(2))
 RLBase.current_player(::AIAPCEnv) = SIMULTANEOUS_PLAYER
 RLBase.NumAgentStyle(::AIAPCEnv) = MultiAgent(2)
 RLBase.DynamicStyle(::AIAPCEnv) = SIMULTANEOUS
 RLBase.ActionStyle(::AIAPCEnv) = MINIMAL_ACTION_SET
 RLBase.InformationStyle(::AIAPCEnv) = IMPERFECT_INFORMATION
-RLBase.StateStyle(::AIAPCEnv) = Observation{Int16}()
+RLBase.StateStyle(::AIAPCEnv) = Observation{Int64}()
 RLBase.RewardStyle(::AIAPCEnv) = STEP_REWARD
 RLBase.UtilityStyle(::AIAPCEnv) = GENERAL_SUM
 RLBase.ChanceStyle(::AIAPCEnv) = DETERMINISTIC

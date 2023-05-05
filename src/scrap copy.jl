@@ -8,8 +8,10 @@ using ReinforcementLearningCore:
     PostEpisodeStage,
     current_player,
     action_space,
-    EpsilonGreedyExplorer
-using ReinforcementLearningBase: test_interfaces!, test_runnable!
+    EpsilonGreedyExplorer,
+    RandomPolicy,
+    PreActStage
+using ReinforcementLearningBase: test_interfaces!, test_runnable!, AbstractPolicy
 import ReinforcementLearningCore
 using StaticArrays
 using Statistics
@@ -39,7 +41,7 @@ using AlgorithmicCompetition:
     AIAPCEpsilonGreedyExplorer,
     AIAPCSummary,
     TDLearner
-using JET
+using Distributed
 
 α = Float32(0.125)
 β = Float32(1e-5)
@@ -54,8 +56,18 @@ competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
 
 competition_solution = CompetitionSolution(competition_params)
 
-hyperparams =
-    AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold = 1)
+hyperparams = AIAPCHyperParameters(
+    α,
+    β,
+    δ,
+    max_iter,
+    competition_solution;
+    convergence_threshold = 1,
+)
+env = AIAPCEnv(hyperparams)
+policy = AIAPCPolicy(env)
 
+policy(PreActStage(), env)
+policy(env)[1]
 
-@report_opt run(hyperparams; stop_on_convergence = false)
+[policy(env)...]

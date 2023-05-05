@@ -27,7 +27,7 @@ hyperparameter_vect =
 # a = run(hyperparameter_vect[1]; stop_on_convergence=false)
 
 # using ReinforcementLearning
-# @report_opt RLBase.reward(a.env.env)
+# @report_opt RLBase.reward(a.env)
 # a = run(hyperparameter_vect[1]; stop_on_convergence=false)
 
 # a
@@ -42,7 +42,7 @@ hyperparameter_vect =
 #     @views env.is_done[1] ? (env.profit_array[env.memory, :]) : [Float32(0), Float32(0)]
 # end
 
-# @btime reward1(a.env.env)
+# @btime reward1(a.env)
 # 322.022 ns (9 allocations: 464 bytes)
 # 113.926 ns (2 allocations: 288 bytes)
 # 111.879 ns (2 allocations: 288 bytes)
@@ -51,4 +51,4 @@ hyperparameter_vect =
 #     env.is_done[1] ? env.profit_array[env.memory[1], env.memory[2], p] : 0
 # end
 
-# @btime reward1(a.env.env)
+# @btime reward1(a.env)

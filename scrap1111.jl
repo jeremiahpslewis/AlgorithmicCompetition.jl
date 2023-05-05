@@ -39,6 +39,7 @@ using AlgorithmicCompetition:
     AIAPCEpsilonGreedyExplorer,
     AIAPCSummary,
     TDLearner
+using Distributed
 using JET
 
 α = Float32(0.125)
@@ -47,15 +48,21 @@ using JET
 ξ = 0.1
 δ = 0.95
 n_prices = 15
-max_iter = 1000
+max_iter = 5000
 price_index = 1:n_prices
 
 competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
 
 competition_solution = CompetitionSolution(competition_params)
 
-hyperparams =
-    AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold = 1)
+hyperparams = AIAPCHyperParameters(
+    α,
+    β,
+    δ,
+    max_iter,
+    competition_solution;
+    convergence_threshold = 1,
+)
 
 
 @report_opt run(hyperparams; stop_on_convergence = false)

@@ -1,19 +1,17 @@
 using Test
 using JuMP
 using Chain
-using ReinforcementLearning:
+using ReinforcementLearningCore:
     PostActStage,
+    PreActStage,
     state,
     reward,
-    PostEpisodeStage,
-    SequentialEnv,
     current_player,
     action_space,
-    VectorSARTTrajectory,
     EpsilonGreedyExplorer,
-    TabularQApproximator,
-    TDLearner
-using ReinforcementLearningBase: test_interfaces!, test_runnable!
+    RandomPolicy,
+    MultiAgentPolicy
+using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy
 import ReinforcementLearningCore
 using StaticArrays
 using Statistics
@@ -41,7 +39,8 @@ using AlgorithmicCompetition:
     InitMatrix,
     get_ϵ,
     AIAPCEpsilonGreedyExplorer,
-    AIAPCSummary
+    AIAPCSummary,
+    TDLearner
 using Distributed
 
 @testset "Prepackaged Environment Tests" begin
@@ -110,7 +109,8 @@ end
     @test construct_state_space_lookup(((1, 1), (1, 2), (2, 1), (2, 2)), 2) == [1 3; 2 4]
 end
 
-@testset "run AIAPC full simulation" begin
+
+@testset "Policy operation test" begin
     α = Float32(0.125)
     β = Float32(1e-5)
     δ = 0.95
@@ -132,23 +132,54 @@ end
         competition_solution;
         convergence_threshold = 1,
     )
+    env = AIAPCEnv(hyperparams)
+    policy = AIAPCPolicy(env)
+
+    # Test full policy exploration of states
+    policy(PreActStage(), env)
+    n_ = Int(1e5)
+    policy_runs = [[policy(env)...] for i in 1:n_]
+    checksum_ = [sum(unique(policy_runs[j][i] for j in 1:n_)) for i in 1:2]
+    @test all(checksum_ .== sum(1:env.n_prices))
+end
+
+@testset "run full AIAPC simulation" begin
+    α = Float32(0.125)
+    β = Float32(1e-5)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = Int(1e6)
+    price_index = 1:n_prices
+
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+
+    competition_solution = CompetitionSolution(competition_params)
+
+    hyperparams = AIAPCHyperParameters(
+        α,
+        β,
+        δ,
+        max_iter,
+        competition_solution;
+        convergence_threshold = 1,
+    )
 
     c_out = run(hyperparams; stop_on_convergence = false)
 
     # ensure that the policy is updated by the learner
-    @test sum(c_out.policy.agents[1].policy.policy.learner.approximator.table .!= 0) != 0
-    @test length(reward(c_out.env.env)) == 2
-    @test length(reward(c_out.env.env, 1)) == 1
+    @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table .!= 0) != 0
+    @test length(reward(c_out.env)) == 2
+    @test length(reward(c_out.env, 1)) == 1
 
-    c_out.env.env.is_done[1] = false
-    @test reward(c_out.env.env) == [0, 0]
-    @test reward(c_out.env.env, 1) != 0
+    c_out.env.is_done[1] = false
+    @test reward(c_out.env) == [0, 0]
+    @test reward(c_out.env, 1) != 0
 
-
-    @test state(c_out.env) != 1
-    @test sum(c_out.hook.hooks[1][2].best_response_vector == 0) == 0
-    @test c_out.hook.hooks[1][2].best_response_vector !=
-          c_out.hook.hooks[2][2].best_response_vector
+    @test sum(c_out.hook[Symbol(1)][2].best_response_vector == 0) == 0
+    @test c_out.hook[Symbol(1)][2].best_response_vector !=
+          c_out.hook[Symbol(2)][2].best_response_vector
 end
 
 @testset "Run a set of experiments." begin
@@ -160,7 +191,7 @@ end
     α_ = Float32.(range(0.025, 0.25, n_increments))
     β_ = Float32.(range(1.25e-8, 2e-5, n_increments))
     δ = 0.95
-    max_iter = Int(1e4)
+    max_iter = Int(1e7)
 
     hyperparameter_vect = [
         AIAPCHyperParameters(
@@ -176,7 +207,7 @@ end
     experiments = @chain hyperparameter_vect run_and_extract.(stop_on_convergence = true)
 
     @test experiments[1] isa AIAPCSummary
-    @test 10 < experiments[1].iterations_until_convergence < max_iter
+    @test all(10 < experiments[1].iterations_until_convergence[i] < max_iter for i in 1:2)
     @test (sum(experiments[1].avg_profit .> 1) + sum(experiments[1].avg_profit .< 0)) == 0
     @test experiments[1].avg_profit[1] != experiments[1].avg_profit[2]
     @test all(experiments[1].is_converged)
@@ -186,7 +217,7 @@ end
     @test CompetitionParameters(1, 1, [1.0, 1], [1.0, 1]) isa CompetitionParameters
     @test_throws DimensionMismatch CompetitionParameters(1, 1, [1.0, 1], [1.0])
 end
-
+ 
 @testset "q_fun" begin
     @test q_fun([1.47293, 1.47293], CompetitionParameters(0.25, 0, [2, 2], [1, 1])) ≈
           fill(0.47138, 2) atol = 0.01
@@ -209,13 +240,13 @@ end
     exper = Experiment(env)
     state(env)
     policies = env |> AIAPCPolicy
-    AlgorithmicCompetition.update!(exper.hook.hooks[1][2], Int16(2), 3, false)
-    @test exper.hook.hooks[1][2].best_response_vector[2] == 3
+    exper.hook[Symbol(1)][2](Int64(2), 3, false)
+    @test exper.hook[Symbol(1)][2].best_response_vector[2] == 3
 
 
-    policies[1].policy.policy.learner.approximator.table[11, :] .= 2
-    exper.hook.hooks[1][2](PostEpisodeStage(), policies[1], exper.env)
-    @test exper.hook.hooks[1][2].best_response_vector[state(env)] == 11
+    policies[Symbol(1)].policy.learner.approximator.table[11, :] .= 2
+    exper.hook[Symbol(1)][2](PostActStage(), policies[Symbol(1)], exper.env, :p1)
+    @test exper.hook[Symbol(1)][2].best_response_vector[state(env)] == 11
 end
 
 @testset "Profit array test" begin
@@ -286,28 +317,28 @@ end
     c_out = run(hyperparams; stop_on_convergence = false)
 
     # ensure that the policy is updated by the learner
-    @test sum(c_out.policy.agents[1].policy.policy.learner.approximator.table .!= 0) != 0
-    @test sum(c_out.policy.agents[2].policy.policy.learner.approximator.table .!= 0) != 0
-    @test c_out.env.env.is_done[1]
-    @test c_out.hook.hooks[1][2].iterations_until_convergence == max_iter
-    @test c_out.hook.hooks[2][2].iterations_until_convergence == max_iter
+    @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table .!= 0) != 0
+    @test sum(c_out.policy[Symbol(2)].policy.learner.approximator.table .!= 0) != 0
+    @test c_out.env.is_done[1]
+    @test c_out.hook[Symbol(1)][2].iterations_until_convergence == max_iter
+    @test c_out.hook[Symbol(2)][2].iterations_until_convergence == max_iter
 
 
-    @test c_out.policy.agents[1].trajectory[:reward][1] .!= 0
-    @test c_out.policy.agents[2].trajectory[:reward][1] .!= 0
+    @test c_out.policy[Symbol(1)].trajectory.container[:reward][1] .!= 0
+    @test c_out.policy[Symbol(2)].trajectory.container[:reward][1] .!= 0
 
-    @test c_out.policy.agents[1].policy.policy.learner.approximator.table !=
-          c_out.policy.agents[2].policy.policy.learner.approximator.table
-    @test c_out.hook.hooks[1][2].best_response_vector !=
-          c_out.hook.hooks[2][2].best_response_vector
+    @test c_out.policy[Symbol(1)].policy.learner.approximator.table !=
+          c_out.policy[Symbol(2)].policy.learner.approximator.table
+    @test c_out.hook[Symbol(1)][2].best_response_vector !=
+          c_out.hook[Symbol(2)][2].best_response_vector
 
 
     @test mean(
-        c_out.hook.hooks[1][1].rewards[(end-2):end] .!=
-        c_out.hook.hooks[2][1].rewards[(end-2):end],
+        c_out.hook[Symbol(1)][1].rewards[(end-2):end] .!=
+        c_out.hook[Symbol(2)][1].rewards[(end-2):end],
     ) >= 0.3
 
-    for i = 1:2
+    for i = [Symbol(1), Symbol(2)]
         @test c_out.hook[i][2].convergence_duration >= 0
         @test c_out.hook[i][2].is_converged
         @test c_out.hook[i][2].convergence_threshold == 1
@@ -316,11 +347,9 @@ end
 
     @test reward(c_out.env, 1) != 0
     @test reward(c_out.env, 2) != 0
-    @test length(reward(c_out.env.env)) == 2
-    @test length(c_out.env.env.action_space) == 225
-    @test length(reward(c_out.env)) == 1
-
-
+    @test length(reward(c_out.env)) == 2
+    @test length(c_out.env.action_space) == 225
+    @test length(reward(c_out.env)) == 2
 end
 
 @testset "Sequential environment" begin
@@ -346,16 +375,15 @@ end
         convergence_threshold = 1,
     )
 
-    seq_env = AIAPCEnv(hyperparams) |> SequentialEnv
-    @test current_player(seq_env) == 1
-    @test action_space(seq_env) == 1:15
-    @test reward(seq_env) != 0 # reward reflects outcomes of last play (which happens at player = 1, e.g. before any actions chosen)
-    seq_env(5)
-    @test current_player(seq_env) == 2
-    @test reward(seq_env) == 0 # reward is zero as at least one player has already played (technically sequental plays)
+    env = AIAPCEnv(hyperparams)
+    @test current_player(env) == RLBase.SimultaneousPlayer()
+    @test action_space(env, Symbol(1)) == 1:15
+    @test reward(env) != 0 # reward reflects outcomes of last play (which happens at player = 1, e.g. before any actions chosen)
+    env((5, 5))
+    @test reward(env) != [0,0] # reward is zero as at least one player has already played (technically sequental plays)
 end
 
-@testset "Convergence stop works" begin
+@testset "No stop on Convergence stop works" begin
     α = Float32(0.125)
     β = Float32(1e-5)
     δ = 0.95
@@ -366,7 +394,6 @@ end
     price_index = 1:n_prices
 
     competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
-
     competition_solution = CompetitionSolution(competition_params)
 
     hyperparams = AIAPCHyperParameters(
@@ -378,8 +405,22 @@ end
         convergence_threshold = 10,
     )
     c_out = run(hyperparams; stop_on_convergence = false)
-    @test get_ϵ(c_out.policy.agents[1].policy.policy.explorer) < 1e-4
-    @test get_ϵ(c_out.policy.agents[2].policy.policy.explorer) < 1e-4
+    @test get_ϵ(c_out.policy[Symbol(1)].policy.explorer) < 1e-4
+    @test get_ϵ(c_out.policy[Symbol(2)].policy.explorer) < 1e-4
+end
+
+@testset "Convergence stop works" begin
+    α = Float32(0.125)
+    β = Float32(1e-5)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = Int(1e7)
+    price_index = 1:n_prices
+
+    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_solution = CompetitionSolution(competition_params)
 
     hyperparams = AIAPCHyperParameters(
         α,
@@ -387,16 +428,19 @@ end
         δ,
         max_iter,
         competition_solution;
-        convergence_threshold = 10,
+        convergence_threshold = 5,
     )
     c_out = run(hyperparams; stop_on_convergence = true)
-    @test 0.98 < get_ϵ(c_out.policy.agents[1].policy.policy.explorer) < 1
-    @test 0.98 < get_ϵ(c_out.policy.agents[2].policy.policy.explorer) < 1
+    @test 0.98 < get_ϵ(c_out.policy[Symbol(1)].policy.explorer) < 1
+    @test 0.98 < get_ϵ(c_out.policy[Symbol(2)].policy.explorer) < 1
 
-    @test_broken c_out.hook.hooks[2][2].convergence_duration == 10
-    @test c_out.hook.hooks[2][2].convergence_duration >= 0
-    @test c_out.hook.hooks[1][2].convergence_duration >= 0
-    @test c_out.env.env.convergence_int[1] < max_iter
+    @test c_out.stop_condition(1, c_out.env) == true
+    @test c_out.stop_condition.stop_conditions[1](1, c_out.env) == false
+    @test c_out.stop_condition.stop_conditions[2](1, c_out.env) == true
+
+    @test c_out.hook[Symbol(1)][2].convergence_duration >= 5
+    @test c_out.hook[Symbol(2)][2].convergence_duration >= 5
+    @test (c_out.hook[Symbol(2)][2].convergence_duration == 5) || (c_out.hook[Symbol(1)][2].convergence_duration == 5)
 end
 
 @testset "EpsilonGreedy" begin
@@ -429,7 +473,7 @@ end
     policies = env |> AIAPCPolicy
 
     convergence_hook = ConvergenceCheck(1)
-    convergence_hook(PostEpisodeStage(), policies.agents[1], SequentialEnv(env))
+    convergence_hook(PostActStage(), policies[Symbol(1)], env, :player_1)
     @test convergence_hook.convergence_duration == 0
     @test convergence_hook.iterations_until_convergence == 1
     @test convergence_hook.best_response_vector[1] == 1
@@ -437,7 +481,7 @@ end
 
     convergence_hook_1 = ConvergenceCheck(1)
     convergence_hook_1.best_response_vector = MVector{225,Int}(fill(1, 225))
-    convergence_hook_1(PostEpisodeStage(), policies.agents[1], SequentialEnv(env))
+    convergence_hook_1(PostActStage(), policies[Symbol(1)], env, :player_1)
 
     @test convergence_hook.iterations_until_convergence == 1
     @test convergence_hook.convergence_duration ∈ [0, 1]

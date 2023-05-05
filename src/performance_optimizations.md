@@ -98,7 +98,7 @@ TODO:
 14.491 s (149013687 allocations: 6.66 GiB) # MVector instead of MMatrix
 14.821 s (149017914 allocations: 6.67 GiB) # Drop circ call
 14.700 s (149016255 allocations: 6.62 GiB) # use tuple instead of vector
-14.916 s (149013687 allocations: 6.62 GiB) # Int16 state object
+14.916 s (149013687 allocations: 6.62 GiB) # Int64 state object
 14.351 s (149013689 allocations: 6.62 GiB)
 14.075 s (145013687 allocations: 6.38 GiB) # BEST SO FAR.
 14.631 s (145013706 allocations: 6.38 GiB) # few steps back (type instability?)
@@ -122,4 +122,25 @@ TODO:
 14.061 s (143013687 allocations: 6.29 GiB)
 13.370 s (133014833 allocations: 5.99 GiB) # use state lookup
 13.594 s (133013911 allocations: 5.99 GiB) # EpsilonGreedyExplorer has almost no performance penalty vs GreedyExplorer
+17.474 s (213112876 allocations: 13.63 GiB) # 2023-05-03 post refactor...
+
 # rework convergence logic, reduce env calls
+
+# 2023-05-03
+1e7 iteration, @time:
+200.327392 seconds (2.14 G allocations: 136.634 GiB, 13.44% gc time)
+
+## Post RLCore refactor
+# 30 Jet warnings
+Convergence stop works |    7       1      8  1m51.0s
+run multiprocessing code | None  2m34.8s
+# 28 jet warnings
+
+Convergence stop works |    7       1      8  1m51.1s
+run multiprocessing code | None  2m51.7s
+# 26 jet warnings
+
+Convergence stop works |    7       1      8  1m49.5s
+run multiprocessing code | None  2m29.3s
+
+Convergence stop works |    7       1      8  6m27.4s
