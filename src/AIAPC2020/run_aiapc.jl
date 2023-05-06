@@ -28,11 +28,8 @@ function run_aiapc(;
     exp_list_ = AIAPCSummary[]
     for i = 1:n_parameter_iterations
         println("Running iteration $i of $n_parameter_iterations")
-        exp_list = @showprogress pmap(
-            run_and_extract,
-            hyperparameter_vect;
-            on_error = identity,
-        )
+        exp_list =
+            @showprogress pmap(run_and_extract, hyperparameter_vect; on_error = identity)
         append!(exp_list_, exp_list)
     end
 

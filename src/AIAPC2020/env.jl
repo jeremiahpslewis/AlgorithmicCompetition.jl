@@ -76,7 +76,7 @@ struct AIAPCEnv <: AbstractEnv
     end
 end
 
-function (env::AIAPCEnv)(price_tuple::Tuple{Int64, Int64})
+function (env::AIAPCEnv)(price_tuple::Tuple{Int64,Int64})
     # TODO: Fix support for longer memories
     env.memory .= price_tuple
     env.is_done[1] = true
@@ -93,7 +93,7 @@ end
 
 # map price vector to state
 function map_vect_to_int(vect_, base)
-    sum(vect_[k] * base^(k - 1) for k = Base.OneTo(length(vect_))) # From Julia help / docs
+    sum(vect_[k] * base^(k - 1) for k in Base.OneTo(length(vect_))) # From Julia help / docs
 end
 
 function map_int_to_vect(int_val, base, vect_length)

@@ -13,7 +13,9 @@ end
 
 function economic_summary(e::RLCore.Experiment)
     convergence_threshold = e.env.convergence_threshold
-    iterations_until_convergence = [e.hook[player][2].iterations_until_convergence for player in [Symbol(1), Symbol(2)]]
+    iterations_until_convergence = [
+        e.hook[player][2].iterations_until_convergence for player in [Symbol(1), Symbol(2)]
+    ]
 
     π_N = e.env.profit_function(fill(e.env.p_Bert_nash_equilibrium, 2))[1]
     π_M = e.env.profit_function(fill(e.env.p_monop_opt, 2))[1]

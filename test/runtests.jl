@@ -138,8 +138,8 @@ end
     # Test full policy exploration of states
     policy(PreActStage(), env)
     n_ = Int(1e5)
-    policy_runs = [[policy(env)...] for i in 1:n_]
-    checksum_ = [sum(unique(policy_runs[j][i] for j in 1:n_)) for i in 1:2]
+    policy_runs = [[policy(env)...] for i = 1:n_]
+    checksum_ = [sum(unique(policy_runs[j][i] for j = 1:n_)) for i = 1:2]
     @test all(checksum_ .== sum(1:env.n_prices))
 end
 
@@ -207,7 +207,7 @@ end
     experiments = @chain hyperparameter_vect run_and_extract.(stop_on_convergence = true)
 
     @test experiments[1] isa AIAPCSummary
-    @test all(10 < experiments[1].iterations_until_convergence[i] < max_iter for i in 1:2)
+    @test all(10 < experiments[1].iterations_until_convergence[i] < max_iter for i = 1:2)
     @test (sum(experiments[1].avg_profit .> 1) + sum(experiments[1].avg_profit .< 0)) == 0
     @test experiments[1].avg_profit[1] != experiments[1].avg_profit[2]
     @test all(experiments[1].is_converged)
@@ -217,7 +217,7 @@ end
     @test CompetitionParameters(1, 1, [1.0, 1], [1.0, 1]) isa CompetitionParameters
     @test_throws DimensionMismatch CompetitionParameters(1, 1, [1.0, 1], [1.0])
 end
- 
+
 @testset "q_fun" begin
     @test q_fun([1.47293, 1.47293], CompetitionParameters(0.25, 0, [2, 2], [1, 1])) ≈
           fill(0.47138, 2) atol = 0.01
@@ -338,7 +338,7 @@ end
         c_out.hook[Symbol(2)][1].rewards[(end-2):end],
     ) >= 0.3
 
-    for i = [Symbol(1), Symbol(2)]
+    for i in [Symbol(1), Symbol(2)]
         @test c_out.hook[i][2].convergence_duration >= 0
         @test c_out.hook[i][2].is_converged
         @test c_out.hook[i][2].convergence_threshold == 1
@@ -380,7 +380,7 @@ end
     @test action_space(env, Symbol(1)) == 1:15
     @test reward(env) != 0 # reward reflects outcomes of last play (which happens at player = 1, e.g. before any actions chosen)
     env((5, 5))
-    @test reward(env) != [0,0] # reward is zero as at least one player has already played (technically sequental plays)
+    @test reward(env) != [0, 0] # reward is zero as at least one player has already played (technically sequental plays)
 end
 
 @testset "No stop on Convergence stop works" begin
@@ -440,7 +440,8 @@ end
 
     @test c_out.hook[Symbol(1)][2].convergence_duration >= 5
     @test c_out.hook[Symbol(2)][2].convergence_duration >= 5
-    @test (c_out.hook[Symbol(2)][2].convergence_duration == 5) || (c_out.hook[Symbol(1)][2].convergence_duration == 5)
+    @test (c_out.hook[Symbol(2)][2].convergence_duration == 5) ||
+          (c_out.hook[Symbol(1)][2].convergence_duration == 5)
 end
 
 @testset "EpsilonGreedy" begin

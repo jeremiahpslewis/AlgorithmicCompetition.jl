@@ -22,13 +22,16 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentPolicy(
                 ),
                 explorer = AIAPCEpsilonGreedyExplorer(Float32(1e-5)),
             ),
-        Trajectory(CircularArraySARTTraces(;
-        capacity=3,
-        state=Int64 => (225,),
-        action=Int64 => (15,),
-        reward=Float32 => (),
-        terminal=Bool => ()
-        ), DummySampler()),
+            Trajectory(
+                CircularArraySARTTraces(;
+                    capacity = 3,
+                    state = Int64 => (225,),
+                    action = Int64 => (15,),
+                    reward = Float32 => (),
+                    terminal = Bool => (),
+                ),
+                DummySampler(),
+            ),
         ) for p in players(env)
-    )
+    ),
 )
