@@ -13,7 +13,7 @@ Base.@kwdef struct TDLearner{A,F<:AbstractFloat,I<:Integer} <: AbstractLearner
     n::I = 0
 end
 
-(L::TDLearner)(env::E) where {E <: AbstractEnv} = L.approximator(state(env))
+(L::TDLearner)(env::E) where {E<:AbstractEnv} = L.approximator(state(env))
 (L::TDLearner)(s) = L.approximator(s)
 (L::TDLearner)(s, a) = L.approximator(s, a)
 
@@ -25,7 +25,7 @@ function _optimise!(L::TDLearner, t)
     S, A, R, T = (t[x][1] for x in SART)
     n, γ, Q = L.n, L.γ, L.approximator
     G = 0.0
-    for i in 1:min(n + 1, length(R))
+    for i = 1:min(n + 1, length(R))
         G = R + γ * G
         s, a = S[end-i], A[end-i]
         RLBase.optimise!(Q, (s, a) => Q(s, a) - G)

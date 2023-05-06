@@ -25,7 +25,7 @@ function (h::ConvergenceCheck)(state_::Int64, best_action::Int, iter_converged::
 
         if h.convergence_duration >= h.convergence_threshold
             h.is_converged = true
-        end    
+        end
     else
         h.convergence_duration = 0
         h.best_response_vector[state_] = best_action
@@ -57,10 +57,10 @@ function AIAPCHook(env::AbstractEnv)
     MultiAgentHook(
         NamedTuple(
             p => ComposedHook(
-                TotalRewardPerEpisode(; is_display_on_exit = false), 
+                TotalRewardPerEpisode(; is_display_on_exit = false),
                 # TODO: MultiAgent version of TotalRewardPerEpisode / better player handling for hooks
                 ConvergenceCheck(env.convergence_threshold),
             ) for p in players(env)
-        )
+        ),
     )
 end

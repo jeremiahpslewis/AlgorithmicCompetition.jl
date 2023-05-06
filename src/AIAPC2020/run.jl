@@ -5,7 +5,10 @@ import Base
 
 # Patch to improve type stability and try to speed things up (avoid generator)
 function (multiagent::MultiAgentPolicy)(env::AIAPCEnv)
-    return tuple(multiagent[Symbol(:1)](env, Symbol(:1)), multiagent[Symbol(:2)](env, Symbol(:1)))
+    return tuple(
+        multiagent[Symbol(:1)](env, Symbol(:1)),
+        multiagent[Symbol(:2)](env, Symbol(:1)),
+    )
 end
 
 function Experiment(env::AIAPCEnv; stop_on_convergence = true)
@@ -28,11 +31,13 @@ end
 function Base.run(hyperparameters::AIAPCHyperParameters; stop_on_convergence = true)
     env = AIAPCEnv(hyperparameters)
     experiment = Experiment(env; stop_on_convergence = stop_on_convergence)
-    RLCore._run(experiment.policy,
-                       experiment.env,
-                       experiment.stop_condition,
-                       experiment.hook,
-                       ResetAtTerminal())
+    RLCore._run(
+        experiment.policy,
+        experiment.env,
+        experiment.stop_condition,
+        experiment.hook,
+        ResetAtTerminal(),
+    )
     return experiment
 end
 

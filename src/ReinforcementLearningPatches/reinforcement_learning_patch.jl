@@ -92,7 +92,8 @@ function (s::AIAPCEpsilonGreedyExplorer{<:Any})(values)
 end
 
 # TODO: Fix mask code to work with subarray types?
-(s::AIAPCEpsilonGreedyExplorer{<:Any})(values, mask) = (s::AIAPCEpsilonGreedyExplorer{<:Any})(values)
+(s::AIAPCEpsilonGreedyExplorer{<:Any})(values, mask) =
+    (s::AIAPCEpsilonGreedyExplorer{<:Any})(values)
 
 # Patch for QBasedPolicy, not sure why NamedTuple dispatch is not working
 RLBase.optimise!(p::QBasedPolicy, x::CircularArraySARTTraces) = optimise!(p.learner, x)

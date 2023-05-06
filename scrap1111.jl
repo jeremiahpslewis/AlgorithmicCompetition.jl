@@ -55,14 +55,8 @@ competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
 
 competition_solution = CompetitionSolution(competition_params)
 
-hyperparams = AIAPCHyperParameters(
-    α,
-    β,
-    δ,
-    max_iter,
-    competition_solution;
-    convergence_threshold = 1,
-)
+hyperparams =
+    AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold = 1)
 
 
 @report_opt run(hyperparams; stop_on_convergence = false)
