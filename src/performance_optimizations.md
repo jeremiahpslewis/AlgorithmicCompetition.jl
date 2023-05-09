@@ -139,6 +139,7 @@ TODO:
 1e6 / v1.9
 17.599272 seconds (146.43 M allocations: 14.895 GiB, 21.30% gc time, 4.99% compilation time)
 16.234867 seconds (144.01 M allocations: 14.741 GiB, 21.70% gc time)
+15.479326 seconds (139.01 M allocations: 14.309 GiB, 21.63% gc time)
 # 2023-05-03
 1e7 iteration, @time:
 200.327392 seconds (2.14 G allocations: 136.634 GiB, 13.44% gc time)
