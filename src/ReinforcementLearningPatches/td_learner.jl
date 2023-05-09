@@ -17,12 +17,17 @@ end
 (L::TDLearner)(s) = L.approximator(s)
 (L::TDLearner)(s, a) = L.approximator(s, a)
 
-function RLBase.optimise!(L::TDLearner, x)
-    _optimise!(L, x)
+function RLBase.optimise!(L::TDLearner, t)
+    _optimise!(L, t)
 end
 
+# NOTE: Indexing is hard-coded due to RLTrajectories type instability
 function _optimise!(L::TDLearner, t)
-    S, A, R, T = (t[x][1] for x in SART)
+    S = t.container.traces[1][:state]
+    A = t.container.traces[2][:action]
+    R = t.container.traces[3]
+    T = t.container.traces[4]
+
     n, γ, Q = L.n, L.γ, L.approximator
     G = 0.0
     for i = 1:min(n + 1, length(R))
