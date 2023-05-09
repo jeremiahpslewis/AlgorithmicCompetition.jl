@@ -23,8 +23,8 @@ end
 
 # NOTE: Indexing is hard-coded due to RLTrajectories type instability
 function _optimise!(L::TDLearner, t)
-    S = t.traces[1][:state]
-    A = t.traces[2][:action]
+    S = t.traces[1][:state][1]
+    A = t.traces[2][:action][1]
     R = t.traces[3][1]
     T = t.traces[4][1]
 
