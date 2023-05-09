@@ -42,7 +42,7 @@ function (h::ConvergenceCheck)(::PostActStage, policy, env, player::Symbol)
     n_prices = env.n_prices
 
     state_ = RLBase.state(env, player)
-    best_action = argmax(@view policy.policy.learner.approximator.table[:, state_])
+    best_action = argmax(@view policy.policy.learner.approximator.table[:, state_])::Int64
     iter_converged = (@views h.best_response_vector[state_] == best_action)
 
     h(state_, best_action, iter_converged)
@@ -63,4 +63,12 @@ function AIAPCHook(env::AbstractEnv)
             ) for p in players(env)
         ),
     )
+end
+
+
+function (hook::MultiAgentHook)(stage::AbstractStage, policy::MultiAgentPolicy, env::AIAPCEnv)
+    for p in (Symbol(1), Symbol(2))
+        hook[p][1](stage, policy[p], env, p)
+        hook[p][2](stage, policy[p], env, p)
+    end
 end

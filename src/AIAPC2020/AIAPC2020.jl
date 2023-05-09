@@ -1,6 +1,6 @@
 include("params.jl")
-include("hooks.jl")
 include("env.jl")
+include("hooks.jl")
 include("explorer.jl")
 include("policy.jl") # Need to finish porting!
 include("stop_condition.jl")
