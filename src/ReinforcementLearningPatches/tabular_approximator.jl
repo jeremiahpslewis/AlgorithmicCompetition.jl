@@ -28,9 +28,9 @@ TabularVApproximator(; n_state, init = 0.0, opt = InvDecay(1.0)) =
 TabularQApproximator(; n_state, n_action, init = 0.0, opt = InvDecay(1.0)) =
     TabularApproximator(fill(init, n_action, n_state), opt)
 
-(app::TabularVApproximator)(s::I) where {I<:Integer} = @views app.table[s]
+(app::TabularVApproximator{T,O})(s::I) where {T,O,I<:Integer} = @views app.table[s]
 
-(app::TabularQApproximator)(s::I) where {I<:Integer} = @views app.table[:, s]
+(app::TabularQApproximator{T,O})(s::I) where {T,O,I<:Integer} = @views app.table[:, s]
 (app::TabularQApproximator)(s::I1, a::I2) where {I1<:Integer,I2<:Integer} = app.table[a, s]
 
 function RLBase.optimise!(

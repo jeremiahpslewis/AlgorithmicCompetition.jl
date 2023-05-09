@@ -11,7 +11,8 @@ using ReinforcementLearningCore:
     EpsilonGreedyExplorer,
     RandomPolicy,
     MultiAgentPolicy,
-    RLCore
+    RLCore,
+    ResetAtTerminal
 using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy
 import ReinforcementLearningCore
 using StaticArrays
@@ -81,9 +82,9 @@ experiment = Experiment(env; stop_on_convergence = false)
     experiment.env,
     experiment.stop_condition,
     experiment.hook,
-    # ResetAtTerminal(),
+    ResetAtTerminal(),
 )
 
 
-L = experiment.policy.agents[Symbol(1)].policy.learner
-t = experiment.policy.agents[Symbol(1)].trajectory.container
+# L = experiment.policy.agents[Symbol(1)].policy.learner
+# t = experiment.policy.agents[Symbol(1)].trajectory.container

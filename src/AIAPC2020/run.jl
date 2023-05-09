@@ -5,7 +5,7 @@ import Base
 
 # Patch to improve type stability and try to speed things up (avoid generator)
 function (multiagent::MultiAgentPolicy)(env::AIAPCEnv)
-    return tuple(
+    return Tuple{Int,Int}(
         multiagent[Symbol(:1)](env, Symbol(:1)),
         multiagent[Symbol(:2)](env, Symbol(:1)),
     )
