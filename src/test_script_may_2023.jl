@@ -41,6 +41,7 @@ using AlgorithmicCompetition:
     AIAPCEpsilonGreedyExplorer,
     AIAPCSummary,
     TDLearner
+using JET
 # using Distributed
 
 α = Float32(0.125)
@@ -69,6 +70,8 @@ env = AIAPCEnv(hyperparams)
 experiment = Experiment(env; stop_on_convergence = false)
 
 experiment.policy(PreActStage(), experiment.env)
-experiment.policy(experiment.env)
+@report_opt experiment.policy(experiment.env)
 
 @time run(hyperparams; stop_on_convergence = false)
+
+

@@ -32,6 +32,7 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentPolicy(
                 ),
                 DummySampler(),
             ),
+            SRT{Int64, Float32, Bool}()
         ) for p in players(env)
     ),
 )
