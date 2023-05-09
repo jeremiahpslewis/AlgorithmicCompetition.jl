@@ -50,7 +50,7 @@ using JET
 ξ = 0.1
 δ = 0.95
 n_prices = 15
-max_iter = Int(1e7)
+max_iter = Int(1e6)
 price_index = 1:n_prices
 
 competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])

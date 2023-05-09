@@ -23,10 +23,10 @@ end
 
 # NOTE: Indexing is hard-coded due to RLTrajectories type instability
 function _optimise!(L::TDLearner, t)
-    S = t.container.traces[1][:state]
-    A = t.container.traces[2][:action]
-    R = t.container.traces[3]
-    T = t.container.traces[4]
+    S = t.traces[1][:state]
+    A = t.traces[2][:action]
+    R = t.traces[3][1]
+    T = t.traces[4][1]
 
     n, γ, Q = L.n, L.γ, L.approximator
     G = 0.0
