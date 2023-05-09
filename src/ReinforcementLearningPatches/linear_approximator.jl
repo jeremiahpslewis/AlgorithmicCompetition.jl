@@ -17,9 +17,8 @@ LinearVApproximator(; n, init = 0.0, opt = Descent(1.0)) =
 
 (V::LinearVApproximator)(s) = dot(s, V.weights)
 
-function RLBase.optimise!(V::LinearVApproximator, correction::Pair)
+function RLBase.optimise!(V::LinearVApproximator, s::Int64, Δ::Float32)
     w = V.weights
-    s, Δ = correction
     w̄ = s .* Δ
     Flux.Optimise.update!(V.optimizer, w, w̄)
 end
@@ -36,8 +35,7 @@ LinearQApproximator(; n_state, n_action, init = 0.0, opt = Descent(1.0)) =
 (Q::LinearQApproximator)(s) = [dot(s, c) for c in eachcol(Q.weights)]
 (Q::LinearQApproximator)(s, a) = dot(s, @view(Q.weights[:, a]))
 
-function RLBase.optimise!(Q::LinearQApproximator, correction::Pair)
-    (s, a), Δ = correction
+function RLBase.optimise!(Q::LinearQApproximator, s::Int64, a::Int64, Δ::Float32)
     @views w = Q.weights[:, a]
     w̄ = s .* Δ
     Flux.Optimise.update!(Q.optimizer, w, w̄)

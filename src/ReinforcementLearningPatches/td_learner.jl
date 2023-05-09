@@ -33,7 +33,7 @@ function _optimise!(L::TDLearner, t)
     for i = 1:min(n + 1, length(R))
         G = R + γ * G
         s, a = S[end-i], A[end-i]
-        RLBase.optimise!(Q, (s, a) => Q(s, a) - G)
+        RLBase.optimise!(Q, s, a, Q(s, a) - G)
     end
 end
 

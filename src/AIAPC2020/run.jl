@@ -5,10 +5,10 @@ import Base
 
 # Patch to improve type stability and try to speed things up (avoid generator)
 function (multiagent::MultiAgentPolicy)(env::AIAPCEnv)
-    return Tuple{Int,Int}(
+    return (
         multiagent[Symbol(:1)](env, Symbol(:1)),
         multiagent[Symbol(:2)](env, Symbol(:1)),
-    )
+    )::Tuple{Int64,Int64}
 end
 
 function Experiment(env::AIAPCEnv; stop_on_convergence = true)
