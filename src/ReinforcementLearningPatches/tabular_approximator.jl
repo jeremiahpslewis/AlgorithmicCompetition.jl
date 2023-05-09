@@ -50,7 +50,6 @@ function RLBase.optimise!(
     a::I2,
     e::F,
 ) where {I1<:Integer,I2<:Integer,F<:AbstractFloat}
-    (s, a), e = correction
     x = @view app.table[a, s]
     x̄ = @view [e][1]
     Flux.Optimise.update!(app.optimizer, x, x̄)
@@ -61,7 +60,6 @@ function RLBase.optimise!(
     s::I,
     errors::Vector{F},
 ) where {I<:Integer,F<:AbstractFloat}
-    s, errors = correction
     x = @view app.table[:, s]
     Flux.Optimise.update!(app.optimizer, x, errors)
 end
