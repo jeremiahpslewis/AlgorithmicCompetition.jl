@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../ReinforcementLearningTrajectories.jl"
+		},
+		{
+			"path": "../ReinforcementLearning.jl"
+		}
+	],
+	"settings": {}
+}

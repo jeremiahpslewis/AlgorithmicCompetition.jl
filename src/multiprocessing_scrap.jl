@@ -8,7 +8,7 @@ using AlgorithmicCompetition:
     Experiment,
     run_and_extract,
     run
-using ReinforcementLearning
+using ReinforcementLearningCore
 using Chain
 using Statistics
 using DataFrames
