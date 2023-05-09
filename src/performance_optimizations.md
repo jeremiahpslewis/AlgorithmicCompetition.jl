@@ -140,6 +140,10 @@ TODO:
 17.599272 seconds (146.43 M allocations: 14.895 GiB, 21.30% gc time, 4.99% compilation time)
 16.234867 seconds (144.01 M allocations: 14.741 GiB, 21.70% gc time)
 15.479326 seconds (139.01 M allocations: 14.309 GiB, 21.63% gc time)
+6.841070 seconds (129.01 M allocations: 4.862 GiB, 15.62% gc time)
+7.295190 seconds (129.33 M allocations: 4.980 GiB, 14.52% gc time, 9.10% compilation time)
+6.766770 seconds (127.01 M allocations: 4.832 GiB, 15.01% gc time)
+
 # 2023-05-03
 1e7 iteration, @time:
 200.327392 seconds (2.14 G allocations: 136.634 GiB, 13.44% gc time)

@@ -29,10 +29,12 @@ TabularQApproximator(; n_state, n_action, init = 0.0, opt = InvDecay(1.0)) =
     TabularApproximator(fill(init, n_action, n_state), opt)
 
 _get_vapproximator(table::T, s::I) where {T<:AbstractArray,I<:Integer} = @views table[s]
-(app::TabularVApproximator{T,O})(s::I) where {T<:AbstractArray,O,I<:Integer} = _get_vapproximator(app.table, s)
-
 _get_qapproximator(table::T, s::I) where {T<:AbstractArray,I<:Integer} = @views table[:, s]
 _get_qapproximator(table::T, s::I1, a::I2) where {T<:AbstractArray,I1<:Integer,I2<:Integer} = @views table[a, s]
+_get_qapproximator_as_view(table::T, s::I) where {T<:AbstractArray,I<:Integer} = @view table[:, s]
+_get_qapproximator_as_view(table::T, s::I1, a::I2) where {T<:AbstractArray,I1<:Integer,I2<:Integer} = @view table[a, s]
+    
+(app::TabularVApproximator{T,O})(s::I) where {T<:AbstractArray,O,I<:Integer} = _get_vapproximator(app.table, s)
 (app::TabularQApproximator{T,O})(s::I) where {T,O,I<:Integer} = _get_qapproximator(app.table, s)
 (app::TabularQApproximator{T,O})(s::I1, a::I2) where {T,O,I1<:Integer,I2<:Integer} = _get_qapproximator(app.table, s, a)
 
@@ -42,7 +44,7 @@ function RLBase.optimise!(
     e::F,
 ) where {I<:Integer,F<:AbstractFloat}
     s, e = correction
-    x = @view app.table[s]
+    x = _get_vapproximator(app.table, s)
     x̄ = @view [e][1]
     Flux.Optimise.update!(app.optimizer, x, x̄)
 end
@@ -53,7 +55,7 @@ function RLBase.optimise!(
     a::I2,
     e::F,
 ) where {I1<:Integer,I2<:Integer,F<:AbstractFloat}
-    x = @view app.table[a, s]
+    x = _get_qapproximator_as_view(app.table, s, a)
     x̄ = @view [e][1]
     Flux.Optimise.update!(app.optimizer, x, x̄)
 end
@@ -63,6 +65,6 @@ function RLBase.optimise!(
     s::I,
     errors::Vector{F},
 ) where {I<:Integer,F<:AbstractFloat}
-    x = @view app.table[:, s]
+    x = _get_qapproximator_as_view(app.table, s)
     Flux.Optimise.update!(app.optimizer, x, errors)
 end
