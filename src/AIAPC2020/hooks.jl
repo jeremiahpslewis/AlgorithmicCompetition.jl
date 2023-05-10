@@ -66,8 +66,8 @@ function AIAPCHook(env::AbstractEnv)
     )
 end
 
-RLCore.update!(hook::MultiAgentHook, stage::AbstractStage,
-    policy::MultiAgentPolicy env::AIAPCEnv)
+function RLCore.update!(hook::MultiAgentHook, stage::AbstractStage,
+    policy::MultiAgentPolicy, env::AIAPCEnv)
     for p in (Symbol(1), Symbol(2))
         RLCore.update!(hook[p][1], stage, policy[p], env, p)
         RLCore.update!(hook[p][2], stage, policy[p], env, p)
