@@ -1442,7 +1442,7 @@ version = "1.2.2"
 
 [[deps.ReinforcementLearningBase]]
 deps = ["AbstractTrees", "CommonRLInterface", "CommonRLSpaces", "DomainSets", "Markdown", "Random", "Reexport", "Test"]
-git-tree-sha1 = "31de27c0a8c7ced620e0429ec69c28f494ae0fee"
+git-tree-sha1 = "cfc3e8e75c617723c709db49d93443b9e366a6d6"
 repo-rev = "jpsl/performance-fixes"
 repo-subdir = "src/ReinforcementLearningBase"
 repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"
@@ -1451,7 +1451,7 @@ version = "0.11.1"
 
 [[deps.ReinforcementLearningCore]]
 deps = ["AbstractTrees", "Adapt", "CUDA", "ChainRulesCore", "CircularArrayBuffers", "Crayons", "Distributions", "FillArrays", "Flux", "Functors", "LinearAlgebra", "Parsers", "ProgressMeter", "Random", "Reexport", "ReinforcementLearningBase", "ReinforcementLearningTrajectories", "Statistics", "StatsBase", "UnicodePlots"]
-git-tree-sha1 = "b0cc6abfb96165758e75a2b4d0471409eff60446"
+git-tree-sha1 = "35cc09bf907c94a917d17e0440972be0d43b1f41"
 repo-rev = "jpsl/performance-fixes"
 repo-subdir = "src/ReinforcementLearningCore"
 repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"
