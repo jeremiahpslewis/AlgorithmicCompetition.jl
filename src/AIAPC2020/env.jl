@@ -76,7 +76,8 @@ struct AIAPCEnv <: AbstractEnv
     end
 end
 
-function (env::AIAPCEnv)(price_tuple::Tuple{Int64,Int64})
+# TODO: add back type signature ::Tuple{Int64,Int64}
+function RLBase.act!(env::AIAPCEnv, price_tuple)
     # TODO: Fix support for longer memories
     env.memory .= price_tuple
     env.is_done[1] = true

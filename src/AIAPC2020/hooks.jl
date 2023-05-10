@@ -14,7 +14,7 @@ mutable struct ConvergenceCheck <: AbstractHook
     end
 end
 
-function (h::ConvergenceCheck)(state_::Int64, best_action::Int, iter_converged::Bool)
+function RLCore.update!(h::ConvergenceCheck, state_::Int64, best_action::Int, iter_converged::Bool)
     # Increment duration whenever argmax action is stable (convergence criteria)
     # Increment convergence metric (e.g. convergence not reached)
     # Keep track of number of iterations it takes until convergence
@@ -37,16 +37,16 @@ function (h::ConvergenceCheck)(state_::Int64, best_action::Int, iter_converged::
 end
 
 
-function (h::ConvergenceCheck)(::PostActStage, policy, env, player::Symbol)
+function RLCore.update!(h::ConvergenceCheck, ::PostActStage, policy::P, env::E, player::Symbol) where {P <: AbstractPolicy, E <: AbstractEnv}
     # Convergence is defined over argmax action for each state 
     # E.g. best / greedy action
     n_prices = env.n_prices
 
     state_ = RLBase.state(env, player)
-    best_action = argmax(@view policy.policy.learner.approximator.table[:, state_])::Int64
+    best_action = argmax(@view policy.policy.learner.approximator.table[:, state_])
     iter_converged = (@views h.best_response_vector[state_] == best_action)
 
-    h(state_, best_action, iter_converged)
+    RLCore.update!(h, state_, best_action, iter_converged)
 
     env.convergence_dict[player] = h.is_converged
 
