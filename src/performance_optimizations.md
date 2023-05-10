@@ -126,7 +126,7 @@ TODO:
 
 # rework convergence logic, reduce env calls
 
-# 20230-05-09
+# 2023-05-09
 1e6, @time
 19.308903 seconds (176.01 M allocations: 15.412 GiB, 19.09% gc time, 0.00% compilation time)
 18.314387 seconds (176.01 M allocations: 15.412 GiB, 13.85% gc time)

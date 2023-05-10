@@ -1,4 +1,5 @@
 using ReinforcementLearningCore, ReinforcementLearningBase
+import ReinforcementLearningCore: RLCore
 using StaticArrays
 
 mutable struct ConvergenceCheck <: AbstractHook
@@ -65,10 +66,10 @@ function AIAPCHook(env::AbstractEnv)
     )
 end
 
-
-function (hook::MultiAgentHook)(stage::AbstractStage, policy::MultiAgentPolicy, env::AIAPCEnv)
+RLCore.update!(hook::MultiAgentHook, stage::AbstractStage,
+    policy::MultiAgentPolicy env::AIAPCEnv)
     for p in (Symbol(1), Symbol(2))
-        hook[p][1](stage, policy[p], env, p)
-        hook[p][2](stage, policy[p], env, p)
+        RLCore.update!(hook[p][1], stage, policy[p], env, p)
+        RLCore.update!(hook[p][2], stage, policy[p], env, p)
     end
 end
