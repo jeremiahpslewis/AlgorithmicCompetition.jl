@@ -11,8 +11,9 @@ using ReinforcementLearningCore:
     EpsilonGreedyExplorer,
     RandomPolicy,
     MultiAgentPolicy,
-    update!
-using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy
+    update!,
+    plan!
+using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy, act!
 import ReinforcementLearningCore
 using StaticArrays
 using Statistics
@@ -139,7 +140,7 @@ end
     # Test full policy exploration of states
     update!(policy, PreActStage(), env)
     n_ = Int(1e5)
-    policy_runs = [[policy(env)...] for i = 1:n_]
+    policy_runs = [[plan!(policy, env)...] for i = 1:n_]
     checksum_ = [sum(unique(policy_runs[j][i] for j = 1:n_)) for i = 1:2]
     @test all(checksum_ .== sum(1:env.n_prices))
 end
@@ -241,7 +242,7 @@ end
     exper = Experiment(env)
     state(env)
     policies = env |> AIAPCPolicy
-    exper.hook[Symbol(1)][2](Int64(2), 3, false)
+    update!(exper.hook[Symbol(1)][2], Int64(2), 3, false)
     @test exper.hook[Symbol(1)][2].best_response_vector[2] == 3
 
 
@@ -380,7 +381,7 @@ end
     @test current_player(env) == RLBase.SimultaneousPlayer()
     @test action_space(env, Symbol(1)) == 1:15
     @test reward(env) != 0 # reward reflects outcomes of last play (which happens at player = 1, e.g. before any actions chosen)
-    env((5, 5))
+    act!(env, (5, 5))
     @test reward(env) != [0, 0] # reward is zero as at least one player has already played (technically sequental plays)
 end
 
