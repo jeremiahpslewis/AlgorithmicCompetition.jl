@@ -24,6 +24,7 @@
 using ReinforcementLearningCore
 
 using ReinforcementLearningBase
+import ReinforcementLearningBase: RLBase
 using ReinforcementLearningEnvironments
 using Random
 
@@ -77,7 +78,7 @@ end
 
 get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any}) = get_ϵ(s, s.step)
 
-function (s::AIAPCEpsilonGreedyExplorer{<:Any})(values)
+function RLBase.plan!(s::AIAPCEpsilonGreedyExplorer{<:Any}, values)
     ϵ = get_ϵ(s)
     s.step += 1
     max_vals = find_all_max(values)[2]
@@ -92,8 +93,8 @@ function (s::AIAPCEpsilonGreedyExplorer{<:Any})(values)
 end
 
 # TODO: Fix mask code to work with subarray types?
-(s::AIAPCEpsilonGreedyExplorer{<:Any})(values, mask) =
-    (s::AIAPCEpsilonGreedyExplorer{<:Any})(values)
+RLBase.plan!(s::AIAPCEpsilonGreedyExplorer{<:Any}, values, mask) =
+    RLBase.plan!(s::AIAPCEpsilonGreedyExplorer{<:Any}, values)
 
 # Patch for QBasedPolicy, not sure why NamedTuple dispatch is not working
 RLBase.optimise!(p::QBasedPolicy, x::CircularArraySARTTraces) = optimise!(p.learner, x)

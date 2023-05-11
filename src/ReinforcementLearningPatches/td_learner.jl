@@ -14,9 +14,9 @@ Base.@kwdef struct TDLearner{A,F<:AbstractFloat,I<:Integer} <: AbstractLearner
     n::I = 0
 end
 
-RLCore.estimate_reward(L::TDLearner, env::E) where {E<:AbstractEnv} = RLCore.estimate_reward(L.approximator, state(env))
-RLCore.estimate_reward(L::TDLearner, s) = RLCore.estimate_reward(L.approximator, s)
-RLCore.estimate_reward(L::TDLearner, s, a) = RLCore.estimate_reward(L.approximator, s, a)
+RLCore.estimate_reward(L::TDLearner{A,F,I}, env::E) where {A,F,I,E<:AbstractEnv} = RLCore.estimate_reward(L.approximator, state(env))
+RLCore.estimate_reward(L::TDLearner{A,F,I}, s) where {A,F,I} = RLCore.estimate_reward(L.approximator, s)
+RLCore.estimate_reward(L::TDLearner{A,F,I}, s, a) where {A,F,I} = RLCore.estimate_reward(L.approximator, s, a)
 
 function RLBase.optimise!(L::TDLearner, t)
     _optimise!(L, t)

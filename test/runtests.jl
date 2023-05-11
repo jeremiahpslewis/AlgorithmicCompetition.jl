@@ -11,9 +11,8 @@ using ReinforcementLearningCore:
     EpsilonGreedyExplorer,
     RandomPolicy,
     MultiAgentPolicy,
-    update!,
-    plan!
-using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy, act!
+    update!
+using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy, act!, plan!
 import ReinforcementLearningCore
 using StaticArrays
 using Statistics
