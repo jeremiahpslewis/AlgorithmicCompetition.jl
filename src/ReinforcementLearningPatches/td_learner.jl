@@ -23,7 +23,7 @@ function RLBase.optimise!(L::TDLearner, t)
 end
 
 # NOTE: Indexing is hard-coded due to RLTrajectories type instability
-function _optimise!(L::TDLearner, t)
+function _optimise!(L::TDLearner{Ap,F,I}, t::Tr) where {Ap,F,I,Tr<:Traces}
     S = t.traces[1][:state][1]
     A = t.traces[2][:action][1]
     R = t.traces[3][1]

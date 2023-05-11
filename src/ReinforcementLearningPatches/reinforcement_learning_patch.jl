@@ -78,7 +78,7 @@ end
 
 get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any}) = get_ϵ(s, s.step)
 
-function RLBase.plan!(s::AIAPCEpsilonGreedyExplorer{<:Any}, values)
+function RLBase.plan!(s::AIAPCEpsilonGreedyExplorer{<:Any}, values::T) where {T}
     ϵ = get_ϵ(s)
     s.step += 1
     max_vals = find_all_max(values)[2]
