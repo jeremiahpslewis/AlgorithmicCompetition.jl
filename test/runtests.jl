@@ -10,7 +10,7 @@ using ReinforcementLearningCore:
     action_space,
     EpsilonGreedyExplorer,
     RandomPolicy,
-    MultiAgentPolicy
+    MultiAgentPolicy,
     update!
 using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy
 import ReinforcementLearningCore

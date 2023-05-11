@@ -72,7 +72,7 @@ env = AIAPCEnv(hyperparams)
 experiment = Experiment(env; stop_on_convergence = false)
 
 @report_opt RLCore.update!(experiment.policy, PreActStage(), experiment.env)
-@report_opt RLBase.choose!(experiment.policy, experiment.env)
+@report_opt RLBase.plan!(experiment.policy, experiment.env)
 
 @time run(hyperparams; stop_on_convergence = false);
 
