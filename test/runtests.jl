@@ -2,6 +2,7 @@ using Test
 using JuMP
 using Chain
 using ReinforcementLearningCore:
+    RLCore,
     PostActStage,
     PreActStage,
     state,
