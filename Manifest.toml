@@ -622,9 +622,9 @@ version = "0.19.3"
 
 [[deps.GeoInterface]]
 deps = ["Extents"]
-git-tree-sha1 = "0eb6de0b312688f852f347171aba888658e29f20"
+git-tree-sha1 = "bb198ff907228523f3dee1070ceee63b9359b6ab"
 uuid = "cf35fbd7-0cd7-5166-be24-54bfbe79505f"
-version = "1.3.0"
+version = "1.3.1"
 
 [[deps.GeometryBasics]]
 deps = ["EarCut_jll", "GeoInterface", "IterTools", "LinearAlgebra", "StaticArrays", "StructArrays", "Tables"]
@@ -1451,7 +1451,7 @@ version = "0.11.1"
 
 [[deps.ReinforcementLearningCore]]
 deps = ["AbstractTrees", "Adapt", "CUDA", "ChainRulesCore", "CircularArrayBuffers", "Crayons", "Distributions", "FillArrays", "Flux", "Functors", "LinearAlgebra", "Parsers", "ProgressMeter", "Random", "Reexport", "ReinforcementLearningBase", "ReinforcementLearningTrajectories", "Statistics", "StatsBase", "UnicodePlots"]
-git-tree-sha1 = "e9a37a811554d247e7e5184226b8311cf16a2910"
+git-tree-sha1 = "06d5936535304757ac06cd9be2895b2d3ecb57a3"
 repo-rev = "jpsl/performance-fixes"
 repo-subdir = "src/ReinforcementLearningCore"
 repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"
@@ -1505,10 +1505,10 @@ uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 version = "0.7.0"
 
 [[deps.SIMD]]
-deps = ["SnoopPrecompile"]
-git-tree-sha1 = "8b20084a97b004588125caebf418d8cab9e393d1"
+deps = ["PrecompileTools"]
+git-tree-sha1 = "0e270732477b9e551d884e6b07e23bb2ec947790"
 uuid = "fdea26ae-647d-5447-a871-4b548cad5224"
-version = "3.4.4"
+version = "3.4.5"
 
 [[deps.ScanByte]]
 deps = ["Libdl", "SIMD"]

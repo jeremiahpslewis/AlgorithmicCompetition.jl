@@ -4,6 +4,7 @@ using LinearAlgebra: dot
 using Distributions: pdf
 using ReinforcementLearningBase
 using ReinforcementLearningCore
+import ReinforcementLearningCore: RLCore
 using ReinforcementLearningTrajectories: Trajectory
 
 Base.@kwdef struct TDLearner{A,F<:AbstractFloat,I<:Integer} <: AbstractLearner
@@ -13,9 +14,9 @@ Base.@kwdef struct TDLearner{A,F<:AbstractFloat,I<:Integer} <: AbstractLearner
     n::I = 0
 end
 
-estimate_reward(L::TDLearner, env::E) where {E<:AbstractEnv} = L.approximator(state(env))
-estimate_reward(L::TDLearner, s) = L.approximator(s)
-estimate_reward(L::TDLearner, s, a) = L.approximator(s, a)
+RLCore.estimate_reward(L::TDLearner, env::E) where {E<:AbstractEnv} = RLCore.estimate_reward(L.approximator, state(env))
+RLCore.estimate_reward(L::TDLearner, s) = RLCore.estimate_reward(L.approximator, s)
+RLCore.estimate_reward(L::TDLearner, s, a) = RLCore.estimate_reward(L.approximator, s, a)
 
 function RLBase.optimise!(L::TDLearner, t)
     _optimise!(L, t)
@@ -33,7 +34,7 @@ function _optimise!(L::TDLearner, t)
     for i = 1:min(n + 1, length(R))
         G = R + γ * G
         s, a = S[end-i], A[end-i]
-        RLBase.optimise!(Q, s, a, estimate_reward(Q, s, a) - G)
+        RLBase.optimise!(Q, s, a, RLCore.estimate_reward(Q, s, a) - G)
     end
 end
 
@@ -41,7 +42,7 @@ function RLBase.priority(L::TDLearner, transition::Tuple)
     if L.method == :SARS
         s, a, r, d, s′ = transition
         γ, Q = L.γ, L.approximator
-        Δ = d ? (r - estimate_reward(Q, s, a)) : (r + γ^(L.n + 1) * maximum(estimate_reward(Q, s′)) - estimate_reward(Q, s, a))
+        Δ = d ? (r - RLCore.estimate_reward(Q, s, a)) : (r + γ^(L.n + 1) * maximum(RLCore.estimate_reward(Q, s′)) - RLCore.estimate_reward(Q, s, a))
         Δ = [Δ]  # must be broadcastable in Flux.Optimise
         Flux.Optimise.apply!(Q.optimizer, (s, a), Δ)
         abs(Δ[])
