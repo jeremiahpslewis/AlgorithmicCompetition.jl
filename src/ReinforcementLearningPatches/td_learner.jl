@@ -38,7 +38,8 @@ function _optimise!(Q::TDLearner, table::Matrix{Float64}, n, γ, S, A, R)
     for i = 1:min(n + 1, length(R))
         G = R + γ * G
         s, a = S[end-i], A[end-i]
-        RLBase.optimise!(Q.approximator.table, Q.approximator.optimizer, s, a, RLCore.estimate_reward(table, s, a) - G)
+        e = RLCore.estimate_reward(table, s, a) - G
+        RLBase.optimise!(Q.approximator.table, Q.approximator.optimizer, s, a, e)
     end
     return
 end

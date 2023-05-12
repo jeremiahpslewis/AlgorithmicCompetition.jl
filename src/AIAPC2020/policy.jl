@@ -1,5 +1,6 @@
 using ReinforcementLearningCore
 using StaticArrays
+using Flux
 
 function InitMatrix(n_prices, n_state_space)
     return zeros(Float64, n_prices, n_state_space)

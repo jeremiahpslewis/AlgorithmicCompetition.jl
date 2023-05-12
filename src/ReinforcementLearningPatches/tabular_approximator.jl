@@ -13,20 +13,10 @@ For `table` of 2-d, it will serve as a state-action value approximator.
     For `table` of 2-d, the first dimension is action and the second dimension is state.
 """
 # TODO: add back missing AbstractApproximator
-struct TabularApproximator{O}
+struct TabularApproximator
     table::Matrix{Float64}
-    optimizer::O
-    function TabularApproximator(table::Matrix{Float64}, opt::O) where {O}
-        n = ndims(table)
-        n <= 2 || throw(ArgumentError("the dimension of table must be <= 2"))
-        new{O}(table, opt)
-    end
+    optimizer::Descent
 end
-
-const TabularQApproximator = TabularApproximator{2}
-
-TabularQApproximator(; n_state, n_action, init = 0.0, opt = InvDecay(1.0)) =
-    TabularApproximator(fill(init, n_action, n_state), opt)
 
 _get_qapproximator(table::Matrix{Float64}, s::I) where {I<:Integer} = @views table[:, s]
 _get_qapproximator(table::Matrix{Float64}, s::I1, a::I2) where {I1<:Integer,I2<:Integer} = Float64(table[a, s])
