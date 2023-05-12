@@ -7,16 +7,16 @@ using ReinforcementLearningCore
 import ReinforcementLearningCore: RLCore
 using ReinforcementLearningTrajectories: Trajectory
 
-Base.@kwdef struct TDLearner{A,F<:AbstractFloat,I<:Integer} <: AbstractLearner
-    approximator::A
+Base.@kwdef struct TDLearner{F<:AbstractFloat,I<:Integer} <: AbstractLearner
+    approximator::TabularApproximator
     γ::F = 1.0
     method::Symbol
     n::I = 0
 end
 
-RLCore.estimate_reward(L::TDLearner{A,F,I}, env::E) where {A,F,I,E<:AbstractEnv} = _get_qapproximator(L.approximator.table, RLBase.state(env))
-RLCore.estimate_reward(L::TDLearner{A,F,I}, s) where {A,F,I} = RLCore.estimate_reward(L.approximator, s)
-RLCore.estimate_reward(L::TDLearner{A,F,I}, s, a) where {A,F,I} = RLCore.estimate_reward(L.approximator, s, a)
+RLCore.estimate_reward(L::TDLearner, env::E) where {E<:AbstractEnv} = _get_qapproximator(L.approximator.table, RLBase.state(env))
+RLCore.estimate_reward(L::TDLearner, s) = RLCore.estimate_reward(L.approximator.table, s)
+RLCore.estimate_reward(L::TDLearner, s, a) = RLCore.estimate_reward(L.approximator.table, s, a)
 
 function RLBase.optimise!(L::TDLearner, t)
     _optimise!(L, t)
@@ -24,7 +24,7 @@ function RLBase.optimise!(L::TDLearner, t)
 end
 
 # NOTE: Indexing is hard-coded due to RLTrajectories type instability
-function _optimise!(L::TDLearner{Ap,F,I}, t::Tr) where {Ap,F,I,Tr<:Traces}
+function _optimise!(L::TDLearner, t::Tr) where {Tr<:Traces}
     S = t.traces[1][:state][1]
     A = t.traces[2][:action][1]
     R = t.traces[3][1]
@@ -33,12 +33,12 @@ function _optimise!(L::TDLearner{Ap,F,I}, t::Tr) where {Ap,F,I,Tr<:Traces}
     return
 end
 
-function _optimise!(Q::TDLearner{Ap,F,I}, table::Matrix{Float32}, n, γ, S, A, R) where {Ap,F,I}
+function _optimise!(Q::TDLearner, table::Matrix{Float64}, n, γ, S, A, R)
     G = 0.0
     for i = 1:min(n + 1, length(R))
         G = R + γ * G
         s, a = S[end-i], A[end-i]
-        RLBase.optimise!(Q.approximator, s, a, RLCore.estimate_reward(Q.approximator, table, s, a) - G)
+        RLBase.optimise!(Q.approximator.table, Q.approximator.optimizer, s, a, RLCore.estimate_reward(table, s, a) - G)
     end
     return
 end

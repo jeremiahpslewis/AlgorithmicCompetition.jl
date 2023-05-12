@@ -89,7 +89,7 @@ TODO:
 23.618 s (203000500 allocations: 8.60 GiB)
 24.456 s (208005856 allocations: 8.89 GiB) # gets worse if smaller ints are not used, but not significantly...
 24.158 s (203000500 allocations: 8.57 GiB)
-23.958 s (203000500 allocations: 8.47 GiB) # Float32s help a bit
+23.958 s (203000500 allocations: 8.47 GiB) # Float64s help a bit
 24.012 s (203000406 allocations: 8.47 GiB)
 23.594 s (203000638 allocations: 8.47 GiB) # Stop recalculating action space
 21.765 s (185013689 allocations: 7.54 GiB) # Stop recalculating profits!
@@ -139,6 +139,11 @@ TODO:
 5.672007 seconds (115.41 M allocations: 4.355 GiB, 15.54% gc time)
 5.681733 seconds (115.42 M allocations: 4.355 GiB, 15.31% gc time)
 5.398183 seconds (111.41 M allocations: 4.236 GiB, 15.36% gc time)
+6.895325 seconds (109.41 M allocations: 4.147 GiB, 13.95% gc time)
+6.842156 seconds (109.41 M allocations: 4.147 GiB, 12.83% gc time)
+6.978497 seconds (109.41 M allocations: 4.147 GiB, 12.91% gc time)
+7.137854 seconds (109.41 M allocations: 4.147 GiB, 13.70% gc time)
+7.067014 seconds (109.42 M allocations: 4.147 GiB, 13.15% gc time)
 
 # 2023-05-11
 1.9 / 1e6

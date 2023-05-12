@@ -37,7 +37,7 @@ RLCore.estimate_reward(table::Matrix{Float64}, s::I1, a::I2) where {I1<:Integer,
 
 function RLBase.optimise!(
     table::Matrix{Float64},
-    optimizer,
+    optimizer::Flux.Optimiser.Descent,
     s::Int64,
     a::Int64,
     e::Float64,

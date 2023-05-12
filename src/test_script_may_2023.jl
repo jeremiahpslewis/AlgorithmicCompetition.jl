@@ -46,8 +46,8 @@ using AlgorithmicCompetition:
 using JET
 # using Distributed
 
-α = Float32(0.125)
-β = Float32(1e-5)
+α = Float64(0.125)
+β = Float64(1e-5)
 δ = 0.95
 ξ = 0.1
 δ = 0.95
