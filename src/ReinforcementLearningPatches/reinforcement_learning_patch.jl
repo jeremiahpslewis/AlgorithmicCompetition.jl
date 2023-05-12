@@ -88,7 +88,7 @@ function RLBase.plan!(s::AIAPCEpsilonGreedyExplorer{<:Any}, values::T) where {T}
         end
         return rand(s.rng, max_vals)
     else
-        return rand(s.rng, Base.OneTo(Int64(length(values))))
+        return rand(s.rng, Base.OneTo(length(values)))
     end
 end
 

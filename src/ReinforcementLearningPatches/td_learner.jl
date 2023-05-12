@@ -14,7 +14,7 @@ Base.@kwdef struct TDLearner{A,F<:AbstractFloat,I<:Integer} <: AbstractLearner
     n::I = 0
 end
 
-RLCore.estimate_reward(L::TDLearner{A,F,I}, env::E) where {A,F,I,E<:AbstractEnv} = RLCore.estimate_reward(L.approximator, state(env))
+@inline RLCore.estimate_reward(L::TDLearner{A,F,I}, env::E) where {A,F,I,E<:AbstractEnv} = RLCore.estimate_reward(L.approximator, state(env))
 RLCore.estimate_reward(L::TDLearner{A,F,I}, s) where {A,F,I} = RLCore.estimate_reward(L.approximator, s)
 RLCore.estimate_reward(L::TDLearner{A,F,I}, s, a) where {A,F,I} = RLCore.estimate_reward(L.approximator, s, a)
 
@@ -27,15 +27,20 @@ function _optimise!(L::TDLearner{Ap,F,I}, t::Tr) where {Ap,F,I,Tr<:Traces}
     S = t.traces[1][:state][1]
     A = t.traces[2][:action][1]
     R = t.traces[3][1]
-    T = t.traces[4][1]
 
-    n, γ, Q = L.n, L.γ, L.approximator
+    _optimise!(L.approximator, L.n, L.γ, S, A, R)
+    return
+end
+
+function _optimise!(approximator::TabularApproximator{N,T,O}, n, γ, S, A, R) where {N,T,O}
+    Q = approximator
     G = 0.0
     for i = 1:min(n + 1, length(R))
         G = R + γ * G
         s, a = S[end-i], A[end-i]
         RLBase.optimise!(Q, s, a, RLCore.estimate_reward(Q, s, a) - G)
     end
+    return
 end
 
 function RLBase.priority(L::TDLearner, transition::Tuple)
