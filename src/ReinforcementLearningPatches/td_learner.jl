@@ -20,6 +20,7 @@ RLCore.estimate_reward(L::TDLearner{A,F,I}, s, a) where {A,F,I} = RLCore.estimat
 
 function RLBase.optimise!(L::TDLearner, t)
     _optimise!(L, t)
+    return
 end
 
 # NOTE: Indexing is hard-coded due to RLTrajectories type instability

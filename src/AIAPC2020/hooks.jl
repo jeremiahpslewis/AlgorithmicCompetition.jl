@@ -40,12 +40,12 @@ function _best_action_lookup(state_, table)
     argmax(@view table[:, state_])
 end
 
-function RLCore.update!(h::ConvergenceCheck, ::PostActStage, approximator::TabularApproximator{N,T,O}, env::E, player::Symbol, state_::S) where {E <: AbstractEnv,S,N,T,O}
+function RLCore.update!(h::ConvergenceCheck, ::PostActStage, table::Matrix{Float32}, env::E, player::Symbol, state_::S) where {E <: AbstractEnv,S}
     # Convergence is defined over argmax action for each state 
     # E.g. best / greedy action
     n_prices = env.n_prices
 
-    best_action = _best_action_lookup(state_, approximator.table)
+    best_action = _best_action_lookup(state_, table)
     iter_converged = (@views h.best_response_vector[state_] == best_action)
 
     RLCore.update!(h, state_, best_action, iter_converged)
@@ -57,7 +57,7 @@ end
     
 function RLCore.update!(h::ConvergenceCheck, ::PostActStage, policy::P, env::E, player::Symbol) where {P <: AbstractPolicy, E <: AbstractEnv}
     state_ = RLBase.state(env, player)
-    RLCore.update!(h, PostActStage(), policy.policy.learner.approximator, env, player, state_)
+    RLCore.update!(h, PostActStage(), policy.policy.learner.approximator.table, env, player, state_)
     return
 end
 
