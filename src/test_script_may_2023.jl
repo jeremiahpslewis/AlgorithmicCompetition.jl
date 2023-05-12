@@ -75,9 +75,9 @@ experiment = Experiment(env; stop_on_convergence = false)
 @report_opt RLBase.plan!(experiment.policy, experiment.env)
 
 @time run(hyperparams; stop_on_convergence = false);
+@time run(hyperparams; stop_on_convergence = false);
 
-
-@report_opt ignored_modules=(Base,) RLCore._run(
+@report_opt ignored_modules=(Base,GPUArrays,) RLCore._run(
     experiment.policy,
     experiment.env,
     experiment.stop_condition,

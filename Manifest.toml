@@ -814,9 +814,9 @@ version = "1.0.0"
 
 [[deps.JET]]
 deps = ["InteractiveUtils", "JuliaInterpreter", "LoweredCodeUtils", "MacroTools", "Pkg", "PrecompileTools", "Preferences", "Revise", "Test"]
-git-tree-sha1 = "37fa60fb1e2571f4038df7933b354f8cd63b9609"
+git-tree-sha1 = "d23bf4f90d1e869236b3d701fc3c45f63eae2454"
 uuid = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"
-version = "0.7.14"
+version = "0.7.15"
 
 [[deps.JLLWrappers]]
 deps = ["Preferences"]
@@ -1455,7 +1455,7 @@ version = "0.11.1"
 
 [[deps.ReinforcementLearningCore]]
 deps = ["AbstractTrees", "Adapt", "CUDA", "ChainRulesCore", "CircularArrayBuffers", "Crayons", "Distributions", "FillArrays", "Flux", "Functors", "LinearAlgebra", "Parsers", "ProgressMeter", "Random", "Reexport", "ReinforcementLearningBase", "ReinforcementLearningTrajectories", "Statistics", "StatsBase", "UnicodePlots"]
-git-tree-sha1 = "852c04a4a2893893018a3e2b662034c049cfac58"
+git-tree-sha1 = "579bc08bb563b442c9fe81472117bf723dc7f964"
 repo-rev = "jpsl/performance-fixes"
 repo-subdir = "src/ReinforcementLearningCore"
 repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"

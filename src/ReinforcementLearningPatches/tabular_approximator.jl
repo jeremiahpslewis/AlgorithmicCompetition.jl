@@ -30,15 +30,15 @@ TabularVApproximator(; n_state, init = 0.0, opt = InvDecay(1.0)) =
 TabularQApproximator(; n_state, n_action, init = 0.0, opt = InvDecay(1.0)) =
     TabularApproximator(fill(init, n_action, n_state), opt)
 
-_get_vapproximator(table::T, s::I) where {T<:AbstractArray,I<:Integer} = @views table[s]
-_get_qapproximator(table::T, s::I) where {T<:AbstractArray,I<:Integer} = @views table[:, s]
-_get_qapproximator(table::T, s::I1, a::I2) where {T<:AbstractArray,I1<:Integer,I2<:Integer} = @views table[a, s]
-_get_qapproximator_as_view(table::T, s::I) where {T<:AbstractArray,I<:Integer} = @view table[:, s]
-_get_qapproximator_as_view(table::T, s::I1, a::I2) where {T<:AbstractArray,I1<:Integer,I2<:Integer} = @view table[a, s]
+_get_vapproximator(table::Matrix{Float32}, s::I) where {I<:Integer} = @views table[s]
+_get_qapproximator(table::Matrix{Float32}, s::I) where {I<:Integer} = @views table[:, s]
+_get_qapproximator(table::Matrix{Float32}, s::I1, a::I2) where {I1<:Integer,I2<:Integer} = @views table[a, s]
+_get_qapproximator_as_view(table::Matrix{Float32}, s::I) where {I<:Integer} = @view table[:, s]
+_get_qapproximator_as_view(table::Matrix{Float32}, s::I1, a::I2) where {I1<:Integer,I2<:Integer} = @view table[a, s]
     
-RLCore.estimate_reward(app::TabularVApproximator{T,O}, s::I) where {T<:AbstractArray,O,I<:Integer} = _get_vapproximator(app.table, s)
-RLCore.estimate_reward(app::TabularQApproximator{T,O}, s::I) where {T,O,I<:Integer} = _get_qapproximator(app.table, s)
-RLCore.estimate_reward(app::TabularQApproximator{T,O}, s::I1, a::I2) where {T,O,I1<:Integer,I2<:Integer} = _get_qapproximator(app.table, s, a)
+RLCore.estimate_reward(app::TabularVApproximator, table::Matrix{Float32}, s::I) where {I<:Integer} = _get_vapproximator(table, s)
+RLCore.estimate_reward(app::TabularQApproximator, table::Matrix{Float32}, s::I) where {I<:Integer} = _get_qapproximator(table, s)
+RLCore.estimate_reward(app::TabularQApproximator, table::Matrix{Float32}, s::I1, a::I2) where {I1<:Integer,I2<:Integer} = _get_qapproximator(table, s, a)
 
 function RLBase.optimise!(
     app::TabularVApproximator,

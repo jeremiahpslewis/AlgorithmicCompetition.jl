@@ -78,23 +78,16 @@ end
 
 get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any}) = get_ϵ(s, s.step)
 
-function RLBase.plan!(s::AIAPCEpsilonGreedyExplorer{<:Any}, values::T) where {T}
+function RLBase.plan!(s::AIAPCEpsilonGreedyExplorer{<:Any}, values::T, full_action_space) where {T}
     ϵ = get_ϵ(s)
     s.step += 1
-    max_vals = find_all_max(values)[2]
-    if rand(s.rng) >= ϵ
-        if length(max_vals) == 1
-            return max_vals[1]
-        end
-        return rand(s.rng, max_vals)
-    else
-        return rand(s.rng, Base.OneTo(length(values)))
+    if rand(s.rng) < ϵ
+        return rand(s.rng, full_action_space)
     end
-end
+    max_vals = find_all_max(values)[2]
 
-# TODO: Fix mask code to work with subarray types?
-RLBase.plan!(s::AIAPCEpsilonGreedyExplorer{<:Any}, values, mask) =
-    RLBase.plan!(s::AIAPCEpsilonGreedyExplorer{<:Any}, values)
+    return rand(s.rng, max_vals)
+end
 
 # Patch for QBasedPolicy, not sure why NamedTuple dispatch is not working
 RLBase.optimise!(p::QBasedPolicy, x::CircularArraySARTTraces) = optimise!(p.learner, x)
