@@ -19,7 +19,7 @@ struct TabularApproximator
 end
 
 _get_qapproximator(table::Matrix{Float64}, s::I) where {I<:Integer} = @views table[:, s]
-_get_qapproximator(table::Matrix{Float64}, s::I1, a::I2) where {I1<:Integer,I2<:Integer} = Float64(table[a, s])
+_get_qapproximator(table::Matrix{Float64}, s::I1, a::I2) where {I1<:Integer,I2<:Integer} = @views table[a, s]
 _get_qapproximator_as_view(table::Matrix{Float64}, s::I) where {I<:Integer} = @view table[:, s]
 _get_qapproximator_as_view(table::Matrix{Float64}, s::I1, a::I2) where {I1<:Integer,I2<:Integer} = @view table[a, s]
     
