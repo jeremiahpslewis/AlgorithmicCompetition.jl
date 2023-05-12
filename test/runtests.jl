@@ -46,8 +46,8 @@ using AlgorithmicCompetition:
 using Distributed
 
 @testset "Prepackaged Environment Tests" begin
-    α = Float32(0.125)
-    β = Float32(1e-5)
+    α = Float64(0.125)
+    β = Float64(1e-5)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -113,8 +113,8 @@ end
 
 
 @testset "Policy operation test" begin
-    α = Float32(0.125)
-    β = Float32(1e-5)
+    α = Float64(0.125)
+    β = Float64(1e-5)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -146,8 +146,8 @@ end
 end
 
 @testset "run full AIAPC simulation" begin
-    α = Float32(0.125)
-    β = Float32(1e-5)
+    α = Float64(0.125)
+    β = Float64(1e-5)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -190,8 +190,8 @@ end
     competition_solution = CompetitionSolution(competition_params)
 
     n_increments = 3
-    α_ = Float32.(range(0.025, 0.25, n_increments))
-    β_ = Float32.(range(1.25e-8, 2e-5, n_increments))
+    α_ = Float64.(range(0.025, 0.25, n_increments))
+    β_ = Float64.(range(1.25e-8, 2e-5, n_increments))
     δ = 0.95
     max_iter = Int(1e7)
 
@@ -233,8 +233,8 @@ end
 
     env =
         AIAPCHyperParameters(
-            Float32(0.1),
-            Float32(1e-4),
+            Float64(0.1),
+            Float64(1e-4),
             0.95,
             Int(1e7),
             competition_solution,
@@ -257,8 +257,8 @@ end
 
     env =
         AIAPCHyperParameters(
-            Float32(0.1),
-            Float32(1e-4),
+            Float64(0.1),
+            Float64(1e-4),
             0.95,
             Int(1e7),
             competition_solution,
@@ -293,8 +293,8 @@ end
 end
 
 @testset "Parameter / learning checks" begin
-    α = Float32(0.125)
-    β = Float32(1e-5)
+    α = Float64(0.125)
+    β = Float64(1e-5)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -355,8 +355,8 @@ end
 end
 
 @testset "Sequential environment" begin
-    α = Float32(0.125)
-    β = Float32(1e-5)
+    α = Float64(0.125)
+    β = Float64(1e-5)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -386,8 +386,8 @@ end
 end
 
 @testset "No stop on Convergence stop works" begin
-    α = Float32(0.125)
-    β = Float32(1e-5)
+    α = Float64(0.125)
+    β = Float64(1e-5)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -412,8 +412,8 @@ end
 end
 
 @testset "Convergence stop works" begin
-    α = Float32(0.125)
-    β = Float32(1e-5)
+    α = Float64(0.125)
+    β = Float64(1e-5)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -456,7 +456,7 @@ end
     @test ReinforcementLearningCore.get_ϵ(explorer, 1e5) ≈ 0.36787944117144233
     @test_broken ReinforcementLearningCore.get_ϵ(explorer, 1e5) ≈ 0.14 # Percentage cited in AIAPC paper
 
-    explorer = AIAPCEpsilonGreedyExplorer(Float32(1e-5))
+    explorer = AIAPCEpsilonGreedyExplorer(Float64(1e-5))
     @test get_ϵ(explorer, 1e5) ≈ 0.3678794504648588
     @test_broken get_ϵ(explorer, 1e5) ≈ 0.14 # Percentage cited in AIAPC paper
 end
@@ -467,8 +467,8 @@ end
 
     env =
         AIAPCHyperParameters(
-            Float32(0.1),
-            Float32(1e-4),
+            Float64(0.1),
+            Float64(1e-4),
             0.95,
             Int(1e7),
             competition_solution,

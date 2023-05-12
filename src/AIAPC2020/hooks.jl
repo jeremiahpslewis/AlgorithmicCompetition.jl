@@ -40,7 +40,7 @@ function _best_action_lookup(state_, table)
     argmax(@view table[:, state_])
 end
 
-function RLCore.update!(h::ConvergenceCheck, ::PostActStage, table::Matrix{Float32}, env::E, player::Symbol, state_::S) where {E <: AbstractEnv,S}
+function RLCore.update!(h::ConvergenceCheck, ::PostActStage, table::Matrix{Float64}, env::E, player::Symbol, state_::S) where {E <: AbstractEnv,S}
     # Convergence is defined over argmax action for each state 
     # E.g. best / greedy action
     n_prices = env.n_prices

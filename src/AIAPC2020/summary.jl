@@ -4,10 +4,10 @@ using ReinforcementLearningCore, ReinforcementLearningBase
 profit_measure(π_hat::Vector{Float64}, π_N, π_M) = (mean(π_hat) - π_N) / (π_M - π_N)
 
 struct AIAPCSummary
-    α::Float32
-    β::Float32
+    α::Float64
+    β::Float64
     is_converged::Vector{Bool}
-    avg_profit::Vector{Float32}
+    avg_profit::Vector{Float64}
     iterations_until_convergence::Vector{Int32}
 end
 
@@ -20,7 +20,7 @@ function economic_summary(e::RLCore.Experiment)
     π_N = e.env.profit_function(fill(e.env.p_Bert_nash_equilibrium, 2))[1]
     π_M = e.env.profit_function(fill(e.env.p_monop_opt, 2))[1]
 
-    avg_profit = Float32[]
+    avg_profit = Float64[]
     is_converged = Bool[]
 
     for i in [Symbol(1), Symbol(2)]

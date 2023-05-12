@@ -9,12 +9,12 @@ using StaticArrays
     Calvano, E., Calzolari, G., Denicolò, V., & Pastorello, S. (2020). Artificial Intelligence, Algorithmic Pricing, and Collusion. American Economic Review, 110(10), 3267–3297. https://doi.org/10.1257/aer.20190623
 """
 struct AIAPCEnv <: AbstractEnv
-    α::Float32
-    β::Float32
+    α::Float64
+    β::Float64
     δ::Float64
     n_players::Int
     memory_length::Int
-    price_options::SVector{15,Float32}
+    price_options::SVector{15,Float64}
     max_iter::Int
     convergence_threshold::Int
     n_prices::Int
@@ -26,15 +26,15 @@ struct AIAPCEnv <: AbstractEnv
     memory::MVector{2,Int}
     convergence_dict::Dict{Symbol,Bool}
     is_done::MVector{1,Bool}
-    p_Bert_nash_equilibrium::Float32
-    p_monop_opt::Float32
+    p_Bert_nash_equilibrium::Float64
+    p_monop_opt::Float64
     action_space::Tuple
-    profit_array::Array{Float32,3}
+    profit_array::Array{Float64,3}
 
     function AIAPCEnv(p::AIAPCHyperParameters)
         # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
         # TODO: Think about how initial memory should be assigned
-        price_options = SVector{15,Float32}(p.price_options)
+        price_options = SVector{15,Float64}(p.price_options)
         n_prices = length(p.price_options)
         price_index = SVector{15,Int64}(1:n_prices)
         n_players = p.n_players
@@ -103,13 +103,13 @@ end
 
 function construct_profit_array(
     action_space::NTuple,
-    price_options::SVector{15,Float32},
+    price_options::SVector{15,Float64},
     profit_function,
     n_players::Int,
 )
     n_prices = length(price_options)
     # TODO: Carve out into separate function:
-    profit_array = zeros(Float32, n_prices, n_prices, n_players)
+    profit_array = zeros(Float64, n_prices, n_prices, n_players)
     for k = 1:n_players
         for (i, j) in action_space
             profit_array[i, j, k] = profit_function([price_options[i], price_options[j]])[k]

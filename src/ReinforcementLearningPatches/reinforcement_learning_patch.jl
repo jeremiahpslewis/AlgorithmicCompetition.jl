@@ -62,13 +62,13 @@ Base.convert(::Type{Int64}, a::Int64) = Int64(a)
 # Well worth looking into optimizations for RLCore
 # TODO evaluate performance cost of checking all values for max, perhaps only do this in the beginning?
 mutable struct AIAPCEpsilonGreedyExplorer{R} <: AbstractExplorer
-    β::Float32
-    β_neg::Float32
+    β::Float64
+    β_neg::Float64
     step::Int
     rng::R
 end
 
-function AIAPCEpsilonGreedyExplorer(β::Float32)
+function AIAPCEpsilonGreedyExplorer(β::Float64)
     AIAPCEpsilonGreedyExplorer{typeof(Random.GLOBAL_RNG)}(β, β * -1, 1, Random.GLOBAL_RNG)
 end
 

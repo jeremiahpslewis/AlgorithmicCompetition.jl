@@ -2,14 +2,14 @@ using ReinforcementLearningCore
 using StaticArrays
 
 function InitMatrix(n_prices, n_state_space)
-    return zeros(Float32, n_prices, n_state_space)
+    return zeros(Float64, n_prices, n_state_space)
 end
 
 AIAPCPolicy(env::AIAPCEnv) = MultiAgentPolicy(
     NamedTuple(
         p => Agent(
             QBasedPolicy(;
-                learner = TDLearner{TabularApproximator,Float64,Int}(;
+                learner = TDLearner{Float64,Int}(;
                     # TabularQApproximator with specified init matrix
                     approximator = TabularApproximator(
                         InitMatrix(env.n_prices, env.n_state_space),
@@ -20,19 +20,19 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentPolicy(
                     γ = env.δ,
                     n = 0,
                 ),
-                explorer = AIAPCEpsilonGreedyExplorer(Float32(1e-5)),
+                explorer = AIAPCEpsilonGreedyExplorer(Float64(1e-5)),
             ),
             Trajectory(
                 CircularArraySARTTraces(;
                     capacity = 3,
                     state = Int64 => (225,),
                     action = Int64 => (15,),
-                    reward = Float32 => (),
+                    reward = Float64 => (),
                     terminal = Bool => (),
                 ),
                 DummySampler(),
             ),
-            RLCore.SRT{Int64, Float32, Bool}()
+            RLCore.SRT{Int64, Float64, Bool}()
         ) for p in players(env)
     ),
 )

@@ -16,8 +16,8 @@ struct CompetitionSolution
 end
 
 struct AIAPCHyperParameters
-    α::Float32
-    β::Float32
+    α::Float64
+    β::Float64
     δ::Float64
     price_options::Vector{Float64}
     memory_length::Int
@@ -29,8 +29,8 @@ struct AIAPCHyperParameters
     p_monop_opt::Float64
 
     function AIAPCHyperParameters(
-        α::Float32,
-        β::Float32,
+        α::Float64,
+        β::Float64,
         δ::Float64,
         max_iter::Int,
         competition_solution::CompetitionSolution;
