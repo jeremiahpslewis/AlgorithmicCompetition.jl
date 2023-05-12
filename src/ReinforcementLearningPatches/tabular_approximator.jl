@@ -1,6 +1,7 @@
 using ReinforcementLearningBase
 import ReinforcementLearningBase: RLBase
 import ReinforcementLearningCore: RLCore
+using Flux
 
 """
     TabularApproximator(table<:AbstractArray, opt)
