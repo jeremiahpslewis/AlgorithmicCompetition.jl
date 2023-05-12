@@ -38,13 +38,12 @@ RLCore.estimate_reward(table::Matrix{Float64}, s::I1, a::I2) where {I1<:Integer,
 
 function RLBase.optimise!(
     table::Matrix{Float64},
-    optimizer::Flux.Optimiser.Descent,
+    optimizer::Descent,
     s::Int64,
     a::Int64,
     e::Float64,
 )
-    x = _get_qapproximator(table, s, a)
-    x = @view [x][1]
+    x = _get_qapproximator_as_view(table, s, a)
     x̄ = @view [e][1]
     Flux.Optimise.update!(optimizer, x, x̄)
     return

@@ -457,7 +457,7 @@ end
     @test_broken ReinforcementLearningCore.get_ϵ(explorer, 1e5) ≈ 0.14 # Percentage cited in AIAPC paper
 
     explorer = AIAPCEpsilonGreedyExplorer(Float64(1e-5))
-    @test get_ϵ(explorer, 1e5) ≈ 0.3678794504648588
+    @test get_ϵ(explorer, 1e5) ≈ 0.36787944117144233
     @test_broken get_ϵ(explorer, 1e5) ≈ 0.14 # Percentage cited in AIAPC paper
 end
 
