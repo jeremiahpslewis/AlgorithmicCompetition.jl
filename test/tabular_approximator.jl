@@ -6,6 +6,23 @@ using ReinforcementLearningCore
 using ReinforcementLearningEnvironments
 using Test
 
+@testset "Constructors" begin
+    @test TabularApproximator{Int64}(fill(1,10,10), fill(1, 10)) isa TabularApproximator
+    @test TabularVApproximator(n_state=10) isa TabularApproximator{1, Float64, InvDecay}
+    @test TabularQApproximator(n_state = 10, n_action=10) isa TabularApproximator{2, Float64, InvDecay}
+end
+
+
+@testset "RLCore.estimate_reward" begin
+    v_approx = TabularVApproximator(n_state=10)
+    @test RLCore.estimate_reward(v_approx, 1) == 0.0
+
+    q_approx = TabularQApproximator(n_state = 5, n_action=10)
+    @test RLCore.estimate_reward(q_approx, 1) == zeros(Float64, 10)
+    @test RLCore.estimate_reward(q_approx, 1, 5) == 0.0
+    
+end
+
 @testset "TabularApproximator" begin
     n_state = 200
     n_action = 10
