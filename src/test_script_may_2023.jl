@@ -44,6 +44,7 @@ using AlgorithmicCompetition:
     AIAPCSummary,
     TDLearner
 using JET
+using ProfileView
 # using Distributed
 
 α = Float64(0.125)
@@ -78,6 +79,14 @@ experiment = Experiment(env; stop_on_convergence = false)
 @time run(hyperparams; stop_on_convergence = false);
 
 @report_opt RLCore._run(
+    experiment.policy,
+    experiment.env,
+    experiment.stop_condition,
+    experiment.hook,
+    ResetAtTerminal(),
+)
+
+@profview RLCore._run(
     experiment.policy,
     experiment.env,
     experiment.stop_condition,

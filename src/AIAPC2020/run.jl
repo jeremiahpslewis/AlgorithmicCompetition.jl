@@ -9,7 +9,7 @@ function RLBase.plan!(multiagent::MultiAgentPolicy, env::AIAPCEnv)
     return (
         RLBase.plan!(multiagent[Symbol(:1)], env, Symbol(:1)),
         RLBase.plan!(multiagent[Symbol(:2)], env, Symbol(:2)),
-    )::Tuple{Int64,Int64}
+    )
 end
 
 function Experiment(env::AIAPCEnv; stop_on_convergence = true)
