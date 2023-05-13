@@ -14,9 +14,9 @@ Base.@kwdef struct TDLearner{F<:AbstractFloat,I<:Integer} <: AbstractLearner
     n::I = 0
 end
 
-RLCore.estimate_reward(L::TDLearner, env::E) where {E<:AbstractEnv} = _get_qapproximator(L.approximator.table, RLBase.state(env))
-RLCore.estimate_reward(L::TDLearner, s) = RLCore.estimate_reward(L.approximator.table, s)
-RLCore.estimate_reward(L::TDLearner, s, a) = RLCore.estimate_reward(L.approximator.table, s, a)
+# RLCore.estimate_reward(L::TDLearner, env::E) where {E<:AbstractEnv} = _get_qapproximator(L.approximator.table, RLBase.state(env))
+# RLCore.estimate_reward(L::TDLearner, s) = RLCore.estimate_reward(L.approximator, s)
+# RLCore.estimate_reward(L::TDLearner, s, a) = RLCore.estimate_reward(L.approximator, s, a)
 
 function RLBase.optimise!(L::TDLearner, t)
     _optimise!(L, t)
@@ -29,17 +29,17 @@ function _optimise!(L::TDLearner, t::Tr) where {Tr<:Traces}
     A = t.traces[2][:action][1]
     R = t.traces[3][1]
 
-    _optimise!(L, L.approximator.table, L.n, L.γ, S, A, R)
+    _optimise!(L, L.approximator, L.n, L.γ, S, A, R)
     return
 end
 
-function _optimise!(Q::TDLearner, table::Matrix{Float64}, n, γ, S, A, R)
+function _optimise!(Q::TDLearner, approximator::TabularApproximator{2,Rd,O}, n, γ, S, A, R) where {Rd,O}
     G = 0.0
     for i = 1:min(n + 1, length(R))
         G = R + γ * G
         s, a = S[end-i], A[end-i]
-        e = RLCore.estimate_reward(table, s, a) - G
-        RLBase.optimise!(Q.approximator.table, Q.approximator.optimizer, s, a, e)
+        e = RLCore.estimate_reward(approximator, s, a) - G
+        RLBase.optimise!(Q.approximator, (s, a) => e)
     end
     return
 end

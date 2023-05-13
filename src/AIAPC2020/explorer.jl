@@ -6,5 +6,5 @@ function RLCore.EpsilonGreedyExplorer(decay_steps::Int)
 end
 
 function RLBase.plan!(p::QBasedPolicy{L,Ex}, env::AIAPCEnv, player::Symbol) where {L,Ex}
-    return RLBase.plan!(p.explorer, RLCore.estimate_reward(p.learner.approximator.table, RLBase.state(env)), env.price_index)
+    return RLBase.plan!(p.explorer, RLCore.estimate_reward(p.learner.approximator, RLBase.state(env)), env.price_index)
 end

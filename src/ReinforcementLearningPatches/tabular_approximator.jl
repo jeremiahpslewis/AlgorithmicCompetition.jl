@@ -16,7 +16,7 @@ struct TabularApproximator{N,R,O}
     # R is the reward type
     table::AbstractArray{R,N}
     optimizer::O
-    function TabularApproximator{R}(table::AbstractArray{R,N}, opt::O) where {N,R,O}
+    function TabularApproximator(table::AbstractArray{R,N}, opt::O) where {N,R,O}
         n = ndims(table)
         n <= 2 || throw(ArgumentError("the dimension of table must be <= 2"))
         new{N,R,O}(table, opt)
@@ -35,7 +35,7 @@ RLCore.estimate_reward(app::TabularApproximator{2,R,O}, s::I) where {R,O,I<:Inte
 RLCore.estimate_reward(app::TabularApproximator{2,R,O}, s::I1, a::I2) where {R,O,I1<:Integer,I2<:Integer} = @views app.table[a, s]
 
 function RLBase.optimise!(
-    app::TabularApproximator{N,R,O},
+    app::TabularApproximator{1,R,O},
     correction::Pair{I,F},
 ) where {R,O,I<:Integer,F<:AbstractFloat}
     s, e = correction
