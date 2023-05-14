@@ -78,7 +78,7 @@ experiment = Experiment(env; stop_on_convergence = false)
 
 @time run(hyperparams; stop_on_convergence = false);
 @time run(hyperparams; stop_on_convergence = false);
-
+@profview run(hyperparams; stop_on_convergence = false);
 @report_opt RLCore._run(
     experiment.policy,
     experiment.env,
@@ -103,7 +103,9 @@ RLCore._run(
 #     ResetAtTerminal(),
 # )
 
-RLBase.plan!(experiment.policy.agents[Symbol(1)], env)
-@report_opt RLBase.plan!(experiment.policy.agents[Symbol(1)], env, Symbol(1))
-@report_opt RLBase.plan!(experiment.policy.agents[Symbol(1)], env, Symbol(1))
+# RLBase.plan!(experiment.policy.agents[Symbol(1)], env)
+# @report_opt RLBase.plan!(experiment.policy.agents[Symbol(1)], env, Symbol(1))
+# @report_opt RLBase.plan!(experiment.policy, env, Symbol(1))
 # @report_opt RLCore.estimate_reward(td_learner, env)
+@report_opt RLBase.plan!(experiment.policy, env)
+# @report_opt RLBase.act!(env, (1,1))

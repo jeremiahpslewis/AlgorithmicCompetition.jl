@@ -37,27 +37,23 @@ function RLCore.update!(h::ConvergenceCheck, state_::Int64, best_action::Int, it
 end
 
 function _best_action_lookup(state_, table)
-    argmax(@view table[:, state_])
+    @views argmax(table[:, state_])
 end
 
-function RLCore.update!(h::ConvergenceCheck, ::PostActStage, table::Matrix{Float64}, env::E, player::Symbol, state_::S) where {E <: AbstractEnv,S}
+function RLCore.update!(h::ConvergenceCheck, table::Matrix{Float64}, state_::S) where {S}
     # Convergence is defined over argmax action for each state 
     # E.g. best / greedy action
-    n_prices = env.n_prices
-
     best_action = _best_action_lookup(state_, table)
     iter_converged = (@views h.best_response_vector[state_] == best_action)
 
     RLCore.update!(h, state_, best_action, iter_converged)
 
-    env.convergence_dict[player] = h.is_converged
-
-    return
+    return h.is_converged
 end
     
 function RLCore.update!(h::ConvergenceCheck, ::PostActStage, policy::P, env::E, player::Symbol) where {P <: AbstractPolicy, E <: AbstractEnv}
     state_ = RLBase.state(env, player)
-    RLCore.update!(h, PostActStage(), policy.policy.learner.approximator.table, env, player, state_)
+    env.convergence_dict[player] = RLCore.update!(h, policy.policy.learner.approximator.table, state_)
     return
 end
 

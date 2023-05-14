@@ -125,6 +125,9 @@ RLBase.action_space(env::AIAPCEnv, ::SimultaneousPlayer) = env.action_space
 
 RLBase.legal_action_space(env::AIAPCEnv, p) = is_terminated(env) ? () : action_space(env, p)
 
+const _legal_action_space = 1:15
+RLBase.legal_action_space_mask(env::AIAPCEnv, player::Symbol) = _legal_action_space
+
 RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
 function RLBase.reward(env::AIAPCEnv)

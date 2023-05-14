@@ -130,6 +130,8 @@ TODO:
 5.554617 seconds (83.41 M allocations: 3.282 GiB, 11.67% gc time)
 5.843871 seconds (83.42 M allocations: 3.283 GiB, 11.28% gc time)
 4.577566 seconds (83.41 M allocations: 3.282 GiB, 12.36% gc time)
+4.576021 seconds (83.41 M allocations: 3.282 GiB, 12.42% gc time)
+4.481501 seconds (83.41 M allocations: 3.282 GiB, 12.28% gc time)
 
 # 2023-05-12
 1.9 / 1e6
