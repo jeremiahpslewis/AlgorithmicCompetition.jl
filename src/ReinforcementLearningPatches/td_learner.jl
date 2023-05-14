@@ -26,24 +26,29 @@ RLCore.estimate_reward(L::TDLearnerSARS{Ap,F,I}, env::E) where {Ap,F,I,E<:Abstra
 RLCore.estimate_reward(L::TDLearnerSARS{Ap,F,I}, s::I1) where {Ap,F,I<:Integer,I1<:Integer} = RLCore.estimate_reward(L.approximator, s)
 RLCore.estimate_reward(L::TDLearnerSARS{Ap,F,I}, s::I1, a::I2) where {Ap,F,I,I1<:Integer,I2<:Integer} = RLCore.estimate_reward(L.approximator, s, a)
 
-function extract_sar(t::Tr) where {Tr<:Traces}
+function extract_sar(t::Traces{Tr}) where {Tr}
     # TODO: Delete this when RLTrajectories.jl is fixed
     # Hard coded to deal with index type instability in RLTrajectories.jl
     S = t.traces[1][:state][1]
     A = t.traces[2][:action][1]
     R = t.traces[3][1]
+    return (S, A, R)
 end
 
-function RLBase.optimise!(L::TDLearnerSARS{Ap,F,I}, t::Tr) where {Ap,F,I,Tr<:Traces}
-    # S, A, R, T = (t[x][1] for x in SART)
-    S, A, R = extract_sar(t) # Remove this when the above line works without a performance hit
-    n, γ, Q = L.n, L.γ, L.approximator
+
+function _optimise!(n::I1, γ::F, Q::TabularApproximator{2,Ar,O}, S::SubArray{I2}, A::SubArray{I3}, R::F) where {I1<:Number,I2<:Number,I3<:Number,Ar<:AbstractArray,F<:AbstractFloat,O}
     G = 0.0
     for i = 1:min(n + 1, length(R))
         G = R + γ * G
         s, a = S[end-i], A[end-i]
-        RLBase.optimise!(Q, (s, a) => RLCore.estimate_reward(Q, s, a) - G)
+        RLBase.optimise!(Q, (s, a), RLCore.estimate_reward(Q, s, a) - G)
     end
+end
+
+function RLBase.optimise!(L::TDLearnerSARS{Ap,F,I}, t::Traces{Tr}) where {Ap,F,I,Tr}
+    # S, A, R, T = (t[x][1] for x in SART)
+    S, A, R = extract_sar(t) # Remove this when the above line works without a performance hit
+    _optimise!(L.n, L.γ, L.approximator, S, A, R)
 end
 
 function RLBase.priority(L::TDLearnerSARS{Ap,F,I}, transition::Tuple{T}) where {Ap,F,I,T}

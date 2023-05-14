@@ -42,7 +42,8 @@ using AlgorithmicCompetition:
     get_ϵ,
     AIAPCEpsilonGreedyExplorer,
     AIAPCSummary,
-    TDLearner
+    TDLearner,
+    TabularApproximator
 using JET
 using ProfileView
 # using Distributed
@@ -86,7 +87,7 @@ experiment = Experiment(env; stop_on_convergence = false)
     ResetAtTerminal(),
 )
 
-@profview RLCore._run(
+RLCore._run(
     experiment.policy,
     experiment.env,
     experiment.stop_condition,
@@ -94,8 +95,34 @@ experiment = Experiment(env; stop_on_convergence = false)
     ResetAtTerminal(),
 )
 
+# @profview RLCore._run(
+#     experiment.policy,
+#     experiment.env,
+#     experiment.stop_condition,
+#     experiment.hook,
+#     ResetAtTerminal(),
+# )
+
 
 
 # AIAPCHook(experiment.env)
 # L = experiment.policy.agents[Symbol(1)].policy.learner
 # t = experiment.policy.agents[Symbol(1)].trajectory.container
+
+using Flux
+td_learner = TDLearner(;
+# TabularQApproximator with specified init matrix
+approximator = TabularApproximator(
+    InitMatrix(experiment.env.n_prices, experiment.env.n_state_space),
+    Descent(experiment.env.α),
+),
+# For param info: https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/f97747923c6d7bbc5576f81664ed7b05a2ab8f1e/src/ReinforcementLearningZoo/src/algorithms/tabular/td_learner.jl#L15
+method = :SARS,
+γ = experiment.env.δ,
+n = 0,
+)
+
+@report_opt RLCore.estimate_reward(td_learner, env)
+
+RLBase.optimise!(td_learner, experiment.policy.agents[Symbol(1)].trajectory.container)
+@report_opt RLBase.optimise!(td_learner, experiment.policy.agents[Symbol(1)].trajectory.container)

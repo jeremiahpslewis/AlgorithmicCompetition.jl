@@ -12,33 +12,32 @@ For `table` of 2-d, it will serve as a state-action value approximator.
     For `table` of 2-d, the first dimension is action and the second dimension is state.
 """
 # TODO: add back missing AbstractApproximator
-struct TabularApproximator{N,R,O}
-    # R is the reward type
-    table::AbstractArray{R,N}
+struct TabularApproximator{N,A,O}
+    table::A
     optimizer::O
-    function TabularApproximator(table::AbstractArray{R,N}, opt::O) where {N,R,O}
+    function TabularApproximator(table::A, opt::O) where {A<:AbstractArray,O}
         n = ndims(table)
         n <= 2 || throw(ArgumentError("the dimension of table must be <= 2"))
-        new{N,R,O}(table, opt)
+        new{n,A,O}(table, opt)
     end
 end
 
 TabularVApproximator(; n_state, init = 0.0, opt = InvDecay(1.0)) =
-    TabularApproximator{typeof(init)}(fill(init, n_state), opt)
+    TabularApproximator(fill(init, n_state), opt)
 
 TabularQApproximator(; n_state, n_action, init = 0.0, opt = InvDecay(1.0)) =
-    TabularApproximator{typeof(init)}(fill(init, n_action, n_state), opt)
+    TabularApproximator(fill(init, n_action, n_state), opt)
 
-RLCore.estimate_reward(app::TabularApproximator{1,R,O}, s::I) where {R,O,I<:Integer} = @views app.table[s]
+RLCore.estimate_reward(app::TabularApproximator{1,R,O}, s::I) where {R<:AbstractArray,O,I<:Integer} = @views app.table[s]
 
-RLCore.estimate_reward(app::TabularApproximator{2,R,O}, s::I) where {R,O,I<:Integer} = @views app.table[:, s]
-RLCore.estimate_reward(app::TabularApproximator{2,R,O}, s::I1, a::I2) where {R,O,I1<:Integer,I2<:Integer} = @views app.table[a, s]
+RLCore.estimate_reward(app::TabularApproximator{2,R,O}, s::I) where {R<:AbstractArray,O,I<:Integer} = @views app.table[:, s]
+RLCore.estimate_reward(app::TabularApproximator{2,R,O}, s::I1, a::I2) where {R<:AbstractArray,O,I1<:Integer,I2<:Integer} = @views app.table[a, s]
 
 function RLBase.optimise!(
     app::TabularApproximator{1,R,O},
-    correction::Pair{I,F},
-) where {R,O,I<:Integer,F<:AbstractFloat}
-    s, e = correction
+    s::I,
+    e::F,
+) where {R<:AbstractArray,O,I<:Integer,F<:AbstractFloat}
     x = @view app.table[s]
     x̄ = @view [e][1]
     Flux.Optimise.update!(app.optimizer, x, x̄)
@@ -46,9 +45,10 @@ end
 
 function RLBase.optimise!(
     app::TabularApproximator{2,R,O},
-    correction::Pair{Tuple{I1,I2},F},
-) where {R,O,I1<:Integer,I2<:Integer,F<:AbstractFloat}
-    (s, a), e = correction
+    s_a::Tuple{I1,I2},
+    e::F,
+) where {R<:AbstractArray,O,I1<:Integer,I2<:Integer,F<:AbstractFloat}
+    (s, a) = s_a
     x = @view app.table[a, s]
     x̄ = @view [e][1]
     Flux.Optimise.update!(app.optimizer, x, x̄)
@@ -56,9 +56,9 @@ end
 
 function RLBase.optimise!(
     app::TabularApproximator{2,R,O},
-    correction::Pair{I,Vector{F}},
-) where {R,O,I<:Integer,F<:AbstractFloat}
-    s, errors = correction
+    s::I,
+    errors::Vector{F},
+) where {R<:AbstractArray,O,I<:Integer,F<:AbstractFloat}
     x = @view app.table[:, s]
     Flux.Optimise.update!(app.optimizer, x, errors)
 end

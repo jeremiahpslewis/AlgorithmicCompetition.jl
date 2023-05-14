@@ -52,13 +52,13 @@ RLCore.estimate_reward(L::T, s::I1, a::I2) where {T<:AbstractTDLearner,I1<:Integ
 # end
 
 
-function RLBase.update!(L::T, t::Any, ::AbstractEnv, s::PreActStage) where {T<:AbstractTDLearner}
-    _update!(L, L.approximator, t, s)
-end
+# function RLBase.update!(L::T, t::Any, ::AbstractEnv, s::PreActStage) where {T<:AbstractTDLearner}
+#     _update!(L, L.approximator, t, s)
+# end
 
-function RLBase.update!(L::T, t::Any, ::AbstractEnv, s::PostEpisodeStage) where {T<:AbstractTDLearner}
-    _update!(L, L.approximator, t, s)
-end
+# function RLBase.update!(L::T, t::Any, ::AbstractEnv, s::PostEpisodeStage) where {T<:AbstractTDLearner}
+#     _update!(L, L.approximator, t, s)
+# end
 
 # for ExpectedSARSA
 # function RLBase.update!(
@@ -72,17 +72,17 @@ end
 
 ## update trajectories
 
-function RLBase.update!(
-    t::Any,
-    ::Union{
-        QBasedPolicy{<:TDLearner},
-        VBasedPolicy{<:TDLearner},
-    },
-    ::AbstractEnv,
-    ::PreEpisodeStage,
-)
-    empty!(t)
-end
+# function RLBase.update!(
+#     t::Any,
+#     ::Union{
+#         QBasedPolicy{<:TDLearner},
+#         VBasedPolicy{<:TDLearner},
+#     },
+#     ::AbstractEnv,
+#     ::PreEpisodeStage,
+# )
+#     empty!(t)
+# end
 
 ## implementations
 
