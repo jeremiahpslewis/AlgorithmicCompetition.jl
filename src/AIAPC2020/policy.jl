@@ -10,7 +10,7 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentPolicy(
     NamedTuple(
         p => Agent(
             QBasedPolicy(;
-                learner = TDLearner(
+                learner = TDLearner(;
                     # TabularQApproximator with specified init matrix
                     approximator = TabularApproximator(
                         InitMatrix(env.n_prices, env.n_state_space),

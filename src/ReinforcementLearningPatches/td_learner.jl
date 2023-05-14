@@ -6,19 +6,20 @@ using ReinforcementLearningBase
 using ReinforcementLearningCore
 using ReinforcementLearningTrajectories: Trajectory
 
+
+function TDLearner(; approximator::Ap, γ::F = 1.0, method::Symbol, n::I = 0) where {Ap,F,I}
+    if method != :SARS
+        @error "unsupported method"
+    else
+        TDLearnerSARS{Ap,F,I}(approximator, γ, method, n)
+    end
+end
+
 struct TDLearnerSARS{Ap,F<:AbstractFloat,I<:Integer} <: AbstractLearner
     approximator::Ap
     γ::F 
     method::Symbol
     n::I
-
-    function TDLearner(; approximator::Ap, γ::F = 1.0, method::Symbol, n::I = 0) where {Ap,F,I}
-        if method != :SARS
-            @error "unsupported method"
-        else
-            new{Ap,F,I}(approximator, γ, method, n)
-        end
-    end
 end
 
 RLCore.estimate_reward(L::TDLearnerSARS{Ap,F,I}, env::E) where {Ap,F,I,E<:AbstractEnv} = RLCore.estimate_reward(L.approximator, state(env))
