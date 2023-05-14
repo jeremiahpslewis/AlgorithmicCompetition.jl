@@ -6,24 +6,24 @@ using ReinforcementLearningBase
 using ReinforcementLearningCore
 using ReinforcementLearningTrajectories: Trajectory
 
-struct TDLearnerSARS{A,F<:AbstractFloat,I<:Integer} <: AbstractLearner
-    approximator::A
-    γ::F = 1.0
+struct TDLearnerSARS{Ap,F<:AbstractFloat,I<:Integer} <: AbstractLearner
+    approximator::Ap
+    γ::F 
     method::Symbol
-    n::I = 0
+    n::I
 
-    function TDLearner(; approximator::A, γ::F, method::Symbol, n::I) where {A,F,I}
+    function TDLearner(; approximator::Ap, γ::F = 1.0, method::Symbol, n::I = 0) where {Ap,F,I}
         if method != :SARS
             @error "unsupported method"
         else
-            new{A,F,I}(approximator, γ, method, n)
+            new{Ap,F,I}(approximator, γ, method, n)
         end
     end
 end
 
-RLCore.estimate_reward(L::TDLearnerSARS{A,F,I}, env::E) where {A,F,I,E<:AbstractEnv} = RLCore.estimate_reward(L.approximator, state(env))
-RLCore.estimate_reward(L::TDLearnerSARS{A,F,I}, s::I1) where {A,F,I1<:Integer} = RLCore.estimate_reward(L.approximator, s)
-RLCore.estimate_reward(L::TDLearnerSARS{A,F,I}, s::I1, a::I2) where {A,F,I,I1<:Integer,I2<:Integer} = RLCore.estimate_reward(L.approximator, s, a)
+RLCore.estimate_reward(L::TDLearnerSARS{Ap,F,I}, env::E) where {Ap,F,I,E<:AbstractEnv} = RLCore.estimate_reward(L.approximator, state(env))
+RLCore.estimate_reward(L::TDLearnerSARS{Ap,F,I}, s::I1) where {Ap,F,I<:Integer,I1<:Integer} = RLCore.estimate_reward(L.approximator, s)
+RLCore.estimate_reward(L::TDLearnerSARS{Ap,F,I}, s::I1, a::I2) where {Ap,F,I,I1<:Integer,I2<:Integer} = RLCore.estimate_reward(L.approximator, s, a)
 
 function extract_sar(t::Tr) where {Tr<:Traces}
     # TODO: Delete this when RLTrajectories.jl is fixed
@@ -33,7 +33,7 @@ function extract_sar(t::Tr) where {Tr<:Traces}
     R = t.traces[3][1]
 end
 
-function RLBase.optimise!(L::TDLearnerSARS{A,F,I}, t::Tr) where {A,F,I,Tr<:Traces}
+function RLBase.optimise!(L::TDLearnerSARS{Ap,F,I}, t::Tr) where {Ap,F,I,Tr<:Traces}
     # S, A, R, T = (t[x][1] for x in SART)
     S, A, R = extract_sar(t) # Remove this when the above line works without a performance hit
     n, γ, Q = L.n, L.γ, L.approximator
@@ -45,7 +45,7 @@ function RLBase.optimise!(L::TDLearnerSARS{A,F,I}, t::Tr) where {A,F,I,Tr<:Trace
     end
 end
 
-function RLBase.priority(L::TDLearnerSARS{A,F,I}, transition::Tuple{T}) where {A,F,I,T}
+function RLBase.priority(L::TDLearnerSARS{Ap,F,I}, transition::Tuple{T}) where {Ap,F,I,T}
         s, a, r, d, s′ = transition
         γ, Q = L.γ, L.approximator
         if d
