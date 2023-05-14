@@ -27,6 +27,7 @@ using ReinforcementLearningBase
 import ReinforcementLearningBase: RLBase
 using ReinforcementLearningEnvironments
 using Random
+using StaticArrays
 
 # Fudge an issue with non Int64 Ints in RL.jl
 using Base
@@ -78,11 +79,11 @@ end
 
 get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any}) = get_ϵ(s, s.step)
 
-function RLBase.plan!(s::AIAPCEpsilonGreedyExplorer{<:Any}, values::T, full_action_space) where {T}
+function RLBase.plan!(s::AIAPCEpsilonGreedyExplorer{<:Any}, values, full_action_space)
     ϵ = get_ϵ(s)
     s.step += 1
     if rand(s.rng) < ϵ
-        return rand(s.rng, full_action_space)
+        return rand(s.rng, 1:length(values))
     end
     max_vals = find_all_max(values)[2]
 

@@ -24,6 +24,22 @@ end
     
 end
 
+
+# using Flux
+# td_learner = TDLearner(;
+# # TabularQApproximator with specified init matrix
+# approximator = TabularApproximator(
+#     InitMatrix(experiment.env.n_prices, experiment.env.n_state_space),
+#     Descent(experiment.env.α),
+# ),
+# # For param info: https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/f97747923c6d7bbc5576f81664ed7b05a2ab8f1e/src/ReinforcementLearningZoo/src/algorithms/tabular/td_learner.jl#L15
+# method = :SARS,
+# γ = experiment.env.δ,
+# n = 0,
+# )
+
+# RLBase.optimise!(td_learner, experiment.policy.agents[Symbol(1)].trajectory.container)
+
 # @testset "TabularApproximator" begin
 #     n_state = 200
 #     n_action = 10
