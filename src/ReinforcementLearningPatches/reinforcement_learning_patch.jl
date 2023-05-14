@@ -62,24 +62,24 @@ Base.convert(::Type{Int64}, a::Int64) = Int64(a)
 # This one has: 59.003 ns (1 allocation: 16 bytes)
 # Well worth looking into optimizations for RLCore
 # TODO evaluate performance cost of checking all values for max, perhaps only do this in the beginning?
-mutable struct AIAPCEpsilonGreedyExplorer{R} <: AbstractExplorer
-    β::Float64
-    β_neg::Float64
+mutable struct AIAPCEpsilonGreedyExplorer{R,F<:AbstractFloat} <: AbstractExplorer
+    β::F
+    β_neg::F
     step::Int
     rng::R
 end
 
-function AIAPCEpsilonGreedyExplorer(β::Float64)
-    AIAPCEpsilonGreedyExplorer{typeof(Random.GLOBAL_RNG)}(β, β * -1, 1, Random.GLOBAL_RNG)
+function AIAPCEpsilonGreedyExplorer(β::F) where {F<:AbstractFloat}
+    AIAPCEpsilonGreedyExplorer{typeof(Random.GLOBAL_RNG),F}(β, β * -1, 1, Random.GLOBAL_RNG)
 end
 
-function get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any}, step)
+function get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any, F}, step) where {F<:AbstractFloat}
     exp(s.β_neg * step)
 end
 
-get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any}) = get_ϵ(s, s.step)
+get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any, F}) where {F<:AbstractFloat} = get_ϵ(s, s.step)
 
-function RLBase.plan!(s::AIAPCEpsilonGreedyExplorer{<:Any}, values, full_action_space)
+function RLBase.plan!(s::AIAPCEpsilonGreedyExplorer{<:Any,F}, values, full_action_space) where {F<:AbstractFloat}
     # NOTE: use of legal_action_space_mask as full_action_space is a bit of a hack, won't work in other cases
     ϵ = get_ϵ(s)
     s.step += 1

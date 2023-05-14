@@ -40,7 +40,7 @@ function _best_action_lookup(state_, table)
     @views argmax(table[:, state_])
 end
 
-function RLCore.update!(h::ConvergenceCheck, table::Matrix{Float64}, state_::S) where {S}
+function RLCore.update!(h::ConvergenceCheck, table::Matrix{F}, state_::S) where {S,F<:AbstractFloat}
     # Convergence is defined over argmax action for each state 
     # E.g. best / greedy action
     best_action = _best_action_lookup(state_, table)
