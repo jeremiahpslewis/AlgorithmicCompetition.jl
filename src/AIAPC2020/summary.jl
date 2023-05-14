@@ -1,7 +1,7 @@
 using Chain
 using ReinforcementLearningCore, ReinforcementLearningBase
 
-profit_measure(π_hat::Vector{F}, π_N, π_M) where {F<:AbstractFloat}= (mean(π_hat) - π_N) / (π_M - π_N)
+profit_measure(π_hat::Vector{F}, π_N, π_M) where {F<:AbstractFloat} = (mean(π_hat) - π_N) / (π_M - π_N)
 
 struct AIAPCSummary
     α::Float64
