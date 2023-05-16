@@ -29,7 +29,7 @@ using AlgorithmicCompetition:
     map_vect_to_int,
     map_int_to_vect,
     construct_profit_array,
-    q_fun,
+    Q,
     run,
     run_and_extract,
     Experiment,

@@ -33,7 +33,7 @@ using AlgorithmicCompetition:
     map_vect_to_int,
     map_int_to_vect,
     construct_profit_array,
-    q_fun,
+    Q,
     run,
     run_and_extract,
     Experiment,
@@ -78,7 +78,7 @@ experiment = Experiment(env; stop_on_convergence = false)
 
 @time run(hyperparams; stop_on_convergence = false);
 @time run(hyperparams; stop_on_convergence = false);
-@profview run(hyperparams; stop_on_convergence = false);
+# @profview run(hyperparams; stop_on_convergence = false);
 @report_opt RLCore._run(
     experiment.policy,
     experiment.env,
@@ -109,3 +109,27 @@ RLCore._run(
 # @report_opt RLCore.estimate_reward(td_learner, env)
 @report_opt RLBase.plan!(experiment.policy, env)
 # @report_opt RLBase.act!(env, (1,1))
+
+
+@report_opt AlgorithmicCompetition.economic_summary(experiment)
+# n_procs_ = 3
+
+# _procs = addprocs(
+#     n_procs_,
+#     topology = :master_worker,
+#     exeflags = ["--threads=1", "--project=$(Base.active_project())"],
+# )
+
+# @everywhere begin
+#     using Pkg
+#     Pkg.instantiate()
+#     using AlgorithmicCompetition
+# end
+
+# AlgorithmicCompetition.run_aiapc(;
+#     n_parameter_iterations = 100,
+#     # max_iter = Int(1e6),
+#     # convergence_threshold = Int(10),
+# )
+
+# rmprocs(_procs)

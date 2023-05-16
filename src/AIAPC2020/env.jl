@@ -19,7 +19,7 @@ struct AIAPCEnv <: AbstractEnv
     convergence_threshold::Int
     n_prices::Int
     price_index::SVector{15,Int64}
-    profit_function::Function
+    competition_solution::CompetitionSolution
     n_state_space::Int64
     state_space::Base.OneTo{Int64}
     state_space_lookup::Array{Int64,2}
@@ -45,7 +45,7 @@ struct AIAPCEnv <: AbstractEnv
         profit_array = construct_profit_array(
             action_space,
             price_options,
-            p.profit_function,
+            p.competition_solution.params,
             n_players,
         )
         state_space_lookup = construct_state_space_lookup(action_space, n_prices)
@@ -61,7 +61,7 @@ struct AIAPCEnv <: AbstractEnv
             p.convergence_threshold,
             n_prices,
             price_index,
-            p.profit_function,
+            p.competition_solution,
             n_state_space,
             state_space,
             state_space_lookup,
@@ -104,7 +104,7 @@ end
 function construct_profit_array(
     action_space::NTuple,
     price_options::SVector{15,Float64},
-    profit_function,
+    params::CompetitionParameters,
     n_players::Int,
 )
     n_prices = length(price_options)
@@ -112,7 +112,7 @@ function construct_profit_array(
     profit_array = zeros(Float64, n_prices, n_prices, n_players)
     for k = 1:n_players
         for (i, j) in action_space
-            profit_array[i, j, k] = profit_function([price_options[i], price_options[j]])[k]
+            profit_array[i, j, k] = π([price_options[i], price_options[j]], params)[k]
         end
     end
 

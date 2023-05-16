@@ -33,7 +33,8 @@ using AlgorithmicCompetition:
     map_vect_to_int,
     map_int_to_vect,
     construct_profit_array,
-    q_fun,
+    Q,
+    π,
     run,
     run_and_extract,
     Experiment,
@@ -220,10 +221,10 @@ end
     @test_throws DimensionMismatch CompetitionParameters(1, 1, [1.0, 1], [1.0])
 end
 
-@testset "q_fun" begin
-    @test q_fun([1.47293, 1.47293], CompetitionParameters(0.25, 0, [2, 2], [1, 1])) ≈
+@testset "Q" begin
+    @test Q([1.47293, 1.47293], CompetitionParameters(0.25, 0, [2, 2], [1, 1])) ≈
           fill(0.47138, 2) atol = 0.01
-    @test q_fun([1.92498, 1.92498], CompetitionParameters(0.25, 0, [2, 2], [1, 1])) ≈
+    @test Q([1.92498, 1.92498], CompetitionParameters(0.25, 0, [2, 2], [1, 1])) ≈
           fill(0.36486, 2) atol = 0.01
 end
 
@@ -254,23 +255,21 @@ end
 @testset "Profit array test" begin
     competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
     competition_solution = CompetitionSolution(competition_params)
-
-    env =
-        AIAPCHyperParameters(
-            Float64(0.1),
-            Float64(1e-4),
-            0.95,
-            Int(1e7),
-            competition_solution,
-        ) |> AIAPCEnv
+    params = AIAPCHyperParameters(
+        Float64(0.1),
+        Float64(1e-4),
+        0.95,
+        Int(1e7),
+        competition_solution,
+    )
+    env = params |> AIAPCEnv
     exper = Experiment(env)
 
     price_options = env.price_options
-    profit_function = env.profit_function
     action_space_ = env.action_space
-    profit_array = construct_profit_array(action_space_, price_options, profit_function, 2)
+    profit_array = construct_profit_array(action_space_, price_options, competition_solution.params, 2)
 
-    profit_array[5, 3, :] ≈ env.profit_function([price_options[5], price_options[3]])
+    profit_array[5, 3, :] ≈ π([price_options[5], price_options[3]], competition_solution.params)
 end
 
 @testset "map_vect_to_int, map_int_to_vect" begin
