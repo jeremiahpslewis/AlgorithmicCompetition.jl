@@ -11,23 +11,21 @@ struct AIAPCSummary
     iterations_until_convergence::Vector{Int32}
 end
 
-function extract_profit_vars(env)
-    p_N = env.p_Bert_nash_equilibrium
-    p_M = env.p_monop_opt
-    π_N = π(fill(p_N, 2), env.competition_solution.params)[1]
-    π_M = π(fill(p_M, 2), env.competition_solution.params)[1]
+function extract_profit_vars(p_Bert_nash_equilibrium, p_monop_opt, competition_params)
+    π_N = π(p_Bert_nash_equilibrium, p_Bert_nash_equilibrium, competition_params)[1]
+    π_M = π(p_monop_opt, p_monop_opt, competition_params)[1]
     return (π_N, π_M)
 end
 
 economic_summary(e::RLCore.Experiment) = economic_summary(e.env, e.hook)
 
-function economic_summary(env, hook)
+function economic_summary(env::AbstractEnv, hook::AbstractHook)
     convergence_threshold = env.convergence_threshold
     iterations_until_convergence = Int32[
         hook[player][2].iterations_until_convergence for player in [Symbol(1), Symbol(2)]
     ]
 
-    π_N, π_M = extract_profit_vars(env)
+    π_N, π_M = extract_profit_vars(env.p_Bert_nash_equilibrium, env.p_monop_opt, env.competition_solution.params)
 
     avg_profit = Float64[]
     is_converged = Bool[]

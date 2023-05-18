@@ -9,8 +9,8 @@ using Statistics
 struct CompetitionParameters
     μ::Float64
     a_0::Float64
-    a::Vector{Float64}
-    c::Vector{Float64}
+    a::Tuple{Float64,Float64}
+    c::Tuple{Float64,Float64}
     n_firms::Int64
 
     function CompetitionParameters(μ, a_0, a, c)
@@ -21,23 +21,25 @@ struct CompetitionParameters
     end
 end
 
-function Q(p, params::CompetitionParameters)
+function Q(p1, p2, params::CompetitionParameters)
     # Logit demand function from pg 3372 AIAPC 2020
-    a_ = [params.a_0, params.a...]
-    p_ = [0, p...]
-    return softmax((a_ .- p_) ./ params.μ)[2:end]
+    a_ = (params.a_0, params.a...)
+    p_ = (0, p1, p2)
+    mu_vect = ((a_ .- p_) ./ params.μ)
+    q_out = softmax([mu_vect...])
+    return q_out[2:3]
 end
 
-function π(p, params::CompetitionParameters)
+function π(p1::T, p2::T, params::CompetitionParameters) where {T<:Real}
     # Returns profit due to p_1
-    q_ = Q(p, params)
-    π_ = (p - params.c) .* q_
+    q_ = Q(p1, p2, params)
+    π_ = ((p1, p2) .- params.c) .* q_
     return π_
 end
 
 function p_BR(p_minus_i_::T, params::CompetitionParameters) where {T<:Real} 
     # Best response Bertrand price
-    π_i_(p_i_, p_minus_i_) = π([p_i_, p_minus_i_], params)[1]
+    π_i_(p_i_, p_minus_i_) = π(p_i_, p_minus_i_, params)[1]
     model = Model(Ipopt.Optimizer)
     set_silent(model)
     register(model, :π_i_, 2, π_i_; autodiff = true)
@@ -51,9 +53,9 @@ function p_BR(p_minus_i_::T, params::CompetitionParameters) where {T<:Real}
     return value(p_i)
 end
 
-π_i(p_i::T, p_minus_i::T, params::CompetitionParameters) where {T<:Real} = π([p_i, p_minus_i], params)[1]
-π_bertrand(p_1::T, params::CompetitionParameters) where {T<:Real} = π([p_1, p_BR(p_1, params)], params)[1]
-π_monop(p_1::T, p_2::T, params::CompetitionParameters) where {T<:Real} = sum(π([p_1, p_2], params)) / 2 # per-firm
+π_i(p_i::T, p_minus_i::T, params::CompetitionParameters) where {T<:Real} = π(p_i, p_minus_i, params)[1]
+π_bertrand(p_1::T, params::CompetitionParameters) where {T<:Real} = π(p_1, p_BR(p_1, params), params)[1]
+π_monop(p_1::T, p_2::T, params::CompetitionParameters) where {T<:Real} = sum(π(p_1, p_2, params)) / 2 # per-firm
 
 
 function solve_monopolist(params::CompetitionParameters)
@@ -61,12 +63,13 @@ function solve_monopolist(params::CompetitionParameters)
     π_monop_(p_1, p_2) = π_monop(p_1, p_2, params)
     set_silent(model)
     register(model, :π_monop_, 2, π_monop_; autodiff = true)
-    @variable(model, p[i = 1:params.n_firms])
-    @NLobjective(model, Max, π_monop_(p[1], p[2]))
+    @variable(model, p_1)
+    @variable(model, p_2)
+    @NLobjective(model, Max, π_monop_(p_1, p_2))
 
     optimize!(model)
 
-    return model, value.(p)
+    return model, (value(p_1), value(p_2))
 end
 
 
@@ -78,29 +81,29 @@ function solve_bertrand(params::CompetitionParameters)
     register(model, :π_i_, 2, π_i_, autodiff = true)
 
     @variable(model, p_i)
-    @NLparameter(model, p_min_i[i = 1:(params.n_firms-1)] == 1)
-    @NLobjective(model, Max, π_i_(p_i, p_min_i[1]))
+    @NLparameter(model, p_min_i == 1)
+    @NLobjective(model, Max, π_i_(p_i, p_min_i))
 
     optimize!(model)
 
     i = 0
-    while !isapprox(value(p_i), value(p_min_i[1]))
+    while !isapprox(value(p_i), value(p_min_i))
         i += 1
-        set_value(p_min_i[1], value(p_i))
+        set_value(p_min_i, value(p_i))
         optimize!(model)
     end
 
-    return model, value.([p_i, p_min_i...]), i
+    return model, (value(p_i), value(p_min_i)), i
 end
 
-function Q_0_i(p::T, p_vect::Vector{T}, δ::T) where {T<:Real} 
-    @chain p begin
-        π_i.(_, price_options)
-        mean()
-        _ / (1 - δ)
-    end
-end
+# function Q_0_i(p::T, p_vect::Vector{T}, δ::T) where {T<:Real} 
+#     @chain p begin
+#         π_i.(_, price_options)
+#         mean()
+#         _ / (1 - δ)
+#     end
+# end
 
-function Q_0(p_vect::Vector{T}, δ::T) where {T<:Real} 
-    Q_0_i.(p_vect, (p_vect,), δ)
-end
+# function Q_0(p_vect::Vector{T}, δ::T) where {T<:Real} 
+#     Q_0_i.(p_vect, (p_vect,), δ)
+# end

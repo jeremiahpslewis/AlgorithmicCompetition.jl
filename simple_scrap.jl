@@ -9,7 +9,7 @@ using AlgorithmicCompetition:
     run
 using BenchmarkTools
 
-competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
 
 competition_solution = CompetitionSolution(competition_params)
 

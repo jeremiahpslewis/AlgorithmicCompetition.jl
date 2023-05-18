@@ -56,7 +56,7 @@ using Distributed
     max_iter = 1000
     price_index = 1:n_prices
 
-    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
 
     competition_solution = CompetitionSolution(competition_params)
 
@@ -73,7 +73,7 @@ using Distributed
     test_runnable!(AIAPCEnv(hyperparams))
 end
 @testset "Competitive Equilibrium: Monopoly" begin
-    params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
     model_monop, p_monop = solve_monopolist(params)
 
     # symmetric solution found
@@ -85,7 +85,7 @@ end
 end
 
 @testset "Competitive Equilibrium: Bertrand" begin
-    params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
 
     p_Bertrand_ = value.(solve_bertrand(params)[2])
     p_Bertrand = p_Bertrand_[1]
@@ -123,7 +123,7 @@ end
     max_iter = 1000
     price_index = 1:n_prices
 
-    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
 
     competition_solution = CompetitionSolution(competition_params)
 
@@ -156,7 +156,7 @@ end
     max_iter = Int(1e6)
     price_index = 1:n_prices
 
-    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
 
     competition_solution = CompetitionSolution(competition_params)
 
@@ -186,7 +186,7 @@ end
 end
 
 @testset "Run a set of experiments." begin
-    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
 
     competition_solution = CompetitionSolution(competition_params)
 
@@ -217,19 +217,19 @@ end
 end
 
 @testset "CompetitionParameters" begin
-    @test CompetitionParameters(1, 1, [1.0, 1], [1.0, 1]) isa CompetitionParameters
-    @test_throws DimensionMismatch CompetitionParameters(1, 1, [1.0, 1], [1.0])
+    @test CompetitionParameters(1, 1, (1.0, 1.0), (1.0, 1.0)) isa CompetitionParameters
+    @test_throws DimensionMismatch CompetitionParameters(1, 1, (1.0, 1), (1.0))
 end
 
 @testset "Q" begin
-    @test Q([1.47293, 1.47293], CompetitionParameters(0.25, 0, [2, 2], [1, 1])) ≈
+    @test Q(1.47293, 1.47293, CompetitionParameters(0.25, 0, (2, 2), (1, 1))) ≈
           fill(0.47138, 2) atol = 0.01
-    @test Q([1.92498, 1.92498], CompetitionParameters(0.25, 0, [2, 2], [1, 1])) ≈
+    @test Q(1.92498, 1.92498, CompetitionParameters(0.25, 0, (2, 2), (1, 1))) ≈
           fill(0.36486, 2) atol = 0.01
 end
 
 @testset "Convergence Check Hook" begin
-    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
     competition_solution = CompetitionSolution(competition_params)
 
     env =
@@ -253,7 +253,7 @@ end
 end
 
 @testset "Profit array test" begin
-    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
     competition_solution = CompetitionSolution(competition_params)
     params = AIAPCHyperParameters(
         Float64(0.1),
@@ -269,7 +269,7 @@ end
     action_space_ = env.action_space
     profit_array = construct_profit_array(action_space_, price_options, competition_solution.params, 2)
 
-    profit_array[5, 3, :] ≈ π([price_options[5], price_options[3]], competition_solution.params)
+    profit_array[5, 3, :] ≈ π(price_options[5], price_options[3], competition_solution.params)
 end
 
 @testset "map_vect_to_int, map_int_to_vect" begin
@@ -301,7 +301,7 @@ end
     max_iter = 5000
     price_index = 1:n_prices
 
-    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
 
     competition_solution = CompetitionSolution(competition_params)
 
@@ -363,7 +363,7 @@ end
     max_iter = 1000
     price_index = 1:n_prices
 
-    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
 
     competition_solution = CompetitionSolution(competition_params)
 
@@ -394,7 +394,7 @@ end
     max_iter = Int(1e6)
     price_index = 1:n_prices
 
-    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
     competition_solution = CompetitionSolution(competition_params)
 
     hyperparams = AIAPCHyperParameters(
@@ -420,7 +420,7 @@ end
     max_iter = Int(1e7)
     price_index = 1:n_prices
 
-    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
     competition_solution = CompetitionSolution(competition_params)
 
     hyperparams = AIAPCHyperParameters(
@@ -435,9 +435,9 @@ end
     @test 0.98 < get_ϵ(c_out.policy[Symbol(1)].policy.explorer) < 1
     @test 0.98 < get_ϵ(c_out.policy[Symbol(2)].policy.explorer) < 1
 
-    @test RLCore.stop(c_out.stop_condition, 1, c_out.env) == true
-    @test RLCore.stop(c_out.stop_condition.stop_conditions[1], 1, c_out.env) == false
-    @test RLCore.stop(c_out.stop_condition.stop_conditions[2], 1, c_out.env) == true
+    @test RLCore.check_stop(c_out.stop_condition, 1, c_out.env) == true
+    @test RLCore.check_stop(c_out.stop_condition.stop_conditions[1], 1, c_out.env) == false
+    @test RLCore.check_stop(c_out.stop_condition.stop_conditions[2], 1, c_out.env) == true
 
     @test c_out.hook[Symbol(1)][2].convergence_duration >= 5
     @test c_out.hook[Symbol(2)][2].convergence_duration >= 5
@@ -461,7 +461,7 @@ end
 end
 
 @testset "ConvergenceCheck" begin
-    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
     competition_solution = CompetitionSolution(competition_params)
 
     env =

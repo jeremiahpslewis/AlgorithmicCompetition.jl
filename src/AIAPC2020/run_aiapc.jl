@@ -6,7 +6,7 @@ function run_aiapc(;
     max_iter = Int(1e9),
     convergence_threshold = Int(1e5),
 )
-    competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
     competition_solution = CompetitionSolution(competition_params)
     n_increments = 100
 
