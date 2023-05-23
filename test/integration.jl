@@ -13,7 +13,7 @@ using ReinforcementLearningCore:
     RandomPolicy,
     MultiAgentPolicy
 using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy, act!, plan!
-import ReinforcementLearningCore
+import ReinforcementLearningCore: RLCore
 using StaticArrays
 using Statistics
 using AlgorithmicCompetition:
@@ -451,8 +451,8 @@ end
         ϵ_stable = 0,
         decay_steps = Int(round(1 / 1e-5)),
     )
-    @test ReinforcementLearningCore.get_ϵ(explorer, 1e5) ≈ 0.36787944117144233
-    @test_broken ReinforcementLearningCore.get_ϵ(explorer, 1e5) ≈ 0.14 # Percentage cited in AIAPC paper
+    @test RLCore.get_ϵ(explorer, 1e5) ≈ 0.36787944117144233
+    @test_broken RLCore.get_ϵ(explorer, 1e5) ≈ 0.14 # Percentage cited in AIAPC paper
 
     explorer = AIAPCEpsilonGreedyExplorer(Float64(1e-5))
     @test get_ϵ(explorer, 1e5) ≈ 0.36787944117144233
