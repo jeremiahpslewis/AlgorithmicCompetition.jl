@@ -1,4 +1,4 @@
-import AlgorithmicCompetition
+using AlgorithmicCompetition
 using Chain
 using Statistics
 using DataFrames
@@ -21,7 +21,8 @@ _procs = addprocs(
     using AlgorithmicCompetition
 end
 
-exp_list_ = AlgorithmicCompetition.run_aiapc(; n_parameter_iterations = 10)
+exp_list_ = AlgorithmicCompetition.run_aiapc(; n_parameter_iterations = 1,
+    n_parameter_increments = 100)
 
 α_result = [ex.α for ex in exp_list if !(ex isa Exception)]
 β_result = [ex.β for ex in exp_list if !(ex isa Exception)]
