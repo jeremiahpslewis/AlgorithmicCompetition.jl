@@ -14,13 +14,13 @@ using ReinforcementLearningEnvironments
 end
 
 
-@testset "RLCore.estimate_reward" begin
+@testset "RLCore.forward" begin
     v_approx = TabularVApproximator(n_state=10)
-    @test RLCore.estimate_reward(v_approx, 1) == 0.0
+    @test RLCore.forward(v_approx, 1) == 0.0
 
     q_approx = TabularQApproximator(n_state = 5, n_action=10)
-    @test RLCore.estimate_reward(q_approx, 1) == zeros(Float64, 10)
-    @test RLCore.estimate_reward(q_approx, 1, 5) == 0.0
+    @test RLCore.forward(q_approx, 1) == zeros(Float64, 10)
+    @test RLCore.forward(q_approx, 1, 5) == 0.0
     
 end
 

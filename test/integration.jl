@@ -11,8 +11,7 @@ using ReinforcementLearningCore:
     action_space,
     EpsilonGreedyExplorer,
     RandomPolicy,
-    MultiAgentPolicy,
-    update!
+    MultiAgentPolicy
 using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy, act!, plan!
 import ReinforcementLearningCore
 using StaticArrays
@@ -139,7 +138,7 @@ end
     policy = AIAPCPolicy(env)
 
     # Test full policy exploration of states
-    update!(policy, PreActStage(), env)
+    push!(policy, PreActStage(), env)
     n_ = Int(1e5)
     policy_runs = [[plan!(policy, env)...] for i = 1:n_]
     checksum_ = [sum(unique(policy_runs[j][i] for j = 1:n_)) for i = 1:2]
@@ -243,12 +242,12 @@ end
     exper = Experiment(env)
     state(env)
     policies = env |> AIAPCPolicy
-    update!(exper.hook[Symbol(1)][2], Int64(2), 3, false)
+    push!(exper.hook[Symbol(1)][2], Int64(2), 3, false)
     @test exper.hook[Symbol(1)][2].best_response_vector[2] == 3
 
 
     policies[Symbol(1)].policy.learner.approximator.table[11, :] .= 2
-    update!(exper.hook[Symbol(1)][2], PostActStage(), policies[Symbol(1)], exper.env, :p1)
+    push!(exper.hook[Symbol(1)][2], PostActStage(), policies[Symbol(1)], exper.env, :p1)
     @test exper.hook[Symbol(1)][2].best_response_vector[state(env)] == 11
 end
 
@@ -475,7 +474,7 @@ end
     policies = env |> AIAPCPolicy
 
     convergence_hook = ConvergenceCheck(1)
-    update!(convergence_hook, PostActStage(), policies[Symbol(1)], env, :player_1)
+    push!(convergence_hook, PostActStage(), policies[Symbol(1)], env, :player_1)
     @test convergence_hook.convergence_duration == 0
     @test convergence_hook.iterations_until_convergence == 1
     @test convergence_hook.best_response_vector[1] == 1
@@ -483,7 +482,7 @@ end
 
     convergence_hook_1 = ConvergenceCheck(1)
     convergence_hook_1.best_response_vector = MVector{225,Int}(fill(1, 225))
-    update!(convergence_hook_1, PostActStage(), policies[Symbol(1)], env, :player_1)
+    push!(convergence_hook_1, PostActStage(), policies[Symbol(1)], env, :player_1)
 
     @test convergence_hook.iterations_until_convergence == 1
     @test convergence_hook.convergence_duration ∈ [0, 1]

@@ -22,9 +22,9 @@ struct TDLearnerSARS{Ap,F<:AbstractFloat,I<:Integer} <: AbstractLearner
     n::I
 end
 
-RLCore.estimate_reward(L::TDLearnerSARS{Ap,F,I}, env::E) where {Ap,F,I,E<:AbstractEnv} = RLCore.estimate_reward(L.approximator, state(env))
-RLCore.estimate_reward(L::TDLearnerSARS{Ap,F,I}, s::I1) where {Ap,F,I<:Integer,I1<:Integer} = RLCore.estimate_reward(L.approximator, s)
-RLCore.estimate_reward(L::TDLearnerSARS{Ap,F,I}, s::I1, a::I2) where {Ap,F,I,I1<:Integer,I2<:Integer} = RLCore.estimate_reward(L.approximator, s, a)
+RLCore.forward(L::TDLearnerSARS{Ap,F,I}, env::E) where {Ap,F,I,E<:AbstractEnv} = RLCore.forward(L.approximator, state(env))
+RLCore.forward(L::TDLearnerSARS{Ap,F,I}, s::I1) where {Ap,F,I<:Integer,I1<:Integer} = RLCore.forward(L.approximator, s)
+RLCore.forward(L::TDLearnerSARS{Ap,F,I}, s::I1, a::I2) where {Ap,F,I,I1<:Integer,I2<:Integer} = RLCore.forward(L.approximator, s, a)
 
 function extract_sar(t::Traces{Tr}) where {Tr}
     # TODO: Delete this when RLTrajectories.jl is fixed
@@ -41,7 +41,7 @@ function _optimise!(n::I1, γ::F, Q::TabularApproximator{2,Ar,O}, S::SubArray{I2
     for i = 1:min(n + 1, length(R))
         G = R + γ * G
         s, a = S[end-i], A[end-i]
-        RLBase.optimise!(Q, (s, a), RLCore.estimate_reward(Q, s, a) - G)
+        RLBase.optimise!(Q, (s, a), RLCore.forward(Q, s, a) - G)
     end
 end
 
@@ -55,9 +55,9 @@ function RLBase.priority(L::TDLearnerSARS{Ap,F,I}, transition::Tuple{T}) where {
         s, a, r, d, s′ = transition
         γ, Q = L.γ, L.approximator
         if d
-            Δ = (r - RLCore.estimate_reward(Q, s, a))
+            Δ = (r - RLCore.forward(Q, s, a))
         else
-            Δ = (r + γ * RLCore.estimate_reward(Q, s′) - RLCore.estimate_reward(Q, s, a))
+            Δ = (r + γ * RLCore.forward(Q, s′) - RLCore.forward(Q, s, a))
         end
         Δ = [Δ]  # must be broadcastable in Flux.Optimise
         Flux.Optimise.apply!(Q.optimizer, (s, a), Δ)

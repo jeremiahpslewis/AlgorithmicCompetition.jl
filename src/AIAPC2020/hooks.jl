@@ -1,6 +1,6 @@
 using ReinforcementLearningCore, ReinforcementLearningBase
-import ReinforcementLearningCore: RLCore
 using StaticArrays
+import Base.push!
 
 mutable struct ConvergenceCheck <: AbstractHook
     convergence_duration::Int32
@@ -14,7 +14,7 @@ mutable struct ConvergenceCheck <: AbstractHook
     end
 end
 
-function RLCore.update!(h::ConvergenceCheck, state_::Int64, best_action::Int, iter_converged::Bool)
+function Base.push!(h::ConvergenceCheck, state_::Int64, best_action::Int, iter_converged::Bool)
     # Increment duration whenever argmax action is stable (convergence criteria)
     # Increment convergence metric (e.g. convergence not reached)
     # Keep track of number of iterations it takes until convergence
@@ -40,20 +40,20 @@ function _best_action_lookup(state_, table)
     @views argmax(table[:, state_])
 end
 
-function RLCore.update!(h::ConvergenceCheck, table::Matrix{F}, state_::S) where {S,F<:AbstractFloat}
+function Base.push!(h::ConvergenceCheck, table::Matrix{F}, state_::S) where {S,F<:AbstractFloat}
     # Convergence is defined over argmax action for each state 
     # E.g. best / greedy action
     best_action = _best_action_lookup(state_, table)
     iter_converged = (@views h.best_response_vector[state_] == best_action)
 
-    RLCore.update!(h, state_, best_action, iter_converged)
+    Base.push!(h, state_, best_action, iter_converged)
 
     return h.is_converged
 end
     
-function RLCore.update!(h::ConvergenceCheck, ::PostActStage, policy::P, env::E, player::Symbol) where {P <: AbstractPolicy, E <: AbstractEnv}
+function Base.push!(h::ConvergenceCheck, ::PostActStage, policy::P, env::E, player::Symbol) where {P <: AbstractPolicy, E <: AbstractEnv}
     state_ = RLBase.state(env, player)
-    env.convergence_dict[player] = RLCore.update!(h, policy.policy.learner.approximator.table, state_)
+    env.convergence_dict[player] = Base.push!(h, policy.policy.learner.approximator.table, state_)
     return
 end
 
@@ -70,9 +70,9 @@ function AIAPCHook(env::AbstractEnv)
     )
 end
 
-function RLCore.update!(hook::MultiAgentHook, stage::AbstractStage,
+function Base.push!(hook::MultiAgentHook, stage::AbstractStage,
     policy::MultiAgentPolicy, env::AIAPCEnv)
     for p in (Symbol(1), Symbol(2))
-        RLCore.update!(hook[p], stage, policy[p], env, p)
+        Base.push!(hook[p], stage, policy[p], env, p)
     end
 end

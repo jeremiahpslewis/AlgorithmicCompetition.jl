@@ -73,7 +73,7 @@ hyperparams = AIAPCHyperParameters(
 env = AIAPCEnv(hyperparams)
 experiment = Experiment(env; stop_on_convergence = false)
 
-@report_opt RLCore.update!(experiment.policy, PreActStage(), experiment.env)
+@report_opt Base.push!(experiment.policy, PreActStage(), experiment.env)
 @report_opt RLBase.plan!(experiment.policy, experiment.env)
 
 @time run(hyperparams; stop_on_convergence = false);
@@ -106,7 +106,7 @@ RLCore._run(
 # RLBase.plan!(experiment.policy.agents[Symbol(1)], env)
 # @report_opt RLBase.plan!(experiment.policy.agents[Symbol(1)], env, Symbol(1))
 # @report_opt RLBase.plan!(experiment.policy, env, Symbol(1))
-# @report_opt RLCore.estimate_reward(td_learner, env)
+# @report_opt RLCore.forward(td_learner, env)
 @report_opt RLBase.plan!(experiment.policy, env)
 # @report_opt RLBase.act!(env, (1,1))
 

@@ -28,10 +28,10 @@ TabularVApproximator(; n_state, init = 0.0, opt = InvDecay(1.0)) =
 TabularQApproximator(; n_state, n_action, init = 0.0, opt = InvDecay(1.0)) =
     TabularApproximator(fill(init, n_action, n_state), opt)
 
-RLCore.estimate_reward(app::TabularApproximator{1,R,O}, s::I) where {R<:AbstractArray,O,I<:Integer} = @views app.table[s]
+RLCore.forward(app::TabularApproximator{1,R,O}, s::I) where {R<:AbstractArray,O,I<:Integer} = @views app.table[s]
 
-RLCore.estimate_reward(app::TabularApproximator{2,R,O}, s::I) where {R<:AbstractArray,O,I<:Integer} = @views app.table[:, s]
-RLCore.estimate_reward(app::TabularApproximator{2,R,O}, s::I1, a::I2) where {R<:AbstractArray,O,I1<:Integer,I2<:Integer} = @views app.table[a, s]
+RLCore.forward(app::TabularApproximator{2,R,O}, s::I) where {R<:AbstractArray,O,I<:Integer} = @views app.table[:, s]
+RLCore.forward(app::TabularApproximator{2,R,O}, s::I1, a::I2) where {R<:AbstractArray,O,I1<:Integer,I2<:Integer} = @views app.table[a, s]
 
 function RLBase.optimise!(
     app::TabularApproximator{1,R,O},
