@@ -21,7 +21,7 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentPolicy(
                     γ = env.δ,
                     n = 0,
                 ),
-                explorer = AIAPCEpsilonGreedyExplorer(Float64(1e-5)),
+                explorer = AIAPCEpsilonGreedyExplorer(env.β),
             ),
             Trajectory(
                 CircularArraySARTTraces(;
