@@ -1,5 +1,6 @@
 import ProgressMeter: @showprogress
 using Distributed
+using Random
 
 function run_aiapc(;
     n_parameter_iterations = 1,
@@ -27,7 +28,7 @@ function run_aiapc(;
     exp_list_ = AIAPCSummary[]
     println("About to run $(length(hyperparameter_vect)) parameter settings, each $n_parameter_iterations times")
     exp_list =
-        @showprogress pmap(run_and_extract, repeat(hyperparameter_vect, n_parameter_iterations); on_error = identity)
+        @showprogress pmap(run_and_extract, shuffle(repeat(hyperparameter_vect, n_parameter_iterations)); on_error = identity)
     append!(exp_list_, exp_list)
 
     return exp_list_
