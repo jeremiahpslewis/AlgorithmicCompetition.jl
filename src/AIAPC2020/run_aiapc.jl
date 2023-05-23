@@ -24,14 +24,11 @@ function run_aiapc(;
             convergence_threshold = convergence_threshold,
         ) for α in α_ for β in β_
     ]
-
     exp_list_ = AIAPCSummary[]
-    @showprogress for i = 1:n_parameter_iterations
-        println("Running iteration $i of $n_parameter_iterations")
-        exp_list =
-            @showprogress pmap(run_and_extract, hyperparameter_vect; on_error = identity)
-        append!(exp_list_, exp_list)
-    end
+    println("About to run $(length(hyperparameter_vect)) parameter settings, each $n_parameter_iterations times")
+    exp_list =
+        @showprogress pmap(run_and_extract, repeat(hyperparameter_vect, n_parameter_iterations); on_error = identity)
+    append!(exp_list_, exp_list)
 
     return exp_list_
 end
