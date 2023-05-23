@@ -29,7 +29,7 @@ using AlgorithmicCompetition:
     map_vect_to_int,
     map_int_to_vect,
     construct_profit_array,
-    q_fun,
+    Q,
     run,
     run_and_extract,
     Experiment,
@@ -51,7 +51,7 @@ n_prices = 15
 max_iter = 5000
 price_index = 1:n_prices
 
-competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
 
 competition_solution = CompetitionSolution(competition_params)
 

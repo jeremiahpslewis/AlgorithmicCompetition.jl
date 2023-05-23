@@ -1,5 +1,6 @@
 using ReinforcementLearningCore, ReinforcementLearningBase
 using StaticArrays
+import Base.push!
 
 mutable struct ConvergenceCheck <: AbstractHook
     convergence_duration::Int32
@@ -13,7 +14,7 @@ mutable struct ConvergenceCheck <: AbstractHook
     end
 end
 
-function (h::ConvergenceCheck)(state_::Int64, best_action::Int, iter_converged::Bool)
+function Base.push!(h::ConvergenceCheck, state_::Int64, best_action::Int, iter_converged::Bool)
     # Increment duration whenever argmax action is stable (convergence criteria)
     # Increment convergence metric (e.g. convergence not reached)
     # Keep track of number of iterations it takes until convergence
@@ -35,20 +36,24 @@ function (h::ConvergenceCheck)(state_::Int64, best_action::Int, iter_converged::
     return
 end
 
+function _best_action_lookup(state_, table)
+    @views argmax(table[:, state_])
+end
 
-function (h::ConvergenceCheck)(::PostActStage, policy, env, player::Symbol)
+function Base.push!(h::ConvergenceCheck, table::Matrix{F}, state_::S) where {S,F<:AbstractFloat}
     # Convergence is defined over argmax action for each state 
     # E.g. best / greedy action
-    n_prices = env.n_prices
-
-    state_ = RLBase.state(env, player)
-    best_action = argmax(@view policy.policy.learner.approximator.table[:, state_])
+    best_action = _best_action_lookup(state_, table)
     iter_converged = (@views h.best_response_vector[state_] == best_action)
 
-    h(state_, best_action, iter_converged)
+    Base.push!(h, state_, best_action, iter_converged)
 
-    env.convergence_dict[player] = h.is_converged
-
+    return h.is_converged
+end
+    
+function Base.push!(h::ConvergenceCheck, ::PostActStage, policy::P, env::E, player::Symbol) where {P <: AbstractPolicy, E <: AbstractEnv}
+    state_ = RLBase.state(env, player)
+    env.convergence_dict[player] = Base.push!(h, policy.policy.learner.approximator.table, state_)
     return
 end
 
@@ -63,4 +68,11 @@ function AIAPCHook(env::AbstractEnv)
             ) for p in players(env)
         ),
     )
+end
+
+function Base.push!(hook::MultiAgentHook, stage::AbstractStage,
+    policy::MultiAgentPolicy, env::AIAPCEnv)
+    for p in (Symbol(1), Symbol(2))
+        Base.push!(hook[p], stage, policy[p], env, p)
+    end
 end

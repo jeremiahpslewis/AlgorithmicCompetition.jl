@@ -2,12 +2,13 @@ using ReinforcementLearningCore
 using ReinforcementLearningEnvironments
 using Distributed
 import Base
+import ReinforcementLearningBase: RLBase
 
 # Patch to improve type stability and try to speed things up (avoid generator)
-function (multiagent::MultiAgentPolicy)(env::AIAPCEnv)
-    return tuple(
-        multiagent[Symbol(:1)](env, Symbol(:1)),
-        multiagent[Symbol(:2)](env, Symbol(:1)),
+function RLBase.plan!(multiagent::MultiAgentPolicy, env::AIAPCEnv)
+    return (
+        RLBase.plan!(multiagent[Symbol(:1)], env, Symbol(:1)),
+        RLBase.plan!(multiagent[Symbol(:2)], env, Symbol(:2)),
     )
 end
 
@@ -23,7 +24,12 @@ end
 function Base.run(experiments::Vector{ReinforcementLearningCore.Experiment})
     sendto(workers(), experiments = experiments)
     status = pmap(1:length(experiments)) do i
-        Base.run(experiments[i])
+        experiment = experiment[i]
+        RLCore._run(experiment.policy,
+        experiment.env,
+        experiment.stop_condition,
+        experiment.hook,
+        ResetAtTerminal())
         experiments[i]
     end
 end

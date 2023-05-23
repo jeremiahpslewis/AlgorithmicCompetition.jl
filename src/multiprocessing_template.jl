@@ -1,4 +1,4 @@
-import AlgorithmicCompetition
+using AlgorithmicCompetition
 using Chain
 using Statistics
 using DataFrames
@@ -7,7 +7,7 @@ using CSV
 using Distributed
 using CSV
 
-n_procs_ = 4
+n_procs_ = 7 # up to 8 performance cores on m1
 
 _procs = addprocs(
     n_procs_,
@@ -21,7 +21,8 @@ _procs = addprocs(
     using AlgorithmicCompetition
 end
 
-exp_list_ = AlgorithmicCompetition.run_aiapc(; n_parameter_iterations = 10)
+@time exp_list_ = AlgorithmicCompetition.run_aiapc(; n_parameter_iterations = 10,
+    n_parameter_increments = 10)
 
 α_result = [ex.α for ex in exp_list if !(ex isa Exception)]
 β_result = [ex.β for ex in exp_list if !(ex isa Exception)]

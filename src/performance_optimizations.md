@@ -89,7 +89,7 @@ TODO:
 23.618 s (203000500 allocations: 8.60 GiB)
 24.456 s (208005856 allocations: 8.89 GiB) # gets worse if smaller ints are not used, but not significantly...
 24.158 s (203000500 allocations: 8.57 GiB)
-23.958 s (203000500 allocations: 8.47 GiB) # Float32s help a bit
+23.958 s (203000500 allocations: 8.47 GiB) # Float64s help a bit
 24.012 s (203000406 allocations: 8.47 GiB)
 23.594 s (203000638 allocations: 8.47 GiB) # Stop recalculating action space
 21.765 s (185013689 allocations: 7.54 GiB) # Stop recalculating profits!
@@ -125,6 +125,70 @@ TODO:
 17.474 s (213112876 allocations: 13.63 GiB) # 2023-05-03 post refactor...
 
 # rework convergence logic, reduce env calls
+
+# 2023-05-14
+5.554617 seconds (83.41 M allocations: 3.282 GiB, 11.67% gc time)
+5.843871 seconds (83.42 M allocations: 3.283 GiB, 11.28% gc time)
+4.577566 seconds (83.41 M allocations: 3.282 GiB, 12.36% gc time)
+4.576021 seconds (83.41 M allocations: 3.282 GiB, 12.42% gc time)
+4.481501 seconds (83.41 M allocations: 3.282 GiB, 12.28% gc time)
+4.379715 seconds (83.41 M allocations: 3.282 GiB, 9.88% gc time)
+
+# 2023-05-12
+1.9 / 1e6
+8.385367 seconds (125.01 M allocations: 4.743 GiB, 13.61% gc time)
+6.116944 seconds (127.01 M allocations: 5.428 GiB, 17.93% gc time)
+6.326637 seconds (127.01 M allocations: 5.428 GiB, 17.94% gc time)
+6.304462 seconds (126.41 M allocations: 5.577 GiB, 18.60% gc time)
+6.427265 seconds (126.41 M allocations: 5.577 GiB, 18.44% gc time)
+5.736242 seconds (117.41 M allocations: 4.981 GiB, 18.16% gc time)
+9.666130 seconds (115.41 M allocations: 4.951 GiB, 9.89% gc time)
+6.018495 seconds (117.41 M allocations: 4.981 GiB, 16.51% gc time)
+5.672007 seconds (115.41 M allocations: 4.355 GiB, 15.54% gc time)
+5.681733 seconds (115.42 M allocations: 4.355 GiB, 15.31% gc time)
+5.398183 seconds (111.41 M allocations: 4.236 GiB, 15.36% gc time)
+6.895325 seconds (109.41 M allocations: 4.147 GiB, 13.95% gc time)
+6.842156 seconds (109.41 M allocations: 4.147 GiB, 12.83% gc time)
+6.978497 seconds (109.41 M allocations: 4.147 GiB, 12.91% gc time)
+7.137854 seconds (109.41 M allocations: 4.147 GiB, 13.70% gc time)
+7.067014 seconds (109.42 M allocations: 4.147 GiB, 13.15% gc time)
+6.817556 seconds (107.41 M allocations: 4.117 GiB, 11.85% gc time)
+6.708287 seconds (107.41 M allocations: 4.117 GiB, 12.50% gc time)
+6.554879 seconds (107.41 M allocations: 4.117 GiB, 12.64% gc time)
+6.293737 seconds (107.41 M allocations: 4.117 GiB, 12.44% gc time)
+6.507044 seconds (107.41 M allocations: 4.117 GiB, 10.55% gc time)
+5.673315 seconds (83.41 M allocations: 3.282 GiB, 10.99% gc time)
+
+# 2023-05-11
+1.9 / 1e6
+9.340106 seconds (128.01 M allocations: 5.115 GiB, 14.79% gc time)
+6.618584 seconds (129.01 M allocations: 4.862 GiB, 15.24% gc time)
+6.728069 seconds (129.01 M allocations: 4.862 GiB, 15.17% gc time)
+
+# 2023-05-10
+1.9 / 1e6
+5.924159 seconds (125.01 M allocations: 4.743 GiB, 15.70% gc time)
+9.029067 seconds (128.01 M allocations: 5.115 GiB, 14.01% gc time)
+7.491959 seconds (128.01 M allocations: 5.115 GiB, 13.44% gc time)
+
+# 2023-05-09
+1e6, @time
+19.308903 seconds (176.01 M allocations: 15.412 GiB, 19.09% gc time, 0.00% compilation time)
+18.314387 seconds (176.01 M allocations: 15.412 GiB, 13.85% gc time)
+17.942883 seconds (176.01 M allocations: 15.412 GiB, 13.70% gc time)
+17.117924 seconds (184.53 M allocations: 15.812 GiB, 11.48% gc time, 4.78% compilation time)
+1e7 / v1.8
+159.585808 seconds (1.80 G allocations: 155.870 GiB, 10.49% gc time)
+1e7 / v1.9
+193.547811 seconds (1.76 G allocations: 154.082 GiB, 19.44% gc time)
+1e6 / v1.9
+17.599272 seconds (146.43 M allocations: 14.895 GiB, 21.30% gc time, 4.99% compilation time)
+16.234867 seconds (144.01 M allocations: 14.741 GiB, 21.70% gc time)
+15.479326 seconds (139.01 M allocations: 14.309 GiB, 21.63% gc time)
+6.841070 seconds (129.01 M allocations: 4.862 GiB, 15.62% gc time)
+7.295190 seconds (129.33 M allocations: 4.980 GiB, 14.52% gc time, 9.10% compilation time)
+6.766770 seconds (127.01 M allocations: 4.832 GiB, 15.01% gc time)
+6.690375 seconds (129.01 M allocations: 4.862 GiB, 15.90% gc time)
 
 # 2023-05-03
 1e7 iteration, @time:

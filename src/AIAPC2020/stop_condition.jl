@@ -1,8 +1,9 @@
 using ReinforcementLearningCore
+import ReinforcementLearningCore: RLCore
 
 struct StopWhenConverged <: AbstractStopCondition end
 
-function (s::StopWhenConverged)(agent, env)
+function RLCore.check_stop(s::StopWhenConverged, agent, env)
     # false until converged, then true
     return (env.convergence_dict[Symbol(1)] && env.convergence_dict[Symbol(2)])
 end

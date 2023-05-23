@@ -6,41 +6,60 @@ using ReinforcementLearningBase
 using ReinforcementLearningCore
 using ReinforcementLearningTrajectories: Trajectory
 
-Base.@kwdef struct TDLearner{A,F<:AbstractFloat,I<:Integer} <: AbstractLearner
-    approximator::A
-    γ::F = 1.0
+
+function TDLearner(; approximator::Ap, γ::F = 1.0, method::Symbol, n::I = 0) where {Ap,F,I}
+    if method != :SARS
+        @error "unsupported method"
+    else
+        TDLearnerSARS{Ap,F,I}(approximator, γ, method, n)
+    end
+end
+
+struct TDLearnerSARS{Ap,F<:AbstractFloat,I<:Integer} <: AbstractLearner
+    approximator::Ap
+    γ::F 
     method::Symbol
-    n::I = 0
+    n::I
 end
 
-(L::TDLearner)(env::E) where {E<:AbstractEnv} = L.approximator(state(env))
-(L::TDLearner)(s) = L.approximator(s)
-(L::TDLearner)(s, a) = L.approximator(s, a)
+RLCore.forward(L::TDLearnerSARS{Ap,F,I}, env::E) where {Ap,F,I,E<:AbstractEnv} = RLCore.forward(L.approximator, state(env))
+RLCore.forward(L::TDLearnerSARS{Ap,F,I}, s::I1) where {Ap,F,I<:Integer,I1<:Integer} = RLCore.forward(L.approximator, s)
+RLCore.forward(L::TDLearnerSARS{Ap,F,I}, s::I1, a::I2) where {Ap,F,I,I1<:Integer,I2<:Integer} = RLCore.forward(L.approximator, s, a)
 
-function RLBase.optimise!(L::TDLearner, x)
-    _optimise!(L, x)
+function extract_sar(t::Traces{Tr}) where {Tr}
+    # TODO: Delete this when RLTrajectories.jl is fixed
+    # Hard coded to deal with index type instability in RLTrajectories.jl
+    S = t.traces[1][:state][1]
+    A = t.traces[2][:action][1]
+    R = t.traces[3][1]
+    return (S, A, R)
 end
 
-function _optimise!(L::TDLearner, t)
-    S, A, R, T = (t[x][1] for x in SART)
-    n, γ, Q = L.n, L.γ, L.approximator
+
+function _optimise!(n::I1, γ::F, Q::TabularApproximator{2,Ar,O}, S::SubArray{I2}, A::SubArray{I3}, R::F) where {I1<:Number,I2<:Number,I3<:Number,Ar<:AbstractArray,F<:AbstractFloat,O}
     G = 0.0
     for i = 1:min(n + 1, length(R))
         G = R + γ * G
         s, a = S[end-i], A[end-i]
-        RLBase.optimise!(Q, (s, a) => Q(s, a) - G)
+        RLBase.optimise!(Q, (s, a), RLCore.forward(Q, s, a) - G)
     end
 end
 
-function RLBase.priority(L::TDLearner, transition::Tuple)
-    if L.method == :SARS
+function RLBase.optimise!(L::TDLearnerSARS{Ap,F,I}, t::Traces{Tr}) where {Ap,F,I,Tr}
+    # S, A, R, T = (t[x][1] for x in SART)
+    S, A, R = extract_sar(t) # Remove this when the above line works without a performance hit
+    _optimise!(L.n, L.γ, L.approximator, S, A, R)
+end
+
+function RLBase.priority(L::TDLearnerSARS{Ap,F,I}, transition::Tuple{T}) where {Ap,F,I,T}
         s, a, r, d, s′ = transition
         γ, Q = L.γ, L.approximator
-        Δ = d ? (r - Q(s, a)) : (r + γ^(L.n + 1) * maximum(Q(s′)) - Q(s, a))
+        if d
+            Δ = (r - RLCore.forward(Q, s, a))
+        else
+            Δ = (r + γ * RLCore.forward(Q, s′) - RLCore.forward(Q, s, a))
+        end
         Δ = [Δ]  # must be broadcastable in Flux.Optimise
         Flux.Optimise.apply!(Q.optimizer, (s, a), Δ)
         abs(Δ[])
-    else
-        @error "unsupported method"
-    end
 end

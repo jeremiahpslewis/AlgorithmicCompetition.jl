@@ -1,7 +1,7 @@
 struct CompetitionSolution
     p_Bert_nash_equilibrium::Float64
     p_monop_opt::Float64
-    profit_function::Any
+    params::CompetitionParameters
 
     function CompetitionSolution(params::CompetitionParameters)
         model_monop, p_monop = solve_monopolist(params)
@@ -9,28 +9,26 @@ struct CompetitionSolution
         p_Bert_nash_equilibrium = solve_bertrand(params)[2][1]
         p_monop_opt = solve_monopolist(params)[2][1]
 
-        profit_function = p -> π_fun(p, params)
-
-        new(p_Bert_nash_equilibrium, p_monop_opt, profit_function)
+        new(p_Bert_nash_equilibrium, p_monop_opt, params)
     end
 end
 
 struct AIAPCHyperParameters
-    α::Float32
-    β::Float32
+    α::Float64
+    β::Float64
     δ::Float64
     price_options::Vector{Float64}
     memory_length::Int
     n_players::Int
     max_iter::Int
     convergence_threshold::Int
-    profit_function::Any
+    competition_solution::CompetitionSolution
     p_Bert_nash_equilibrium::Float64
     p_monop_opt::Float64
 
     function AIAPCHyperParameters(
-        α::Float32,
-        β::Float32,
+        α::Float64,
+        β::Float64,
         δ::Float64,
         max_iter::Int,
         competition_solution::CompetitionSolution;
@@ -66,7 +64,7 @@ struct AIAPCHyperParameters
             n_players,
             max_iter,
             convergence_threshold,
-            competition_solution.profit_function,
+            competition_solution,
             competition_solution.p_Bert_nash_equilibrium,
             competition_solution.p_monop_opt,
         )
