@@ -7,7 +7,7 @@ using CSV
 using Distributed
 using CSV
 
-n_procs_ = 4
+n_procs_ = 2 # up to 4 possible on m1
 
 _procs = addprocs(
     n_procs_,
