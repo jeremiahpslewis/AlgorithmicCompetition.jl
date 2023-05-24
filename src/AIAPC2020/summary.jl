@@ -25,7 +25,11 @@ function economic_summary(env::AbstractEnv, hook::AbstractHook)
         hook[player][2].iterations_until_convergence for player in [Symbol(1), Symbol(2)]
     ]
 
-    π_N, π_M = extract_profit_vars(env.p_Bert_nash_equilibrium, env.p_monop_opt, env.competition_solution.params)
+    π_N, π_M = extract_profit_vars(
+        env.p_Bert_nash_equilibrium,
+        env.p_monop_opt,
+        env.competition_solution.params,
+    )
 
     avg_profit = Float64[]
     is_converged = Bool[]

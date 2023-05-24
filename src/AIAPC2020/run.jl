@@ -25,11 +25,13 @@ function Base.run(experiments::Vector{ReinforcementLearningCore.Experiment})
     sendto(workers(), experiments = experiments)
     status = pmap(1:length(experiments)) do i
         experiment = experiment[i]
-        RLCore._run(experiment.policy,
-        experiment.env,
-        experiment.stop_condition,
-        experiment.hook,
-        ResetAtTerminal())
+        RLCore._run(
+            experiment.policy,
+            experiment.env,
+            experiment.stop_condition,
+            experiment.hook,
+            ResetAtTerminal(),
+        )
         experiments[i]
     end
 end
