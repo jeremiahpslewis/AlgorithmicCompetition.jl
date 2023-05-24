@@ -12,7 +12,8 @@ using ReinforcementLearningCore:
     EpsilonGreedyExplorer,
     RandomPolicy,
     MultiAgentPolicy
-using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy, act!, plan!
+using ReinforcementLearningBase:
+    RLBase, test_interfaces!, test_runnable!, AbstractPolicy, act!, plan!
 import ReinforcementLearningCore: RLCore
 using StaticArrays
 using Statistics
@@ -266,9 +267,11 @@ end
 
     price_options = env.price_options
     action_space_ = env.action_space
-    profit_array = construct_profit_array(action_space_, price_options, competition_solution.params, 2)
+    profit_array =
+        construct_profit_array(action_space_, price_options, competition_solution.params, 2)
 
-    profit_array[5, 3, :] ≈ π(price_options[5], price_options[3], competition_solution.params)
+    profit_array[5, 3, :] ≈
+    π(price_options[5], price_options[3], competition_solution.params)
 end
 
 @testset "map_vect_to_int, map_int_to_vect" begin

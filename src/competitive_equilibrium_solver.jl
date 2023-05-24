@@ -37,7 +37,7 @@ function π(p1::T, p2::T, params::CompetitionParameters) where {T<:Real}
     return π_
 end
 
-function p_BR(p_minus_i_::T, params::CompetitionParameters) where {T<:Real} 
+function p_BR(p_minus_i_::T, params::CompetitionParameters) where {T<:Real}
     # Best response Bertrand price
     π_i_(p_i_, p_minus_i_) = π(p_i_, p_minus_i_, params)[1]
     model = Model(Ipopt.Optimizer)
@@ -53,9 +53,12 @@ function p_BR(p_minus_i_::T, params::CompetitionParameters) where {T<:Real}
     return value(p_i)
 end
 
-π_i(p_i::T, p_minus_i::T, params::CompetitionParameters) where {T<:Real} = π(p_i, p_minus_i, params)[1]
-π_bertrand(p_1::T, params::CompetitionParameters) where {T<:Real} = π(p_1, p_BR(p_1, params), params)[1]
-π_monop(p_1::T, p_2::T, params::CompetitionParameters) where {T<:Real} = sum(π(p_1, p_2, params)) / 2 # per-firm
+π_i(p_i::T, p_minus_i::T, params::CompetitionParameters) where {T<:Real} =
+    π(p_i, p_minus_i, params)[1]
+π_bertrand(p_1::T, params::CompetitionParameters) where {T<:Real} =
+    π(p_1, p_BR(p_1, params), params)[1]
+π_monop(p_1::T, p_2::T, params::CompetitionParameters) where {T<:Real} =
+    sum(π(p_1, p_2, params)) / 2 # per-firm
 
 
 function solve_monopolist(params::CompetitionParameters)

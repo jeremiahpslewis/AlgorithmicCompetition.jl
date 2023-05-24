@@ -78,9 +78,13 @@ function get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any, F}, step) where {F<:Abstrac
     exp(s.β_neg * step_doubled)
 end
 
-get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any, F}) where {F<:AbstractFloat} = get_ϵ(s, s.step)
+get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}) where {F<:AbstractFloat} = get_ϵ(s, s.step)
 
-function RLBase.plan!(s::AIAPCEpsilonGreedyExplorer{<:Any,F}, values, full_action_space) where {F<:AbstractFloat}
+function RLBase.plan!(
+    s::AIAPCEpsilonGreedyExplorer{<:Any,F},
+    values,
+    full_action_space,
+) where {F<:AbstractFloat}
     # NOTE: use of legal_action_space_mask as full_action_space is a bit of a hack, won't work in other cases
     ϵ = get_ϵ(s)     
     s.step += 1
