@@ -14,7 +14,12 @@ mutable struct ConvergenceCheck <: AbstractHook
     end
 end
 
-function Base.push!(h::ConvergenceCheck, state_::Int64, best_action::Int, iter_converged::Bool)
+function Base.push!(
+    h::ConvergenceCheck,
+    state_::Int64,
+    best_action::Int,
+    iter_converged::Bool,
+)
     # Increment duration whenever argmax action is stable (convergence criteria)
     # Increment convergence metric (e.g. convergence not reached)
     # Keep track of number of iterations it takes until convergence
@@ -40,7 +45,11 @@ function _best_action_lookup(state_, table)
     @views argmax(table[:, state_])
 end
 
-function Base.push!(h::ConvergenceCheck, table::Matrix{F}, state_::S) where {S,F<:AbstractFloat}
+function Base.push!(
+    h::ConvergenceCheck,
+    table::Matrix{F},
+    state_::S,
+) where {S,F<:AbstractFloat}
     # Convergence is defined over argmax action for each state 
     # E.g. best / greedy action
     best_action = _best_action_lookup(state_, table)
@@ -50,10 +59,17 @@ function Base.push!(h::ConvergenceCheck, table::Matrix{F}, state_::S) where {S,F
 
     return h.is_converged
 end
-    
-function Base.push!(h::ConvergenceCheck, ::PostActStage, policy::P, env::E, player::Symbol) where {P <: AbstractPolicy, E <: AbstractEnv}
+
+function Base.push!(
+    h::ConvergenceCheck,
+    ::PostActStage,
+    policy::P,
+    env::E,
+    player::Symbol,
+) where {P<:AbstractPolicy,E<:AbstractEnv}
     state_ = RLBase.state(env, player)
-    env.convergence_dict[player] = Base.push!(h, policy.policy.learner.approximator.table, state_)
+    env.convergence_dict[player] =
+        Base.push!(h, policy.policy.learner.approximator.table, state_)
     return
 end
 
@@ -70,8 +86,12 @@ function AIAPCHook(env::AbstractEnv)
     )
 end
 
-function Base.push!(hook::MultiAgentHook, stage::AbstractStage,
-    policy::MultiAgentPolicy, env::AIAPCEnv)
+function Base.push!(
+    hook::MultiAgentHook,
+    stage::AbstractStage,
+    policy::MultiAgentPolicy,
+    env::AIAPCEnv,
+)
     for p in (Symbol(1), Symbol(2))
         Base.push!(hook[p], stage, policy[p], env, p)
     end

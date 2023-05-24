@@ -17,14 +17,20 @@ end
 
 struct TDLearnerSARS{Ap,F<:AbstractFloat,I<:Integer} <: AbstractLearner
     approximator::Ap
-    γ::F 
+    γ::F
     method::Symbol
     n::I
 end
 
-RLCore.forward(L::TDLearnerSARS{Ap,F,I}, env::E) where {Ap,F,I,E<:AbstractEnv} = RLCore.forward(L.approximator, state(env))
-RLCore.forward(L::TDLearnerSARS{Ap,F,I}, s::I1) where {Ap,F,I<:Integer,I1<:Integer} = RLCore.forward(L.approximator, s)
-RLCore.forward(L::TDLearnerSARS{Ap,F,I}, s::I1, a::I2) where {Ap,F,I,I1<:Integer,I2<:Integer} = RLCore.forward(L.approximator, s, a)
+RLCore.forward(L::TDLearnerSARS{Ap,F,I}, env::E) where {Ap,F,I,E<:AbstractEnv} =
+    RLCore.forward(L.approximator, state(env))
+RLCore.forward(L::TDLearnerSARS{Ap,F,I}, s::I1) where {Ap,F,I<:Integer,I1<:Integer} =
+    RLCore.forward(L.approximator, s)
+RLCore.forward(
+    L::TDLearnerSARS{Ap,F,I},
+    s::I1,
+    a::I2,
+) where {Ap,F,I,I1<:Integer,I2<:Integer} = RLCore.forward(L.approximator, s, a)
 
 function extract_sar(t::Traces{Tr}) where {Tr}
     # TODO: Delete this when RLTrajectories.jl is fixed
@@ -36,7 +42,14 @@ function extract_sar(t::Traces{Tr}) where {Tr}
 end
 
 
-function _optimise!(n::I1, γ::F, Q::TabularApproximator{2,Ar,O}, S::SubArray{I2}, A::SubArray{I3}, R::F) where {I1<:Number,I2<:Number,I3<:Number,Ar<:AbstractArray,F<:AbstractFloat,O}
+function _optimise!(
+    n::I1,
+    γ::F,
+    Q::TabularApproximator{2,Ar,O},
+    S::SubArray{I2},
+    A::SubArray{I3},
+    R::F,
+) where {I1<:Number,I2<:Number,I3<:Number,Ar<:AbstractArray,F<:AbstractFloat,O}
     G = 0.0
     for i = 1:min(n + 1, length(R))
         G = R + γ * G
@@ -52,14 +65,14 @@ function RLBase.optimise!(L::TDLearnerSARS{Ap,F,I}, t::Traces{Tr}) where {Ap,F,I
 end
 
 function RLBase.priority(L::TDLearnerSARS{Ap,F,I}, transition::Tuple{T}) where {Ap,F,I,T}
-        s, a, r, d, s′ = transition
-        γ, Q = L.γ, L.approximator
-        if d
-            Δ = (r - RLCore.forward(Q, s, a))
-        else
-            Δ = (r + γ * RLCore.forward(Q, s′) - RLCore.forward(Q, s, a))
-        end
-        Δ = [Δ]  # must be broadcastable in Flux.Optimise
-        Flux.Optimise.apply!(Q.optimizer, (s, a), Δ)
-        abs(Δ[])
+    s, a, r, d, s′ = transition
+    γ, Q = L.γ, L.approximator
+    if d
+        Δ = (r - RLCore.forward(Q, s, a))
+    else
+        Δ = (r + γ * RLCore.forward(Q, s′) - RLCore.forward(Q, s, a))
+    end
+    Δ = [Δ]  # must be broadcastable in Flux.Optimise
+    Flux.Optimise.apply!(Q.optimizer, (s, a), Δ)
+    abs(Δ[])
 end
