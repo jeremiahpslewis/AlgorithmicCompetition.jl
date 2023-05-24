@@ -21,7 +21,7 @@ _procs = addprocs(
     using AlgorithmicCompetition
 end
 
-@time exp_list_ = AlgorithmicCompetition.run_aiapc(; n_parameter_iterations = 10,
+@time exp_list = AlgorithmicCompetition.run_aiapc(; n_parameter_iterations = 10,
     n_parameter_increments = 10)
 
 α_result = [ex.α for ex in exp_list if !(ex isa Exception)]
