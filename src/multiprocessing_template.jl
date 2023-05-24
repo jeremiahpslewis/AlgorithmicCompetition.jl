@@ -7,7 +7,7 @@ using CSV
 using Distributed
 using CSV
 
-n_procs_ = 7 # up to 8 performance cores on m1
+n_procs_ = 40 # up to 8 performance cores on m1
 
 _procs = addprocs(
     n_procs_,
@@ -18,11 +18,13 @@ _procs = addprocs(
 @everywhere begin
     using Pkg
     Pkg.instantiate()
-    using AlgorithmicCompetition
+    using AlgorithmicCompetition: run_and_extract
 end
 
 @time exp_list = AlgorithmicCompetition.run_aiapc(; n_parameter_iterations = 10,
     n_parameter_increments = 10)
+
+rmprocs(_procs)
 
 α_result = [ex.α for ex in exp_list if !(ex isa Exception)]
 β_result = [ex.β for ex in exp_list if !(ex isa Exception)]
