@@ -49,7 +49,7 @@ function Base.push!(
     h::ConvergenceCheck,
     table::Matrix{F},
     state_::S,
-) where {S,F<:AbstractFloat}
+) where {S<:Integer, F<:AbstractFloat}
     # Convergence is defined over argmax action for each state 
     # E.g. best / greedy action
     best_action = _best_action_lookup(state_, table)
@@ -60,16 +60,27 @@ function Base.push!(
     return h.is_converged
 end
 
-function Base.push!(
-    h::ConvergenceCheck,
-    ::PostActStage,
-    policy::P,
-    env::E,
-    player::Symbol,
-) where {P<:AbstractPolicy,E<:AbstractEnv}
+function Base.push!(h::ConvergenceCheck, ::PostActStage, agent::Agent{P,T,C}, env::AIAPCEnv, player::Symbol) where {P<:AbstractPolicy,T<:Trajectory,C}
+    Base.push!(h, PostActStage(), agent.policy, env, player)
+end
+
+
+function Base.push!(h::ConvergenceCheck, ::PostActStage, policy::QBasedPolicy{L,Exp}, env::AIAPCEnv, player::Symbol) where {L<:AbstractLearner,Exp<:AbstractExplorer}
+    Base.push!(h, PostActStage(), policy.learner, env, player)
+end
+
+function Base.push!(h::ConvergenceCheck, ::PostActStage, learner::L, env::E, player::Symbol) where {L<:AbstractLearner,E<:AbstractEnv}
+    Base.push!(h, PostActStage(), learner.approximator, env, player)
+end
+
+function Base.push!(h::ConvergenceCheck, ::PostActStage, approximator::TabularApproximator{S,A}, env::E, player::Symbol) where {S,A,E<:AbstractEnv}
+    Base.push!(h, PostActStage(), approximator.table, env, player)
+end
+
+function Base.push!(h::ConvergenceCheck, ::PostActStage, table::Matrix{F}, env::E, player::Symbol) where {F<:AbstractFloat,E<:AbstractEnv}
     state_ = RLBase.state(env, player)
     env.convergence_dict[player] =
-        Base.push!(h, policy.policy.learner.approximator.table, state_)
+        Base.push!(h, table, state_)
     return
 end
 
@@ -78,7 +89,7 @@ function AIAPCHook(env::AbstractEnv)
     MultiAgentHook(
         NamedTuple(
             p => ComposedHook(
-                TotalRewardPerEpisode(; is_display_on_exit = false),
+                TotalRewardPerEpisode(; is_display_on_exit=false),
                 # TODO: MultiAgent version of TotalRewardPerEpisode / better player handling for hooks
                 ConvergenceCheck(env.convergence_threshold),
             ) for p in players(env)
