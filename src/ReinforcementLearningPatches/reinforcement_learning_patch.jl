@@ -73,7 +73,7 @@ function AIAPCEpsilonGreedyExplorer(β::F) where {F<:AbstractFloat}
     AIAPCEpsilonGreedyExplorer{typeof(Random.GLOBAL_RNG),F}(β, β * -1, 1, Random.GLOBAL_RNG)
 end
 
-function get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any, F}, step) where {F<:AbstractFloat}
+function get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}, step) where {F<:AbstractFloat}
     step_doubled = step * 2# FIXME TODO: This is a hack to get to 14% like AIAPC paper
     exp(s.β_neg * step_doubled)
 end
@@ -86,7 +86,7 @@ function RLBase.plan!(
     full_action_space,
 ) where {F<:AbstractFloat}
     # NOTE: use of legal_action_space_mask as full_action_space is a bit of a hack, won't work in other cases
-    ϵ = get_ϵ(s)     
+    ϵ = get_ϵ(s)
     s.step += 1
     if rand(s.rng) < ϵ
         return rand(s.rng, full_action_space)
