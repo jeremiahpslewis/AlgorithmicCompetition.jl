@@ -41,8 +41,8 @@ function Base.push!(
     return
 end
 
-function _best_action_lookup(state_, table)
-    @views argmax(table[:, state_])
+function _best_action_lookup(state_::Int, table::Matrix{F}) where {F<:AbstractFloat}
+    argmax(table, dims=1)[state_][2]
 end
 
 function Base.push!(
