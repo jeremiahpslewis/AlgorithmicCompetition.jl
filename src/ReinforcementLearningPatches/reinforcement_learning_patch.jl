@@ -29,32 +29,6 @@ using ReinforcementLearningEnvironments
 using Random
 using StaticArrays
 
-# Fudge an issue with non Int64 Ints in RL.jl
-using Base
-Base.convert(::Type{Int64}, a::Int64) = Int64(a)
-
-### Patch modified from https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/v0.10.1/src/ReinforcementLearningCore/src/policies/q_based_policies/learners/approximators/tabular_approximator.jl
-### To support smaller ints / floats
-# (app::TabularQApproximator)(s::Int64) = @views app.table[:, s]
-# (app::TabularQApproximator)(s::Int64, a::Int64) = app.table[a, s]
-
-# add missing update! method for smaller Int types
-# function RLBase.optimise!(
-#     app::TabularQApproximator,
-#     correction::Pair{Tuple{Int64,Int64},Float64},
-# )
-#     (s, a), e = correction
-#     x = @view app.table[a, s]
-#     x̄ = @view Float64[e][1]
-
-#     Flux.Optimise.update!(app.optimizer, x, x̄)
-# end
-
-# function RLBase.optimise!(app::TabularQApproximator, correction::Pair{Int64,Vector{Float64}})
-#     s, errors = correction
-#     x = @view app.table[:, s]
-#     Flux.Optimise.update!(app.optimizer, x, errors)
-# end
 
 
 # Epsilon Greedy Explorer for AIAPC Zoo
@@ -67,10 +41,11 @@ mutable struct AIAPCEpsilonGreedyExplorer{R,F<:AbstractFloat} <: AbstractExplore
     β_neg::F
     step::Int
     rng::R
+    maximum_placeholder::Vector{F}
 end
 
 function AIAPCEpsilonGreedyExplorer(β::F) where {F<:AbstractFloat}
-    AIAPCEpsilonGreedyExplorer{typeof(Random.GLOBAL_RNG),F}(β, β * -1, 1, Random.GLOBAL_RNG)
+    AIAPCEpsilonGreedyExplorer{typeof(Random.GLOBAL_RNG),F}(β, β * -1, 1, Random.GLOBAL_RNG, F[1])
 end
 
 function get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}, step) where {F<:AbstractFloat}
@@ -79,6 +54,11 @@ function get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}, step) where {F<:Abstract
 end
 
 get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}) where {F<:AbstractFloat} = get_ϵ(s, s.step)
+
+function find_all_max_(x, maximum_placeholder)
+    maximum!(maximum_placeholder, x)
+    return findall(==(maximum_placeholder[1]), x)
+end
 
 function RLBase.plan!(
     s::AIAPCEpsilonGreedyExplorer{<:Any,F},
@@ -91,7 +71,7 @@ function RLBase.plan!(
     if rand(s.rng) < ϵ
         return rand(s.rng, full_action_space)
     end
-    max_vals = find_all_max(values)[2]
+    max_vals = find_all_max_(values, s.maximum_placeholder)
 
     return rand(s.rng, max_vals)
 end

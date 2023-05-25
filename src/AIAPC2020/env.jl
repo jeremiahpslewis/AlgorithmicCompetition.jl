@@ -8,7 +8,7 @@ using StaticArrays
     
     Calvano, E., Calzolari, G., Denicolò, V., & Pastorello, S. (2020). Artificial Intelligence, Algorithmic Pricing, and Collusion. American Economic Review, 110(10), 3267–3297. https://doi.org/10.1257/aer.20190623
 """
-struct AIAPCEnv <: AbstractEnv
+mutable struct AIAPCEnv <: AbstractEnv
     α::Float64
     β::Float64
     δ::Float64
@@ -77,7 +77,7 @@ struct AIAPCEnv <: AbstractEnv
 end
 
 # TODO: add back type signature ::Tuple{Int64,Int64}
-function RLBase.act!(env::AIAPCEnv, price_tuple)
+function RLBase.act!(env::AIAPCEnv, price_tuple::Tuple{Int64,Int64})
     # TODO: Fix support for longer memories
     env.memory .= price_tuple
     env.is_done[1] = true
@@ -125,8 +125,7 @@ RLBase.action_space(env::AIAPCEnv, ::SimultaneousPlayer) = env.action_space
 
 RLBase.legal_action_space(env::AIAPCEnv, p) = is_terminated(env) ? () : action_space(env, p)
 
-const _legal_action_space = 1:15
-RLBase.legal_action_space_mask(env::AIAPCEnv, player::Symbol) = _legal_action_space
+RLBase.legal_action_space_mask(env::AIAPCEnv, player::Symbol) = SA[1:15...]
 
 RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 

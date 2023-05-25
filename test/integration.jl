@@ -60,7 +60,7 @@ using Distributed
 
     competition_solution = CompetitionSolution(competition_params)
 
-    hyperparams = AIAPCHyperParameters(
+    hyperparameters = AIAPCHyperParameters(
         α,
         β,
         δ,
@@ -69,8 +69,8 @@ using Distributed
         convergence_threshold = 1,
     )
 
-    test_interfaces!(AIAPCEnv(hyperparams))
-    test_runnable!(AIAPCEnv(hyperparams))
+    test_interfaces!(AIAPCEnv(hyperparameters))
+    test_runnable!(AIAPCEnv(hyperparameters))
 end
 @testset "Competitive Equilibrium: Monopoly" begin
     params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
@@ -127,7 +127,7 @@ end
 
     competition_solution = CompetitionSolution(competition_params)
 
-    hyperparams = AIAPCHyperParameters(
+    hyperparameters = AIAPCHyperParameters(
         α,
         β,
         δ,
@@ -135,7 +135,7 @@ end
         competition_solution;
         convergence_threshold = 1,
     )
-    env = AIAPCEnv(hyperparams)
+    env = AIAPCEnv(hyperparameters)
     policy = AIAPCPolicy(env)
 
     # Test full policy exploration of states
@@ -160,7 +160,7 @@ end
 
     competition_solution = CompetitionSolution(competition_params)
 
-    hyperparams = AIAPCHyperParameters(
+    hyperparameters = AIAPCHyperParameters(
         α,
         β,
         δ,
@@ -169,7 +169,7 @@ end
         convergence_threshold = 1,
     )
 
-    c_out = run(hyperparams; stop_on_convergence = false)
+    c_out = run(hyperparameters; stop_on_convergence = false)
 
     # ensure that the policy is updated by the learner
     @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table .!= 0) != 0
@@ -307,7 +307,7 @@ end
 
     competition_solution = CompetitionSolution(competition_params)
 
-    hyperparams = AIAPCHyperParameters(
+    hyperparameters = AIAPCHyperParameters(
         α,
         β,
         δ,
@@ -317,7 +317,7 @@ end
     )
 
 
-    c_out = run(hyperparams; stop_on_convergence = false)
+    c_out = run(hyperparameters; stop_on_convergence = false)
 
     # ensure that the policy is updated by the learner
     @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table .!= 0) != 0
@@ -369,7 +369,7 @@ end
 
     competition_solution = CompetitionSolution(competition_params)
 
-    hyperparams = AIAPCHyperParameters(
+    hyperparameters = AIAPCHyperParameters(
         α,
         β,
         δ,
@@ -378,7 +378,7 @@ end
         convergence_threshold = 1,
     )
 
-    env = AIAPCEnv(hyperparams)
+    env = AIAPCEnv(hyperparameters)
     @test current_player(env) == RLBase.SimultaneousPlayer()
     @test action_space(env, Symbol(1)) == 1:15
     @test reward(env) != 0 # reward reflects outcomes of last play (which happens at player = 1, e.g. before any actions chosen)
@@ -399,7 +399,7 @@ end
     competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
     competition_solution = CompetitionSolution(competition_params)
 
-    hyperparams = AIAPCHyperParameters(
+    hyperparameters = AIAPCHyperParameters(
         α,
         β,
         δ,
@@ -407,7 +407,7 @@ end
         competition_solution;
         convergence_threshold = 10,
     )
-    c_out = run(hyperparams; stop_on_convergence = false)
+    c_out = run(hyperparameters; stop_on_convergence = false)
     @test get_ϵ(c_out.policy[Symbol(1)].policy.explorer) < 1e-4
     @test get_ϵ(c_out.policy[Symbol(2)].policy.explorer) < 1e-4
 end
@@ -425,7 +425,7 @@ end
     competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
     competition_solution = CompetitionSolution(competition_params)
 
-    hyperparams = AIAPCHyperParameters(
+    hyperparameters = AIAPCHyperParameters(
         α,
         β,
         δ,
@@ -433,7 +433,7 @@ end
         competition_solution;
         convergence_threshold = 5,
     )
-    c_out = run(hyperparams; stop_on_convergence = true)
+    c_out = run(hyperparameters; stop_on_convergence = true)
     @test 0.98 < get_ϵ(c_out.policy[Symbol(1)].policy.explorer) < 1
     @test 0.98 < get_ϵ(c_out.policy[Symbol(2)].policy.explorer) < 1
 
