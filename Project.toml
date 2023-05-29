@@ -25,6 +25,9 @@ ReinforcementLearningTrajectories = "6486599b-a3cd-4e92-a99a-2cea90cc8c3c"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
+[compat]
+DataFrames = "1"
+
 [compt]
 ReinforcementLearningBase = "0.12"
 ReinforcementLearningCore = "0.10"
