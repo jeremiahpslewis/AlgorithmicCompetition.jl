@@ -34,7 +34,7 @@ function economic_summary(env::AbstractEnv, hook::AbstractHook)
     avg_profit = Float64[]
     is_converged = Bool[]
 
-    for i in [Symbol(1), Symbol(2)]
+    for i in (Symbol(1), Symbol(2))
         @chain hook[i][1].rewards[(end-convergence_threshold):end] begin
             push!(avg_profit, profit_measure(_, π_N, π_M))
         end

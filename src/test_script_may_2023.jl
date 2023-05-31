@@ -45,7 +45,7 @@ using AlgorithmicCompetition:
     TDLearner,
     TabularApproximator
 using JET
-using ProfileView
+# using ProfileView
 # using Distributed
 
 α = Float64(0.125)
@@ -57,12 +57,12 @@ n_prices = 15
 max_iter = Int(1e6)
 price_index = 1:n_prices
 
-competition_params = CompetitionParameters(0.25, 0, [2, 2], [1, 1])
+competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
 
 competition_solution = CompetitionSolution(competition_params)
 
 hyperparams =
-    AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold = 1)
+    AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold = Int(1e5))
 
 env = AIAPCEnv(hyperparams)
 experiment = Experiment(env; stop_on_convergence = false)
@@ -70,8 +70,8 @@ experiment = Experiment(env; stop_on_convergence = false)
 @report_opt Base.push!(experiment.policy, PreActStage(), experiment.env)
 @report_opt RLBase.plan!(experiment.policy, experiment.env)
 
-@time run(hyperparams; stop_on_convergence = false);
-@time run(hyperparams; stop_on_convergence = false);
+@btime run(hyperparams; stop_on_convergence = false);
+a = @time run(hyperparams; stop_on_convergence = true);
 # @profview run(hyperparams; stop_on_convergence = false);
 @report_opt RLCore._run(
     experiment.policy,
@@ -104,26 +104,26 @@ RLCore._run(
 @report_opt RLBase.plan!(experiment.policy, env)
 # @report_opt RLBase.act!(env, (1,1))
 
-
+# AlgorithmicCompetition.run_and_extract(hyperparams; stop_on_convergence = true).iterations_until_convergence[1]
 @report_opt AlgorithmicCompetition.economic_summary(experiment)
-# n_procs_ = 3
+n_procs_ = 3
 
-# _procs = addprocs(
-#     n_procs_,
-#     topology = :master_worker,
-#     exeflags = ["--threads=1", "--project=$(Base.active_project())"],
-# )
+_procs = addprocs(
+    n_procs_,
+    topology = :master_worker,
+    exeflags = ["--threads=1", "--project=$(Base.active_project())"],
+)
 
-# @everywhere begin
-#     using Pkg
-#     Pkg.instantiate()
-#     using AlgorithmicCompetition
-# end
+@everywhere begin
+    using Pkg
+    Pkg.instantiate()
+    using AlgorithmicCompetition
+end
 
-# AlgorithmicCompetition.run_aiapc(;
-#     n_parameter_iterations = 100,
-#     # max_iter = Int(1e6),
-#     # convergence_threshold = Int(10),
-# )
+AlgorithmicCompetition.run_aiapc(;
+    n_parameter_iterations = 100,
+    # max_iter = Int(1e6),
+    # convergence_threshold = Int(10),
+)
 
-# rmprocs(_procs)
+rmprocs(_procs)

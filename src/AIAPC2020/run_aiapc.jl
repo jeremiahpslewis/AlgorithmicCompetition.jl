@@ -11,8 +11,8 @@ function run_aiapc(;
     competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
     competition_solution = CompetitionSolution(competition_params)
 
-    α_ = Float64.(range(0.025, 0.25, n_parameter_increments))
-    β_ = Float64.(range(1.25e-8, 2e-5, n_parameter_increments))
+    α_ = Float64.(range(0.0025, 0.25, n_parameter_increments))
+    β_ = Float64.(range(0.025, 2, n_parameter_increments)) * 1e-5
     δ = 0.95
 
     hyperparameter_vect = [

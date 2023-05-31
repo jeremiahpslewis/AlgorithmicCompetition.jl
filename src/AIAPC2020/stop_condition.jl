@@ -5,7 +5,7 @@ struct StopWhenConverged <: AbstractStopCondition end
 
 function RLCore.check_stop(s::StopWhenConverged, agent, env)
     # false until converged, then true
-    return (env.convergence_dict[Symbol(1)] && env.convergence_dict[Symbol(2)])
+    return all(values(env.convergence_dict))
 end
 
 function AIAPCStop(env::AIAPCEnv; stop_on_convergence = true)
