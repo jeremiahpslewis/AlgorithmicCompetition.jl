@@ -103,7 +103,7 @@ function Base.push!(
     policy::MultiAgentPolicy,
     env::AIAPCEnv,
 )
-    for p in (Symbol(1), Symbol(2))
+    @simd for p in (Symbol(1), Symbol(2))
         Base.push!(hook[p], stage, policy[p], env, p)
     end
 end

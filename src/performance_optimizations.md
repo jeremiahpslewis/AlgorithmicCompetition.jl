@@ -126,6 +126,22 @@ TODO:
 
 # rework convergence logic, reduce env calls
 
+# 2023-05-31
+5.592509 seconds (85.09 M allocations: 3.388 GiB, 8.53% gc time, 9.29% compilation time)
+5.107336 seconds (83.70 M allocations: 3.297 GiB, 8.46% gc time)
+
+# 2023-05-25
+
+5.931672 seconds (83.70 M allocations: 3.297 GiB, 9.23% gc time)
+6.166603 seconds (87.70 M allocations: 3.535 GiB, 9.41% gc time)
+6.007948 seconds (83.70 M allocations: 3.297 GiB, 8.84% gc time)
+5.998509 seconds (83.70 M allocations: 3.297 GiB, 9.09% gc time)
+6.147404 seconds (83.70 M allocations: 3.297 GiB, 8.47% gc time)
+6.182084 seconds (83.70 M allocations: 3.297 GiB, 8.53% gc time)
+5.389166 seconds (83.70 M allocations: 3.297 GiB, 8.45% gc time)
+5.314105 seconds (83.70 M allocations: 3.297 GiB, 8.58% gc time)
+5.344166 seconds (83.70 M allocations: 3.297 GiB, 8.77% gc time)
+
 # 2023-05-14
 5.554617 seconds (83.41 M allocations: 3.282 GiB, 11.67% gc time)
 5.843871 seconds (83.42 M allocations: 3.283 GiB, 11.28% gc time)
