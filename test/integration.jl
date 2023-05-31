@@ -190,11 +190,11 @@ end
 
     competition_solution = CompetitionSolution(competition_params)
 
-    n_increments = 3
-    α_ = Float64.(range(0.025, 0.25, n_increments))
-    β_ = Float64.(range(1.25e-8, 2e-5, n_increments))
+    n_parameter_increments = 3
+    α_ = Float64.(range(0.0025, 0.25, n_parameter_increments))
+    β_ = Float64.(range(0.025, 2, n_parameter_increments)) * 1e-5
     δ = 0.95
-    max_iter = Int(1e7)
+    max_iter = Int(1e8)
 
     hyperparameter_vect = [
         AIAPCHyperParameters(
@@ -454,12 +454,12 @@ end
         ϵ_stable = 0,
         decay_steps = Int(round(1 / 1e-5)),
     )
-    @test RLCore.get_ϵ(explorer, 1e5) ≈ 0.36787944117144233 # Percentage according to formula
-    @test_broken RLCore.get_ϵ(explorer, 1e5) ≈ 0.1353352832366127 # Percentage cited in AIAPC paper (2x step count)
+    @test_broken RLCore.get_ϵ(explorer, 1e5) ≈ 0.36787944117144233 # Percentage according to formula and paper convergence results
+    @test RLCore.get_ϵ(explorer, 1e5) ≈ 0.1353352832366127 # Percentage cited in AIAPC paper (2x step count)
 
     explorer = AIAPCEpsilonGreedyExplorer(Float64(1e-5))
-    @test_broken get_ϵ(explorer, 1e5) ≈ 0.36787944117144233 # Percentage according to formula
-    @test get_ϵ(explorer, 1e5) ≈ 0.1353352832366127 # Percentage cited in AIAPC paper (2x step count)
+    @test get_ϵ(explorer, 1e5) ≈ 0.36787944117144233 # Percentage according to formula and paper convergence results
+    @test_broken get_ϵ(explorer, 1e5) ≈ 0.1353352832366127 # Percentage cited in AIAPC paper (2x step count)
 end
 
 @testset "ConvergenceCheck" begin

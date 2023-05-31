@@ -8,7 +8,7 @@ using StaticArrays
     
     Calvano, E., Calzolari, G., Denicolò, V., & Pastorello, S. (2020). Artificial Intelligence, Algorithmic Pricing, and Collusion. American Economic Review, 110(10), 3267–3297. https://doi.org/10.1257/aer.20190623
 """
-mutable struct AIAPCEnv <: AbstractEnv
+struct AIAPCEnv <: AbstractEnv
     α::Float64
     β::Float64
     δ::Float64
