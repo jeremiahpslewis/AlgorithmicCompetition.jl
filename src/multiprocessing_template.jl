@@ -7,7 +7,7 @@ using CSV
 using Distributed
 using CSV
 
-n_procs_ = 40 # up to 8 performance cores on m1
+n_procs_ = 2 # up to 8 performance cores on m1
 
 _procs = addprocs(
     n_procs_,
@@ -24,6 +24,7 @@ end
 @time exp_list = AlgorithmicCompetition.run_aiapc(;
     n_parameter_iterations = 10,
     n_parameter_increments = 10,
+    max_iter = Int(1e6),
 )
 
 rmprocs(_procs)
