@@ -166,7 +166,7 @@ end
         δ,
         max_iter,
         competition_solution;
-        convergence_threshold = 1,
+        convergence_threshold = 3,
     )
 
     c_out = run(hyperparameters; stop_on_convergence = false)
@@ -300,7 +300,7 @@ end
     ξ = 0.1
     δ = 0.95
     n_prices = 15
-    max_iter = 5000
+    max_iter = 10000
     price_index = 1:n_prices
 
     competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))

@@ -1,13 +1,9 @@
 using AlgorithmicCompetition
-using Chain
 using Statistics
 using DataFrames
-using DataFrameMacros
 using CSV
 using Distributed
-using CSV
-
-n_procs_ = 7 # up to 8 performance cores on m1
+n_procs_ = 25 # up to 8 performance cores on m1
 
 _procs = addprocs(
     n_procs_,
@@ -22,9 +18,9 @@ _procs = addprocs(
 end
 
 @time exp_list = AlgorithmicCompetition.run_aiapc(;
-    n_parameter_iterations = 10,
+    n_parameter_iterations = 1,
     n_parameter_increments = 100,
-    max_iter = Int(1e6),
+    max_iter = Int(1e9), # TODO: increment to 1e9
 )
 
 rmprocs(_procs)
@@ -32,7 +28,7 @@ rmprocs(_procs)
 α_result = [ex.α for ex in exp_list if !(ex isa Exception)]
 β_result = [ex.β for ex in exp_list if !(ex isa Exception)]
 iterations_until_convergence =
-    [ex.iterations_until_convergence for ex in exp_list if !(ex isa Exception)]
+    [ex.iterations_until_convergence[1] for ex in exp_list if !(ex isa Exception)]
 
 avg_profit_result = [ex.avg_profit[1] for ex in exp_list if !(ex isa Exception)]
 
