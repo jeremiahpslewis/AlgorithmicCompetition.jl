@@ -29,7 +29,8 @@ using ReinforcementLearningEnvironments
 using Random
 using StaticArrays
 using CircularArrayBuffers: CircularVectorBuffer
-
+import Base.push!
+import Base.getindex
 
 # Epsilon Greedy Explorer for AIAPC Zoo
 # Note: get_ϵ function in RLCore takes: 600.045 ns (6 allocations: 192 bytes)
@@ -86,27 +87,41 @@ RLBase.optimise!(p::QBasedPolicy, x::CircularArraySARTTraces) = optimise!(p.lear
 
 const SART = (:state, :action, :reward, :terminal)
 
-struct TotalRewardPerEpisodeLastN{F} <: AbstractHook where {F<:AbstractFloat}
+mutable struct TotalRewardPerEpisodeLastN{F} <: AbstractHook where {F<:AbstractFloat}
     rewards::CircularVectorBuffer{F}
     reward::F
     is_display_on_exit::Bool
     
     function TotalRewardPerEpisodeLastN(; max_steps=100)
-        new{Float64}(CircularVectorBuffer{Float64}(max_steps), 1.0)
+        new{Float64}(CircularVectorBuffer{Float64}(max_steps), 0.0)
     end
 end
 
-Base.getindex(h::TotalRewardPerEpisodeLastN) = h.rewards
+Base.getindex(h::TotalRewardPerEpisodeLastN{F}, inds...) where {F<:AbstractFloat} = getindex(h.rewards, inds...)
 
-Base.push!(h::TotalRewardPerEpisodeLastN, ::PostActStage, agent::P, env::E) where {P <: AbstractPolicy, E <: AbstractEnv} = h.reward += reward(env)
-Base.push!(h::TotalRewardPerEpisodeLastN, ::PostActStage, agent::P, env::E, player::Symbol) where {P <: AbstractPolicy, E <: AbstractEnv} = h.reward += reward(env, player)
+Base.push!(h::TotalRewardPerEpisodeLastN{F}, ::PostActStage, agent::P, env::E) where {P <: AbstractPolicy, E <: AbstractEnv,  F<:AbstractFloat} = h.reward += reward(env)
+Base.push!(h::TotalRewardPerEpisodeLastN{F}, ::PostActStage, agent::P, env::E, player::Symbol) where {P <: AbstractPolicy, E <: AbstractEnv, F<:AbstractFloat} = h.reward += reward(env, player)
 
-function Base.push!(hook::TotalRewardPerEpisodeLastN,
+function Base.push!(hook::TotalRewardPerEpisodeLastN{F},
     ::PostEpisodeStage,
     agent,
     env,
-)
+) where {F<:AbstractFloat}
     push!(hook.rewards, hook.reward)
     hook.reward = 0
+    return
+end
+
+function Base.push!(hook::TotalRewardPerEpisodeLastN{F}, 
+    stage::Union{PostEpisodeStage, PostExperimentStage},
+    agent,
+    env,
+    player::Symbol
+) where {F<:AbstractFloat}
+    push!(hook,
+        stage,
+        agent,
+        env,
+    )
     return
 end
