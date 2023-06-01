@@ -54,7 +54,7 @@ using JET
 ξ = 0.1
 δ = 0.95
 n_prices = 15
-max_iter = Int(1e6)
+max_iter = Int(1e7)
 price_index = 1:n_prices
 
 competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
@@ -77,7 +77,7 @@ experiment = Experiment(env; stop_on_convergence = false)
 @report_opt RLBase.plan!(experiment.policy, experiment.env)
 
 @btime run(hyperparams; stop_on_convergence = false);
-a = @time run(hyperparams; stop_on_convergence = true);
+a = @time run(hyperparams; stop_on_convergence = false);
 # @profview run(hyperparams; stop_on_convergence = false);
 @report_opt RLCore._run(
     experiment.policy,
