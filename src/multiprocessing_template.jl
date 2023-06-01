@@ -3,8 +3,7 @@ using Statistics
 using DataFrames
 using CSV
 using Distributed
-
-n_procs_ = 7 # up to 8 performance cores on m1
+n_procs_ = 25 # up to 8 performance cores on m1
 
 _procs = addprocs(
     n_procs_,
