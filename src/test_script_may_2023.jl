@@ -61,8 +61,14 @@ competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
 
 competition_solution = CompetitionSolution(competition_params)
 
-hyperparams =
-    AIAPCHyperParameters(α, β, δ, max_iter, competition_solution; convergence_threshold = Int(1e5))
+hyperparams = AIAPCHyperParameters(
+    α,
+    β,
+    δ,
+    max_iter,
+    competition_solution;
+    convergence_threshold = Int(1e5),
+)
 
 env = AIAPCEnv(hyperparams)
 experiment = Experiment(env; stop_on_convergence = false)

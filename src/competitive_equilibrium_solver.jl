@@ -114,4 +114,3 @@ end
 # TODO: Investigate and fix this???
 # ν(m, n, k, β) = (m-1)^n / (m^((k*n) * (n + 1)) * (1 - exp(-β * (n+1))))
 # ν(15, 2, 1, 2e-5)
-
