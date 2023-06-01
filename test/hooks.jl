@@ -9,10 +9,10 @@ using ReinforcementLearningCore
         env = TicTacToeEnv()
         agent = RandomPolicy()
 
-        for i in 1:10
+        for i in 1:15
             push!(hook, PostActStage(), agent, env)
             push!(hook, PostEpisodeStage(), agent, env)
-            @test length(hook.rewards) == i
+            @test length(hook.rewards) == min(i, 10)
             @test hook.rewards[i] == reward(env)
         end
     end
@@ -22,10 +22,10 @@ using ReinforcementLearningCore
         env = TicTacToeEnv()
         agent = RandomPolicy()
 
-        for i in 1:10
+        for i in 1:15
             push!(hook, PostActStage(), agent, env, :Cross)
             push!(hook, PostEpisodeStage(), agent, env, :Cross)
-            @test length(hook.rewards) == i
+            @test length(hook.rewards) == min(i, 10)
             @test hook.rewards[i] == reward(env, :Cross)
         end
     end
