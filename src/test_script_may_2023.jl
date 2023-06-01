@@ -54,7 +54,7 @@ using JET
 ξ = 0.1
 δ = 0.95
 n_prices = 15
-max_iter = Int(1e7)
+max_iter = Int(1e6)
 price_index = 1:n_prices
 
 competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
@@ -76,8 +76,16 @@ experiment = Experiment(env; stop_on_convergence = false)
 @report_opt Base.push!(experiment.policy, PreActStage(), experiment.env)
 @report_opt RLBase.plan!(experiment.policy, experiment.env)
 
-@btime run(hyperparams; stop_on_convergence = false);
+@time run(hyperparams; stop_on_convergence = false);
 a = @time run(hyperparams; stop_on_convergence = false);
+
+# 509.952693 seconds (8.40 G allocations: 330.871 GiB, 8.58% gc time, 0.10% compilation time)
+# 626.709955 seconds (8.60 G allocations: 333.888 GiB, 7.34% gc time, 0.10% compilation time) # with circulararraybuffers
+
+
+# 53.278634 seconds (859.40 M allocations: 33.351 GiB, 8.71% gc time) # With circular arrays
+# 50.567420 seconds (839.40 M allocations: 33.055 GiB, 8.84% gc time) # With normal hook
+
 # @profview run(hyperparams; stop_on_convergence = false);
 @report_opt RLCore._run(
     experiment.policy,

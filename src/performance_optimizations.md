@@ -128,6 +128,7 @@ TODO:
 
 # 2023-06-01
 3 hours for one full run through @ 10k params
+5.382660 seconds (85.40 M allocations: 3.310 GiB, 9.12% gc time)
 
 # 2023-05-31
 5.592509 seconds (85.09 M allocations: 3.388 GiB, 8.53% gc time, 9.29% compilation time)
