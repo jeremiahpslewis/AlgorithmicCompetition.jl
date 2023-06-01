@@ -28,7 +28,7 @@ import ReinforcementLearningBase: RLBase
 using ReinforcementLearningEnvironments
 using Random
 using StaticArrays
-
+using CircularArrayBuffers: CircularVectorBuffer
 
 
 # Epsilon Greedy Explorer for AIAPC Zoo
@@ -85,3 +85,28 @@ end
 RLBase.optimise!(p::QBasedPolicy, x::CircularArraySARTTraces) = optimise!(p.learner, x)
 
 const SART = (:state, :action, :reward, :terminal)
+
+struct TotalRewardPerEpisodeLastN{F} <: AbstractHook where {F<:AbstractFloat}
+    rewards::CircularVectorBuffer{F}
+    reward::F
+    is_display_on_exit::Bool
+    
+    function TotalRewardPerEpisodeLastN(; max_steps=100)
+        new{Float64}(CircularVectorBuffer{Float64}(max_steps), 1.0)
+    end
+end
+
+Base.getindex(h::TotalRewardPerEpisodeLastN) = h.rewards
+
+Base.push!(h::TotalRewardPerEpisodeLastN, ::PostActStage, agent::P, env::E) where {P <: AbstractPolicy, E <: AbstractEnv} = h.reward += reward(env)
+Base.push!(h::TotalRewardPerEpisodeLastN, ::PostActStage, agent::P, env::E, player::Symbol) where {P <: AbstractPolicy, E <: AbstractEnv} = h.reward += reward(env, player)
+
+function Base.push!(hook::TotalRewardPerEpisodeLastN,
+    ::PostEpisodeStage,
+    agent,
+    env,
+)
+    push!(hook.rewards, hook.reward)
+    hook.reward = 0
+    return
+end
