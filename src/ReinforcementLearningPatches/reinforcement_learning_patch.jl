@@ -45,7 +45,13 @@ mutable struct AIAPCEpsilonGreedyExplorer{R,F<:AbstractFloat} <: AbstractExplore
 end
 
 function AIAPCEpsilonGreedyExplorer(β::F) where {F<:AbstractFloat}
-    AIAPCEpsilonGreedyExplorer{typeof(Random.GLOBAL_RNG),F}(β, β * -1, 1, Random.GLOBAL_RNG, F[1])
+    AIAPCEpsilonGreedyExplorer{typeof(Random.GLOBAL_RNG),F}(
+        β,
+        β * -1,
+        1,
+        Random.GLOBAL_RNG,
+        F[1],
+    )
 end
 
 function get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}, step) where {F<:AbstractFloat}
