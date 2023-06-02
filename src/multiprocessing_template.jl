@@ -18,8 +18,8 @@ _procs = addprocs(
 end
 
 @time exp_list = AlgorithmicCompetition.run_aiapc(;
-    n_parameter_iterations = 50,
-    n_parameter_increments = 30,
+    n_parameter_iterations = 10,
+    n_parameter_increments = 10,
     max_iter = Int(1e9), # TODO: increment to 1e9
 )
 
@@ -47,10 +47,17 @@ using Chain
 using DataFrameMacros
 using AlgebraOfGraphics
 
+df = DataFrame(CSV.File("simulation_results.csv"))
 df_summary = @chain df begin
     @groupby(:α, :β)
     @combine(:π_bar = mean(:π_bar),
-               :iterations_until_convergence = log10(mean(:iterations_until_convergence)))
+               :iterations_until_convergence = log10(mean(:iterations_until_convergence)/2))
+end
+
+plt = @chain df_summary begin
+    data(_) *
+    mapping(:β, :α, :π_bar) *
+    visual(Heatmap)
 end
 
 plt = @chain df_summary begin
@@ -58,4 +65,5 @@ plt = @chain df_summary begin
     mapping(:β, :α, :iterations_until_convergence) *
     visual(Heatmap)
 end
+
 draw(plt)

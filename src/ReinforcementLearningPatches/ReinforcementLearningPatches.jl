@@ -2,3 +2,4 @@
 include("tabular_approximator.jl")
 include("td_learner.jl")
 include("reinforcement_learning_patch.jl")
+include("q_learning.jl")

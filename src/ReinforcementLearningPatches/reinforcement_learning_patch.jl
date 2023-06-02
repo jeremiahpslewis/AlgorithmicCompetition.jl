@@ -28,9 +28,9 @@ import ReinforcementLearningBase: RLBase
 using ReinforcementLearningEnvironments
 using Random
 using StaticArrays
-using CircularArrayBuffers: CircularVectorBuffer
 import Base.push!
 import Base.getindex
+using DataStructures: CircularBuffer
 
 # Epsilon Greedy Explorer for AIAPC Zoo
 # Note: get_ϵ function in RLCore takes: 600.045 ns (6 allocations: 192 bytes)
@@ -87,13 +87,13 @@ RLBase.optimise!(p::QBasedPolicy, x::CircularArraySARTTraces) = optimise!(p.lear
 
 const SART = (:state, :action, :reward, :terminal)
 
-mutable struct TotalRewardPerEpisodeLastN{F} <: AbstractHook where {F<:AbstractFloat}
-    rewards::CircularVectorBuffer{F}
-    reward::F
+struct TotalRewardPerEpisodeLastN{F} <: AbstractHook where {F<:AbstractFloat}
+    rewards::CircularBuffer{F}
+    reward::Vector{F}
     is_display_on_exit::Bool
 
     function TotalRewardPerEpisodeLastN(; max_steps = 100)
-        new{Float64}(CircularVectorBuffer{Float64}(max_steps), 0.0)
+        new{Float64}(CircularBuffer{Float64}(max_steps), Float64[0.0])
     end
 end
 
@@ -105,7 +105,8 @@ Base.push!(
     ::PostActStage,
     agent::P,
     env::E,
-) where {P<:AbstractPolicy,E<:AbstractEnv,F<:AbstractFloat} = h.reward += reward(env)
+) where {P<:AbstractPolicy,E<:AbstractEnv,F<:AbstractFloat} = h.reward[1] += reward(env)
+
 Base.push!(
     h::TotalRewardPerEpisodeLastN{F},
     ::PostActStage,
@@ -113,7 +114,7 @@ Base.push!(
     env::E,
     player::Symbol,
 ) where {P<:AbstractPolicy,E<:AbstractEnv,F<:AbstractFloat} =
-    h.reward += reward(env, player)
+    h.reward[1] += reward(env, player)
 
 function Base.push!(
     hook::TotalRewardPerEpisodeLastN{F},
@@ -121,8 +122,10 @@ function Base.push!(
     agent,
     env,
 ) where {F<:AbstractFloat}
-    push!(hook.rewards, hook.reward)
-    hook.reward = 0
+    rewards = hook.rewards
+    reward = hook.reward[1]
+    Base.push!(rewards, reward)
+    hook.reward[1] = 0.0
     return
 end
 
@@ -133,6 +136,6 @@ function Base.push!(
     env,
     player::Symbol,
 ) where {F<:AbstractFloat}
-    push!(hook, stage, agent, env)
+    Base.push!(hook, stage, agent, env)
     return
 end

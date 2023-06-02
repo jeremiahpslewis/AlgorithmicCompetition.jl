@@ -126,6 +126,9 @@ TODO:
 
 # rework convergence logic, reduce env calls
 
+# 2023-06-02
+0.700276 seconds (11.06 M allocations: 427.700 MiB, 9.21% gc time)
+
 # 2023-06-01
 3 hours for one full run through @ 10k params
 5.382660 seconds (85.40 M allocations: 3.310 GiB, 9.12% gc time)

@@ -36,32 +36,30 @@ function extract_sar(t::Traces{Tr}) where {Tr}
     # TODO: Delete this when RLTrajectories.jl is fixed
     # Hard coded to deal with index type instability in RLTrajectories.jl
     S = t.traces[1][:state][1]
+    S_next = t.traces[1][:next_state][1]
     A = t.traces[2][:action][1]
     R = t.traces[3][1]
-    return (S, A, R)
+    return (S, S_next, A, R)
 end
 
 
 function _optimise!(
     n::I1,
     γ::F,
-    Q::TabularApproximator{2,Ar,O},
-    S::SubArray{I2},
-    A::SubArray{I3},
-    R::F,
+    app::TabularApproximator{2,Ar,O},
+    s::I2,
+    s_next::I2,
+    a::I3,
+    r::F,
 ) where {I1<:Number,I2<:Number,I3<:Number,Ar<:AbstractArray,F<:AbstractFloat,O}
-    G = 0.0
-    for i = 1:min(n + 1, length(R))
-        G = R + γ * G
-        s, a = S[end-i], A[end-i]
-        RLBase.optimise!(Q, (s, a), RLCore.forward(Q, s, a) - G)
-    end
+        α = app.optimizer.eta
+        Q!(app, s, s_next, a, α, r, γ)
 end
 
 function RLBase.optimise!(L::TDLearnerSARS{Ap,F,I}, t::Traces{Tr}) where {Ap,F,I,Tr}
     # S, A, R, T = (t[x][1] for x in SART)
-    S, A, R = extract_sar(t) # Remove this when the above line works without a performance hit
-    _optimise!(L.n, L.γ, L.approximator, S, A, R)
+    S, S_next, A, R = extract_sar(t) # Remove this when the above line works without a performance hit
+    _optimise!(L.n, L.γ, L.approximator, S, S_next, A, R)
 end
 
 function RLBase.priority(L::TDLearnerSARS{Ap,F,I}, transition::Tuple{T}) where {Ap,F,I,T}
