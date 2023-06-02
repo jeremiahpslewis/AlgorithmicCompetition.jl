@@ -91,18 +91,32 @@ mutable struct TotalRewardPerEpisodeLastN{F} <: AbstractHook where {F<:AbstractF
     rewards::CircularVectorBuffer{F}
     reward::F
     is_display_on_exit::Bool
-    
-    function TotalRewardPerEpisodeLastN(; max_steps=100)
+
+    function TotalRewardPerEpisodeLastN(; max_steps = 100)
         new{Float64}(CircularVectorBuffer{Float64}(max_steps), 0.0)
     end
 end
 
-Base.getindex(h::TotalRewardPerEpisodeLastN{F}, inds...) where {F<:AbstractFloat} = getindex(h.rewards, inds...)
+Base.getindex(h::TotalRewardPerEpisodeLastN{F}, inds...) where {F<:AbstractFloat} =
+    getindex(h.rewards, inds...)
 
-Base.push!(h::TotalRewardPerEpisodeLastN{F}, ::PostActStage, agent::P, env::E) where {P <: AbstractPolicy, E <: AbstractEnv,  F<:AbstractFloat} = h.reward += reward(env)
-Base.push!(h::TotalRewardPerEpisodeLastN{F}, ::PostActStage, agent::P, env::E, player::Symbol) where {P <: AbstractPolicy, E <: AbstractEnv, F<:AbstractFloat} = h.reward += reward(env, player)
+Base.push!(
+    h::TotalRewardPerEpisodeLastN{F},
+    ::PostActStage,
+    agent::P,
+    env::E,
+) where {P<:AbstractPolicy,E<:AbstractEnv,F<:AbstractFloat} = h.reward += reward(env)
+Base.push!(
+    h::TotalRewardPerEpisodeLastN{F},
+    ::PostActStage,
+    agent::P,
+    env::E,
+    player::Symbol,
+) where {P<:AbstractPolicy,E<:AbstractEnv,F<:AbstractFloat} =
+    h.reward += reward(env, player)
 
-function Base.push!(hook::TotalRewardPerEpisodeLastN{F},
+function Base.push!(
+    hook::TotalRewardPerEpisodeLastN{F},
     ::PostEpisodeStage,
     agent,
     env,
@@ -112,16 +126,13 @@ function Base.push!(hook::TotalRewardPerEpisodeLastN{F},
     return
 end
 
-function Base.push!(hook::TotalRewardPerEpisodeLastN{F}, 
-    stage::Union{PostEpisodeStage, PostExperimentStage},
+function Base.push!(
+    hook::TotalRewardPerEpisodeLastN{F},
+    stage::Union{PostEpisodeStage,PostExperimentStage},
     agent,
     env,
-    player::Symbol
+    player::Symbol,
 ) where {F<:AbstractFloat}
-    push!(hook,
-        stage,
-        agent,
-        env,
-    )
+    push!(hook, stage, agent, env)
     return
 end

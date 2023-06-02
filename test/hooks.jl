@@ -5,11 +5,11 @@ using ReinforcementLearningCore
 
 @testset "TotalRewardPerEpisodeLastN" begin
     @testset "Single Agent" begin
-        hook = TotalRewardPerEpisodeLastN(max_steps=10)
+        hook = TotalRewardPerEpisodeLastN(max_steps = 10)
         env = TicTacToeEnv()
         agent = RandomPolicy()
 
-        for i in 1:15
+        for i = 1:15
             push!(hook, PostActStage(), agent, env)
             push!(hook, PostEpisodeStage(), agent, env)
             @test length(hook.rewards) == min(i, 10)
@@ -18,11 +18,11 @@ using ReinforcementLearningCore
     end
 
     @testset "MultiAgent" begin
-        hook = TotalRewardPerEpisodeLastN(max_steps=10)
+        hook = TotalRewardPerEpisodeLastN(max_steps = 10)
         env = TicTacToeEnv()
         agent = RandomPolicy()
 
-        for i in 1:15
+        for i = 1:15
             push!(hook, PostActStage(), agent, env, :Cross)
             push!(hook, PostEpisodeStage(), agent, env, :Cross)
             @test length(hook.rewards) == min(i, 10)
