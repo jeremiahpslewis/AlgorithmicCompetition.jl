@@ -21,7 +21,7 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentPolicy(
                     γ = env.δ,
                     n = 0,
                 ),
-                explorer = AIAPCEpsilonGreedyExplorer(env.β * 2), # TODO: Remove this, just testing whether \beta param was misspecified and what impact it has...
+                explorer = AIAPCEpsilonGreedyExplorer(env.β),
             ),
             Trajectory(
                 CircularArraySARTTraces(;

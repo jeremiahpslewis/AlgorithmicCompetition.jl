@@ -44,7 +44,7 @@ using AlgorithmicCompetition:
     AIAPCSummary,
     TDLearner,
     TabularApproximator
-using JET
+# using JET
 # using ProfileView
 # using Distributed
 
@@ -54,7 +54,7 @@ using JET
 ξ = 0.1
 δ = 0.95
 n_prices = 15
-max_iter = Int(1e6)
+max_iter = Int(1e9)
 price_index = 1:n_prices
 
 competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
@@ -71,12 +71,12 @@ hyperparams = AIAPCHyperParameters(
 )
 
 env = AIAPCEnv(hyperparams)
-experiment = Experiment(env; stop_on_convergence = false)
+experiment = Experiment(env; stop_on_convergence = true)
 
 @report_opt Base.push!(experiment.policy, PreActStage(), experiment.env)
 @report_opt RLBase.plan!(experiment.policy, experiment.env)
 
-@time run(hyperparams; stop_on_convergence = false);
+@time run(hyperparams; stop_on_convergence = true);
 a = @time run(hyperparams; stop_on_convergence = false);
 
 # 509.952693 seconds (8.40 G allocations: 330.871 GiB, 8.58% gc time, 0.10% compilation time)
