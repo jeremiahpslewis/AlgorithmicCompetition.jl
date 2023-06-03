@@ -49,13 +49,13 @@ using AlgebraOfGraphics
 
 df_summary = @chain df begin
     @groupby(:α, :β)
-    @combine(:π_bar = mean(:π_bar),
-               :iterations_until_convergence = log10(mean(:iterations_until_convergence)))
+    @combine(
+        :π_bar = mean(:π_bar),
+        :iterations_until_convergence = log10(mean(:iterations_until_convergence))
+    )
 end
 
 plt = @chain df_summary begin
-    data(_) *
-    mapping(:β, :α, :iterations_until_convergence) *
-    visual(Heatmap)
+    data(_) * mapping(:β, :α, :iterations_until_convergence) * visual(Heatmap)
 end
 draw(plt)
