@@ -3,6 +3,9 @@ using Statistics
 using DataFrames
 using CSV
 using Distributed
+using Dates
+
+start_timestamp = now()
 n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
 
 _procs = addprocs(
@@ -39,8 +42,8 @@ df = DataFrame(
     iterations_until_convergence = iterations_until_convergence,
 )
 
-CSV.write("simulation_results.csv", df)
-df = DataFrame(CSV.File("simulation_results.csv"))
+CSV.write("simulation_results_$start_timestamp.csv", df)
+df = DataFrame(CSV.File("simulation_results_$start_timestamp.csv"))
 
 using CairoMakie
 using Chain
