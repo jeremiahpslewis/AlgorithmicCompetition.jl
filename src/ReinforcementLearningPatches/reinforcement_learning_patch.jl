@@ -82,8 +82,18 @@ function RLBase.plan!(
     return rand(s.rng, max_vals)
 end
 
-# Patch for QBasedPolicy, not sure why NamedTuple dispatch is not working
-RLBase.optimise!(p::QBasedPolicy, x::CircularArraySARTTraces) = optimise!(p.learner, x)
+# Patch for Agent -> QBasedPolicy
+function RLBase.optimise!(agent::Agent, stage::PreActStage)
+    optimise!(agent.policy, agent.cache, agent.trajectory)
+end
+
+function RLBase.optimise!(policy::QBasedPolicy, cache, trajectory)
+    for batch in trajectory
+        optimise!(policy.learner, cache, trajectory)
+    end
+end
+
+RLBase.optimise!(agent::Agent, stage::PostActStage) = nothing
 
 const SART = (:state, :action, :reward, :terminal)
 

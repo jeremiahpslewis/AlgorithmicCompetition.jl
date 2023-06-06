@@ -34,6 +34,7 @@ using AlgorithmicCompetition:
     map_int_to_vect,
     construct_profit_array,
     Q,
+    Q!,
     π,
     run,
     run_and_extract,

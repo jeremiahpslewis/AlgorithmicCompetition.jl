@@ -32,14 +32,12 @@ RLCore.forward(
     a::I2,
 ) where {Ap,F,I,I1<:Integer,I2<:Integer} = RLCore.forward(L.approximator, s, a)
 
-function extract_sar(t::Traces{Tr}) where {Tr}
+function extract_sa(t::Traces{Tr}) where {Tr}
     # TODO: Delete this when RLTrajectories.jl is fixed
     # Hard coded to deal with index type instability in RLTrajectories.jl
     S = t.traces[1][:state][1]
-    S_next = t.traces[1][:next_state][1]
     A = t.traces[2][:action][1]
-    R = t.traces[3][1]
-    return (S, S_next, A, R)
+    return (S, A)
 end
 
 
@@ -56,9 +54,11 @@ function _optimise!(
         Q!(app, s, s_next, a, α, r, γ)
 end
 
-function RLBase.optimise!(L::TDLearnerSARS{Ap,F,I}, t::Traces{Tr}) where {Ap,F,I,Tr}
+function RLBase.optimise!(L::TDLearnerSARS{Ap,F,I}, cache::RLCore.SRT, t::Traces{Tr}) where {Ap,F,I,Tr}
     # S, A, R, T = (t[x][1] for x in SART)
-    S, S_next, A, R = extract_sar(t) # Remove this when the above line works without a performance hit
+    S, A = extract_sar(t) # Remove this when the above line works without a performance hit
+    R = cache.reward
+    S_next = cache.state
     _optimise!(L.n, L.γ, L.approximator, S, S_next, A, R)
 end
 

@@ -18,8 +18,8 @@ _procs = addprocs(
 end
 
 @time exp_list = AlgorithmicCompetition.run_aiapc(;
-    n_parameter_iterations = 10,
-    n_parameter_increments = 10,
+    n_parameter_iterations = 25,
+    n_parameter_increments = 50,
     max_iter = Int(1e9), # TODO: increment to 1e9
 )
 
