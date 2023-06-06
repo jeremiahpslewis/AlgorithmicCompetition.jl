@@ -40,14 +40,13 @@ df = DataFrame(
 )
 
 CSV.write("simulation_results.csv", df)
-
+df = DataFrame(CSV.File("simulation_results.csv"))
 
 using CairoMakie
 using Chain
 using DataFrameMacros
 using AlgebraOfGraphics
 
-df = DataFrame(CSV.File("simulation_results.csv"))
 df_summary = @chain df begin
     @groupby(:α, :β)
     @combine(:π_bar = mean(:π_bar),
