@@ -87,13 +87,15 @@ function RLBase.optimise!(agent::Agent, stage::PreActStage)
     optimise!(agent.policy, agent.cache, agent.trajectory)
 end
 
-function RLBase.optimise!(policy::QBasedPolicy, cache, trajectory)
+function RLBase.optimise!(policy::QBasedPolicy, cache::RLCore.SRT, trajectory::Trajectory)
     for batch in trajectory
-        optimise!(policy.learner, cache, trajectory)
+        optimise!(policy.learner, cache, batch)
     end
 end
 
 RLBase.optimise!(agent::Agent, stage::PostActStage) = nothing
+RLBase.optimise!(agent::Agent, stage::PostEpisodeStage) = nothing
+RLBase.optimise!(agent::Agent, stage::PreEpisodeStage) = nothing
 
 const SART = (:state, :action, :reward, :terminal)
 

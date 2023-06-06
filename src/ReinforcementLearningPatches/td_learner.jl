@@ -56,7 +56,7 @@ end
 
 function RLBase.optimise!(L::TDLearnerSARS{Ap,F,I}, cache::RLCore.SRT, t::Traces{Tr}) where {Ap,F,I,Tr}
     # S, A, R, T = (t[x][1] for x in SART)
-    S, A = extract_sar(t) # Remove this when the above line works without a performance hit
+    S, A = extract_sa(t) # Remove this when the above line works without a performance hit
     R = cache.reward
     S_next = cache.state
     _optimise!(L.n, L.γ, L.approximator, S, S_next, A, R)
