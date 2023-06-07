@@ -65,8 +65,7 @@ struct AIAPCEnv <: AbstractEnv
             n_state_space,
             state_space,
             state_space_lookup,
-            rand(p.memory_length, p.n_players)
-            MVector{2,Int}(rand(state_space, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int; randomly initialized
+            MVector{2,Int}(rand(price_index, p.memory_length, p.n_players)), # Memory, note max of 127 prices with Int; randomly initialized
             Dict(Symbol(1) => false, Symbol(2) => false), # Convergence counter
             MVector{1,Bool}([false]), # Is done
             p.p_Bert_nash_equilibrium,

@@ -50,7 +50,7 @@ function Base.push!(
     table::Matrix{F},
     state_::S,
 ) where {S<:Integer,F<:AbstractFloat}
-    # Convergence is defined over argmax action for each state 
+    # Convergence is defined over argmax action for each state
     # E.g. best / greedy action
     best_action = _best_action_lookup(state_, table)
     iter_converged = (@views h.best_response_vector[state_] == best_action)
