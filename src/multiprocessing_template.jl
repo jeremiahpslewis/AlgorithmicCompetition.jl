@@ -21,7 +21,7 @@ _procs = addprocs(
 end
 
 @time exp_list = AlgorithmicCompetition.run_aiapc(;
-    n_parameter_iterations = 25,
+    n_parameter_iterations = 20,
     n_parameter_increments = 50,
     max_iter = Int(1e9), # TODO: increment to 1e9
 )
@@ -43,6 +43,7 @@ df = DataFrame(
 )
 
 CSV.write("simulation_results_$start_timestamp.csv", df)
+
 df = DataFrame(CSV.File("simulation_results_$start_timestamp.csv"))
 
 using CairoMakie
@@ -56,16 +57,18 @@ df_summary = @chain df begin
                :iterations_until_convergence = log10(mean(:iterations_until_convergence)/2))
 end
 
-plt = @chain df_summary begin
+plt1 = @chain df_summary begin
     data(_) *
     mapping(:β, :α, :π_bar) *
     visual(Heatmap)
 end
 
-plt = @chain df_summary begin
+draw(plt1)
+
+plt2 = @chain df_summary begin
     data(_) *
     mapping(:β, :α, :iterations_until_convergence) *
     visual(Heatmap)
 end
 
-draw(plt)
+draw(plt2)
