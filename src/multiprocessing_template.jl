@@ -21,27 +21,14 @@ _procs = addprocs(
 end
 
 @time exp_list = AlgorithmicCompetition.run_aiapc(;
-    n_parameter_iterations = 20,
+    n_parameter_iterations = 25,
     n_parameter_increments = 50,
     max_iter = Int(1e9), # TODO: increment to 1e9
 )
 
 rmprocs(_procs)
 
-α_result = [ex.α for ex in exp_list if !(ex isa Exception)]
-β_result = [ex.β for ex in exp_list if !(ex isa Exception)]
-iterations_until_convergence =
-    [ex.iterations_until_convergence[1] for ex in exp_list if !(ex isa Exception)]
-
-avg_profit_result = [ex.avg_profit[1] for ex in exp_list if !(ex isa Exception)]
-
-df = DataFrame(
-    α = α_result,
-    β = β_result,
-    π_bar = avg_profit_result,
-    iterations_until_convergence = iterations_until_convergence,
-)
-
+df = extract_sim_results(exp_list)
 CSV.write("simulation_results_$start_timestamp.csv", df)
 
 df = DataFrame(CSV.File("simulation_results_$start_timestamp.csv"))
@@ -53,13 +40,13 @@ using AlgebraOfGraphics
 
 df_summary = @chain df begin
     @groupby(:α, :β)
-    @combine(:π_bar = mean(:π_bar),
-               :iterations_until_convergence = log10(mean(:iterations_until_convergence)/2))
+    @combine(:Δ_π_bar = mean(:π_bar),
+               :iterations_until_convergence = log10(mean(:iterations_until_convergence)))
 end
 
 plt1 = @chain df_summary begin
     data(_) *
-    mapping(:β, :α, :π_bar) *
+    mapping(:β, :α, :Δ_π_bar) *
     visual(Heatmap)
 end
 
@@ -72,3 +59,4 @@ plt2 = @chain df_summary begin
 end
 
 draw(plt2)
+

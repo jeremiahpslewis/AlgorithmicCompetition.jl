@@ -1,5 +1,6 @@
 using Chain
 using ReinforcementLearningCore, ReinforcementLearningBase
+using DataFrames
 
 profit_measure(π_hat, π_N, π_M) = (mean(π_hat) - π_N) / (π_M - π_N)
 
@@ -8,7 +9,7 @@ struct AIAPCSummary
     β::Float64
     is_converged::Vector{Bool}
     avg_profit::Vector{Float64}
-    iterations_until_convergence::Vector{Int32}
+    iterations_until_convergence::Vector{Int64}
 end
 
 function extract_profit_vars(p_Bert_nash_equilibrium, p_monop_opt, competition_params)
@@ -21,7 +22,7 @@ economic_summary(e::RLCore.Experiment) = economic_summary(e.env, e.hook)
 
 function economic_summary(env::AbstractEnv, hook::AbstractHook)
     convergence_threshold = env.convergence_threshold
-    iterations_until_convergence = Int32[
+    iterations_until_convergence = Int64[
         hook[player][2].iterations_until_convergence for player in [Symbol(1), Symbol(2)]
     ]
 
@@ -49,4 +50,21 @@ function economic_summary(env::AbstractEnv, hook::AbstractHook)
         avg_profit,
         iterations_until_convergence,
     )
+end
+
+function extract_sim_results(exp_list::Vector{AIAPCSummary})
+    α_result = [ex.α for ex in exp_list if !(ex isa Exception)]
+    β_result = [ex.β for ex in exp_list if !(ex isa Exception)]
+    iterations_until_convergence =
+        [ex.iterations_until_convergence[1] for ex in exp_list if !(ex isa Exception)]
+
+    avg_profit_result = [ex.avg_profit[1] for ex in exp_list if !(ex isa Exception)]
+
+    df = DataFrame(
+        α = α_result,
+        β = β_result,
+        π_bar = avg_profit_result,
+        iterations_until_convergence = iterations_until_convergence,
+    )
+    return df
 end

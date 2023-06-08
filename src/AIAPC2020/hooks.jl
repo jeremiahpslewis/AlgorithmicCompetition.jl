@@ -3,8 +3,8 @@ using StaticArrays
 import Base.push!
 
 mutable struct ConvergenceCheck <: AbstractHook
-    convergence_duration::Int32
-    iterations_until_convergence::Int32
+    convergence_duration::Int64
+    iterations_until_convergence::Int64
     best_response_vector::MVector{225,Int} # state x action # TODO: Fix hardcoding of n_states
     is_converged::Bool
     convergence_threshold::Int64

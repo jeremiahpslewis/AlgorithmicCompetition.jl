@@ -21,7 +21,7 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentPolicy(
                     γ = env.δ,
                     n = 0,
                 ),
-                explorer = AIAPCEpsilonGreedyExplorer(env.β),
+                explorer = AIAPCEpsilonGreedyExplorer(env.β * 2), # TODO: Drop this hack / attempt to get conversion to behave
             ),
             Trajectory(
                 CircularArraySARTTraces(;
