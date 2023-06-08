@@ -17,7 +17,8 @@ function InitMatrix(price_options::SVector{15,Float64},
         mode="baseline"
     )
     @assert mode == "baseline" "Only baseline mode is supported"
-    return fill(init_value, n_prices, n_state_space)
+    opponent_randomizes_expected_profit = Q_i_0(price_options, δ, params)
+    return repeat(opponent_randomizes_expected_profit, 1, n_state_space)
 end
 
 AIAPCPolicy(env::AIAPCEnv) = MultiAgentPolicy(
@@ -27,7 +28,13 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentPolicy(
                 learner = TDLearner(;
                     # TabularQApproximator with specified init matrix
                     approximator = TabularApproximator(
-                        InitMatrix(env.n_prices, env.n_state_space),
+                        InitMatrix(
+                            env.price_options,
+                            env.n_state_space,
+                            env.δ,
+                            env.competition_solution.params,
+                            mode="baseline"
+                        ),
                         Descent(env.α),
                     ),
                     # For param info: https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/f97747923c6d7bbc5576f81664ed7b05a2ab8f1e/src/ReinforcementLearningZoo/src/algorithms/tabular/td_learner.jl#L15
