@@ -15,8 +15,8 @@ function test_key_AIAPC_points(; n_parameter_iterations = 1000)
     test_params = DataFrame(
         :α => [0.08, 0.2, 0.15],
         :β => [2, 0.25, 1] .* 1e5,
-        :iter_min => [0, 1.5e5, 0.5e5],
-        :iter_max => [5e5,10e5, 1.5e5],
+        :iter_min => [0, 1.5e6, 0.5e6],
+        :iter_max => [0.5e6, 1e7, 1.5e6],
         :Δ_π_bar_min => [0.7, 0.75, 0.8],
         :Δ_π_bar_max => [0.8, 0.85, 0.9],
     )
@@ -66,8 +66,10 @@ exp_df = test_key_AIAPC_points(; n_parameter_iterations=100)
 rmprocs(_procs)
 
 @chain exp_df begin
-    @transform(:convergence_match = :Δ_π_bar_max > :Δ_π_bar > :Δ_π_bar_min,
-               :profit_match = :iter_max > :iterations_until_convergence > :iter_min,
+    @transform(:profit_match = :Δ_π_bar_max > :Δ_π_bar > :Δ_π_bar_min,
+               :convergence_match = :iter_max > :iterations_until_convergence > :iter_min,
+               :convergence_status = :Δ_π_bar > :Δ_π_bar_max ? "high" : :Δ_π_bar < :Δ_π_bar_min ? "low" : "ok",
+                :profit_status = :Δ_π_bar > :Δ_π_bar_max ? "high" : :Δ_π_bar < :Δ_π_bar_min ? "low" : "ok"
                )
-    @select(:α, :β, :convergence_match, :profit_match, :iter_min, :iterations_until_convergence,  :iter_max)
+    @select(:α, :β, :convergence_match, :convergence_status, :profit_match, :profit_status)
 end
