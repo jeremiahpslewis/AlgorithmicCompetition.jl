@@ -2,8 +2,22 @@ using ReinforcementLearningCore
 using StaticArrays
 using Flux
 
-function InitMatrix(n_prices, n_state_space)
-    return zeros(Float64, n_prices, n_state_space)
+function Q_i_0(price::Float64, price_options::SVector{15,Float64}, δ::Float64, params::CompetitionParameters)
+    mean(π.((price,), price_options, (params,))[1]) ./ (1 - δ)
+end
+
+function Q_i_0(price_options::SVector{15,Float64}, δ::Float64, params::CompetitionParameters)
+    Q_i_0.(price_options, (price_options,), δ, (params,))
+end
+
+function InitMatrix(price_options::SVector{15,Float64},
+        n_state_space::Int64,
+        δ::Float64,
+        params::CompetitionParameters;
+        mode="baseline"
+    )
+    @assert mode == "baseline" "Only baseline mode is supported"
+    return fill(init_value, n_prices, n_state_space)
 end
 
 AIAPCPolicy(env::AIAPCEnv) = MultiAgentPolicy(
@@ -21,7 +35,7 @@ AIAPCPolicy(env::AIAPCEnv) = MultiAgentPolicy(
                     γ = env.δ,
                     n = 0,
                 ),
-                explorer = AIAPCEpsilonGreedyExplorer(env.β), # TODO: Drop this hack / attempt to get conversion to behave
+                explorer = AIAPCEpsilonGreedyExplorer(env.β * 2), # TODO: Drop this hack / attempt to get conversion to behave
             ),
             Trajectory(
                 CircularArraySARTTraces(;

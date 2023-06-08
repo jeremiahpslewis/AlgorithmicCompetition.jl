@@ -147,6 +147,35 @@ end
     @test all(checksum_ .== sum(1:env.n_prices))
 end
 
+@testset "Q_i_0" begin
+    α = Float64(0.125)
+    β = Float64(1e-5)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = 1000
+    price_index = 1:n_prices
+
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
+
+    competition_solution = CompetitionSolution(competition_params)
+
+    hyperparameters = AIAPCHyperParameters(
+        α,
+        β,
+        δ,
+        max_iter,
+        competition_solution;
+        convergence_threshold = 1,
+    )
+    env = AIAPCEnv(hyperparameters)
+    
+    test_prices = Q_i_0(env.price_options, env.δ, env.competition_solution.params)
+    @test minimum(test_prices) == 4.4585331170361515
+    @test maximum(test_prices) == 4.4585331170361515
+end
+
 @testset "run full AIAPC simulation" begin
     α = Float64(0.125)
     β = Float64(1e-5)
