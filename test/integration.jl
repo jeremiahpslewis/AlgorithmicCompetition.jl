@@ -195,33 +195,51 @@ end
 
     policy = AIAPCPolicy(env)
     approx_table = copy(policy.agents[Symbol(1)].policy.learner.approximator.table)
-    # First two rounds
+    # First three rounds
+
+    # t=1
     push!(policy, PreEpisodeStage(), env)
     push!(policy, PreActStage(), env)
     @test policy.agents[Symbol(1)].cache.reward == nothing
     @test policy.agents[Symbol(1)].cache.terminal == nothing
     @test length(policy.agents[Symbol(1)].trajectory.container) == 0
     optimise!(policy, PreActStage())
-    @test policy.agents[Symbol(1)].policy.learner.approximator.table == approx_table # test that optimise! in t=1 is a noop
+    approx_table_t_1 = copy(policy.agents[Symbol(1)].policy.learner.approximator.table)
+    @test approx_table_t_1 == approx_table # test that optimise! in t=1 is a noop
     action = RLBase.plan!(policy, env)
+    act!(env, action)
     @test length(policy.agents[Symbol(1)].trajectory.container) == 0 # test that trajectory has not been filled
     push!(policy, PostActStage(), env)
     push!(policy, PostEpisodeStage(), env)
+    cache_1 = deepcopy(policy.agents[Symbol(1)].cache)
+
+    # t=2
+    push!(policy, PreEpisodeStage(), env)
     push!(policy, PreActStage(), env)
-    @test length(policy.agents[Symbol(1)].trajectory.container) == 1
-    
-    # @test policy.agents[Symbol(1)].trajectory.container[:state][1] == 0
-    # @test policy.agents[Symbol(1)].trajectory.container[:action][1] == 0
-    # @test policy.agents[Symbol(1)].trajectory.container[:reward][1] == 0.0
-    # @test policy.agents[Symbol(1)].trajectory.container[:next_state][1] != 0
-    # @test policy.agents[Symbol(1)].trajectory.container[:next_action][1] != 0
-    # act!(env, action)
-    # push!(policy, PostActStage(), env)
-    # push!(policy, PostEpisodeStage(), env)
+    @test length(policy.agents[Symbol(1)].trajectory.container) == 1 
+    optimise!(policy, PreActStage())
+    approx_table_t_2 = copy(policy.agents[Symbol(1)].policy.learner.approximator.table)
+    @test approx_table_t_2 != approx_table_t_1 # test that optimise! in t=2 is not a noop   
+    action = RLBase.plan!(policy, env)
+    act!(env, action)
+    push!(policy, PostActStage(), env)
+    push!(policy, PostEpisodeStage(), env)
+    cache_2 = deepcopy(policy.agents[Symbol(1)].cache)
+    @test cache_1.action != cache_2.action
+
+    # t=3
+    push!(policy, PreEpisodeStage(), env)
     push!(policy, PreActStage(), env)
     @test length(policy.agents[Symbol(1)].trajectory.container) == 1
     optimise!(policy, PreActStage())
-    @test policy.agents[Symbol(1)].policy.learner.approximator.table != approx_table # test that optimise! in t=2 is not a noop
+    approx_table_t_3 = copy(policy.agents[Symbol(1)].policy.learner.approximator.table)
+    @test approx_table_t_2 != approx_table_t_3 # test that optimise! in t=2 is not a noop
+    action = RLBase.plan!(policy, env) 
+    act!(env, action)
+    push!(policy, PostActStage(), env)
+    push!(policy, PostEpisodeStage(), env)
+    cache_3 = deepcopy(policy.agents[Symbol(1)].cache)
+    @test cache_2.action != cache_3.action
 end
 
 @testset "run full AIAPC simulation" begin
@@ -231,7 +249,7 @@ end
     ξ = 0.1
     δ = 0.95
     n_prices = 15
-    max_iter = Int(1)
+    max_iter = Int(1e5)
     price_index = 1:n_prices
 
     competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
@@ -244,13 +262,14 @@ end
         δ,
         max_iter,
         competition_solution;
-        convergence_threshold = 0,
+        convergence_threshold = 10,
     )
 
-    c_out = run(hyperparameters; stop_on_convergence = false)
-
+    c_out = run(hyperparameters; stop_on_convergence = true)
     # ensure that the policy is updated by the learner
-    @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table .!= 0) != 0
+    @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table; dims=2) != 0
+    state_sum = sum(c_out.policy[Symbol(1)].policy.learner.approximator.table;dims=1)
+    @test !all(y->y==state_sum[1], state_sum)
     @test length(reward(c_out.env)) == 2
     @test length(reward(c_out.env, 1)) == 1
 
