@@ -56,7 +56,7 @@ function AIAPCPolicy(env::AIAPCEnv)
                     explorer = AIAPCEpsilonGreedyExplorer(env.β), # * 2 # TODO: Drop this hack / attempt to get conversion to behave
                 ),
                 Trajectory(
-                    CircularArraySARTTraces(;
+                    CircularArraySARSTraces(;
                         capacity = 1,
                         state = Int64 => (),
                         action = Int64 => (),
