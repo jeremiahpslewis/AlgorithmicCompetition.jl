@@ -2,7 +2,10 @@ using Chain
 using ReinforcementLearningCore, ReinforcementLearningBase
 using DataFrames
 
-profit_measure(π_hat, π_N, π_M) = (mean(π_hat) - π_N) / (π_M - π_N)
+function profit_gain(π_hat, env)
+    π_N, π_M = extract_profit_vars(env)
+    (mean(π_hat) - π_N) / (π_M - π_N)
+end
 
 struct AIAPCSummary
     α::Float64
@@ -12,7 +15,11 @@ struct AIAPCSummary
     iterations_until_convergence::Vector{Int64}
 end
 
-function extract_profit_vars(p_Bert_nash_equilibrium, p_monop_opt, competition_params)
+function extract_profit_vars(env::AIAPCEnv)
+    p_Bert_nash_equilibrium = env.p_Bert_nash_equilibrium
+    p_monop_opt = env.p_monop_opt
+    competition_params = env.competition_solution.params
+
     π_N = π(p_Bert_nash_equilibrium, p_Bert_nash_equilibrium, competition_params)[1]
     π_M = π(p_monop_opt, p_monop_opt, competition_params)[1]
     return (π_N, π_M)
@@ -26,18 +33,12 @@ function economic_summary(env::AbstractEnv, hook::AbstractHook)
         hook[player][2].iterations_until_convergence for player in [Symbol(1), Symbol(2)]
     ]
 
-    π_N, π_M = extract_profit_vars(
-        env.p_Bert_nash_equilibrium,
-        env.p_monop_opt,
-        env.competition_solution.params,
-    )
-
     avg_profit = Float64[]
     is_converged = Bool[]
 
     for i in (Symbol(1), Symbol(2))
         @chain hook[i][1].rewards[(end-convergence_threshold):end] begin
-            push!(avg_profit, profit_measure(_, π_N, π_M))
+            push!(avg_profit, mean(_))
         end
 
         push!(is_converged, hook[i][2].is_converged)
