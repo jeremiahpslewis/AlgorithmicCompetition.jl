@@ -49,8 +49,8 @@ struct AIAPCHyperParameters
             )
         price_options = [
             range(
-                competition_solution.p_Bert_nash_equilibrium,
-                competition_solution.p_monop_opt,
+                competition_solution.p_Bert_nash_equilibrium - p_range_pad,
+                competition_solution.p_monop_opt + p_range_pad,
                 n_prices,
             )...,
         ]

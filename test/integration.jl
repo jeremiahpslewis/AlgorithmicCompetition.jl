@@ -176,8 +176,8 @@ end
     env = AIAPCEnv(hyperparameters)
     
     test_prices = Q_i_0(env.price_options, env.δ, env.competition_solution.params)
-    @test minimum(test_prices) == 4.4585331170361515
-    @test maximum(test_prices) == 4.962704352220955
+    @test minimum(test_prices) == 4.070906600373279
+    @test maximum(test_prices) == 4.61282553058293
 end
 
 @testset "policy push! and optimise! test" begin
@@ -210,6 +210,8 @@ end
     act!(env, action)
     @test length(policy.agents[Symbol(1)].trajectory.container) == 0 # test that trajectory has not been filled
     push!(policy, PostActStage(), env)
+    reward_1 = copy(policy.agents[Symbol(1)].cache.reward)
+    @test reward_1 != 0
     push!(policy, PostEpisodeStage(), env)
     cache_1 = deepcopy(policy.agents[Symbol(1)].cache)
 
@@ -223,6 +225,8 @@ end
     action = RLBase.plan!(policy, env)
     act!(env, action)
     push!(policy, PostActStage(), env)
+    reward_2 = copy(policy.agents[Symbol(1)].cache.reward)
+    @test reward_2 != reward_1
     push!(policy, PostEpisodeStage(), env)
     cache_2 = deepcopy(policy.agents[Symbol(1)].cache)
     @test cache_1.action != cache_2.action
@@ -237,6 +241,8 @@ end
     action = RLBase.plan!(policy, env) 
     act!(env, action)
     push!(policy, PostActStage(), env)
+    reward_3 = copy(policy.agents[Symbol(1)].cache.reward)
+    @test reward_3 != reward_2
     push!(policy, PostEpisodeStage(), env)
     cache_3 = deepcopy(policy.agents[Symbol(1)].cache)
     @test cache_2.action != cache_3.action
@@ -346,7 +352,7 @@ end
 
     policies[Symbol(1)].policy.learner.approximator.table[11, :] .= 2
     push!(exper.hook[Symbol(1)][2], PostActStage(), policies[Symbol(1)], exper.env, :p1)
-    @test exper.hook[Symbol(1)][2].best_response_vector[state(env)] == 9
+    @test exper.hook[Symbol(1)][2].best_response_vector[state(env)] == 8
 end
 
 @testset "Profit array test" begin
@@ -413,9 +419,9 @@ end
         env.competition_solution.params,
         mode="baseline"
     )
-    @test a[1, 1] ≈ 4.4585331170361515
-    @test a[1, 10] ≈ 4.4585331170361515
-    @test a[5, 10] ≈ 4.8434223917125605
+    @test a[1, 1] ≈ 4.070906600373279
+    @test a[1, 10] ≈ 4.070906600373279
+    @test a[5, 10] ≈ 4.521381412143576
 end
 
 @testset "Parameter / learning checks" begin
