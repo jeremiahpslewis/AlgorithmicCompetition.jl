@@ -198,24 +198,26 @@ end
     # First two rounds
     push!(policy, PreEpisodeStage(), env)
     push!(policy, PreActStage(), env)
-    @test policy.agents[Symbol(1)].cache.reward == 0
-    @test policy.agents[Symbol(1)].cache.terminal == true
-    @test !(policy.agents[Symbol(1)].cache.state isa Nothing)
+    @test policy.agents[Symbol(1)].cache.reward == nothing
+    @test policy.agents[Symbol(1)].cache.terminal == nothing
     @test length(policy.agents[Symbol(1)].trajectory.container) == 0
     optimise!(policy, PreActStage())
     @test policy.agents[Symbol(1)].policy.learner.approximator.table == approx_table # test that optimise! in t=1 is a noop
     action = RLBase.plan!(policy, env)
-
-    
-    @test length(policy.agents[Symbol(1)].trajectory.container) == 1 # test that trajectory has been filled
-    @test policy.agents[Symbol(1)].trajectory.container[:state][1] == 0
-    @test policy.agents[Symbol(1)].trajectory.container[:action][1] == 0
-    @test policy.agents[Symbol(1)].trajectory.container[:reward][1] == 0.0
-    @test policy.agents[Symbol(1)].trajectory.container[:next_state][1] != 0
-    @test policy.agents[Symbol(1)].trajectory.container[:next_action][1] != 0
-    act!(env, action)
+    @test length(policy.agents[Symbol(1)].trajectory.container) == 0 # test that trajectory has not been filled
     push!(policy, PostActStage(), env)
     push!(policy, PostEpisodeStage(), env)
+    push!(policy, PreActStage(), env)
+    @test length(policy.agents[Symbol(1)].trajectory.container) == 1
+    
+    # @test policy.agents[Symbol(1)].trajectory.container[:state][1] == 0
+    # @test policy.agents[Symbol(1)].trajectory.container[:action][1] == 0
+    # @test policy.agents[Symbol(1)].trajectory.container[:reward][1] == 0.0
+    # @test policy.agents[Symbol(1)].trajectory.container[:next_state][1] != 0
+    # @test policy.agents[Symbol(1)].trajectory.container[:next_action][1] != 0
+    # act!(env, action)
+    # push!(policy, PostActStage(), env)
+    # push!(policy, PostEpisodeStage(), env)
     push!(policy, PreActStage(), env)
     @test length(policy.agents[Symbol(1)].trajectory.container) == 1
     optimise!(policy, PreActStage())

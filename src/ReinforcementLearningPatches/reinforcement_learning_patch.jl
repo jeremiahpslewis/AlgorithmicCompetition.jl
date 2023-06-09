@@ -84,12 +84,12 @@ end
 
 # Patch for Agent -> QBasedPolicy
 function RLBase.optimise!(agent::Agent, stage::PreActStage)
-    optimise!(agent.policy, agent.cache, agent.trajectory)
+    optimise!(agent.policy, agent.trajectory)
 end
 
-function RLBase.optimise!(policy::QBasedPolicy, cache::RLCore.SRT, trajectory::Trajectory)
+function RLBase.optimise!(policy::QBasedPolicy, trajectory::Trajectory)
     for batch in trajectory
-        optimise!(policy.learner, cache, batch)
+        optimise!(policy.learner, batch)
     end
 end
 

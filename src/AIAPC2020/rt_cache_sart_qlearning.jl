@@ -15,27 +15,30 @@ mutable struct RT{R,T}
     end
 end
 
-function Base.push!(agent::Agent, ::PreActStage, env::AIAPCEnv)
-    push!(agent.trajectory, agent.cache, state(env))
+function Base.push!(multiagent::MultiAgentPolicy, ::PreActStage, env::AIAPCEnv)
+    for player in players(env)
+        agent = multiagent[player]
+        push!(agent.trajectory, agent.cache, state(env, player))
+    end
 end
 
 function RLBase.plan!(agent::Agent{P,T,C}, env::AIAPCEnv, p::Symbol) where {P,T,C}
     action = RLBase.plan!(agent.policy, env, p)
     traces = agent.trajectory.container.traces
-    push!(traces[2].trace, xs.action)
+    push!(traces[2].trace, action)
     action
 end
 
 function Base.push!(t::Trajectory, rt::RT{R,T}, state::S) where {S,R,T}
     traces = t.container.traces
-    push!(traces[1].trace, xs.state) # Push state
+    push!(traces[1].trace, state) # Push state
     if !isnothing(rt.reward) && !isnothing(rt.terminal)
         push!(traces[3], rt.reward)
         push!(traces[4], rt.terminal)
     end
 end
 
-function Base.push!(cache::RT{R,T}, reward::R, terminal::T) where {S,R,T}
+function Base.push!(cache::RT{R,T}, reward::R, terminal::T) where {R,T}
     cache.reward = reward
     cache.terminal = terminal
 end
