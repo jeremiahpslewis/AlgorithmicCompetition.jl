@@ -5,13 +5,16 @@ using ReinforcementLearningCore:
     RLCore,
     PostActStage,
     PreActStage,
+    PostEpisodeStage,
+    PreEpisodeStage,
     state,
     reward,
     current_player,
     action_space,
     EpsilonGreedyExplorer,
     RandomPolicy,
-    MultiAgentPolicy
+    MultiAgentPolicy,
+    optimise!
 using ReinforcementLearningBase:
     RLBase, test_interfaces!, test_runnable!, AbstractPolicy, act!, plan!
 import ReinforcementLearningCore: RLCore
@@ -34,6 +37,8 @@ using AlgorithmicCompetition:
     map_int_to_vect,
     construct_profit_array,
     Q,
+    Q!,
+    Q_i_0,
     π,
     run,
     run_and_extract,
@@ -146,14 +151,14 @@ end
     @test all(checksum_ .== sum(1:env.n_prices))
 end
 
-@testset "run full AIAPC simulation" begin
+@testset "Q_i_0" begin
     α = Float64(0.125)
     β = Float64(1e-5)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
     n_prices = 15
-    max_iter = Int(1e6)
+    max_iter = 1000
     price_index = 1:n_prices
 
     competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
@@ -166,13 +171,105 @@ end
         δ,
         max_iter,
         competition_solution;
-        convergence_threshold = 3,
+        convergence_threshold = 1,
+    )
+    env = AIAPCEnv(hyperparameters)
+    
+    test_prices = Q_i_0(env.price_options, env.δ, env.competition_solution.params)
+    @test minimum(test_prices) == 4.4585331170361515
+    @test maximum(test_prices) == 4.962704352220955
+end
+
+@testset "policy push! and optimise! test" begin
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
+    competition_solution = CompetitionSolution(competition_params)
+
+    env =
+        AIAPCHyperParameters(
+            Float64(0.1),
+            Float64(1e-4),
+            0.95,
+            Int(1e7),
+            competition_solution,
+        ) |> AIAPCEnv
+
+    policy = AIAPCPolicy(env)
+    approx_table = copy(policy.agents[Symbol(1)].policy.learner.approximator.table)
+    # First three rounds
+
+    # t=1
+    push!(policy, PreEpisodeStage(), env)
+    push!(policy, PreActStage(), env)
+    @test policy.agents[Symbol(1)].cache.reward == nothing
+    @test policy.agents[Symbol(1)].cache.terminal == nothing
+    @test length(policy.agents[Symbol(1)].trajectory.container) == 0
+    optimise!(policy, PreActStage())
+    approx_table_t_1 = copy(policy.agents[Symbol(1)].policy.learner.approximator.table)
+    @test approx_table_t_1 == approx_table # test that optimise! in t=1 is a noop
+    action = RLBase.plan!(policy, env)
+    act!(env, action)
+    @test length(policy.agents[Symbol(1)].trajectory.container) == 0 # test that trajectory has not been filled
+    push!(policy, PostActStage(), env)
+    push!(policy, PostEpisodeStage(), env)
+    cache_1 = deepcopy(policy.agents[Symbol(1)].cache)
+
+    # t=2
+    push!(policy, PreEpisodeStage(), env)
+    push!(policy, PreActStage(), env)
+    @test length(policy.agents[Symbol(1)].trajectory.container) == 1 
+    optimise!(policy, PreActStage())
+    approx_table_t_2 = copy(policy.agents[Symbol(1)].policy.learner.approximator.table)
+    @test approx_table_t_2 != approx_table_t_1 # test that optimise! in t=2 is not a noop   
+    action = RLBase.plan!(policy, env)
+    act!(env, action)
+    push!(policy, PostActStage(), env)
+    push!(policy, PostEpisodeStage(), env)
+    cache_2 = deepcopy(policy.agents[Symbol(1)].cache)
+    @test cache_1.action != cache_2.action
+
+    # t=3
+    push!(policy, PreEpisodeStage(), env)
+    push!(policy, PreActStage(), env)
+    @test length(policy.agents[Symbol(1)].trajectory.container) == 1
+    optimise!(policy, PreActStage())
+    approx_table_t_3 = copy(policy.agents[Symbol(1)].policy.learner.approximator.table)
+    @test approx_table_t_2 != approx_table_t_3 # test that optimise! in t=2 is not a noop
+    action = RLBase.plan!(policy, env) 
+    act!(env, action)
+    push!(policy, PostActStage(), env)
+    push!(policy, PostEpisodeStage(), env)
+    cache_3 = deepcopy(policy.agents[Symbol(1)].cache)
+    @test cache_2.action != cache_3.action
+end
+
+@testset "run full AIAPC simulation" begin
+    α = Float64(0.125)
+    β = Float64(1e-5)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = Int(1e5)
+    price_index = 1:n_prices
+
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
+
+    competition_solution = CompetitionSolution(competition_params)
+
+    hyperparameters = AIAPCHyperParameters(
+        α,
+        β,
+        δ,
+        max_iter,
+        competition_solution;
+        convergence_threshold = 10,
     )
 
-    c_out = run(hyperparameters; stop_on_convergence = false)
-
+    c_out = run(hyperparameters; stop_on_convergence = true)
     # ensure that the policy is updated by the learner
-    @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table .!= 0) != 0
+    @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table; dims=2) != 0
+    state_sum = sum(c_out.policy[Symbol(1)].policy.learner.approximator.table;dims=1)
+    @test !all(y->y==state_sum[1], state_sum)
     @test length(reward(c_out.env)) == 2
     @test length(reward(c_out.env, 1)) == 1
 
@@ -249,7 +346,7 @@ end
 
     policies[Symbol(1)].policy.learner.approximator.table[11, :] .= 2
     push!(exper.hook[Symbol(1)][2], PostActStage(), policies[Symbol(1)], exper.env, :p1)
-    @test exper.hook[Symbol(1)][2].best_response_vector[state(env)] == 11
+    @test exper.hook[Symbol(1)][2].best_response_vector[state(env)] == 9
 end
 
 @testset "Profit array test" begin
@@ -286,11 +383,39 @@ end
 end
 
 @testset "simple InitMatrix test" begin
-    a = InitMatrix(15, 225)
-    b = InitMatrix(15, 225)
-    a[1, 1] = 10
-    @test a[1, 1] == 10
-    @test b[1, 1] == 0
+    α = Float64(0.125)
+    β = Float64(1e-5)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = 1000
+    price_index = 1:n_prices
+
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
+
+    competition_solution = CompetitionSolution(competition_params)
+
+    hyperparameters = AIAPCHyperParameters(
+        α,
+        β,
+        δ,
+        max_iter,
+        competition_solution;
+        convergence_threshold = 1,
+    )
+    env = AIAPCEnv(hyperparameters)
+
+    a = InitMatrix(
+        env.price_options,
+        env.n_state_space,
+        env.δ,
+        env.competition_solution.params,
+        mode="baseline"
+    )
+    @test a[1, 1] ≈ 4.4585331170361515
+    @test a[1, 10] ≈ 4.4585331170361515
+    @test a[5, 10] ≈ 4.8434223917125605
 end
 
 @testset "Parameter / learning checks" begin
@@ -477,15 +602,15 @@ end
     policies = env |> AIAPCPolicy
 
     convergence_hook = ConvergenceCheck(1)
-    push!(convergence_hook, PostActStage(), policies[Symbol(1)], env, :player_1)
+    push!(convergence_hook, PostActStage(), policies[Symbol(1)], env, Symbol(1))
     @test convergence_hook.convergence_duration == 0
     @test convergence_hook.iterations_until_convergence == 1
-    @test convergence_hook.best_response_vector[1] == 1
+    @test convergence_hook.best_response_vector[state(env, :1)] != 0
     @test convergence_hook.is_converged != true
 
     convergence_hook_1 = ConvergenceCheck(1)
-    convergence_hook_1.best_response_vector = MVector{225,Int}(fill(1, 225))
-    push!(convergence_hook_1, PostActStage(), policies[Symbol(1)], env, :player_1)
+    convergence_hook_1.best_response_vector = MVector{225,Int}(fill(9, 225))
+    push!(convergence_hook_1, PostActStage(), policies[Symbol(1)], env, Symbol(1))
 
     @test convergence_hook.iterations_until_convergence == 1
     @test convergence_hook.convergence_duration ∈ [0, 1]

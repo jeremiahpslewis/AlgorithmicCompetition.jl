@@ -3,8 +3,8 @@ using StaticArrays
 import Base.push!
 
 mutable struct ConvergenceCheck <: AbstractHook
-    convergence_duration::Int32
-    iterations_until_convergence::Int32
+    convergence_duration::Int64
+    iterations_until_convergence::Int64
     best_response_vector::MVector{225,Int} # state x action # TODO: Fix hardcoding of n_states
     is_converged::Bool
     convergence_threshold::Int64
@@ -50,7 +50,7 @@ function Base.push!(
     table::Matrix{F},
     state_::S,
 ) where {S<:Integer,F<:AbstractFloat}
-    # Convergence is defined over argmax action for each state 
+    # Convergence is defined over argmax action for each state
     # E.g. best / greedy action
     best_action = _best_action_lookup(state_, table)
     iter_converged = (@views h.best_response_vector[state_] == best_action)

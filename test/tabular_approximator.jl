@@ -154,7 +154,7 @@ end
 #                 explorer = EpsilonGreedyExplorer(1, is_break_tie = true),
 #             ),
 #             Trajectory(
-#                 CircularArraySARTTraces(;
+#                 CircularArraySARSTraces(;
 #                     capacity = 3,
 #                     state = Int64 => (225,),
 #                     action = Int64 => (15,),
@@ -183,7 +183,7 @@ end
 #                 explorer = EpsilonGreedyExplorer(1, is_break_tie = true),
 #             ),
 #             Trajectory(
-#                 CircularArraySARTTraces(;
+#                 CircularArraySARSTraces(;
 #                     capacity = 3,
 #                     state = Int64 => (225,),
 #                     action = Int64 => (15,),

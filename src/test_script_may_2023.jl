@@ -1,5 +1,6 @@
 using Test
 using JuMP
+using JET
 using Chain
 using ReinforcementLearningCore:
     PostActStage,
@@ -54,7 +55,7 @@ using AlgorithmicCompetition:
 ξ = 0.1
 δ = 0.95
 n_prices = 15
-max_iter = Int(1e9)
+max_iter = Int(1e6)
 price_index = 1:n_prices
 
 competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
@@ -77,8 +78,10 @@ experiment = Experiment(env; stop_on_convergence = true)
 @report_opt RLBase.plan!(experiment.policy, experiment.env)
 
 @time run(hyperparams; stop_on_convergence = true);
-a = @time run(hyperparams; stop_on_convergence = false);
+a = @time run(hyperparams; stop_on_convergence = true);
 
+# @report_opt push!(hook, PostEpisodeStage(), 1.0, 1.0)
+# a.policy.agents[Symbol(1)].trajectory.container[:next_state]
 # 509.952693 seconds (8.40 G allocations: 330.871 GiB, 8.58% gc time, 0.10% compilation time)
 # 626.709955 seconds (8.60 G allocations: 333.888 GiB, 7.34% gc time, 0.10% compilation time) # with circulararraybuffers
 

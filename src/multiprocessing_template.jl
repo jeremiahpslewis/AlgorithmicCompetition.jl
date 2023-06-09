@@ -3,6 +3,9 @@ using Statistics
 using DataFrames
 using CSV
 using Distributed
+using Dates
+
+start_timestamp = now()
 n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
 
 _procs = addprocs(
@@ -18,29 +21,17 @@ _procs = addprocs(
 end
 
 @time exp_list = AlgorithmicCompetition.run_aiapc(;
-    n_parameter_iterations = 50,
-    n_parameter_increments = 30,
+    n_parameter_iterations = 25,
+    n_parameter_increments = 50,
     max_iter = Int(1e9), # TODO: increment to 1e9
 )
 
 rmprocs(_procs)
 
-α_result = [ex.α for ex in exp_list if !(ex isa Exception)]
-β_result = [ex.β for ex in exp_list if !(ex isa Exception)]
-iterations_until_convergence =
-    [ex.iterations_until_convergence[1] for ex in exp_list if !(ex isa Exception)]
+df = AlgorithmicCompetition.extract_sim_results(exp_list)
+CSV.write("simulation_results_$start_timestamp.csv", df)
 
-avg_profit_result = [ex.avg_profit[1] for ex in exp_list if !(ex isa Exception)]
-
-df = DataFrame(
-    α = α_result,
-    β = β_result,
-    π_bar = avg_profit_result,
-    iterations_until_convergence = iterations_until_convergence,
-)
-
-CSV.write("simulation_results.csv", df)
-
+df = DataFrame(CSV.File("simulation_results_$start_timestamp.csv"))
 
 using CairoMakie
 using Chain
@@ -49,13 +40,23 @@ using AlgebraOfGraphics
 
 df_summary = @chain df begin
     @groupby(:α, :β)
-    @combine(
-        :π_bar = mean(:π_bar),
-        :iterations_until_convergence = log10(mean(:iterations_until_convergence))
-    )
+    @combine(:Δ_π_bar = mean(:π_bar),
+               :iterations_until_convergence = mean(:iterations_until_convergence))
 end
 
-plt = @chain df_summary begin
-    data(_) * mapping(:β, :α, :iterations_until_convergence) * visual(Heatmap)
+plt1 = @chain df_summary begin
+    data(_) *
+    mapping(:β, :α, :Δ_π_bar) *
+    visual(Heatmap)
 end
-draw(plt)
+
+draw(plt1)
+
+plt2 = @chain df_summary begin
+    data(_) *
+    mapping(:β, :α, :iterations_until_convergence => log10) *
+    visual(Heatmap)
+end
+
+draw(plt2)
+

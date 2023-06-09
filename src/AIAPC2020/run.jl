@@ -3,6 +3,7 @@ using ReinforcementLearningEnvironments
 using Distributed
 import Base
 import ReinforcementLearningBase: RLBase
+import ReinforcementLearningCore: RLCore
 
 # Patch to improve type stability and try to speed things up (avoid generator)
 function RLBase.plan!(multiagent::MultiAgentPolicy, env::AIAPCEnv)
