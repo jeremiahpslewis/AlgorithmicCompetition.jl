@@ -15,7 +15,7 @@ function test_key_AIAPC_points(; n_parameter_iterations = 1000)
     test_params = DataFrame(
         :α => [0.08, 0.2, 0.15],
         :β => [2, 0.25, 1] .* 1e-5,
-        :iter_min => [0, 1.5e6, 0.75e6],
+        :iter_min => [0, 1.5e6, 0.5e6],
         :iter_max => [0.5e6, 1e7, 1e6],
         :Δ_π_bar_min => [0.7, 0.75, 0.8],
         :Δ_π_bar_max => [0.8, 0.85, 0.85],
@@ -62,7 +62,7 @@ _procs = addprocs(
     using AlgorithmicCompetition: run_and_extract
 end
 
-exp_df, exp_list = test_key_AIAPC_points(; n_parameter_iterations=200)
+exp_df, exp_list = test_key_AIAPC_points(; n_parameter_iterations=500)
 rmprocs(_procs)
 
 exp_diagostic = @chain exp_df begin

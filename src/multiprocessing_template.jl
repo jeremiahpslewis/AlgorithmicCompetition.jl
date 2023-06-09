@@ -28,7 +28,7 @@ end
 
 rmprocs(_procs)
 
-df = extract_sim_results(exp_list)
+df = AlgorithmicCompetition.extract_sim_results(exp_list)
 CSV.write("simulation_results_$start_timestamp.csv", df)
 
 df = DataFrame(CSV.File("simulation_results_$start_timestamp.csv"))
@@ -41,7 +41,7 @@ using AlgebraOfGraphics
 df_summary = @chain df begin
     @groupby(:α, :β)
     @combine(:Δ_π_bar = mean(:π_bar),
-               :iterations_until_convergence = log10(mean(:iterations_until_convergence)))
+               :iterations_until_convergence = mean(:iterations_until_convergence))
 end
 
 plt1 = @chain df_summary begin
@@ -54,7 +54,7 @@ draw(plt1)
 
 plt2 = @chain df_summary begin
     data(_) *
-    mapping(:β, :α, :iterations_until_convergence) *
+    mapping(:β, :α, :iterations_until_convergence => log10) *
     visual(Heatmap)
 end
 

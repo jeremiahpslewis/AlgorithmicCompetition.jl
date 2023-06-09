@@ -53,7 +53,7 @@ function AIAPCPolicy(env::AIAPCEnv)
                         γ = env.δ,
                         n = 0,
                     ),
-                    explorer = AIAPCEpsilonGreedyExplorer(env.β * 2), # TODO: Drop this hack / attempt to get conversion to behave
+                    explorer = AIAPCEpsilonGreedyExplorer(env.β), # * 2 # TODO: Drop this hack / attempt to get conversion to behave
                 ),
                 Trajectory(
                     CircularArraySARTTraces(;
@@ -65,21 +65,10 @@ function AIAPCPolicy(env::AIAPCEnv)
                     ),
                     DummySampler(),
                 ),
-                RLCore.SRT{Int64,Float64,Bool}(),
+                RT{Float64,Bool}(),
             ) for p in players(env)
         ),
     )
-
-    # Pre-fill cache with reward, terminal so that cache is filled at t=1 
-    Base.push!(aiapc_policy.agents[Symbol(1)].cache, 0.0, true)
-    Base.push!(aiapc_policy.agents[Symbol(2)].cache, 0.0, true)
-
-    Base.push!(aiapc_policy.agents[Symbol(1)].cache, 0)
-    Base.push!(aiapc_policy.agents[Symbol(2)].cache, 0)
-
-    # Pre-fill trajectory with t=0
-    Base.push!(aiapc_policy.agents[Symbol(1)].trajectory, aiapc_policy.agents[Symbol(1)].cache, 0)
-    Base.push!(aiapc_policy.agents[Symbol(2)].trajectory, aiapc_policy.agents[Symbol(2)].cache, 0)
 
     return aiapc_policy
 end
