@@ -2,7 +2,7 @@
     n_prices = 15
     n_state_space = 15^2
     app = TabularApproximator(
-        InitMatrix(n_prices, n_state_space),
+        InitMatrix(n_prices, n_state_space; mode="zero"),
         Descent(0.1),
     )
 

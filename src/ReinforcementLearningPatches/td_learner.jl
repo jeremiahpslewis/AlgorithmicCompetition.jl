@@ -35,8 +35,8 @@ RLCore.forward(
 function extract_sa(t::Traces{Tr}) where {Tr}
     # TODO: Delete this when RLTrajectories.jl is fixed
     # Hard coded to deal with index type instability in RLTrajectories.jl
-    S = t.traces[1][:state][1]
-    A = t.traces[2][:action][1]
+    S = t.traces[1][:next_state][1] # pull 'next_state' from trajectory, e.g. latest state pushed
+    A = t.traces[2][:next_action][1]
     return (S, A)
 end
 
