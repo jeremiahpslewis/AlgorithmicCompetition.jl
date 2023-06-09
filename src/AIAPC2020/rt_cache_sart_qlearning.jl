@@ -32,11 +32,16 @@ end
 function Base.push!(t::Trajectory, art::ART{R,T}, state::S) where {S,R,T}
     traces = t.container.traces
     push!(traces[1].trace, state) # Push state
-    if !isnothing(art.reward) && !isnothing(art.terminal) && !isnothing(art.action)
-        push!(traces[2], art.action)
-        push!(traces[3], art.reward)
-        push!(traces[4], art.terminal)
+
+    reward = art.reward
+    terminal = art.terminal
+    action = art.action
+    if !isnothing(reward) && !isnothing(terminal) && !isnothing(action)
+        push!(traces[2], action)
+        push!(traces[3], reward)
+        push!(traces[4], terminal)
     end
+    ReinforcementLearningTrajectories.on_insert!(t) # let trajectory know it has been updated (required for batch sampling to work)
 end
 
 function Base.push!(cache::ART{A,R,T}, action::A) where {A,R,T}

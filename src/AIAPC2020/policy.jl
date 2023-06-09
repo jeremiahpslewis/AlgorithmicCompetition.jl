@@ -64,7 +64,7 @@ function AIAPCPolicy(env::AIAPCEnv)
                         terminal = Bool => (),
                     ),
                     DummySampler(),
-                    InsertSampleRatioController(threshold = -1),
+                    InsertSampleRatioController(),
                 ),
                 ART{Int,Float64,Bool}(),
             ) for p in players(env)
