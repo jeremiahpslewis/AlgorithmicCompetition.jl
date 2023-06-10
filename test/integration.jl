@@ -174,7 +174,7 @@ end
         convergence_threshold = 1,
     )
     env = AIAPCEnv(hyperparameters)
-    
+
     test_prices = Q_i_0(env.price_options, env.δ, env.competition_solution.params)
     @test minimum(test_prices) == 4.070906600373279
     @test maximum(test_prices) == 4.61282553058293
@@ -218,7 +218,7 @@ end
     # t=2
     push!(policy, PreEpisodeStage(), env)
     push!(policy, PreActStage(), env)
-    @test length(policy.agents[Symbol(1)].trajectory.container) == 1 
+    @test length(policy.agents[Symbol(1)].trajectory.container) == 1
     optimise!(policy, PreActStage())
     approx_table_t_2 = copy(policy.agents[Symbol(1)].policy.learner.approximator.table)
     @test approx_table_t_2 != approx_table_t_1 # test that optimise! in t=2 is not a noop   
@@ -238,7 +238,7 @@ end
     optimise!(policy, PreActStage())
     approx_table_t_3 = copy(policy.agents[Symbol(1)].policy.learner.approximator.table)
     @test approx_table_t_2 != approx_table_t_3 # test that optimise! in t=2 is not a noop
-    action = RLBase.plan!(policy, env) 
+    action = RLBase.plan!(policy, env)
     act!(env, action)
     push!(policy, PostActStage(), env)
     reward_3 = copy(policy.agents[Symbol(1)].cache.reward)
@@ -273,9 +273,9 @@ end
 
     c_out = run(hyperparameters; stop_on_convergence = true)
     # ensure that the policy is updated by the learner
-    @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table; dims=2) != 0
-    state_sum = sum(c_out.policy[Symbol(1)].policy.learner.approximator.table;dims=1)
-    @test !all(y->y==state_sum[1], state_sum)
+    @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table; dims = 2) != 0
+    state_sum = sum(c_out.policy[Symbol(1)].policy.learner.approximator.table; dims = 1)
+    @test !all(y -> y == state_sum[1], state_sum)
     @test length(reward(c_out.env)) == 2
     @test length(reward(c_out.env, 1)) == 1
 
@@ -417,7 +417,7 @@ end
         env.n_state_space,
         env.δ,
         env.competition_solution.params,
-        mode="baseline"
+        mode = "baseline",
     )
     @test a[1, 1] ≈ 4.070906600373279
     @test a[1, 10] ≈ 4.070906600373279

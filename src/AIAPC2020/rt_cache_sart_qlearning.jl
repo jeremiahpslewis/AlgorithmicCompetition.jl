@@ -8,7 +8,7 @@ mutable struct ART{A,R,T}
     terminal::Union{T,Nothing}
 
     function ART()
-        new{Any, Any, Any}(nothing, nothing, nothing)
+        new{Any,Any,Any}(nothing, nothing, nothing)
     end
 
     function ART{A,R,T}() where {A,R,T}

@@ -52,8 +52,8 @@ function _optimise!(
     a::I3,
     r::F,
 ) where {I1<:Number,I2<:Number,I3<:Number,Ar<:AbstractArray,F<:AbstractFloat,O}
-        α = app.optimizer.eta
-        Q!(app, s, s_next, a, α, r, γ)
+    α = app.optimizer.eta
+    Q!(app, s, s_next, a, α, r, γ)
 end
 
 function RLBase.optimise!(L::TDLearnerSARS{Ap,F,I}, t::Traces{Tr}) where {Ap,F,I,Tr}

@@ -40,23 +40,20 @@ using AlgebraOfGraphics
 
 df_summary = @chain df begin
     @groupby(:α, :β)
-    @combine(:Δ_π_bar = mean(:π_bar),
-               :iterations_until_convergence = mean(:iterations_until_convergence))
+    @combine(
+        :Δ_π_bar = mean(:π_bar),
+        :iterations_until_convergence = mean(:iterations_until_convergence)
+    )
 end
 
 plt1 = @chain df_summary begin
-    data(_) *
-    mapping(:β, :α, :Δ_π_bar) *
-    visual(Heatmap)
+    data(_) * mapping(:β, :α, :Δ_π_bar) * visual(Heatmap)
 end
 
 draw(plt1)
 
 plt2 = @chain df_summary begin
-    data(_) *
-    mapping(:β, :α, :iterations_until_convergence => log10) *
-    visual(Heatmap)
+    data(_) * mapping(:β, :α, :iterations_until_convergence => log10) * visual(Heatmap)
 end
 
 draw(plt2)
-
