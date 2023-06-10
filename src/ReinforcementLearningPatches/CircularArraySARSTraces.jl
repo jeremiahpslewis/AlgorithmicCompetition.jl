@@ -13,15 +13,15 @@ const CircularArraySARSTraces = Traces{
         <:Trace{<:CircularArrayBuffer},
         <:Trace{<:CircularArrayBuffer},
         <:Trace{<:CircularArrayBuffer},
-    }
+    },
 }
 
 function CircularArraySARSTraces(;
     capacity::Int,
-    state=Int => (),
-    action=Int => (),
-    reward=Float32 => (),
-    terminal=Bool => ()
+    state = Int => (),
+    action = Int => (),
+    reward = Float32 => (),
+    terminal = Bool => (),
 )
     state_eltype, state_size = state
     action_eltype, action_size = action
@@ -30,10 +30,11 @@ function CircularArraySARSTraces(;
 
     MultiplexTraces{SS′}(CircularArrayBuffer{state_eltype}(state_size..., capacity + 1)) +
     Traces(
-        action=CircularArrayBuffer{action_eltype}(action_size..., capacity),
-        reward=CircularArrayBuffer{reward_eltype}(reward_size..., capacity),
-        terminal=CircularArrayBuffer{terminal_eltype}(terminal_size..., capacity),
+        action = CircularArrayBuffer{action_eltype}(action_size..., capacity),
+        reward = CircularArrayBuffer{reward_eltype}(reward_size..., capacity),
+        terminal = CircularArrayBuffer{terminal_eltype}(terminal_size..., capacity),
     )
 end
 
-CircularArrayBuffers.capacity(t::CircularArraySARSTraces) = CircularArrayBuffers.capacity(t.traces[end])
+CircularArrayBuffers.capacity(t::CircularArraySARSTraces) =
+    CircularArrayBuffers.capacity(t.traces[end])
