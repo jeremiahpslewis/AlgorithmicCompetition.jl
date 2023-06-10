@@ -23,6 +23,12 @@ function Base.push!(multiagent::MultiAgentPolicy, ::PreActStage, env::AIAPCEnv)
     end
 end
 
+function Base.push!(multiagent::MultiAgentPolicy, ::PostActStage, env::AIAPCEnv)
+    for player in players(env)
+        push!(multiagent[player].cache, reward(env, player), is_terminated(env))
+    end
+end
+
 function RLBase.plan!(agent::Agent{P,T,C}, env::AIAPCEnv, p::Symbol) where {P,T,C}
     action = RLBase.plan!(agent.policy, env, p)
     push!(agent.cache, action)
