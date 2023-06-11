@@ -112,6 +112,7 @@ function construct_profit_array(
     profit_array = zeros(Float64, n_prices, n_prices, n_players)
     for k = 1:n_players
         for (i, j) in action_space
+            # TODO: Check that player assignment is correct here (should be...?)
             profit_array[i, j, k] = π(price_options[i], price_options[j], params)[k]
         end
     end

@@ -48,7 +48,8 @@ using AlgorithmicCompetition:
     get_ϵ,
     AIAPCEpsilonGreedyExplorer,
     AIAPCSummary,
-    TDLearner
+    TDLearner,
+    economic_summary
 using Distributed
 
 @testset "Prepackaged Environment Tests" begin
@@ -317,6 +318,47 @@ end
     @test (sum(experiments[1].avg_profit .> 1) + sum(experiments[1].avg_profit .< 0)) == 0
     @test experiments[1].avg_profit[1] != experiments[1].avg_profit[2]
     @test all(experiments[1].is_converged)
+end
+
+@testset "Profit gain check" begin
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
+    competition_solution = CompetitionSolution(competition_params)
+
+    env =
+        AIAPCHyperParameters(
+            Float64(0.1),
+            Float64(1e-4),
+            0.95,
+            Int(1e7),
+            competition_solution,
+        ) |> AIAPCEnv
+    exper = Experiment(env)
+
+    # Find the Nash equilibrium profit
+    params = env.competition_solution.params
+    p_Bert_nash_equilibrium = exper.env.p_Bert_nash_equilibrium
+    π_nash =  π(p_Bert_nash_equilibrium, p_Bert_nash_equilibrium, params)[1]
+
+    for i in 1:exper.hook[Symbol(1)].hooks[1].rewards.capacity
+        push!(exper.hook[Symbol(1)].hooks[1].rewards, π_nash)
+        push!(exper.hook[Symbol(2)].hooks[1].rewards, 0)
+    end
+
+    ec_summary_ = economic_summary(exper)
+    @test round(profit_gain(ec_summary_.avg_profit[1], env); digits=2) == 0
+    @test round(profit_gain(ec_summary_.avg_profit[2], env); digits=2) < 0
+
+    p_monop_opt = exper.env.p_monop_opt
+    π_monop =  π(p_monop_opt, p_monop_opt, params)[1]
+
+    for i in 1:exper.hook[Symbol(1)].hooks[1].rewards.capacity
+        push!(exper.hook[Symbol(1)].hooks[1].rewards, π_monop)
+        push!(exper.hook[Symbol(2)].hooks[1].rewards, 0)
+    end
+
+    ec_summary_ = economic_summary(exper)
+    @test round(profit_gain(ec_summary_.avg_profit[1], env); digits=2) == 1
+    @test round(profit_gain(ec_summary_.avg_profit[2], env); digits=2) < 0
 end
 
 @testset "CompetitionParameters" begin
