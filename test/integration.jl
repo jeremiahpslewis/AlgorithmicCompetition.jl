@@ -251,8 +251,8 @@ end
 end
 
 @testset "run full AIAPC simulation (with full convergence threshold)" begin
-    α = Float64(0.125)
-    β = Float64(1e-5)
+    α = Float64(0.075)
+    β = Float64(0.25e-5)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -272,10 +272,15 @@ end
         competition_solution
     )
 
-    c_out = run(hyperparameters; stop_on_convergence = true)
+    profit_gain_max = 0
+    i = 0
+    while profit_gain_max <= 0.82 && i < 5
+        i += 1
+        c_out = run(hyperparameters; stop_on_convergence = true)
+        profit_gain_max = maximum(profit_gain.(economic_summary(c_out).avg_profit, c_out.env))
+    end
+    @test profit_gain_max > 0.82
 
-    profit_gain(mean(economic_summary(c_out).avg_profit), c_out.env)
-    c_out.hook[Symbol(1)][1]
 end
 
 @testset "run full AIAPC simulation" begin
