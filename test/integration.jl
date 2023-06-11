@@ -274,10 +274,10 @@ end
 
     profit_gain_max = 0
     i = 0
-    while profit_gain_max <= 0.82 && i < 5
+    while (profit_gain_max <= 0.82) && (i < 5)
         i += 1
         c_out = run(hyperparameters; stop_on_convergence = true)
-        profit_gain_max = maximum(profit_gain.(economic_summary(c_out).avg_profit, c_out.env))
+        profit_gain_max = maximum(profit_gain(economic_summary(c_out).avg_profit, c_out.env))
     end
     @test profit_gain_max > 0.82
 
