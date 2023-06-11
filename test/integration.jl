@@ -49,7 +49,8 @@ using AlgorithmicCompetition:
     AIAPCEpsilonGreedyExplorer,
     AIAPCSummary,
     TDLearner,
-    economic_summary
+    economic_summary,
+    profit_gain
 using Distributed
 
 @testset "Prepackaged Environment Tests" begin
@@ -249,6 +250,34 @@ end
     @test cache_2.action != cache_3.action
 end
 
+@testset "run full AIAPC simulation (with full convergence threshold)" begin
+    α = Float64(0.125)
+    β = Float64(1e-5)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = Int(1e9)
+    price_index = 1:n_prices
+
+    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
+
+    competition_solution = CompetitionSolution(competition_params)
+
+    hyperparameters = AIAPCHyperParameters(
+        α,
+        β,
+        δ,
+        max_iter,
+        competition_solution
+    )
+
+    c_out = run(hyperparameters; stop_on_convergence = true)
+
+    profit_gain(mean(economic_summary(c_out).avg_profit), c_out.env)
+    c_out.hook[Symbol(1)][1]
+end
+
 @testset "run full AIAPC simulation" begin
     α = Float64(0.125)
     β = Float64(1e-5)
@@ -337,8 +366,10 @@ end
     # Find the Nash equilibrium profit
     params = env.competition_solution.params
     p_Bert_nash_equilibrium = exper.env.p_Bert_nash_equilibrium
+    π_min_price =  π(minimum(exper.env.price_options), minimum(exper.env.price_options), params)[1]
+    
     π_nash =  π(p_Bert_nash_equilibrium, p_Bert_nash_equilibrium, params)[1]
-
+    @test π_nash > π_min_price
     for i in 1:exper.hook[Symbol(1)].hooks[1].rewards.capacity
         push!(exper.hook[Symbol(1)].hooks[1].rewards, π_nash)
         push!(exper.hook[Symbol(2)].hooks[1].rewards, 0)
@@ -350,6 +381,8 @@ end
 
     p_monop_opt = exper.env.p_monop_opt
     π_monop =  π(p_monop_opt, p_monop_opt, params)[1]
+    π_max_price =  π(maximum(exper.env.price_options), maximum(exper.env.price_options), params)[1]
+    @test π_max_price < π_monop
 
     for i in 1:exper.hook[Symbol(1)].hooks[1].rewards.capacity
         push!(exper.hook[Symbol(1)].hooks[1].rewards, π_monop)
