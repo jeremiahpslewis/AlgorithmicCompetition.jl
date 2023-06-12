@@ -264,20 +264,15 @@ end
 
     competition_solution = CompetitionSolution(competition_params)
 
-    hyperparameters = AIAPCHyperParameters(
-        α,
-        β,
-        δ,
-        max_iter,
-        competition_solution
-    )
+    hyperparameters = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution)
 
     profit_gain_max = 0
     i = 0
     while (profit_gain_max <= 0.82) && (i < 5)
         i += 1
         c_out = run(hyperparameters; stop_on_convergence = true)
-        profit_gain_max = maximum(profit_gain(economic_summary(c_out).avg_profit, c_out.env))
+        profit_gain_max =
+            maximum(profit_gain(economic_summary(c_out).avg_profit, c_out.env))
     end
     @test profit_gain_max > 0.82
 
@@ -371,32 +366,34 @@ end
     # Find the Nash equilibrium profit
     params = env.competition_solution.params
     p_Bert_nash_equilibrium = exper.env.p_Bert_nash_equilibrium
-    π_min_price =  π(minimum(exper.env.price_options), minimum(exper.env.price_options), params)[1]
-    
-    π_nash =  π(p_Bert_nash_equilibrium, p_Bert_nash_equilibrium, params)[1]
+    π_min_price =
+        π(minimum(exper.env.price_options), minimum(exper.env.price_options), params)[1]
+
+    π_nash = π(p_Bert_nash_equilibrium, p_Bert_nash_equilibrium, params)[1]
     @test π_nash > π_min_price
-    for i in 1:exper.hook[Symbol(1)].hooks[1].rewards.capacity
+    for i = 1:exper.hook[Symbol(1)].hooks[1].rewards.capacity
         push!(exper.hook[Symbol(1)].hooks[1].rewards, π_nash)
         push!(exper.hook[Symbol(2)].hooks[1].rewards, 0)
     end
 
     ec_summary_ = economic_summary(exper)
-    @test round(profit_gain(ec_summary_.avg_profit[1], env); digits=2) == 0
-    @test round(profit_gain(ec_summary_.avg_profit[2], env); digits=2) < 0
+    @test round(profit_gain(ec_summary_.avg_profit[1], env); digits = 2) == 0
+    @test round(profit_gain(ec_summary_.avg_profit[2], env); digits = 2) < 0
 
     p_monop_opt = exper.env.p_monop_opt
-    π_monop =  π(p_monop_opt, p_monop_opt, params)[1]
-    π_max_price =  π(maximum(exper.env.price_options), maximum(exper.env.price_options), params)[1]
+    π_monop = π(p_monop_opt, p_monop_opt, params)[1]
+    π_max_price =
+        π(maximum(exper.env.price_options), maximum(exper.env.price_options), params)[1]
     @test π_max_price < π_monop
 
-    for i in 1:exper.hook[Symbol(1)].hooks[1].rewards.capacity
+    for i = 1:exper.hook[Symbol(1)].hooks[1].rewards.capacity
         push!(exper.hook[Symbol(1)].hooks[1].rewards, π_monop)
         push!(exper.hook[Symbol(2)].hooks[1].rewards, 0)
     end
 
     ec_summary_ = economic_summary(exper)
-    @test round(profit_gain(ec_summary_.avg_profit[1], env); digits=2) == 1
-    @test round(profit_gain(ec_summary_.avg_profit[2], env); digits=2) < 0
+    @test round(profit_gain(ec_summary_.avg_profit[1], env); digits = 2) == 1
+    @test round(profit_gain(ec_summary_.avg_profit[2], env); digits = 2) < 0
 end
 
 @testset "CompetitionParameters" begin
