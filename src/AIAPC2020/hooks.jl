@@ -118,8 +118,8 @@ function AIAPCHook(env::AbstractEnv)
     MultiAgentHook(
         NamedTuple(
             p => ComposedHook(
-                TotalRewardPerEpisode(; is_display_on_exit = false),
-                # TotalRewardPerEpisodeLastN(; max_steps = env.convergence_threshold + 100),
+                # TotalRewardPerEpisode(; is_display_on_exit = false),
+                TotalRewardPerEpisodeLastN(; max_steps = env.convergence_threshold + 100),
                 # TODO: MultiAgent version of TotalRewardPerEpisode / better player handling for hooks
                 ConvergenceCheck(env.convergence_threshold),
             ) for p in players(env)
