@@ -49,7 +49,7 @@ function AIAPCEpsilonGreedyExplorer(β::F) where {F<:AbstractFloat}
     AIAPCEpsilonGreedyExplorer{typeof(Random.GLOBAL_RNG),F}(
         β,
         β * -1,
-        1,
+        Int[1],
         Random.GLOBAL_RNG,
         F[1],
     )
