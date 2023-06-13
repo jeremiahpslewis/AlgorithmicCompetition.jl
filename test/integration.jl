@@ -497,12 +497,10 @@ end
     env = AIAPCEnv(hyperparameters)
 
     a = InitMatrix(
-        env.price_options,
-        env.n_state_space,
-        env.δ,
-        env.competition_solution.params,
+        env;
         mode = "baseline",
     )
+    @test mean(a) ≈ 4.475577002635275 # Check this...
     @test a[1, 1] ≈ 4.070906600373279
     @test a[1, 10] ≈ 4.070906600373279
     @test a[5, 10] ≈ 4.521381412143576

@@ -24,21 +24,22 @@ function Q_i_0(
     Q_i_0.(price_options, (price_options,), δ, (params,))
 end
 
-function InitMatrix(n_prices, n_state_space; mode = "zero")
-    @assert mode == "zero" "Only baseline mode is supported"
-    return zeros(n_prices, n_state_space)
-end
+"""
+    InitMatrix(env::AIAPCEnv, mode = "zero")
 
-function InitMatrix(
-    price_options::SVector{15,Float64},
-    n_state_space::Int64,
-    δ::Float64,
-    params::CompetitionParameters;
-    mode = "baseline",
-)
-    @assert mode == "baseline" "Only baseline mode is supported"
-    opponent_randomizes_expected_profit = Q_i_0(price_options, δ, params)
-    return repeat(opponent_randomizes_expected_profit, 1, n_state_space)
+Initialize the Q-matrix for the AIAPC environment.
+"""
+function InitMatrix(env::AIAPCEnv; mode = "zero")
+    if mode == "zero"
+        return zeros(env.n_prices, env.n_state_space)
+    elseif mode == "baseline"
+        opponent_randomizes_expected_profit = Q_i_0(env.price_options, env.δ, env.competition_solution.params)
+        return repeat(opponent_randomizes_expected_profit, 1, env.n_state_space)
+    elseif mode == "constant"
+        return fill(5, env.n_prices, env.n_state_space)
+    else
+        @assert false "Unknown mode"
+    end
 end
 
 function AIAPCPolicy(env::AIAPCEnv)
@@ -50,10 +51,7 @@ function AIAPCPolicy(env::AIAPCEnv)
                         # TabularQApproximator with specified init matrix
                         approximator = TabularApproximator(
                             InitMatrix(
-                                env.price_options,
-                                env.n_state_space,
-                                env.δ,
-                                env.competition_solution.params,
+                                env,
                                 mode = "baseline",
                             ),
                             Descent(env.α),
