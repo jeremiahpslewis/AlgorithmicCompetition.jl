@@ -37,10 +37,10 @@ using DataStructures: CircularBuffer
 # This one has: 59.003 ns (1 allocation: 16 bytes)
 # Well worth looking into optimizations for RLCore
 # TODO evaluate performance cost of checking all values for max, perhaps only do this in the beginning?
-mutable struct AIAPCEpsilonGreedyExplorer{R,F<:AbstractFloat} <: AbstractExplorer
+struct AIAPCEpsilonGreedyExplorer{R,F<:AbstractFloat} <: AbstractExplorer
     β::F
     β_neg::F
-    step::Int
+    step::Vector{Int}
     rng::R
     maximum_placeholder::Vector{F}
 end
@@ -50,14 +50,13 @@ function AIAPCEpsilonGreedyExplorer(β::F) where {F<:AbstractFloat}
         β,
         β * -1,
         1,
-        0,
         Random.GLOBAL_RNG,
         F[1],
     )
 end
 
 function get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}, step) where {F<:AbstractFloat}
-    exp(s.β_neg * step) # This yields a different result (same result, but at 2x step count) than in the paper for 100k steps, but the same convergece duration at α and β midpoints 850k (pg. 13)
+    exp(s.β_neg * step[1]) # This yields a different result (same result, but at 2x step count) than in the paper for 100k steps, but the same convergece duration at α and β midpoints 850k (pg. 13)
 end
 
 get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}) where {F<:AbstractFloat} = get_ϵ(s, s.step)
@@ -74,7 +73,7 @@ function RLBase.plan!(
 ) where {F<:AbstractFloat}
     # NOTE: use of legal_action_space_mask as full_action_space is a bit of a hack, won't work in other cases
     ϵ = get_ϵ(s)
-    s.step += 1
+    s.step[1] += 1
     if rand(s.rng) < ϵ
         return rand(s.rng, full_action_space)
     else

@@ -73,7 +73,7 @@ _procs = addprocs(
     using AlgorithmicCompetition: run_and_extract
 end
 
-exp_df, exp_list = test_key_AIAPC_points(; n_parameter_iterations = 50)
+exp_df, exp_list = test_key_AIAPC_points(; n_parameter_iterations = 5)
 rmprocs(_procs)
 
 exp_diagostic = @chain exp_df begin
