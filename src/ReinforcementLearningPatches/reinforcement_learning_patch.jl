@@ -56,7 +56,9 @@ function AIAPCEpsilonGreedyExplorer(β::F) where {F<:AbstractFloat}
 end
 
 function get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}, step) where {F<:AbstractFloat}
-    exp(s.β_neg * step[1]) # This yields a different result (same result, but at 2x step count) than in the paper for 100k steps, but the same convergece duration at α and β midpoints 850k (pg. 13)
+    exp(s.β_neg * step[1])
+    
+    # This yields a different result (same result, but at 2x step count) than in the paper for 100k steps, but the same convergece duration at α and β midpoints 850k (pg. 13)
 end
 
 get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}) where {F<:AbstractFloat} = get_ϵ(s, s.step)

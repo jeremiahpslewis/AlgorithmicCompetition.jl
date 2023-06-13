@@ -11,7 +11,7 @@ struct AIAPCSummary
     α::Float64
     β::Float64
     is_converged::Vector{Bool}
-    avg_profit::Vector{Float64}
+    convergence_profit::Vector{Float64}
     iterations_until_convergence::Vector{Int64}
 end
 
@@ -33,12 +33,12 @@ function economic_summary(env::AbstractEnv, hook::AbstractHook)
         hook[player][2].iterations_until_convergence for player in [Symbol(1), Symbol(2)]
     ]
 
-    avg_profit = Float64[]
+    convergence_profit = Float64[]
     is_converged = Bool[]
 
     for i in (Symbol(1), Symbol(2))
-        @chain hook[i][1].rewards[(end-convergence_threshold):end] begin
-            push!(avg_profit, mean(_))
+        @chain hook[i][1].rewards[end] begin # log profits in last episode as convergence profit
+            push!(convergence_profit, mean(_))
         end
 
         push!(is_converged, hook[i][2].is_converged)
@@ -48,7 +48,7 @@ function economic_summary(env::AbstractEnv, hook::AbstractHook)
         env.α,
         env.β,
         is_converged,
-        avg_profit,
+        convergence_profit,
         iterations_until_convergence,
     )
 end
@@ -59,7 +59,7 @@ function extract_sim_results(exp_list::Vector{AIAPCSummary})
     iterations_until_convergence =
         [ex.iterations_until_convergence[1] for ex in exp_list if !(ex isa Exception)]
 
-    avg_profit_result = [mean(ex.avg_profit) for ex in exp_list if !(ex isa Exception)]
+    avg_profit_result = [mean(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
 
     df = DataFrame(
         α = α_result,
