@@ -41,7 +41,6 @@ mutable struct AIAPCEpsilonGreedyExplorer{R,F<:AbstractFloat} <: AbstractExplore
     β::F
     β_neg::F
     step::Int
-    aiapc_step_adjustment::Int
     rng::R
     maximum_placeholder::Vector{F}
 end
@@ -58,8 +57,7 @@ function AIAPCEpsilonGreedyExplorer(β::F) where {F<:AbstractFloat}
 end
 
 function get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}, step) where {F<:AbstractFloat}
-    exp(s.β_neg * (step - s.aiapc_step_adjustment)) # This yields a different result (same result, but at 2x step count) than in the paper for 100k steps, but the same convergece duration at α and β midpoints 850k (pg. 13)
-    # NOTE: There seems to be a coding error in the paper, in which the step count is not incremented if the 'best' / greedy action is taken, only if a random (exploration) action is taken
+    exp(s.β_neg * step) # This yields a different result (same result, but at 2x step count) than in the paper for 100k steps, but the same convergece duration at α and β midpoints 850k (pg. 13)
 end
 
 get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}) where {F<:AbstractFloat} = get_ϵ(s, s.step)
@@ -78,9 +76,6 @@ function RLBase.plan!(
     ϵ = get_ϵ(s)
     s.step += 1
     if rand(s.rng) < ϵ
-        # There seems to be a coding error in the paper, in which the step count is not incremented if the 'best' / greedy action is taken, only if a random (exploration) action is taken, so we count the number of times we take a random action and subtract this from the step count
-        s.aiapc_step_adjustment += 1
-
         return rand(s.rng, full_action_space)
     else
         max_vals = find_all_max_(values, s.maximum_placeholder)
