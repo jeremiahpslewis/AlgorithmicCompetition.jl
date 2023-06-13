@@ -7,12 +7,19 @@ function run_aiapc(;
     n_parameter_increments = 100,
     max_iter = Int(1e9),
     convergence_threshold = Int(1e5),
+    max_alpha = 0.25,
+    max_beta = 2,
 )
     competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
     competition_solution = CompetitionSolution(competition_params)
 
     α_ = Float64.(range(0.0025, 0.25, n_parameter_increments))
     β_ = Float64.(range(0.025, 2, n_parameter_increments)) * 1e-5
+
+    # Filter params based on max_alpha and max_beta values
+    α_ = α_[α_ .<= max_alpha]
+    β_ = β_[β_ .<= max_beta]
+
     δ = 0.95
 
     hyperparameter_vect = [
