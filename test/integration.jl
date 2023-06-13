@@ -402,6 +402,13 @@ end
 end
 
 @testset "Q" begin
+    params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
+    p_ = [1, 1]
+    logit_demand = exp.((params.a .- p_) ./ params.μ)
+    q_logit_demand = logit_demand / (sum(exp.((params.a .- p_) ./ params.μ)) + exp(params.a_0 / params.μ))
+    
+    Q(p_[1], p_[2], params) == q_logit_demand
+    
     @test Q(1.47293, 1.47293, CompetitionParameters(0.25, 0, (2, 2), (1, 1))) ≈
           fill(0.47138, 2) atol = 0.01
     @test Q(1.92498, 1.92498, CompetitionParameters(0.25, 0, (2, 2), (1, 1))) ≈
