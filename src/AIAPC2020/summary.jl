@@ -63,7 +63,7 @@ function economic_summary(env::AbstractEnv, policy::MultiAgentPolicy, hook::Abst
 
     is_converged = Bool[]
 
-    convergence_profit = get_convergence_profit_from_env(env)
+    convergence_profit = get_convergence_profit_from_env(env, policy)
 
     for i in (Symbol(1), Symbol(2))
         push!(is_converged, hook[i][2].is_converged)
