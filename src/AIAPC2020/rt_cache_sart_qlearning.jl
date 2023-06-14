@@ -16,16 +16,11 @@ mutable struct ART{A,R,T}
     end
 end
 
-function Base.push!(multiagent::MultiAgentPolicy, ::PreActStage, env::AIAPCEnv)
-    for player in players(env)
-        agent = multiagent[player]
-        push!(agent.trajectory, agent.cache, state(env, player))
-    end
-end
-
 function Base.push!(multiagent::MultiAgentPolicy, ::PostActStage, env::AIAPCEnv)
     for player in players(env)
-        push!(multiagent[player].cache, reward(env, player), is_terminated(env))
+        agent = multiagent[player]
+        push!(agent.cache, reward(env, player), is_terminated(env))
+        push!(agent.trajectory, agent.cache, state(env, player))
     end
 end
 

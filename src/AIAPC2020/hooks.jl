@@ -41,6 +41,11 @@ function Base.push!(
     return
 end
 
+"""
+    _best_action_lookup(state_, table)
+
+Look up the best action for a given state in the q-value matrix
+"""
 function _best_action_lookup(state_, table)
     @views argmax(table[:, state_])
 end

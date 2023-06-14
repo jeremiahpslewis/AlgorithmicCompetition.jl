@@ -31,8 +31,6 @@ using AlgorithmicCompetition:
     solve_bertrand,
     p_BR,
     construct_state_space_lookup,
-    map_vect_to_int,
-    map_int_to_vect,
     construct_profit_array,
     Q,
     run,
@@ -44,13 +42,15 @@ using AlgorithmicCompetition:
     AIAPCEpsilonGreedyExplorer,
     AIAPCSummary,
     TDLearner,
-    TabularApproximator
+    TabularApproximator,
+    economic_summary,
+    extract_sim_results
 # using JET
 # using ProfileView
-# using Distributed
+using Distributed
 
 α = Float64(0.125)
-β = Float64(1e-5)
+β = Float64(4e-6)
 δ = 0.95
 ξ = 0.1
 δ = 0.95
@@ -78,7 +78,14 @@ experiment = Experiment(env; stop_on_convergence = true)
 @report_opt RLBase.plan!(experiment.policy, experiment.env)
 
 @time run(hyperparams; stop_on_convergence = true);
-a = @time run(hyperparams; stop_on_convergence = true);
+a = @time run(hyperparams; stop_on_convergence = true)
+
+# for i in 1:20
+#     a = run(hyperparams; stop_on_convergence = true)
+# end
+
+a_list = run_and_extract.(repeat([hyperparams], 10))
+mean(profit_gain.([g.convergence_profit for g in a_list], (a.env,)))
 
 # @report_opt push!(hook, PostEpisodeStage(), 1.0, 1.0)
 # a.policy.agents[Symbol(1)].trajectory.container[:next_state]

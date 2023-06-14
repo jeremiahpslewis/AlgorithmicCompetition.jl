@@ -2,7 +2,7 @@
 
 julia_version = "1.10.0-DEV"
 manifest_format = "2.0"
-project_hash = "119567cfc77998d90dbf34b8d2724ee64c81fed5"
+project_hash = "6e89615740ab8d9a85702ad4042138ec353594da"
 
 [[deps.ASL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -317,7 +317,7 @@ weakdeps = ["Dates", "LinearAlgebra"]
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "1.0.2+0"
+version = "1.0.5+0"
 
 [[deps.CompositeTypes]]
 git-tree-sha1 = "02d2316b7ffceff992f3096ae48c7829a8aa0638"

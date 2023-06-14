@@ -33,8 +33,6 @@ using AlgorithmicCompetition:
     solve_bertrand,
     p_BR,
     construct_state_space_lookup,
-    map_vect_to_int,
-    map_int_to_vect,
     construct_profit_array,
     Q,
     Q!,
@@ -103,22 +101,6 @@ end
     # Best response function matches AIAPC 2020
     @test p_BR(1.47293, params) ≈ 1.47293 atol = 1e6
 end
-
-@testset "map_vect_to_int" begin
-    n_prices = 15
-    n_players = 2
-    memory_length = 1
-    n_state_space = n_prices^(n_players * memory_length)
-    @test map_vect_to_int(repeat([n_prices], n_players), n_prices) - n_prices ==
-          n_state_space
-    @test map_vect_to_int(Array{Int,2}(repeat([n_prices], n_players)'), n_prices) -
-          n_prices == n_state_space
-end
-
-@testset "construct_state_space_lookup" begin
-    @test construct_state_space_lookup(((1, 1), (1, 2), (2, 1), (2, 2)), 2) == [1 3; 2 4]
-end
-
 
 @testset "Policy operation test" begin
     α = Float64(0.125)
@@ -200,6 +182,7 @@ end
     # First three rounds
 
     # t=1
+    push!(policy[Symbol(1)].trajectory, policy[Symbol(1)].cache, state(env, Symbol(1)))
     push!(policy, PreEpisodeStage(), env)
     push!(policy, PreActStage(), env)
     @test policy.agents[Symbol(1)].cache.reward == nothing
@@ -212,6 +195,8 @@ end
     act!(env, action)
     @test length(policy.agents[Symbol(1)].trajectory.container) == 0 # test that trajectory has not been filled
     push!(policy, PostActStage(), env)
+    @test length(policy.agents[Symbol(1)].trajectory.container) == 1
+    optimise!(policy, PostActStage())
     reward_1 = copy(policy.agents[Symbol(1)].cache.reward)
     @test reward_1 != 0
     push!(policy, PostEpisodeStage(), env)
@@ -227,6 +212,7 @@ end
     action = RLBase.plan!(policy, env)
     act!(env, action)
     push!(policy, PostActStage(), env)
+    optimise!(policy, PostActStage())
     reward_2 = copy(policy.agents[Symbol(1)].cache.reward)
     @test reward_2 != reward_1
     push!(policy, PostEpisodeStage(), env)
@@ -243,6 +229,7 @@ end
     action = RLBase.plan!(policy, env)
     act!(env, action)
     push!(policy, PostActStage(), env)
+    optimise!(policy, PostActStage())
     reward_3 = copy(policy.agents[Symbol(1)].cache.reward)
     @test reward_3 != reward_2
     push!(policy, PostEpisodeStage(), env)
@@ -272,7 +259,7 @@ end
         i += 1
         c_out = run(hyperparameters; stop_on_convergence = true)
         profit_gain_max =
-            maximum(profit_gain(economic_summary(c_out).avg_profit, c_out.env))
+            maximum(profit_gain(economic_summary(c_out).convergence_profit, c_out.env))
     end
     @test profit_gain_max > 0.82
 
@@ -344,8 +331,8 @@ end
 
     @test experiments[1] isa AIAPCSummary
     @test all(10 < experiments[1].iterations_until_convergence[i] < max_iter for i = 1:2)
-    @test (sum(experiments[1].avg_profit .> 1) + sum(experiments[1].avg_profit .< 0)) == 0
-    @test experiments[1].avg_profit[1] != experiments[1].avg_profit[2]
+    @test (sum(experiments[1].convergence_profit .> 1) + sum(experiments[1].convergence_profit .< 0)) == 0
+    @test experiments[1].convergence_profit[1] != experiments[1].convergence_profit[2]
     @test all(experiments[1].is_converged)
 end
 
@@ -377,8 +364,8 @@ end
     end
 
     ec_summary_ = economic_summary(exper)
-    @test round(profit_gain(ec_summary_.avg_profit[1], env); digits = 2) == 0
-    @test round(profit_gain(ec_summary_.avg_profit[2], env); digits = 2) < 0
+    @test round(profit_gain(ec_summary_.convergence_profit[1], env); digits = 2) == 0
+    @test round(profit_gain(ec_summary_.convergence_profit[2], env); digits = 2) < 0
 
     p_monop_opt = exper.env.p_monop_opt
     π_monop = π(p_monop_opt, p_monop_opt, params)[1]
@@ -392,8 +379,8 @@ end
     end
 
     ec_summary_ = economic_summary(exper)
-    @test round(profit_gain(ec_summary_.avg_profit[1], env); digits = 2) == 1
-    @test round(profit_gain(ec_summary_.avg_profit[2], env); digits = 2) < 0
+    @test round(profit_gain(ec_summary_.convergence_profit[1], env); digits = 2) == 1
+    @test round(profit_gain(ec_summary_.convergence_profit[2], env); digits = 2) < 0
 end
 
 @testset "CompetitionParameters" begin
@@ -455,21 +442,10 @@ end
     price_options = env.price_options
     action_space_ = env.action_space
     profit_array =
-        construct_profit_array(action_space_, price_options, competition_solution.params, 2)
+        construct_profit_array(price_options, competition_solution.params, 2)
 
     profit_array[5, 3, :] ≈
     π(price_options[5], price_options[3], competition_solution.params)
-end
-
-@testset "map_vect_to_int, map_int_to_vect" begin
-    vect_ = [1, 2, 3]
-    base = 24
-    i_num = map_vect_to_int(vect_, base)
-    @test [vect_..., 0, 0] == map_int_to_vect(i_num, base, 5)
-
-    int_ = 720
-    vect_1 = map_int_to_vect(int_, base, 6)
-    @test int_ == map_vect_to_int(vect_1, base)
 end
 
 @testset "simple InitMatrix test" begin

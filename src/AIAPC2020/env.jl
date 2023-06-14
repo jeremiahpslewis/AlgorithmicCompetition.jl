@@ -22,18 +22,16 @@ struct AIAPCEnv <: AbstractEnv
     competition_solution::CompetitionSolution
     n_state_space::Int64
     state_space::Base.OneTo{Int64}
-    state_space_lookup::Array{Int64,2}
+    state_space_lookup::Matrix{Int64}
     memory::MVector{2,Int}
     convergence_dict::Dict{Symbol,Bool}
     is_done::MVector{1,Bool}
     p_Bert_nash_equilibrium::Float64
     p_monop_opt::Float64
     action_space::Tuple
-    profit_array::Array{Float64,3}
+    profit_array::Array{Float64}
 
     function AIAPCEnv(p::AIAPCHyperParameters)
-        # Special case starting conditions with 'missing' in lookbacks, think about best way of handling this...
-        # TODO: Think about how initial memory should be assigned
         price_options = SVector{15,Float64}(p.price_options)
         n_prices = length(p.price_options)
         price_index = SVector{15,Int64}(1:n_prices)
@@ -43,7 +41,6 @@ struct AIAPCEnv <: AbstractEnv
         action_space = Tuple((i, j) for i in price_index for j in price_index)
 
         profit_array = construct_profit_array(
-            action_space,
             price_options,
             p.competition_solution.params,
             n_players,
@@ -85,24 +82,11 @@ end
 
 function construct_state_space_lookup(action_space, n_prices)
     @assert length(action_space) == n_prices^2
-    state_space_lookup = zeros(Int64, n_prices, n_prices)
-    for (i, j) in action_space
-        state_space_lookup[i, j] = map_vect_to_int([i, j], n_prices) - n_prices
-    end
+    state_space_lookup = reshape(1:length(action_space), n_prices, n_prices)
     return state_space_lookup
 end
 
-# map price vector to state
-function map_vect_to_int(vect_, base)
-    sum(vect_[k] * base^(k - 1) for k in Base.OneTo(length(vect_))) # From Julia help / docs
-end
-
-function map_int_to_vect(int_val, base, vect_length)
-    return digits(Int, int_val, base = base, pad = vect_length)
-end
-
 function construct_profit_array(
-    action_space::NTuple,
     price_options::SVector{15,Float64},
     params::CompetitionParameters,
     n_players::Int,
@@ -111,9 +95,11 @@ function construct_profit_array(
     # TODO: Carve out into separate function:
     profit_array = zeros(Float64, n_prices, n_prices, n_players)
     for k = 1:n_players
-        for (i, j) in action_space
-            # TODO: Check that player assignment is correct here (should be...?)
-            profit_array[i, j, k] = π(price_options[i], price_options[j], params)[k]
+        for i in 1:n_prices
+            for j in 1:n_prices
+                # TODO: Check that player assignment is correct here (should be...?)
+                profit_array[i, j, k] = π(price_options[i], price_options[j], params)[k]
+            end
         end
     end
 

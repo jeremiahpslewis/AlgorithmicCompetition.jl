@@ -37,7 +37,7 @@ function economic_summary(env::AbstractEnv, hook::AbstractHook)
     is_converged = Bool[]
 
     for i in (Symbol(1), Symbol(2))
-        @chain hook[i][1].rewards[end] begin # log profits in last episode as convergence profit
+        @chain hook[i][1].rewards[(end-99):end] begin # log profits in last episode as convergence profit
             push!(convergence_profit, mean(_))
         end
 

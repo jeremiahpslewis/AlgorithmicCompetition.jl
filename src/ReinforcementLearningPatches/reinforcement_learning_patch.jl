@@ -86,7 +86,7 @@ function RLBase.plan!(
 end
 
 # Patch for Agent -> QBasedPolicy
-function RLBase.optimise!(agent::Agent, stage::PreActStage)
+function RLBase.optimise!(agent::Agent, stage::PostActStage)
     optimise!(agent.policy, agent.trajectory)
 end
 
@@ -96,7 +96,7 @@ function RLBase.optimise!(policy::QBasedPolicy, trajectory::Trajectory)
     end
 end
 
-RLBase.optimise!(agent::Agent, stage::PostActStage) = nothing
+RLBase.optimise!(agent::Agent, stage::PreActStage) = nothing
 RLBase.optimise!(agent::Agent, stage::PostEpisodeStage) = nothing
 RLBase.optimise!(agent::Agent, stage::PreEpisodeStage) = nothing
 
