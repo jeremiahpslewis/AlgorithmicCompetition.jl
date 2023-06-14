@@ -25,22 +25,47 @@ function extract_profit_vars(env::AIAPCEnv)
     return (π_N, π_M)
 end
 
-economic_summary(e::RLCore.Experiment) = economic_summary(e.env, e.hook)
+economic_summary(e::RLCore.Experiment) = economic_summary(e.env, e.policy, e.hook)
 
-function economic_summary(env::AbstractEnv, hook::AbstractHook)
+
+function get_state_from_memory(env::AIAPCEnv)
+    return get_state_from_prices(env, env.memory)
+end
+
+function get_state_from_prices(env::AIAPCEnv, memory)
+    return env.state_space_lookup[memory[1], memory[2]]
+end
+
+function get_prices_from_state(env::AIAPCEnv, state)
+    prices = findall(x->x==state, env.state_space_lookup)[1]
+    return [env.price_options[prices[1]], env.price_options[prices[2]]]
+end
+
+function get_profit_from_state(env::AIAPCEnv, state)
+    prices = get_prices_from_state(env, state)
+    return AlgorithmicCompetition.π(prices[1], prices[2], env.competition_solution.params)
+end
+
+function get_optimal_action(env::AIAPCEnv, policy::MultiAgentPolicy, last_observed_state)
+    optimal_action_set = Int64[]
+    for player_ in [Symbol(1), Symbol(2)]
+        opt_act = argmax(policy[player_].policy.learner.approximator.table[:, last_observed_state])
+        push!(optimal_action, opt_act)
+    end
+    return optimal_action_set
+end
+
+function economic_summary(env::AbstractEnv, policy::MultiAgentPolicy, hook::AbstractHook)
     convergence_threshold = env.convergence_threshold
     iterations_until_convergence = Int64[
         hook[player][2].iterations_until_convergence for player in [Symbol(1), Symbol(2)]
     ]
 
-    convergence_profit = Float64[]
     is_converged = Bool[]
 
-    for i in (Symbol(1), Symbol(2))
-        @chain hook[i][1].rewards[(end-99):end] begin # log profits in last episode as convergence profit
-            push!(convergence_profit, mean(_))
-        end
+    convergence_profit = get_convergence_profit_from_env(env)
 
+    for i in (Symbol(1), Symbol(2))
         push!(is_converged, hook[i][2].is_converged)
     end
 
@@ -51,6 +76,29 @@ function economic_summary(env::AbstractEnv, hook::AbstractHook)
         convergence_profit,
         iterations_until_convergence,
     )
+end
+
+function get_convergence_profit_from_env(env::AIAPCEnv, policy::MultiAgentPolicy)
+    last_observed_state = get_state_from_memory(env)
+
+    visited_states = [last_observed_state]
+    
+    for i in 1:100
+        next_price_set = get_optimal_action(env, policy, last_observed_state)
+        next_state = get_state_from_memory(env, next_price_set)
+    
+        if next_state ∈ visited_states
+            break
+        else
+            push!(visited_states, next_state)
+        end
+    end
+
+    profit_vects = get_profit_from_state.((env,), visited_states)    
+
+    profit_table = hcat(profit_vects...)'
+
+    mean(profit_table, dims=1)
 end
 
 function extract_sim_results(exp_list::Vector{AIAPCSummary})

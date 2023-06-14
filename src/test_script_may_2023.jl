@@ -80,6 +80,19 @@ experiment = Experiment(env; stop_on_convergence = true)
 @time run(hyperparams; stop_on_convergence = true);
 a = @time run(hyperparams; stop_on_convergence = true)
 
+
+# TODO Debug how this can happen...
+# a.hook[Symbol(1)][1].rewards[end-10:end] Weird oscillation happening here...only for player 1
+
+
+
+
+# AlgorithmicCompetition.π(a.env.price_options[7], a.env.price_options[7], a.env.competition_solution.params)
+
+
+# next_price_set = get_optimal_action(a.env, last_observed_state)
+# next_state = get_state_from_memory(a.env, next_price_set)
+
 # for i in 1:20
 #     a = run(hyperparams; stop_on_convergence = true)
 # end
