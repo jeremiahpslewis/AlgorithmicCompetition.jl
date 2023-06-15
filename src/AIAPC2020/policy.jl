@@ -33,7 +33,8 @@ function InitMatrix(env::AIAPCEnv; mode = "zero")
     if mode == "zero"
         return zeros(env.n_prices, env.n_state_space)
     elseif mode == "baseline"
-        opponent_randomizes_expected_profit = Q_i_0(env.price_options, env.δ, env.competition_solution.params)
+        opponent_randomizes_expected_profit =
+            Q_i_0(env.price_options, env.δ, env.competition_solution.params)
         return repeat(opponent_randomizes_expected_profit, 1, env.n_state_space)
     elseif mode == "constant"
         return fill(5, env.n_prices, env.n_state_space)
@@ -50,10 +51,7 @@ function AIAPCPolicy(env::AIAPCEnv)
                     learner = TDLearner(;
                         # TabularQApproximator with specified init matrix
                         approximator = TabularApproximator(
-                            InitMatrix(
-                                env,
-                                mode = "baseline",
-                            ),
+                            InitMatrix(env, mode = "baseline"),
                             Descent(env.α),
                         ),
                         # For param info: https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/f97747923c6d7bbc5576f81664ed7b05a2ab8f1e/src/ReinforcementLearningZoo/src/algorithms/tabular/td_learner.jl#L15

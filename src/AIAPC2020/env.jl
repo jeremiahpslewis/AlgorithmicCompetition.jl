@@ -40,11 +40,8 @@ struct AIAPCEnv <: AbstractEnv
         state_space = Base.OneTo(Int64(n_state_space))
         action_space = Tuple((i, j) for i in price_index for j in price_index)
 
-        profit_array = construct_profit_array(
-            price_options,
-            p.competition_solution.params,
-            n_players,
-        )
+        profit_array =
+            construct_profit_array(price_options, p.competition_solution.params, n_players)
         state_space_lookup = construct_state_space_lookup(action_space, n_prices)
 
         new(
@@ -95,8 +92,8 @@ function construct_profit_array(
     # TODO: Carve out into separate function:
     profit_array = zeros(Float64, n_prices, n_prices, n_players)
     for k = 1:n_players
-        for i in 1:n_prices
-            for j in 1:n_prices
+        for i = 1:n_prices
+            for j = 1:n_prices
                 # TODO: Check that player assignment is correct here (should be...?)
                 profit_array[i, j, k] = π(price_options[i], price_options[j], params)[k]
             end
