@@ -59,7 +59,8 @@ function extract_sim_results(exp_list::Vector{AIAPCSummary})
     iterations_until_convergence =
         [ex.iterations_until_convergence[1] for ex in exp_list if !(ex isa Exception)]
 
-    avg_profit_result = [mean(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
+    avg_profit_result =
+        [mean(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
 
     df = DataFrame(
         α = α_result,

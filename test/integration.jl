@@ -331,7 +331,10 @@ end
 
     @test experiments[1] isa AIAPCSummary
     @test all(10 < experiments[1].iterations_until_convergence[i] < max_iter for i = 1:2)
-    @test (sum(experiments[1].convergence_profit .> 1) + sum(experiments[1].convergence_profit .< 0)) == 0
+    @test (
+        sum(experiments[1].convergence_profit .> 1) +
+        sum(experiments[1].convergence_profit .< 0)
+    ) == 0
     @test experiments[1].convergence_profit[1] != experiments[1].convergence_profit[2]
     @test all(experiments[1].is_converged)
 end
@@ -392,10 +395,12 @@ end
     params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
     p_ = [1, 1]
     logit_demand = exp.((params.a .- p_) ./ params.μ)
-    q_logit_demand = logit_demand / (sum(exp.((params.a .- p_) ./ params.μ)) + exp(params.a_0 / params.μ))
-    
+    q_logit_demand =
+        logit_demand /
+        (sum(exp.((params.a .- p_) ./ params.μ)) + exp(params.a_0 / params.μ))
+
     Q(p_[1], p_[2], params) == q_logit_demand
-    
+
     @test Q(1.47293, 1.47293, CompetitionParameters(0.25, 0, (2, 2), (1, 1))) ≈
           fill(0.47138, 2) atol = 0.01
     @test Q(1.92498, 1.92498, CompetitionParameters(0.25, 0, (2, 2), (1, 1))) ≈
@@ -441,8 +446,7 @@ end
 
     price_options = env.price_options
     action_space_ = env.action_space
-    profit_array =
-        construct_profit_array(price_options, competition_solution.params, 2)
+    profit_array = construct_profit_array(price_options, competition_solution.params, 2)
 
     profit_array[5, 3, :] ≈
     π(price_options[5], price_options[3], competition_solution.params)
@@ -472,10 +476,7 @@ end
     )
     env = AIAPCEnv(hyperparameters)
 
-    a = InitMatrix(
-        env;
-        mode = "baseline",
-    )
+    a = InitMatrix(env; mode = "baseline")
     @test mean(a) ≈ 4.475577002635275 # Check this...
     @test a[1, 1] ≈ 4.070906600373279
     @test a[1, 10] ≈ 4.070906600373279

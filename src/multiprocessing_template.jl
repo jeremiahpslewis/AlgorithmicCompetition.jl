@@ -40,7 +40,8 @@ using CairoMakie
 using Chain
 using DataFrameMacros
 using AlgebraOfGraphics
-using AlgorithmicCompetition: AIAPCHyperParameters, AIAPCEnv, CompetitionParameters, CompetitionSolution, profit_gain
+using AlgorithmicCompetition:
+    AIAPCHyperParameters, AIAPCEnv, CompetitionParameters, CompetitionSolution, profit_gain
 
 competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
 competition_solution = CompetitionSolution(competition_params)

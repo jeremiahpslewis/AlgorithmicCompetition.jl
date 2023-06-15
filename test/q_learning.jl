@@ -23,11 +23,8 @@
         convergence_threshold = 1,
     )
     env = AIAPCEnv(hyperparameters)
-    
-    app = TabularApproximator(
-        InitMatrix(env; mode = "zero"),
-        Descent(0.1),
-    )
+
+    app = TabularApproximator(InitMatrix(env; mode = "zero"), Descent(0.1))
 
     @test Q(app, 1, 1) == 0
     @test Q(app, 1) == zeros(n_prices)
