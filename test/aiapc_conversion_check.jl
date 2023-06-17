@@ -47,6 +47,7 @@ function test_key_AIAPC_points(; n_parameter_iterations = 1000)
     df = extract_sim_results(exp_list_)
 
     df_summary = @chain df begin
+        @subset(all(:is_converged))
         @groupby(:α, :β)
         @combine(
             :Δ_π_bar = profit_gain(:π_bar, AIAPCEnv(hyperparameter_vect[1])),
