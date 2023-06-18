@@ -37,7 +37,7 @@ function get_state_from_prices(env::AIAPCEnv, memory)
 end
 
 function get_prices_from_state(env::AIAPCEnv, state)
-    prices = findall(x->x==state, env.state_space_lookup)[1]
+    prices = findall(x -> x == state, env.state_space_lookup)[1]
     return [env.price_options[prices[1]], env.price_options[prices[2]]]
 end
 
@@ -49,7 +49,9 @@ end
 function get_optimal_action(env::AIAPCEnv, policy::MultiAgentPolicy, last_observed_state)
     optimal_action_set = Int64[]
     for player_ in [Symbol(1), Symbol(2)]
-        opt_act = argmax(policy[player_].policy.learner.approximator.table[:, last_observed_state])
+        opt_act = argmax(
+            policy[player_].policy.learner.approximator.table[:, last_observed_state],
+        )
         push!(optimal_action_set, opt_act)
     end
     return optimal_action_set
@@ -82,11 +84,11 @@ function get_convergence_profit_from_env(env::AIAPCEnv, policy::MultiAgentPolicy
     last_observed_state = get_state_from_memory(env)
 
     visited_states = [last_observed_state]
-    
-    for i in 1:100
+
+    for i = 1:100
         next_price_set = get_optimal_action(env, policy, last_observed_state)
         next_state = get_state_from_prices(env, next_price_set)
-    
+
         if next_state ∈ visited_states
             break
         else
@@ -94,11 +96,11 @@ function get_convergence_profit_from_env(env::AIAPCEnv, policy::MultiAgentPolicy
         end
     end
 
-    profit_vects = get_profit_from_state.((env,), visited_states)    
+    profit_vects = get_profit_from_state.((env,), visited_states)
 
     profit_table = hcat(profit_vects...)'
 
-    mean(profit_table, dims=1)
+    mean(profit_table, dims = 1)
 end
 
 function extract_sim_results(exp_list::Vector{AIAPCSummary})
@@ -107,7 +109,8 @@ function extract_sim_results(exp_list::Vector{AIAPCSummary})
     iterations_until_convergence =
         [ex.iterations_until_convergence[1] for ex in exp_list if !(ex isa Exception)]
 
-    avg_profit_result = [mean(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
+    avg_profit_result =
+        [mean(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
     is_converged = [ex.is_converged for ex in exp_list if !(ex isa Exception)]
     df = DataFrame(
         α = α_result,
