@@ -351,7 +351,7 @@ end
             Int(1e7),
             competition_solution,
         ) |> AIAPCEnv
-    env.memory .= (1,1)
+    env.memory .= (1, 1)
     exper = Experiment(env)
 
     # Find the Nash equilibrium profit
