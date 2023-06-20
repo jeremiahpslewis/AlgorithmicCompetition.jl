@@ -8,14 +8,15 @@ using AlgorithmicCompetition:
     get_ϵ,
     find_all_max
 using ReinforcementLearningCore: RLCore
+using Statistics
 
 α = Float64(0.15)
 β = Float64(4e-6)
 δ = 0.95
 ξ = 0.1
 n_prices = 15
-max_iter = Int(1e2)
-convergence_threshold = max_iter - 1
+max_iter = Int(1e6)
+convergence_threshold = Int(1e5) #max_iter - 1
 price_index = 1:n_prices
 
 const player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
@@ -35,7 +36,7 @@ hyperparams = AIAPCHyperParameters(
 
 env = AIAPCEnv(hyperparams)
 experiment = Experiment(env; stop_on_convergence = true)
-
+# experiment.policy[Symbol(1)].policy.learner.approximator.table
 function run_manual(experiment)
     si_vect = Int64[0, 0]
     spi_vect = Int64[0, 0]
@@ -85,7 +86,6 @@ function run_manual(experiment)
             max_vals = RLCore.find_all_max(values)[2]
             best_response_q = rand(max_vals)
 
-            # q_value_updated = α * (π_ + γ * maximum(Q(app, s_plus_one)) - Q(app, s, a))
             q_delta = α * (profit_ + δ * maximum(max_q_spi) - old_q)
             experiment.policy[player_].policy.learner.approximator.table[action_player, state_int] += q_delta
 
@@ -103,13 +103,28 @@ function run_manual(experiment)
     return experiment, convergence, t
 end
 
-experiment, convergence, t = run_manual(experiment)
-summary = AlgorithmicCompetition.economic_summary(experiment)
-profit_gain = AlgorithmicCompetition.profit_gain(summary.convergence_profit, experiment.env)
-t
+profit_gain_ = []
+duration = []
+for i in 1:10
+    experiment, convergence, t = run_manual(experiment)
+    summary = AlgorithmicCompetition.economic_summary(experiment)
+    profit_gain = AlgorithmicCompetition.profit_gain(summary.convergence_profit, experiment.env)
+    if all(convergence .>= experiment.env.convergence_threshold)
+        push!(profit_gain_, profit_gain)
+        push!(duration, t)
+    end
+end
 
-profit_gain
+mean(profit_gain_)
+mean(duration)
+
+profit_delta = maximum(experiment.env.profit_array) - minimum(experiment.env.profit_array)
+
+(mean(summary.convergence_profit) - minimum(experiment.env.profit_array)) / profit_delta
+
 
 # 4.070906600373279
 # 4.61282553058293
 # maximum(experiment.policy[player_].policy.learner.approximator.table)
+
+experiment.policy[Symbol(1)].policy.learner.approximator.table
