@@ -515,7 +515,7 @@ end
 
 @testset "run full AIAPC simulation" begin
     α = Float64(0.125)
-    β = Float64(1e-5)
+    β = Float64(4e-6)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -537,6 +537,9 @@ end
     )
 
     c_out = run(hyperparameters; stop_on_convergence = true)
+    @test minimum(a.policy[Symbol(1)].policy.learner.approximator.table) < 6
+    @test maximum(a.policy[Symbol(1)].policy.learner.approximator.table) > 6
+
     # ensure that the policy is updated by the learner
     @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table; dims = 2) != 0
     state_sum = sum(c_out.policy[Symbol(1)].policy.learner.approximator.table; dims = 1)
