@@ -159,9 +159,10 @@ end
     )
     env = AIAPCEnv(hyperparameters)
 
-    test_prices = Q_i_0(env.price_options, env.δ, env.competition_solution.params)
-    @test minimum(test_prices) == 4.070906600373279 atol = 0.001
-    @test maximum(test_prices) == 4.61282553058293 atol = 0.001
+    test_prices = Q_i_0(env)
+
+    @test minimum(test_prices) ≈ 4.111178690372623 atol = 0.001
+    @test maximum(test_prices) ≈ 6.278004857861001 atol = 0.001
 end
 
 @testset "policy push! and optimise! test" begin
@@ -330,7 +331,7 @@ end
 
     policies[Symbol(1)].policy.learner.approximator.table[11, :] .= 2
     push!(exper.hook[Symbol(1)][2], PostActStage(), policies[Symbol(1)], exper.env, :p1)
-    @test exper.hook[Symbol(1)][2].best_response_vector[state(env)] == 8
+    @test exper.hook[Symbol(1)][2].best_response_vector[state(env)] == 5
 end
 
 @testset "Profit array test" begin

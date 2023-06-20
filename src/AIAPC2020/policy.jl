@@ -3,7 +3,7 @@ using StaticArrays
 using Flux
 
 """
-    Q_i_0(price, price_options, δ, params)
+    Q_i_0(env::AIAPCEnv)
 
 Calculate the Q-value for player i at time t=0, given the price chosen by player i and assuming random play over the price options of player -i.
 """
