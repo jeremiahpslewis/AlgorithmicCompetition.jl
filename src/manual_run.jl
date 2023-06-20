@@ -37,8 +37,11 @@ experiment = Experiment(env; stop_on_convergence = true)
 si_vect = Int64[]
 spi_vect = Int64[]
 convergence = Int64[0, 0]
+best_responses = [zeros(Int64, 225), zeros(Int64, 225)]
+t = 0
 
-for t in 1:1e6
+while t < 1e6
+    t += 1
     if t == 1
         si_vect = rand(1:15, 2)
     else
@@ -71,14 +74,16 @@ for t in 1:1e6
         profit_ = experiment.env.profit_array[spi_vect[1], spi_vect[2], player_int]
         # Max q over all actions from next state:
         max_q_spi = maximum(experiment.policy[player_].policy.learner.approximator.table[:, statepi_int])
+        # Best response for !current! state
+        best_response_q = argmax(experiment.policy[player_].policy.learner.approximator.table[:, state_int])
+
         new_q = old_q + α * (profit_ + δ * max_q_spi - old_q)
         experiment.policy[player_].policy.learner.approximator.table[spi_player, state_int] = new_q
 
-        best_responses = argmax(experiment.policy[player_].policy.learner.approximator.table, dims=1)
-        if best_responses_old == best_responses
+        if best_responses[player_int][state_int] == best_response_q
             convergence[player_int] += 1
         else
-            best_responses_old = best_responses
+            best_responses[player_int][state_int] = best_response_q
         end
     end
 
