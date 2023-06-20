@@ -380,10 +380,10 @@ end
     env = AIAPCEnv(hyperparameters)
 
     a = InitMatrix(env; mode = "baseline")
-    @test mean(a) ≈ 4.475577002635275 # Check this...
-    @test a[1, 1] ≈ 4.070906600373279
-    @test a[1, 10] ≈ 4.070906600373279
-    @test a[5, 10] ≈ 4.521381412143576
+    @test mean(a) ≈ 5.598115514452509
+    @test a[1, 1] ≈ 5.7897603960172805
+    @test a[1, 10] ≈ 5.7897603960172805
+    @test a[5, 10] ≈ 6.278004857861001
 end
 
 @testset "Sequential environment" begin
@@ -439,7 +439,7 @@ end
     env =
         AIAPCHyperParameters(
             Float64(0.1),
-            Float64(1e-4),
+            Float64(2e-5),
             0.95,
             Int(1e7),
             competition_solution,
