@@ -86,7 +86,7 @@ function run_manual(experiment)
             max_vals = RLCore.find_all_max(values)[2]
             best_response_q = rand(max_vals)
 
-            new_q = (1 - α) * old_q + α * (profit_ + (δ * maximum(max_q_spi)))
+            new_q = (1 - env.α) * old_q + env.α * (profit_ + (env.δ * maximum(max_q_spi)))
                 
             experiment.policy[player_].policy.learner.approximator.table[action_player, state_int] = new_q
 
