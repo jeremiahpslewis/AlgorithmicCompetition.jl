@@ -92,3 +92,6 @@ while t < max_iter
         break
     end
 end
+
+summary = AlgorithmicCompetition.economic_summary(experiment)
+profit_gain = AlgorithmicCompetition.profit_gain(summary.convergence_profit, experiment.env)
