@@ -86,8 +86,9 @@ function run_manual(experiment)
             max_vals = RLCore.find_all_max(values)[2]
             best_response_q = rand(max_vals)
 
-            q_delta = α * (profit_ + δ * maximum(max_q_spi) - old_q)
-            experiment.policy[player_].policy.learner.approximator.table[action_player, state_int] += q_delta
+            new_q = (1 - α) * old_q + α * (profit_ + (δ * maximum(max_q_spi)))
+                
+            experiment.policy[player_].policy.learner.approximator.table[action_player, state_int] = new_q
 
             if best_responses[player_int][state_int] == best_response_q
                 convergence[player_int] += 1
@@ -105,22 +106,27 @@ end
 
 profit_gain_ = []
 duration = []
+profit_gain_basic_ = []
 for i in 1:10
     experiment, convergence, t = run_manual(experiment)
-    summary = AlgorithmicCompetition.economic_summary(experiment)
-    profit_gain = AlgorithmicCompetition.profit_gain(summary.convergence_profit, experiment.env)
+    summary_ = AlgorithmicCompetition.economic_summary(experiment)
+    profit_gain = AlgorithmicCompetition.profit_gain(summary_.convergence_profit, experiment.env)
+
+    profit_delta = maximum(experiment.env.profit_array) - minimum(experiment.env.profit_array)
+
+    profit_gain_basic = (mean(summary_.convergence_profit) - minimum(experiment.env.profit_array)) / profit_delta
+    
+
     if all(convergence .>= experiment.env.convergence_threshold)
         push!(profit_gain_, profit_gain)
         push!(duration, t)
+        push!(profit_gain_basic_, profit_gain_basic)
     end
 end
 
 mean(profit_gain_)
 mean(duration)
 
-profit_delta = maximum(experiment.env.profit_array) - minimum(experiment.env.profit_array)
-
-(mean(summary.convergence_profit) - minimum(experiment.env.profit_array)) / profit_delta
 
 
 # 4.070906600373279
