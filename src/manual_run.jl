@@ -61,7 +61,7 @@ function run_manual(experiment)
             else
                 # NOTE: lazy argmax, could include tie breaking logic
                 values = experiment.policy[player_].policy.learner.approximator.table[:, state_int]
-                max_vals = find_all_max(values)
+                max_vals = find_all_max(values)[2]
                 best_action = rand(max_vals)
                 push!(spi_vect, best_action) # Overwrite next state
             end
@@ -80,7 +80,7 @@ function run_manual(experiment)
             max_q_spi = maximum(experiment.policy[player_].policy.learner.approximator.table[:, statepi_int])
             # Best response for !current! state
             values = experiment.policy[player_].policy.learner.approximator.table[:, state_int]
-            max_vals = RLCore.find_all_max(values)
+            max_vals = RLCore.find_all_max(values)[2]
             best_response_q = rand(max_vals)
 
             # q_value_updated = α * (π_ + γ * maximum(Q(app, s_plus_one)) - Q(app, s, a))

@@ -72,7 +72,7 @@ function RLBase.plan!(
     if rand(s.rng) < ϵ
         return rand(s.rng, full_action_space)
     else
-        max_vals = RLCore.find_all_max(values)
+        max_vals = RLCore.find_all_max(values)[2]
 
         return rand(s.rng, max_vals)
     end
