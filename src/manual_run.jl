@@ -39,13 +39,14 @@ spi_vect = Int64[]
 convergence = Int64[0, 0]
 best_responses = [zeros(Int64, 225), zeros(Int64, 225)]
 t = 0
+player_ = Symbol(1)
 
-while t < 1e6
+while t < max_iter
     t += 1
     if t == 1
         si_vect = rand(1:15, 2)
     else
-        si_vect = spi_vect # Next state from last round is current state in this round
+        si_vect = copy(spi_vect) # Next state from last round is current state in this round
         spi_vect = Int64[]
     end
     
