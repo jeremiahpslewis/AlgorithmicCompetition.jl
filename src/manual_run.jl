@@ -14,7 +14,8 @@ using ReinforcementLearningCore: RLCore
 δ = 0.95
 ξ = 0.1
 n_prices = 15
-max_iter = Int(1e6)
+max_iter = Int(1e2)
+convergence_threshold = max_iter - 1
 price_index = 1:n_prices
 
 const player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
@@ -29,41 +30,42 @@ hyperparams = AIAPCHyperParameters(
     δ,
     max_iter,
     competition_solution;
-    convergence_threshold = Int(1e5),
+    convergence_threshold = convergence_threshold,
 )
 
 env = AIAPCEnv(hyperparams)
 experiment = Experiment(env; stop_on_convergence = true)
 
 function run_manual(experiment)
-    si_vect = Int64[]
-    spi_vect = Int64[]
+    si_vect = Int64[0, 0]
+    spi_vect = Int64[0, 0]
     convergence = Int64[0, 0]
     best_responses = [zeros(Int64, 225), zeros(Int64, 225)]
     t = 0
 
-    while t < max_iter
+    while t < experiment.env.max_iter
         t += 1
         if t == 1
             si_vect = rand(1:15, 2)
         else
             si_vect = copy(spi_vect) # Next state from last round is current state in this round
-            spi_vect = Int64[]
+            spi_vect = Int64[0,0]
         end
         
         state_int = experiment.env.state_space_lookup[si_vect...]
 
         # Act!
         for player_ in [Symbol(1), Symbol(2)]
+            player_int = player_lookup[player_]
             ϵ_threshold = get_ϵ(experiment.policy[player_].policy.explorer, t)
             if rand() < ϵ_threshold
-                push!(spi_vect, rand(1:15)) # Overwrite next state
+                spi_vect[player_int] = rand(1:15) # Overwrite next state
             else
                 # NOTE: lazy argmax, could include tie breaking logic
                 values = experiment.policy[player_].policy.learner.approximator.table[:, state_int]
                 max_vals = find_all_max(values)[2]
                 best_action = rand(max_vals)
-                push!(spi_vect, best_action) # Overwrite next state
+                spi_vect[player_int] = best_action # Overwrite next state
             end
         end
 
@@ -94,7 +96,7 @@ function run_manual(experiment)
             end
         end
 
-        if all(convergence .>= 1e5)
+        if all(convergence .>= experiment.env.convergence_threshold)
             break
         end
     end
