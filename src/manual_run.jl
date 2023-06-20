@@ -5,7 +5,8 @@ using AlgorithmicCompetition:
     AIAPCEnv,
     CompetitionSolution,
     Experiment,
-    get_ϵ
+    get_ϵ,
+    find_all_max_
 using ReinforcementLearningCore: RLCore
 
 α = Float64(0.15)
@@ -59,7 +60,10 @@ function run_manual(experiment)
                 push!(spi_vect, rand(1:15)) # Overwrite next state
             else
                 # NOTE: lazy argmax, could include tie breaking logic
-                best_action = argmax(experiment.policy[player_].policy.learner.approximator.table[:, state_int])
+                maximum_placeholder = []
+                values = experiment.policy[player_].policy.learner.approximator.table[:, state_int]
+                max_vals = find_all_max_(values, maximum_placeholder)
+                best_action = rand(max_vals)
                 push!(spi_vect, best_action) # Overwrite next state
             end
         end
@@ -76,7 +80,10 @@ function run_manual(experiment)
             # Max q over all actions from next state:
             max_q_spi = maximum(experiment.policy[player_].policy.learner.approximator.table[:, statepi_int])
             # Best response for !current! state
-            best_response_q = argmax(experiment.policy[player_].policy.learner.approximator.table[:, state_int])
+            maximum_placeholder = []
+            values = experiment.policy[player_].policy.learner.approximator.table[:, state_int]
+            max_vals = RLCore.find_all_max(values, maximum_placeholder)
+            best_response_q = rand(max_vals)
 
             # q_value_updated = α * (π_ + γ * maximum(Q(app, s_plus_one)) - Q(app, s, a))
             q_delta = α * (profit_ + δ * maximum(max_q_spi) - old_q)
@@ -93,9 +100,10 @@ function run_manual(experiment)
             break
         end
     end
-    return experiment, convergence
+    return experiment, convergence, t
 end
 
+experiment, convergence, t = run_manual(experiment)
 summary = AlgorithmicCompetition.economic_summary(experiment)
 profit_gain = AlgorithmicCompetition.profit_gain(summary.convergence_profit, experiment.env)
 t

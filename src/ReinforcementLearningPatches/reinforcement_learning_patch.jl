@@ -42,7 +42,6 @@ struct AIAPCEpsilonGreedyExplorer{R,F<:AbstractFloat} <: AbstractExplorer
     β_neg::F
     step::Vector{Int}
     rng::R
-    maximum_placeholder::Vector{F}
 end
 
 function AIAPCEpsilonGreedyExplorer(β::F) where {F<:AbstractFloat}
@@ -51,7 +50,6 @@ function AIAPCEpsilonGreedyExplorer(β::F) where {F<:AbstractFloat}
         β * -1,
         Int[1],
         Random.GLOBAL_RNG,
-        F[1],
     )
 end
 
@@ -62,11 +60,6 @@ function get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}, step) where {F<:Abstract
 end
 
 get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}) where {F<:AbstractFloat} = get_ϵ(s, s.step)
-
-function find_all_max_(x, maximum_placeholder)
-    maximum!(maximum_placeholder, x)
-    return findall(==(maximum_placeholder[1]), x)
-end
 
 function RLBase.plan!(
     s::AIAPCEpsilonGreedyExplorer{<:Any,F},
@@ -79,7 +72,7 @@ function RLBase.plan!(
     if rand(s.rng) < ϵ
         return rand(s.rng, full_action_space)
     else
-        max_vals = find_all_max_(values, s.maximum_placeholder)
+        max_vals = RLCore.find_all_max(values)
 
         return rand(s.rng, max_vals)
     end
