@@ -10,6 +10,8 @@ using AlgorithmicCompetition:
 using ReinforcementLearningCore: RLCore
 using Statistics
 
+# NOTE: for some reason, q-learning updating is not working properly!!!
+
 α = Float64(0.15)
 β = Float64(4e-6)
 δ = 0.95
