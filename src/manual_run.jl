@@ -8,8 +8,8 @@ using AlgorithmicCompetition:
     get_ϵ
 using ReinforcementLearningCore: RLCore
 
-α = Float64(0.125)
-β = Float64(4e-6)
+α = Float64(0.2)
+β = Float64(0.25e-5)
 δ = 0.95
 ξ = 0.1
 n_prices = 15
@@ -39,7 +39,6 @@ spi_vect = Int64[]
 convergence = Int64[0, 0]
 best_responses = [zeros(Int64, 225), zeros(Int64, 225)]
 t = 0
-player_ = Symbol(1)
 
 while t < max_iter
     t += 1
@@ -69,8 +68,8 @@ while t < max_iter
     # Update!
     for player_ in [Symbol(1), Symbol(2)]
         player_int = player_lookup[player_]
-        spi_player = spi_vect[player_int] # Current action (next state, e.g. spi, is same as current action)
-        old_q = experiment.policy[player_].policy.learner.approximator.table[spi_player, state_int]
+        action_player = spi_vect[player_int] # Current action (next state, e.g. spi, is same as current action)
+        old_q = experiment.policy[player_].policy.learner.approximator.table[action_player, state_int]
         # Profit from current actions, e.g. next state, spi
         profit_ = experiment.env.profit_array[spi_vect[1], spi_vect[2], player_int]
         # Max q over all actions from next state:
@@ -78,8 +77,8 @@ while t < max_iter
         # Best response for !current! state
         best_response_q = argmax(experiment.policy[player_].policy.learner.approximator.table[:, state_int])
 
-        new_q = old_q + α * (profit_ + δ * max_q_spi - old_q)
-        experiment.policy[player_].policy.learner.approximator.table[spi_player, state_int] = new_q
+        new_q = ((1 - α) * old_q) + (α * (profit_ + (δ * max_q_spi)))
+        experiment.policy[player_].policy.learner.approximator.table[action_player, state_int] = new_q
 
         if best_responses[player_int][state_int] == best_response_q
             convergence[player_int] += 1
@@ -88,10 +87,11 @@ while t < max_iter
         end
     end
 
-    if all(convergence .> 1e5)
+    if all(convergence .>= 1e5)
         break
     end
 end
 
 summary = AlgorithmicCompetition.economic_summary(experiment)
 profit_gain = AlgorithmicCompetition.profit_gain(summary.convergence_profit, experiment.env)
+t
