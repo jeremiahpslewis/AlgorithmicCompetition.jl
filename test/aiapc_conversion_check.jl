@@ -22,7 +22,7 @@ function test_key_AIAPC_points(; n_parameter_iterations = 1000)
 
     test_params = DataFrame(
         :α => [0.15, 0.08, 0.2, 0.15, 0.01, 0.04, 0.1, 0.25, 0.2],
-        :β => [0.4, 2, 0.25, 1, 0.1, 0.2, 1.75, 0.1, 1] * 1e-5 / 4, # NOTE: 4 is a scaling factor, from source code where authors seem to divide by 25000 instead of 1e-5
+        :β => [0.4, 2, 0.25, 1, 0.1, 0.2, 1.75, 0.1, 1] * 1e-5, # NOTE: 4 is a scaling factor, from source code where authors seem to divide by 25000 instead of 1e-5
         :iter_min => [0, 0, 1.5e6, 0.5e6, 0, 1.5e6, 0.2e6, 1.5e6, 0.5e6],
         :iter_max => [1e7, 0.5e6, 1e7, 1.1e6, 1e7, 1e7, 0.5e6, 1e7, 1.5e6],
         :Δ_π_bar_min => [0.75, 0.7, 0.75, 0.75, 0.8, 0.85, 0.5, 0.65, 0.55],
