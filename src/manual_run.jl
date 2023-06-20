@@ -6,7 +6,7 @@ using AlgorithmicCompetition:
     CompetitionSolution,
     Experiment,
     get_ϵ,
-    find_all_max_
+    find_all_max
 using ReinforcementLearningCore: RLCore
 
 α = Float64(0.15)
@@ -62,7 +62,7 @@ function run_manual(experiment)
                 # NOTE: lazy argmax, could include tie breaking logic
                 maximum_placeholder = []
                 values = experiment.policy[player_].policy.learner.approximator.table[:, state_int]
-                max_vals = find_all_max_(values, maximum_placeholder)
+                max_vals = find_all_max(values, maximum_placeholder)
                 best_action = rand(max_vals)
                 push!(spi_vect, best_action) # Overwrite next state
             end
