@@ -17,6 +17,7 @@ function run_aiapc(;
 
     α_ = Float64.(range(0.0025, 0.25, n_parameter_increments))
     β_ = Float64.(range(0.025, 2, n_parameter_increments))
+    β_ = Float64.(range(0.005, 0.5, n_parameter_increments))
 
     # Filter params based on max_alpha and max_beta values
     α_ = α_[α_.<=max_alpha]
