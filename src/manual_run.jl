@@ -62,7 +62,6 @@ function run_manual(experiment)
             if rand() < ϵ_threshold
                 spi_vect[player_int] = rand(1:15) # Overwrite next state
             else
-                # NOTE: lazy argmax, could include tie breaking logic
                 values = experiment.policy[player_].policy.learner.approximator.table[:, state_int]
                 max_vals = find_all_max(values)[2]
                 best_action = rand(max_vals)
@@ -86,7 +85,7 @@ function run_manual(experiment)
             max_vals = RLCore.find_all_max(values)[2]
             best_response_q = rand(max_vals)
 
-            new_q = (1 - env.α) * old_q + env.α * (profit_ + (env.δ * maximum(max_q_spi)))
+            new_q = (1 - experiment.env.α) * old_q + experiment.env.α * (profit_ + (experiment.env.δ * max_q_spi))
                 
             experiment.policy[player_].policy.learner.approximator.table[action_player, state_int] = new_q
 
