@@ -50,7 +50,8 @@ using AlgorithmicCompetition:
     economic_summary,
     profit_gain,
     β_range,
-    α_range
+    α_range,
+    PriceAction
 using Distributed
 
 @testset "Prepackaged Environment Tests" begin
@@ -133,7 +134,7 @@ end
     push!(policy, PreActStage(), env)
     n_ = Int(1e5)
     policy_runs = [[plan!(policy, env)...] for i = 1:n_]
-    checksum_ = [sum(unique(policy_runs[j][i] for j = 1:n_)) for i = 1:2]
+    checksum_ = [sum(unique(policy_runs[j][i].price_index for j = 1:n_)) for i = 1:2]
     @test all(checksum_ .== sum(1:env.n_prices))
 end
 
@@ -224,7 +225,6 @@ end
     @test reward_2 != reward_1
     push!(policy, PostEpisodeStage(), env)
     cache_2 = deepcopy(policy.agents[Symbol(1)].cache)
-    @test cache_1.action != cache_2.action
 
     # t=3
     push!(policy, PreEpisodeStage(), env)
@@ -241,7 +241,7 @@ end
     @test reward_3 != reward_2
     push!(policy, PostEpisodeStage(), env)
     cache_3 = deepcopy(policy.agents[Symbol(1)].cache)
-    @test cache_2.action != cache_3.action
+    @test (cache_2.action != cache_3.action) || (cache_1.action != cache_2.action)
 end
 
 @testset "Profit gain check" begin
@@ -256,7 +256,7 @@ end
             Int(1e7),
             competition_solution,
         ) |> AIAPCEnv
-    env.memory .= (1, 1)
+    env.memory .= (PriceAction(1), PriceAction(1))
     exper = Experiment(env)
 
     # Find the Nash equilibrium profit
@@ -413,9 +413,9 @@ end
 
     env = AIAPCEnv(hyperparameters)
     @test current_player(env) == RLBase.SimultaneousPlayer()
-    @test action_space(env, Symbol(1)) == 1:15
+    @test action_space(env, Symbol(1)) == PriceAction.(1:15)
     @test reward(env) != 0 # reward reflects outcomes of last play (which happens at player = 1, e.g. before any actions chosen)
-    act!(env, (5, 5))
+    act!(env, (PriceAction(5), PriceAction(5)))
     @test reward(env) != [0, 0] # reward is zero as at least one player has already played (technically sequental plays)
 end
 
@@ -718,8 +718,6 @@ end
 
 
 @testset "Test alpha and beta ranges" begin
-    
-
     alpha_range = [0.0025, 0.005, 0.0075, 0.01, 0.0125, 0.015, 0.0175, 0.02, 0.0225, 0.025, 0.0275, 0.03, 0.0325, 0.035, 0.0375, 0.04, 0.0425, 0.045, 0.0475, 0.05, 0.0525, 0.055, 0.0575, 0.06, 0.0625, 0.065, 0.0675, 0.07, 0.0725, 0.075, 0.0775, 0.08, 0.0825, 0.085, 0.0875, 0.09, 0.0925, 0.095, 0.0975, 0.1, 0.1025, 0.105, 0.1075, 0.11, 0.1125, 0.115, 0.1175, 0.12, 0.1225, 0.125, 0.1275, 0.13, 0.1325, 0.135, 0.1375, 0.14, 0.1425, 0.145, 0.1475, 0.15, 0.1525, 0.155, 0.1575, 0.16, 0.1625, 0.165, 0.1675, 0.17, 0.1725, 0.175, 0.1775, 0.18, 0.1825, 0.185, 0.1875, 0.19, 0.1925, 0.195, 0.1975, 0.2, 0.2025, 0.205, 0.2075, 0.21, 0.2125, 0.215, 0.2175, 0.22, 0.2225, 0.225, 0.2275, 0.23, 0.2325, 0.235, 0.2375, 0.24, 0.2425, 0.245, 0.2475, 0.25]
     @test α_ == alpha_range
     

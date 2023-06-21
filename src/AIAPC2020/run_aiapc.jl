@@ -4,7 +4,7 @@ using Random
 using StatsBase
 
 const α_range = Float64.(range(0.0025, 0.25, 100))
-const β_range = Float64.(range(0.025, 2, 100))
+const β_range = Float64.(range(0.005, 0.5, 100))
 
 function run_aiapc(;
     n_parameter_iterations = 1,

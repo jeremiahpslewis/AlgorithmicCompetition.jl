@@ -1,6 +1,11 @@
 using ReinforcementLearningCore
 using ReinforcementLearningBase
 using StaticArrays
+
+struct PriceAction
+    price_index::Int8
+end
+
 """
     AIAPCEnv(p::AIAPCHyperParameters)
 
@@ -18,12 +23,12 @@ struct AIAPCEnv <: AbstractEnv
     max_iter::Int
     convergence_threshold::Int
     n_prices::Int
-    price_index::SVector{15,Int64}
+    price_index::SVector{15,PriceAction}
     competition_solution::CompetitionSolution
     n_state_space::Int64
     state_space::Base.OneTo{Int64}
     state_space_lookup::Matrix{Int64}
-    memory::MVector{2,Int}
+    memory::MVector{2,PriceAction}
     convergence_dict::Dict{Symbol,Bool}
     is_done::MVector{1,Bool}
     p_Bert_nash_equilibrium::Float64
@@ -34,7 +39,7 @@ struct AIAPCEnv <: AbstractEnv
     function AIAPCEnv(p::AIAPCHyperParameters)
         price_options = SVector{15,Float64}(p.price_options)
         n_prices = length(p.price_options)
-        price_index = SVector{15,Int64}(1:n_prices)
+        price_index = SVector{15,PriceAction}(PriceAction.(1:n_prices))
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
         state_space = Base.OneTo(Int64(n_state_space))
@@ -59,7 +64,7 @@ struct AIAPCEnv <: AbstractEnv
             n_state_space,
             state_space,
             state_space_lookup,
-            MVector{2,Int}(rand(price_index, p.memory_length, p.n_players)), # Memory, randomly initialized
+            MVector{2,PriceAction}(rand(price_index, p.memory_length, p.n_players)), # Memory, randomly initialized
             Dict(Symbol(1) => false, Symbol(2) => false), # Convergence counter
             MVector{1,Bool}([false]), # Is done
             p.p_Bert_nash_equilibrium,
@@ -71,7 +76,7 @@ struct AIAPCEnv <: AbstractEnv
 end
 
 # TODO: add back type signature ::Tuple{Int64,Int64}
-function RLBase.act!(env::AIAPCEnv, price_tuple::Tuple{Int64,Int64})
+function RLBase.act!(env::AIAPCEnv, price_tuple::Tuple{PriceAction,PriceAction})
     # TODO: Fix support for longer memories
     env.memory .= price_tuple
     env.is_done[1] = true
@@ -114,11 +119,11 @@ RLBase.legal_action_space_mask(env::AIAPCEnv, player::Symbol) = SA[1:15...]
 RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
 function RLBase.reward(env::AIAPCEnv)
-    env.is_done[1] ? (@view env.profit_array[env.memory[1], env.memory[2], :]) : SA[0, 0]
+    env.is_done[1] ? (@view env.profit_array[env.memory[1].price_index, env.memory[2].price_index, :]) : SA[0, 0]
 end
 
 function RLBase.reward(env::AIAPCEnv, p::Int)
-    (@view env.profit_array[env.memory[1], env.memory[2], p])[1]
+    (@view env.profit_array[env.memory[1].price_index, env.memory[2].price_index, p])[1]
 end
 
 
@@ -129,7 +134,7 @@ RLBase.reward(env::AIAPCEnv, p::Symbol) = reward(env, player_lookup[p])
 RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
 
 function RLBase.state(env::AIAPCEnv, ::Observation, p)
-    env.state_space_lookup[env.memory[1], env.memory[2]]
+    env.state_space_lookup[env.memory[1].price_index, env.memory[2].price_index]
 end
 
 RLBase.is_terminated(env::AIAPCEnv) = env.is_done[1]
