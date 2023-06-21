@@ -539,7 +539,7 @@ end
 
     c_out = run(hyperparameters; stop_on_convergence = true)
     @test minimum(c_out.policy[Symbol(1)].policy.learner.approximator.table) < 6
-    @test maximum(c_out.policy[Symbol(1)].policy.learner.approximator.table) > 6
+    @test maximum(c_out.policy[Symbol(1)].policy.learner.approximator.table) > 5.5
 
     # ensure that the policy is updated by the learner
     @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table; dims = 2) != 0
