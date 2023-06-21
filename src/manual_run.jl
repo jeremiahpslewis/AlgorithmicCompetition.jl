@@ -52,9 +52,9 @@ function run_manual(experiment)
             si_vect = rand(1:15, 2)
         else
             si_vect = copy(spi_vect) # Next state from last round is current state in this round
-            spi_vect = Int64[0,0]
+            spi_vect = Int64[0, 0]
         end
-        
+
         state_int = experiment.env.state_space_lookup[si_vect...]
 
         # Act!
@@ -64,7 +64,10 @@ function run_manual(experiment)
             if rand() < ϵ_threshold
                 spi_vect[player_int] = rand(1:15) # Overwrite next state
             else
-                values = experiment.policy[player_].policy.learner.approximator.table[:, state_int]
+                values = experiment.policy[player_].policy.learner.approximator.table[
+                    :,
+                    state_int,
+                ]
                 max_vals = find_all_max(values)[2]
                 best_action = rand(max_vals)
                 spi_vect[player_int] = best_action # Overwrite next state
@@ -77,19 +80,33 @@ function run_manual(experiment)
         for player_ in [Symbol(1), Symbol(2)]
             player_int = player_lookup[player_]
             action_player = spi_vect[player_int] # Current action (next state, e.g. spi, is same as current action)
-            old_q = experiment.policy[player_].policy.learner.approximator.table[action_player, state_int]
+            old_q = experiment.policy[player_].policy.learner.approximator.table[
+                action_player,
+                state_int,
+            ]
             # Profit from current actions, e.g. next state, spi
             profit_ = experiment.env.profit_array[spi_vect[1], spi_vect[2], player_int]
             # Max q over all actions from next state:
-            max_q_spi = maximum(experiment.policy[player_].policy.learner.approximator.table[:, statepi_int])
+            max_q_spi = maximum(
+                experiment.policy[player_].policy.learner.approximator.table[
+                    :,
+                    statepi_int,
+                ],
+            )
             # Best response for !current! state
-            values = experiment.policy[player_].policy.learner.approximator.table[:, state_int]
+            values =
+                experiment.policy[player_].policy.learner.approximator.table[:, state_int]
             max_vals = RLCore.find_all_max(values)[2]
             best_response_q = rand(max_vals)
 
-            new_q = (1 - experiment.env.α) * old_q + experiment.env.α * (profit_ + (experiment.env.δ * max_q_spi))
-                
-            experiment.policy[player_].policy.learner.approximator.table[action_player, state_int] = new_q
+            new_q =
+                (1 - experiment.env.α) * old_q +
+                experiment.env.α * (profit_ + (experiment.env.δ * max_q_spi))
+
+            experiment.policy[player_].policy.learner.approximator.table[
+                action_player,
+                state_int,
+            ] = new_q
 
             if best_responses[player_int][state_int] == best_response_q
                 convergence[player_int] += 1
@@ -108,15 +125,19 @@ end
 profit_gain_ = []
 duration = []
 profit_gain_basic_ = []
-for i in 1:10
+for i = 1:10
     experiment, convergence, t = run_manual(experiment)
     summary_ = AlgorithmicCompetition.economic_summary(experiment)
-    profit_gain = AlgorithmicCompetition.profit_gain(summary_.convergence_profit, experiment.env)
+    profit_gain =
+        AlgorithmicCompetition.profit_gain(summary_.convergence_profit, experiment.env)
 
-    profit_delta = maximum(experiment.env.profit_array) - minimum(experiment.env.profit_array)
+    profit_delta =
+        maximum(experiment.env.profit_array) - minimum(experiment.env.profit_array)
 
-    profit_gain_basic = (mean(summary_.convergence_profit) - minimum(experiment.env.profit_array)) / profit_delta
-    
+    profit_gain_basic =
+        (mean(summary_.convergence_profit) - minimum(experiment.env.profit_array)) /
+        profit_delta
+
 
     if all(convergence .>= experiment.env.convergence_threshold)
         push!(profit_gain_, profit_gain)
