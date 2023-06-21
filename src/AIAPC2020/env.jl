@@ -26,8 +26,8 @@ struct AIAPCEnv <: AbstractEnv
     price_index::SVector{15,PriceAction}
     competition_solution::CompetitionSolution
     n_state_space::Int64
-    state_space::Base.OneTo{Int64}
-    state_space_lookup::Matrix{Int64}
+    state_space::Base.OneTo{Int16}
+    state_space_lookup::Matrix{Int16}
     memory::MVector{2,PriceAction}
     convergence_dict::Dict{Symbol,Bool}
     is_done::MVector{1,Bool}
@@ -42,8 +42,8 @@ struct AIAPCEnv <: AbstractEnv
         price_index = SVector{15,PriceAction}(PriceAction.(1:n_prices))
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
-        state_space = Base.OneTo(Int64(n_state_space))
-        action_space = Tuple((i, j) for i in price_index for j in price_index)
+        state_space = Base.OneTo(Int16(n_state_space))
+        action_space = Tuple((PriceAction(i), PriceAction(j)) for i in price_index for j in price_index)
 
         profit_array =
             construct_profit_array(price_options, p.competition_solution.params, n_players)
@@ -84,7 +84,7 @@ end
 
 function construct_state_space_lookup(action_space, n_prices)
     @assert length(action_space) == n_prices^2
-    state_space_lookup = reshape(1:length(action_space), n_prices, n_prices)
+    state_space_lookup = reshape(Int16.(1:length(action_space)), n_prices, n_prices)
     return state_space_lookup
 end
 
