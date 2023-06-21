@@ -43,7 +43,7 @@ struct AIAPCEnv <: AbstractEnv
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
         state_space = Base.OneTo(Int16(n_state_space))
-        action_space = Tuple((PriceAction(i), PriceAction(j)) for i in price_index for j in price_index)
+        action_space = Tuple((i, j) for i in price_index for j in price_index)
 
         profit_array =
             construct_profit_array(price_options, p.competition_solution.params, n_players)
@@ -114,7 +114,7 @@ RLBase.action_space(env::AIAPCEnv, ::SimultaneousPlayer) = env.action_space
 
 RLBase.legal_action_space(env::AIAPCEnv, p) = is_terminated(env) ? () : action_space(env, p)
 
-RLBase.legal_action_space_mask(env::AIAPCEnv, player::Symbol) = SA[1:15...]
+RLBase.legal_action_space_mask(env::AIAPCEnv, player::Symbol) = SA[PriceAction.(1:15)...]
 
 RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 

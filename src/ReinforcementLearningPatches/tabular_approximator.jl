@@ -28,6 +28,8 @@ TabularVApproximator(; n_state, init = 0.0, opt = InvDecay(1.0)) =
 TabularQApproximator(; n_state, n_action, init = 0.0, opt = InvDecay(1.0)) =
     TabularApproximator(fill(init, n_action, n_state), opt)
 
+
+
 RLCore.forward(
     app::TabularApproximator{1,R,O},
     s::I,

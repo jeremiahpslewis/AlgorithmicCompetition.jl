@@ -5,12 +5,12 @@ import Base.push!
 mutable struct ConvergenceCheck <: AbstractHook
     convergence_duration::Int64
     iterations_until_convergence::Int64
-    best_response_vector::MVector{225,Int} # state x action # TODO: Fix hardcoding of n_states
+    best_response_vector::MVector{225,Int8} # state x action # TODO: Fix hardcoding of n_states
     is_converged::Bool
     convergence_threshold::Int64
 
     function ConvergenceCheck(convergence_threshold::Int64)
-        new(0, 0, MVector{225,Int}(zeros(Int, 225)), false, convergence_threshold) # TODO: Fix hardcoding of n_states
+        new(0, 0, MVector{225,Int8}(zeros(Int8, 225)), false, convergence_threshold) # TODO: Fix hardcoding of n_states
     end
 end
 
