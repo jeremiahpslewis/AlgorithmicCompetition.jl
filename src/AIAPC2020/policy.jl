@@ -29,7 +29,7 @@ function InitMatrix(env::AIAPCEnv; mode = "zero")
     end
 end
 
-function AIAPCPolicy(env::AIAPCEnv)
+function AIAPCPolicy(env::AIAPCEnv; mode="baseline")
     aiapc_policy = MultiAgentPolicy(
         NamedTuple(
             p => Agent(
@@ -37,7 +37,7 @@ function AIAPCPolicy(env::AIAPCEnv)
                     learner = TDLearner(;
                         # TabularQApproximator with specified init matrix
                         approximator = TabularApproximator(
-                            InitMatrix(env, mode = "baseline"),
+                            InitMatrix(env, mode = mode),
                             Descent(env.α),
                         ),
                         # For param info: https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/f97747923c6d7bbc5576f81664ed7b05a2ab8f1e/src/ReinforcementLearningZoo/src/algorithms/tabular/td_learner.jl#L15

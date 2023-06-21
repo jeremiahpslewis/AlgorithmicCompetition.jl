@@ -16,10 +16,10 @@ end
 
 function Base.push!(
     h::ConvergenceCheck,
-    state_::Int64,
-    best_action::Int,
+    state_::S,
+    best_action::Int8,
     iter_converged::Bool,
-)
+) where {S<:Integer}
     # Increment duration whenever argmax action is stable (convergence criteria)
     # Increment convergence metric (e.g. convergence not reached)
     # Keep track of number of iterations it takes until convergence
@@ -47,7 +47,7 @@ end
 Look up the best action for a given state in the q-value matrix
 """
 function _best_action_lookup(state_, table)
-    @views argmax(table[:, state_])
+    Int8(@views argmax(table[:, state_]))
 end
 
 function Base.push!(

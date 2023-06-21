@@ -325,14 +325,13 @@ end
         ) |> AIAPCEnv
     exper = Experiment(env)
     state(env)
-    policies = env |> AIAPCPolicy
-    push!(exper.hook[Symbol(1)][2], Int64(2), 3, false)
+    policies = AIAPCPolicy(env, mode="zero")
+    push!(exper.hook[Symbol(1)][2], Int16(2), Int8(3), false)
     @test exper.hook[Symbol(1)][2].best_response_vector[2] == 3
 
-
-    policies[Symbol(1)].policy.learner.approximator.table[11, :] .= 2
-    push!(exper.hook[Symbol(1)][2], PostActStage(), policies[Symbol(1)], exper.env, :p1)
-    @test exper.hook[Symbol(1)][2].best_response_vector[state(env)] == 5
+    policies[Symbol(1)].policy.learner.approximator.table[11, :] .= 10
+    push!(exper.hook[Symbol(1)][2], PostActStage(), policies[Symbol(1)], exper.env, Symbol(1))
+    @test exper.hook[Symbol(1)][2].best_response_vector[state(env, Symbol(1))] == 11
 end
 
 @testset "Profit array test" begin
