@@ -4,8 +4,11 @@ using DataFrameMacros
 using AlgebraOfGraphics
 using AlgorithmicCompetition:
     AIAPCHyperParameters, AIAPCEnv, CompetitionParameters, CompetitionSolution, profit_gain
+using CSV
+using DataFrames
+using Statistics
 
-file_name = "simulation_results_2023-06-21T00:01:53.187"
+file_name = "simulation_results_2023-06-21T00:01:53.187.csv"
 df = DataFrame(CSV.File(file_name))
     
 competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))

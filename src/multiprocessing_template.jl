@@ -21,8 +21,7 @@ _procs = addprocs(
 end
 
 @time exp_list = AlgorithmicCompetition.run_aiapc(;
-    n_parameter_iterations = 30,
-    n_parameter_increments = 25,
+    n_parameter_iterations = 1,
     max_iter = Int(1e9), # TODO: increment to 1e9
     # max_alpha = 0.05,
     # max_beta = 0.5,
