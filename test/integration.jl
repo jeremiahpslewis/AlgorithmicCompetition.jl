@@ -504,7 +504,7 @@ end
 
     profit_gain_max = 0
     i = 0
-    while (profit_gain_max <= 0.82) && (i < 5)
+    while (profit_gain_max <= 0.82) && (i < 10)
         i += 1
         c_out = run(hyperparameters; stop_on_convergence = true)
         profit_gain_max =
