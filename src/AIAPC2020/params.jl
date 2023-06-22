@@ -1,3 +1,8 @@
+"""
+    CompetitionSolution(params::CompetitionParameters)
+
+Solve the monopolist and Bertrand competition models for the given parameters and return the solution.
+"""
 struct CompetitionSolution
     p_Bert_nash_equilibrium::Float64
     p_monop_opt::Float64
@@ -13,6 +18,18 @@ struct CompetitionSolution
     end
 end
 
+"""
+    AIAPCHyperParameters(
+        α::Float64,
+        β::Float64,
+        δ::Float64,
+        max_iter::Int,
+        competition_solution::CompetitionSolution;
+        convergence_threshold::Int = Int(1e5),
+    )
+
+Hyperparameters which define a specific AIAPC environment.
+"""
 struct AIAPCHyperParameters
     α::Float64
     β::Float64

@@ -6,6 +6,18 @@ using StatsBase
 const α_range = Float64.(range(0.0025, 0.25, 100))
 const β_range = Float64.(range(0.005, 0.5, 100))
 
+"""
+    run_aiapc(
+        n_parameter_iterations = 1,
+        max_iter = Int(1e9),
+        convergence_threshold = Int(1e5),
+        max_alpha = 0.25,
+        max_beta = 2,
+        sample_fraction = 1,
+    )
+
+Run AIAPC, given a configuration for a set of experiments.
+"""
 function run_aiapc(;
     n_parameter_iterations = 1,
     max_iter = Int(1e9),

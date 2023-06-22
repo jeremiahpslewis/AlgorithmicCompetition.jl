@@ -50,6 +50,11 @@ function Base.run(hyperparameters::AIAPCHyperParameters; stop_on_convergence = t
     return experiment
 end
 
+"""
+    run_and_extract(hyperparameters::AIAPCHyperParameters; stop_on_convergence = true)
+
+Runs the experiment and returns the economic summary.
+"""
 function run_and_extract(hyperparameters::AIAPCHyperParameters; stop_on_convergence = true)
     economic_summary(run(hyperparameters; stop_on_convergence = stop_on_convergence))
 end

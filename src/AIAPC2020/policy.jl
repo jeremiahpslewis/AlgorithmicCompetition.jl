@@ -29,6 +29,11 @@ function InitMatrix(env::AIAPCEnv; mode = "zero")
     end
 end
 
+"""
+    AIAPCPolicy(env::AIAPCEnv; mode = "baseline")
+
+Create a policy for the AIAPC environment, with symmetric agents, using a tabular Q-learner. Mode deterimines the initialization of the Q-matrix.
+"""
 function AIAPCPolicy(env::AIAPCEnv; mode = "baseline")
     aiapc_policy = MultiAgentPolicy(
         NamedTuple(

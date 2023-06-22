@@ -2,6 +2,11 @@ import Base.push!
 using ReinforcementLearningTrajectories
 using ReinforcementLearningCore
 
+"""
+    ART{A,R,T}()
+
+A struct to store the action, reward and terminal state of an agent.
+"""
 mutable struct ART{A,R,T}
     action::Union{A,Nothing}
     reward::Union{R,Nothing}
@@ -16,6 +21,11 @@ mutable struct ART{A,R,T}
     end
 end
 
+"""
+    Base.push!(multiagent::MultiAgentPolicy, ::PostActStage, env::AIAPCEnv)
+
+Pushes the reward and terminal state of each player to their respective cache, updates the trajectory based on the cache.
+"""
 function Base.push!(multiagent::MultiAgentPolicy, ::PostActStage, env::AIAPCEnv)
     for player in players(env)
         agent = multiagent[player]
@@ -24,12 +34,22 @@ function Base.push!(multiagent::MultiAgentPolicy, ::PostActStage, env::AIAPCEnv)
     end
 end
 
+"""
+    RLBase.plan!(agent::Agent{P,T,C}, env::AIAPCEnv, p::Symbol)
+
+Chooses an action for the agent based on the policy and pushes it to the cache. Returns the action.
+"""
 function RLBase.plan!(agent::Agent{P,T,C}, env::AIAPCEnv, p::Symbol) where {P,T,C}
     action = RLBase.plan!(agent.policy, env, p)
     push!(agent.cache, action)
     action
 end
 
+"""
+    Base.push!(t::Trajectory, art::ART{R,T}, state::S)
+
+Pushes the state to the trajectory and the action, reward and terminal state to the cache.
+"""
 function Base.push!(t::Trajectory, art::ART{R,T}, state::S) where {S,R,T}
     traces = t.container.traces
     push!(traces[1].trace, state) # Push state
