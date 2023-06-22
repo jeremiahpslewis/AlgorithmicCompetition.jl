@@ -51,7 +51,7 @@ using AlgorithmicCompetition:
     profit_gain,
     β_range,
     α_range,
-    PriceAction
+    Int8
 using Distributed
 
 @testset "Prepackaged Environment Tests" begin
@@ -255,7 +255,7 @@ end
             Int(1e7),
             competition_solution,
         ) |> AIAPCEnv
-    env.memory .= (PriceAction(1), PriceAction(1))
+    env.memory .= (Int8(1), Int8(1))
     exper = Experiment(env)
 
     # Find the Nash equilibrium profit
@@ -417,9 +417,9 @@ end
 
     env = AIAPCEnv(hyperparameters)
     @test current_player(env) == RLBase.SimultaneousPlayer()
-    @test action_space(env, Symbol(1)) == PriceAction.(1:15)
+    @test action_space(env, Symbol(1)) == Int8.(1:15)
     @test reward(env) != 0 # reward reflects outcomes of last play (which happens at player = 1, e.g. before any actions chosen)
-    act!(env, (PriceAction(5), PriceAction(5)))
+    act!(env, (Int8(5), Int8(5)))
     @test reward(env) != [0, 0] # reward is zero as at least one player has already played (technically sequental plays)
 end
 

@@ -51,14 +51,14 @@ function AIAPCPolicy(env::AIAPCEnv; mode = "baseline")
                     CircularArraySARSTraces(;
                         capacity = 1,
                         state = Int64 => (),
-                        action = PriceAction => (),
+                        action = Int8 => (),
                         reward = Float64 => (),
                         terminal = Bool => (),
                     ),
                     DummySampler(),
                     InsertSampleRatioController(),
                 ),
-                ART{PriceAction,Float64,Bool}(),
+                ART{Int8,Float64,Bool}(),
             ) for p in players(env)
         ),
     )

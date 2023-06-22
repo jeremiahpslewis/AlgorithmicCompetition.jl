@@ -2,10 +2,6 @@ using ReinforcementLearningCore
 using ReinforcementLearningBase
 using StaticArrays
 
-struct PriceAction
-    price_index::Int8
-end
-
 """
     AIAPCEnv(p::AIAPCHyperParameters)
 
@@ -14,32 +10,38 @@ end
     Calvano, E., Calzolari, G., Denicolò, V., & Pastorello, S. (2020). Artificial Intelligence, Algorithmic Pricing, and Collusion. American Economic Review, 110(10), 3267–3297. https://doi.org/10.1257/aer.20190623
 """
 struct AIAPCEnv <: AbstractEnv
-    α::Float64
-    β::Float64
-    δ::Float64
-    n_players::Int
-    memory_length::Int
-    price_options::SVector{15,Float64}
-    max_iter::Int
-    convergence_threshold::Int
-    n_prices::Int
-    price_index::SVector{15,PriceAction}
-    competition_solution::CompetitionSolution
-    n_state_space::Int64
-    state_space::Base.OneTo{Int16}
-    state_space_lookup::Matrix{Int16}
-    memory::MVector{2,PriceAction}
-    convergence_dict::Dict{Symbol,Bool}
-    is_done::MVector{1,Bool}
-    p_Bert_nash_equilibrium::Float64
-    p_monop_opt::Float64
-    action_space::Tuple
-    profit_array::Array{Float64}
+    α::Float64                              # Learning parameter
+    β::Float64                              # Exploration parameter
+    δ::Float64                              # Discount factor
+    max_iter::Int                           # Maximum number of iterations
+    convergence_threshold::Int              # Convergence threshold
+
+    n_players::Int                          # Number of players
+    price_options::SVector{15,Float64}      # Price options
+    price_index::SVector{15,Int8}           # Price indices
+
+    competition_parameters::CompetitionParameters
+
+    state_space::Base.OneTo{Int16}          # State space
+    state_space_lookup::Matrix{Int16}       # State space lookup table
+    memory::MVector{2,Int8}                 # Memory vector (previous prices)
+
+    n_prices::Int                           # Number of price options
+    n_state_space::Int64                    # Number of states
+
+    convergence_dict::Dict{Symbol,Bool}     # Convergence status for each player
+    is_done::MVector{1,Bool}                # Episode is complete
+
+    p_Bert_nash_equilibrium::Float64        # Nash equilibrium price (Betrand price)
+    p_monop_opt::Float64                    # Monopoly optimal price
+
+    action_space::Tuple                     # Action space
+    profit_array::Array{Float64}            # Profit given price pair as coordinates
 
     function AIAPCEnv(p::AIAPCHyperParameters)
         price_options = SVector{15,Float64}(p.price_options)
         n_prices = length(p.price_options)
-        price_index = SVector{15,PriceAction}(PriceAction.(1:n_prices))
+        price_index = SVector{15,Int8}(Int8.(1:n_prices))
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
         state_space = Base.OneTo(Int16(n_state_space))
@@ -64,7 +66,7 @@ struct AIAPCEnv <: AbstractEnv
             n_state_space,
             state_space,
             state_space_lookup,
-            MVector{2,PriceAction}(rand(price_index, p.memory_length, p.n_players)), # Memory, randomly initialized
+            MVector{2,Int8}(rand(price_index, p.memory_length, p.n_players)), # Memory, randomly initialized
             Dict(Symbol(1) => false, Symbol(2) => false), # Convergence counter
             MVector{1,Bool}([false]), # Is done
             p.p_Bert_nash_equilibrium,
@@ -76,7 +78,7 @@ struct AIAPCEnv <: AbstractEnv
 end
 
 # TODO: add back type signature ::Tuple{Int64,Int64}
-function RLBase.act!(env::AIAPCEnv, price_tuple::Tuple{PriceAction,PriceAction})
+function RLBase.act!(env::AIAPCEnv, price_tuple::Tuple{Int8,Int8})
     # TODO: Fix support for longer memories
     env.memory .= price_tuple
     env.is_done[1] = true
@@ -114,7 +116,7 @@ RLBase.action_space(env::AIAPCEnv, ::SimultaneousPlayer) = env.action_space
 
 RLBase.legal_action_space(env::AIAPCEnv, p) = is_terminated(env) ? () : action_space(env, p)
 
-RLBase.legal_action_space_mask(env::AIAPCEnv, player::Symbol) = SA[PriceAction.(1:15)...]
+RLBase.legal_action_space_mask(env::AIAPCEnv, player::Symbol) = SA[Int8.(1:15)...]
 
 RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 

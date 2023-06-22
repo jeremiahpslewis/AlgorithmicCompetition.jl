@@ -47,12 +47,12 @@ function get_profit_from_state(env::AIAPCEnv, state)
 end
 
 function get_optimal_action(env::AIAPCEnv, policy::MultiAgentPolicy, last_observed_state)
-    optimal_action_set = PriceAction[]
+    optimal_action_set = Int8[]
     for player_ in [Symbol(1), Symbol(2)]
         opt_act = argmax(
             policy[player_].policy.learner.approximator.table[:, last_observed_state],
         )
-        push!(optimal_action_set, PriceAction(opt_act))
+        push!(optimal_action_set, Int8(opt_act))
     end
     return optimal_action_set
 end

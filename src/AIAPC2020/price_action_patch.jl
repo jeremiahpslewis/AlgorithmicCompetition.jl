@@ -1,16 +1,10 @@
-function RLCore.forward(
-    app::TabularApproximator{2,R,O},
-    s::I1,
-    a::PriceAction,
-) where {R<:AbstractArray,O,I1<:Integer}
+function RLCore.forward(app::TabularApproximator{2,R,O},
+    s::I1, a::I2) where {R<:AbstractArray,O,I1<:Integer,I2<:Integer}
     RLCore.forward(app, s, a.price_index)
 end
-
-function RLBase.optimise!(
-    app::TabularApproximator{2,R,O},
-    s_a::Tuple{I1,PriceAction},
-    e::F,
-) where {R<:AbstractArray,O,I1<:Integer,F<:AbstractFloat}
+    
+function RLBase.optimise!(app::TabularApproximator{2,R,O}, s_a::Tuple{I1,I2},
+e::F) where {R<:AbstractArray,O,I1<:Integer,I2<:Integer,F<:AbstractFloat}
     RLBase.optimise!(app, (s_a[1], s_a[2].price_index), e)
 end
 
@@ -27,6 +21,6 @@ function RLBase.plan!(
     else
         max_vals = RLCore.find_all_max(values)[2]
 
-        return PriceAction(rand(s.rng, max_vals))
+        return Int8(rand(s.rng, max_vals))
     end
 end
