@@ -2,6 +2,12 @@ using ReinforcementLearningCore, ReinforcementLearningBase
 using StaticArrays
 import Base.push!
 
+
+"""
+    ConvergenceCheck(convergence_threshold::Int64)
+
+Hook to check convergence, as defined by the best response for each state being stable for a given number of iterations.
+"""
 mutable struct ConvergenceCheck <: AbstractHook
     convergence_duration::Int64
     iterations_until_convergence::Int64
@@ -74,7 +80,6 @@ function Base.push!(
 ) where {P<:AbstractPolicy,T<:Trajectory,C}
     Base.push!(h, PostActStage(), agent.policy, env, player)
 end
-
 
 function Base.push!(
     h::ConvergenceCheck,
