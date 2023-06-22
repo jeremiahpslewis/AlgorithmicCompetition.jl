@@ -18,7 +18,7 @@ end
 function extract_profit_vars(env::AIAPCEnv)
     p_Bert_nash_equilibrium = env.p_Bert_nash_equilibrium
     p_monop_opt = env.p_monop_opt
-    competition_params = env.competition_solution.params
+    competition_params = env.competition_params
 
     π_N = π(p_Bert_nash_equilibrium, p_Bert_nash_equilibrium, competition_params)[1]
     π_M = π(p_monop_opt, p_monop_opt, competition_params)[1]
@@ -43,7 +43,7 @@ end
 
 function get_profit_from_state(env::AIAPCEnv, state)
     prices = get_prices_from_state(env, state)
-    return AlgorithmicCompetition.π(prices[1], prices[2], env.competition_solution.params)
+    return AlgorithmicCompetition.π(prices[1], prices[2], env.competition_params)
 end
 
 function get_optimal_action(env::AIAPCEnv, policy::MultiAgentPolicy, last_observed_state)

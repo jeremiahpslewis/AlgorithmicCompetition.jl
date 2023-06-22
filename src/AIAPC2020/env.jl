@@ -22,9 +22,9 @@ struct AIAPCEnv <: AbstractEnv
 
     competition_parameters::CompetitionParameters
 
+    memory::MVector{2,Int8}                 # Memory vector (previous prices)
     state_space::Base.OneTo{Int16}          # State space
     state_space_lookup::Matrix{Int16}       # State space lookup table
-    memory::MVector{2,Int8}                 # Memory vector (previous prices)
 
     n_prices::Int                           # Number of price options
     n_state_space::Int64                    # Number of states
@@ -48,29 +48,35 @@ struct AIAPCEnv <: AbstractEnv
         action_space = Tuple((i, j) for i in price_index for j in price_index)
 
         profit_array =
-            construct_profit_array(price_options, p.competition_solution.params, n_players)
+            construct_profit_array(price_options, p.competition_params, n_players)
         state_space_lookup = construct_state_space_lookup(action_space, n_prices)
 
         new(
             p.α,
             p.β,
             p.δ,
-            n_players,
-            p.memory_length,
-            p.price_options,
             p.max_iter,
             p.convergence_threshold,
-            n_prices,
+
+            n_players,
+            p.price_options,
             price_index,
-            p.competition_solution,
-            n_state_space,
+
+            p.competition_solution.params,            
+            
+            MVector{2,Int8}(rand(price_index, p.memory_length, p.n_players)), # Memory, randomly initialized
             state_space,
             state_space_lookup,
-            MVector{2,Int8}(rand(price_index, p.memory_length, p.n_players)), # Memory, randomly initialized
-            Dict(Symbol(1) => false, Symbol(2) => false), # Convergence counter
-            MVector{1,Bool}([false]), # Is done
+
+            n_prices,
+            n_state_space,
+
+            Dict(Symbol(1) => false, Symbol(2) => false), # Convergence dict
+            MVector{1,Bool}([false]), # Episode is done indicator
+
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,
+
             action_space,
             profit_array,
         )

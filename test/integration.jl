@@ -259,7 +259,7 @@ end
     exper = Experiment(env)
 
     # Find the Nash equilibrium profit
-    params = env.competition_solution.params
+    params = env.competition_params
     p_Bert_nash_equilibrium = exper.env.p_Bert_nash_equilibrium
     π_min_price =
         π(minimum(exper.env.price_options), minimum(exper.env.price_options), params)[1]

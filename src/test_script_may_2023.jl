@@ -87,7 +87,7 @@ a = @time run(hyperparams; stop_on_convergence = false);
 
 
 
-# AlgorithmicCompetition.π(a.env.price_options[7], a.env.price_options[7], a.env.competition_solution.params)
+# AlgorithmicCompetition.π(a.env.price_options[7], a.env.price_options[7], a.env.competition_params)
 
 
 # next_price_set = get_optimal_action(a.env, last_observed_state)
