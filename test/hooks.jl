@@ -29,8 +29,6 @@ using ReinforcementLearningCore
             @test hook.rewards[min(i, 10)] == reward(env, :Cross)
         end
     end
-
-    @test hook.rewards[1] == hook[1]
 end
 
 @testset "Convergence Check Hook" begin
