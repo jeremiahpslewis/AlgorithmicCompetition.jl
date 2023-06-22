@@ -18,8 +18,8 @@ function run_aiapc(;
     competition_solution = CompetitionSolution(competition_params)
 
     # Filter params based on max_alpha and max_beta values
-    α_ = α_range[α_range .<=max_alpha]
-    β_ = α_range[β_range .<=max_beta]
+    α_ = α_range[α_range.<=max_alpha]
+    β_ = α_range[β_range.<=max_beta]
 
     β_ = β_ * 1e-5 # rescale beta
     δ = 0.95

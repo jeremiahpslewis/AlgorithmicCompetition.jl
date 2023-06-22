@@ -29,7 +29,7 @@ function InitMatrix(env::AIAPCEnv; mode = "zero")
     end
 end
 
-function AIAPCPolicy(env::AIAPCEnv; mode="baseline")
+function AIAPCPolicy(env::AIAPCEnv; mode = "baseline")
     aiapc_policy = MultiAgentPolicy(
         NamedTuple(
             p => Agent(

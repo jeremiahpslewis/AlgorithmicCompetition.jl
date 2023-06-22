@@ -10,7 +10,7 @@ using Statistics
 
 file_name = "simulation_results_2023-06-21T00:01:53.187.csv"
 df = DataFrame(CSV.File(file_name))
-    
+
 competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
 competition_solution = CompetitionSolution(competition_params)
 
