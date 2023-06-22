@@ -33,7 +33,7 @@ function get_state_from_memory(env::AIAPCEnv)
 end
 
 function get_state_from_prices(env::AIAPCEnv, memory)
-    return env.state_space_lookup[memory[1].price_index, memory[2].price_index]
+    return env.state_space_lookup[memory[1], memory[2]]
 end
 
 function get_prices_from_state(env::AIAPCEnv, state)

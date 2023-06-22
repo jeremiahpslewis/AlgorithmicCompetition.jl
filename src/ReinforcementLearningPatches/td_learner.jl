@@ -59,7 +59,7 @@ end
 function RLBase.optimise!(L::TDLearnerSARS{Ap,F,I}, t::Traces{Tr}) where {Ap,F,I,Tr}
     # S, A, R, T = (t[x][1] for x in SART)
     S, A, R, S_next = extract_sars(t) # Remove this when the above line works without a performance hit
-    _optimise!(L.n, L.γ, L.approximator, S, S_next, A.price_index, R)
+    _optimise!(L.n, L.γ, L.approximator, S, S_next, A, R)
 end
 
 function RLBase.priority(L::TDLearnerSARS{Ap,F,I}, transition::Tuple{T}) where {Ap,F,I,T}

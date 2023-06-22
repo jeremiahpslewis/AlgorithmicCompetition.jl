@@ -133,7 +133,7 @@ end
     push!(policy, PreActStage(), env)
     n_ = Int(1e5)
     policy_runs = [[plan!(policy, env)...] for i = 1:n_]
-    checksum_ = [sum(unique(policy_runs[j][i].price_index for j = 1:n_)) for i = 1:2]
+    checksum_ = [sum(unique(policy_runs[j][i] for j = 1:n_)) for i = 1:2]
     @test all(checksum_ .== sum(1:env.n_prices))
 end
 

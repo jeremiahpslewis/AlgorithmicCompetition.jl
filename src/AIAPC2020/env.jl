@@ -20,7 +20,7 @@ struct AIAPCEnv <: AbstractEnv
     price_options::SVector{15,Float64}      # Price options
     price_index::SVector{15,Int8}           # Price indices
 
-    competition_parameters::CompetitionParameters
+    competition_params::CompetitionParameters
 
     memory::MVector{2,Int8}                 # Memory vector (previous prices)
     state_space::Base.OneTo{Int16}          # State space
@@ -62,7 +62,7 @@ struct AIAPCEnv <: AbstractEnv
             p.price_options,
             price_index,
 
-            p.competition_solution.params,            
+            p.competition_params,            
             
             MVector{2,Int8}(rand(price_index, p.memory_length, p.n_players)), # Memory, randomly initialized
             state_space,
@@ -128,12 +128,12 @@ RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
 function RLBase.reward(env::AIAPCEnv)
     env.is_done[1] ?
-    (@view env.profit_array[env.memory[1].price_index, env.memory[2].price_index, :]) :
+    (@view env.profit_array[env.memory[1], env.memory[2], :]) :
     SA[0, 0]
 end
 
 function RLBase.reward(env::AIAPCEnv, p::Int)
-    (@view env.profit_array[env.memory[1].price_index, env.memory[2].price_index, p])[1]
+    (@view env.profit_array[env.memory[1], env.memory[2], p])[1]
 end
 
 
@@ -144,7 +144,7 @@ RLBase.reward(env::AIAPCEnv, p::Symbol) = reward(env, player_lookup[p])
 RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
 
 function RLBase.state(env::AIAPCEnv, ::Observation, p)
-    env.state_space_lookup[env.memory[1].price_index, env.memory[2].price_index]
+    env.state_space_lookup[env.memory[1], env.memory[2]]
 end
 
 RLBase.is_terminated(env::AIAPCEnv) = env.is_done[1]
