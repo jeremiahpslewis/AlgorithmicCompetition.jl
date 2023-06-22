@@ -17,12 +17,15 @@ struct AIAPCHyperParameters
     α::Float64
     β::Float64
     δ::Float64
+    max_iter::Int
+    convergence_threshold::Int
+
     price_options::Vector{Float64}
     memory_length::Int
     n_players::Int
-    max_iter::Int
-    convergence_threshold::Int
-    competition_solution::CompetitionSolution
+
+    competition_params::CompetitionParameters
+
     p_Bert_nash_equilibrium::Float64
     p_monop_opt::Float64
 
@@ -59,12 +62,15 @@ struct AIAPCHyperParameters
             α,
             β,
             δ,
+            max_iter,
+            convergence_threshold,
+
             price_options,
             memory_length,
             n_players,
-            max_iter,
-            convergence_threshold,
-            competition_solution,
+
+            competition_solution.params,
+
             competition_solution.p_Bert_nash_equilibrium,
             competition_solution.p_monop_opt,
         )
