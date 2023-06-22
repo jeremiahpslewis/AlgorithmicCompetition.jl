@@ -119,7 +119,9 @@ RLBase.legal_action_space_mask(env::AIAPCEnv, player::Symbol) = SA[PriceAction.(
 RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
 function RLBase.reward(env::AIAPCEnv)
-    env.is_done[1] ? (@view env.profit_array[env.memory[1].price_index, env.memory[2].price_index, :]) : SA[0, 0]
+    env.is_done[1] ?
+    (@view env.profit_array[env.memory[1].price_index, env.memory[2].price_index, :]) :
+    SA[0, 0]
 end
 
 function RLBase.reward(env::AIAPCEnv, p::Int)
