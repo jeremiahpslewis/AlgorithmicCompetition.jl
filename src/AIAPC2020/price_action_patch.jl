@@ -1,6 +1,9 @@
-    
-function RLBase.optimise!(app::TabularApproximator{2,R,O}, s_a::Tuple{I1,I2},
-e::F) where {R<:AbstractArray,O,I1<:Integer,I2<:Integer,F<:AbstractFloat}
+
+function RLBase.optimise!(
+    app::TabularApproximator{2,R,O},
+    s_a::Tuple{I1,I2},
+    e::F,
+) where {R<:AbstractArray,O,I1<:Integer,I2<:Integer,F<:AbstractFloat}
     RLBase.optimise!(app, (s_a[1], s_a[2]), e)
 end
 

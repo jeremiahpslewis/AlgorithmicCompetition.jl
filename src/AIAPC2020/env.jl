@@ -59,26 +59,19 @@ struct AIAPCEnv <: AbstractEnv
             p.δ,
             p.max_iter,
             p.convergence_threshold,
-
             n_players,
             p.price_options,
             price_index,
-
-            p.competition_params,            
-            
+            p.competition_params,
             MVector{2,Int8}(rand(price_index, p.memory_length, p.n_players)), # Memory, randomly initialized
             state_space,
             state_space_lookup,
-
             n_prices,
             n_state_space,
-
             Dict(Symbol(1) => false, Symbol(2) => false), # Convergence dict
             MVector{1,Bool}([false]), # Episode is done indicator
-
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,
-
             action_space,
             profit_array,
         )
@@ -152,9 +145,7 @@ RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 Return the reward for the current state. If the episode is done, return the profit, else return `(0, 0)`.
 """
 function RLBase.reward(env::AIAPCEnv)
-    env.is_done[1] ?
-    (@view env.profit_array[env.memory[1], env.memory[2], :]) :
-    SA[0, 0]
+    env.is_done[1] ? (@view env.profit_array[env.memory[1], env.memory[2], :]) : SA[0, 0]
 end
 
 """
