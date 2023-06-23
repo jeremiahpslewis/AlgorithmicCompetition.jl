@@ -89,4 +89,3 @@ end
     @test convergence_hook.convergence_duration ∈ [0, 1]
     # @test convergence_hook_1.is_converged == true
 end
-

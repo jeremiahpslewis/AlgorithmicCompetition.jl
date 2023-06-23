@@ -353,5 +353,3 @@ end
     @test (c_out.hook[Symbol(2)][2].convergence_duration == 5) ||
           (c_out.hook[Symbol(1)][2].convergence_duration == 5)
 end
-
-

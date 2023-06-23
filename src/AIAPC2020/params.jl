@@ -81,13 +81,10 @@ struct AIAPCHyperParameters
             δ,
             max_iter,
             convergence_threshold,
-
             price_options,
             memory_length,
             n_players,
-
             competition_solution.params,
-
             competition_solution.p_Bert_nash_equilibrium,
             competition_solution.p_monop_opt,
         )
