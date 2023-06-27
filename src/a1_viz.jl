@@ -24,6 +24,8 @@ env =
     ) |> AIAPCEnv
 
 df_summary = @chain df begin
+    @transform(:β = round(:β, digits = 7),
+        :α = round(:α, digits = 2))
     @groupby(:α, :β)
     @combine(
         :Δ_π_bar = profit_gain(mean(:π_bar), env),

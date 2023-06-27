@@ -6,7 +6,7 @@ using Distributed
 using Dates
 
 start_timestamp = now()
-n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
+n_procs_ = 4 # up to 8 performance cores on m1 (7 workers + 1 main)
 
 _procs = addprocs(
     n_procs_,
@@ -21,7 +21,7 @@ _procs = addprocs(
 end
 
 @time exp_list = AlgorithmicCompetition.run_aiapc(;
-    n_parameter_iterations = 1,
+    n_parameter_iterations = 10,
     max_iter = Int(1e9), # TODO: increment to 1e9
     # max_alpha = 0.05,
     # max_beta = 0.5,
