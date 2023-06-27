@@ -6,7 +6,7 @@ using Distributed
 using Dates
 
 start_timestamp = now()
-n_procs_ = 4 # up to 8 performance cores on m1 (7 workers + 1 main)
+n_procs_ = 8 # up to 8 performance cores on m1 (7 workers + 1 main)
 
 _procs = addprocs(
     n_procs_,
@@ -25,7 +25,7 @@ end
     max_iter = Int(1e9), # TODO: increment to 1e9
     # max_alpha = 0.05,
     # max_beta = 0.5,
-    sample_fraction = 0.1,
+    sample_fraction = 1,
 )
 
 rmprocs(_procs)
