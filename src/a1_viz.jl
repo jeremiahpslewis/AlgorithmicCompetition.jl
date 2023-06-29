@@ -8,7 +8,7 @@ using CSV
 using DataFrames
 using Statistics
 
-file_name = "simulation_results_2023-06-21T00:01:53.187.csv"
+file_name = "simulation_results_2023-06-27T20:52:00.709.csv"
 df = DataFrame(CSV.File(file_name))
 
 competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
