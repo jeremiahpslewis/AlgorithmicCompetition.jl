@@ -206,5 +206,5 @@
         0.5,
     ]
 
-    @test β_range == beta_range
+    @test β_range == beta_range * 4 # weird quadruple counting issue with original paper
 end

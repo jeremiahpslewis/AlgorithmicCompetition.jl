@@ -98,7 +98,7 @@ end
     @test current_player(env) == RLBase.SimultaneousPlayer()
     @test action_space(env, Symbol(1)) == Int8.(1:15)
     @test reward(env) != 0 # reward reflects outcomes of last play (which happens at player = 1, e.g. before any actions chosen)
-    act!(env, (Int8(5), Int8(5)))
+    act!(env, CartesianIndex(Int8(5), Int8(5)))
     @test reward(env) != [0, 0] # reward is zero as at least one player has already played (technically sequental plays)
 end
 
@@ -189,7 +189,7 @@ end
     @test length(reward(c_out.env, 1)) == 1
 
     c_out.env.is_done[1] = false
-    @test reward(c_out.env) == [0, 0]
+    @test reward(c_out.env) == (0, 0)
     @test reward(c_out.env, 1) != 0
 
     @test sum(c_out.hook[Symbol(1)][2].best_response_vector == 0) == 0

@@ -48,7 +48,7 @@ economic_summary(e::RLCore.Experiment) = economic_summary(e.env, e.policy, e.hoo
 Helper function. Returns the state corresponding to the current memory of the environment.
 """
 function get_state_from_memory(env::AIAPCEnv)
-    return get_state_from_prices(env, env.memory)
+    return get_state_from_prices(env, env.memory[1])
 end
 
 """
@@ -56,8 +56,8 @@ end
 
 Helper function. Returns the state corresponding to the memory vector passed.
 """
-function get_state_from_prices(env::AIAPCEnv, memory)
-    return env.state_space_lookup[memory[1], memory[2]]
+function get_state_from_prices(env::AIAPCEnv, memory_index)
+    return env.state_space_lookup[memory_index]
 end
 
 """
@@ -93,7 +93,7 @@ function get_optimal_action(env::AIAPCEnv, policy::MultiAgentPolicy, last_observ
         )
         push!(optimal_action_set, Int8(opt_act))
     end
-    return optimal_action_set
+    return CartesianIndex(optimal_action_set...)
 end
 
 function economic_summary(env::AbstractEnv, policy::MultiAgentPolicy, hook::AbstractHook)
