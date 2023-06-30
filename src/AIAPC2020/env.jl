@@ -24,7 +24,7 @@ struct AIAPCEnv <: AbstractEnv
 
     competition_params::CompetitionParameters
 
-    memory::MVector{2,Int8}                 # Memory vector (previous prices)
+    memory::MVector{1,CartesianIndex}                 # Memory vector (previous prices)
     state_space::Base.OneTo{Int16}          # State space
     state_space_lookup::Matrix{Int16}       # State space lookup table
 
@@ -38,7 +38,7 @@ struct AIAPCEnv <: AbstractEnv
     p_monop_opt::Float64                    # Monopoly optimal price
 
     action_space::Tuple                     # Action space
-    profit_array::Array{Float64}            # Profit given price pair as coordinates
+    profit_array::Array{Tuple{Float64,Float64}}            # Profit given price pair as coordinates
 
     function AIAPCEnv(p::AIAPCHyperParameters)
         price_options = SVector{15,Float64}(p.price_options)
@@ -63,7 +63,7 @@ struct AIAPCEnv <: AbstractEnv
             p.price_options,
             price_index,
             p.competition_params,
-            MVector{2,Int8}(rand(price_index, p.memory_length, p.n_players)), # Memory, randomly initialized
+            MVector{1,CartesianIndex}(CartesianIndex(rand(price_index, p.n_players))), # Memory, randomly initialized
             state_space,
             state_space_lookup,
             n_prices,
@@ -83,7 +83,7 @@ end
 
 Act in the environment by setting the memory to the given price tuple and setting `is_done` to `true`.
 """
-function RLBase.act!(env::AIAPCEnv, price_tuple::Tuple{Int8,Int8})
+function RLBase.act!(env::AIAPCEnv, price_tuple::CartesianIndex)
     # TODO: Fix support for longer memories
     env.memory .= price_tuple
     env.is_done[1] = true
@@ -115,13 +115,11 @@ function construct_profit_array(
 )
     n_prices = length(price_options)
     # TODO: Carve out into separate function:
-    profit_array = zeros(Float64, n_prices, n_prices, n_players)
-    for k = 1:n_players
-        for i = 1:n_prices
-            for j = 1:n_prices
-                # TODO: Check that player assignment is correct here (should be...?)
-                profit_array[i, j, k] = π(price_options[i], price_options[j], params)[k]
-            end
+    profit_array = fill(Tuple{Float64,Float64}([0.0, 0.0]), n_prices, n_prices)
+    for i = 1:n_prices
+        for j = 1:n_prices
+            # TODO: Check that player assignment is correct here (should be...?)
+            profit_array[i, j] = Tuple{Float64,Float64}(π(price_options[i], price_options[j], params))
         end
     end
 
@@ -134,12 +132,13 @@ RLBase.action_space(env::AIAPCEnv, ::SimultaneousPlayer) = env.action_space
 
 RLBase.legal_action_space(env::AIAPCEnv, p) = is_terminated(env) ? () : action_space(env, p)
 
-const legal_action_space_mask_object = SA[Int8.(1:15)...]
+const legal_action_space_mask_object = [Int8.(1:15)...]
 
 RLBase.legal_action_space_mask(env::AIAPCEnv, player::Symbol) = legal_action_space_mask_object
 
 RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
+const zero_tuple = Tuple{Float64,Float64}([0,0])
 
 """
     RLBase.reward(env::AIAPCEnv)
@@ -147,7 +146,7 @@ RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 Return the reward for the current state. If the episode is done, return the profit, else return `(0, 0)`.
 """
 function RLBase.reward(env::AIAPCEnv)
-    env.is_done[1] ? (@view env.profit_array[env.memory[1], env.memory[2], :]) : SA[0, 0]
+    env.is_done[1] ? env.profit_array[env.memory] : zero_tuple
 end
 
 """
@@ -156,7 +155,7 @@ end
 Return the reward for the current state for player `p` as an integer. If the episode is done, return the profit, else return `0`.
 """
 function RLBase.reward(env::AIAPCEnv, p::Int)
-    (@view env.profit_array[env.memory[1], env.memory[2], p])[1]
+    env.profit_array[env.memory][p]
 end
 
 """
@@ -174,7 +173,7 @@ RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
 Return the current state as an integer, mapped from the environment memory.
 """
 function RLBase.state(env::AIAPCEnv, ::Observation, p)
-    env.state_space_lookup[env.memory[1], env.memory[2]]
+    env.state_space_lookup[env.memory]
 end
 
 """

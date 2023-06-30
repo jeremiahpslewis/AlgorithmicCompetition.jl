@@ -36,7 +36,7 @@ end
             Int(1e7),
             competition_solution,
         ) |> AIAPCEnv
-    env.memory .= (Int8(1), Int8(1))
+    env.memory .= CartesianIndex(Int8(1), Int8(1))
     exper = Experiment(env)
 
     # Find the Nash equilibrium profit

@@ -29,8 +29,9 @@ Pushes the reward and terminal state of each player to their respective cache, u
 function Base.push!(multiagent::MultiAgentPolicy, ::PostActStage, env::AIAPCEnv)
     for player in players(env)
         agent = multiagent[player]
-        push!(agent.cache, reward(env, player), is_terminated(env))
-        push!(agent.trajectory, agent.cache, state(env, player))
+        cache = agent.cache
+        push!(cache, reward(env, player), is_terminated(env))
+        push!(agent.trajectory, cache, state(env, player))
     end
 end
 
