@@ -72,9 +72,9 @@ function RLBase.optimise!(policy::QBasedPolicy, trajectory::Trajectory)
     end
 end
 
-RLBase.optimise!(agent::Agent, stage::PreActStage) = nothing
-RLBase.optimise!(agent::Agent, stage::PostEpisodeStage) = nothing
-RLBase.optimise!(agent::Agent, stage::PreEpisodeStage) = nothing
+RLBase.optimise!(agent::MultiAgentPolicy, stage::PreActStage) = nothing
+RLBase.optimise!(agent::MultiAgentPolicy, stage::PostEpisodeStage) = nothing
+RLBase.optimise!(agent::MultiAgentPolicy, stage::PreEpisodeStage) = nothing
 
 const SART = (:state, :action, :reward, :terminal)
 
