@@ -49,6 +49,8 @@ using AlgorithmicCompetition:
 # using ProfileView
 using Distributed
 
+RLCore.TimerOutputs.enable_debug_timings(RLCore)
+
 α = Float64(0.125)
 β = Float64(4e-6)
 δ = 0.95
@@ -78,6 +80,9 @@ experiment = Experiment(env; stop_on_convergence = true)
 @report_opt RLBase.plan!(experiment.policy, experiment.env)
 
 @time run(hyperparams; stop_on_convergence = true);
+
+RLCore.timer
+
 a = @time run(hyperparams; stop_on_convergence = false);
 
 
