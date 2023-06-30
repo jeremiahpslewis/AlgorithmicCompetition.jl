@@ -24,7 +24,7 @@ struct AIAPCEnv <: AbstractEnv
 
     competition_params::CompetitionParameters
 
-    memory::MVector{1,CartesianIndex}                 # Memory vector (previous prices)
+    memory::Vector{CartesianIndex}                 # Memory vector (previous prices)
     state_space::Base.OneTo{Int16}          # State space
     state_space_lookup::Matrix{Int16}       # State space lookup table
 
@@ -63,7 +63,7 @@ struct AIAPCEnv <: AbstractEnv
             p.price_options,
             price_index,
             p.competition_params,
-            MVector{1,CartesianIndex}(CartesianIndex(rand(price_index, p.n_players))), # Memory, randomly initialized
+            Vector{CartesianIndex}([CartesianIndex(rand(price_index, p.n_players)...)]), # Memory, randomly initialized
             state_space,
             state_space_lookup,
             n_prices,
@@ -85,7 +85,7 @@ Act in the environment by setting the memory to the given price tuple and settin
 """
 function RLBase.act!(env::AIAPCEnv, price_tuple::CartesianIndex)
     # TODO: Fix support for longer memories
-    env.memory .= price_tuple
+    env.memory[1] = price_tuple
     env.is_done[1] = true
 end
 
@@ -146,7 +146,7 @@ const zero_tuple = Tuple{Float64,Float64}([0,0])
 Return the reward for the current state. If the episode is done, return the profit, else return `(0, 0)`.
 """
 function RLBase.reward(env::AIAPCEnv)
-    env.is_done[1] ? env.profit_array[env.memory] : zero_tuple
+    env.is_done[1] ? env.profit_array[env.memory[1]] : zero_tuple
 end
 
 """
@@ -155,7 +155,7 @@ end
 Return the reward for the current state for player `p` as an integer. If the episode is done, return the profit, else return `0`.
 """
 function RLBase.reward(env::AIAPCEnv, p::Int)
-    env.profit_array[env.memory][p]
+    env.profit_array[[env.memory[1]]][1][p]
 end
 
 """
@@ -173,7 +173,7 @@ RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
 Return the current state as an integer, mapped from the environment memory.
 """
 function RLBase.state(env::AIAPCEnv, ::Observation, p)
-    env.state_space_lookup[env.memory]
+    env.state_space_lookup[env.memory[1]]
 end
 
 """
