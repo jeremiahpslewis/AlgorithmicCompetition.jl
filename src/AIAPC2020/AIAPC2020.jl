@@ -1,4 +1,5 @@
 include("params.jl")
+include("stochastic_demand_stochastic_information.jl")
 include("env.jl")
 include("hooks.jl")
 include("policy.jl") # Need to finish porting!

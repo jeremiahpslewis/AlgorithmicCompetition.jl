@@ -23,8 +23,8 @@ struct AIAPCEnv <: AbstractEnv
     price_index::SVector{15,Int8}           # Price indices
 
     competition_params::CompetitionParameters
-
-    memory::Vector{CartesianIndex{2}}                 # Memory vector (previous prices)
+    activate_extension::Bool                # Whether to activate the Data/Demand/Digital extension
+    memory::Vector{CartesianIndex}       # Memory vector (previous prices)
     state_space::Base.OneTo{Int16}          # State space
     state_space_lookup::Matrix{Int16}       # State space lookup table
 
@@ -38,21 +38,21 @@ struct AIAPCEnv <: AbstractEnv
     p_monop_opt::Float64                    # Monopoly optimal price
 
     action_space::Tuple                     # Action space
-    profit_array::Array{Float64,3}            # Profit given price pair as coordinates
+    profit_array::Array{Float64,3}          # Profit given price pair as coordinates
 
-    function AIAPCEnv(p::AIAPCHyperParameters)
+    data_demand_digital_params::DataDemandDigitalParams # Parameters for Data/Demand/Digital AIAPC extension
+
+    function AIAPCEnv(p::AIAPCHyperParameters; data_demand_digital_params::DataDemandDigitalParams = DataDemandDigitalParams())
         price_options = SVector{15,Float64}(p.price_options)
         n_prices = length(p.price_options)
         price_index = SVector{15,Int8}(Int8.(1:n_prices))
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
         state_space = Base.OneTo(Int16(n_state_space))
-        action_space =
-            Tuple(CartesianIndex{2}(i, j) for i in price_index for j in price_index)
-
+        action_space = construct_action_space(price_index, p.activate_extension)
         profit_array =
             construct_profit_array(price_options, p.competition_params, n_players)
-        state_space_lookup = construct_state_space_lookup(action_space, n_prices)
+        state_space_lookup = construct_state_space_lookup(action_space, n_prices, p.activate_extension)
 
         new(
             p.α,
@@ -64,9 +64,8 @@ struct AIAPCEnv <: AbstractEnv
             p.price_options,
             price_index,
             p.competition_params,
-            Vector{CartesianIndex{2}}([
-                CartesianIndex{2}(rand(price_index, p.n_players)...),
-            ]), # Memory, randomly initialized
+            p.activate_extension,
+            initialize_memory(price_index, p.n_players, data_demand_digital_params.high_demand_state), # Memory, randomly initialized
             state_space,
             state_space_lookup,
             n_prices,
@@ -77,6 +76,7 @@ struct AIAPCEnv <: AbstractEnv
             p.p_monop_opt,
             action_space,
             profit_array,
+            data_demand_digital_params,
         )
     end
 end
@@ -97,10 +97,16 @@ end
 
 Construct a lookup table from action space to the state space.
 """
-function construct_state_space_lookup(action_space, n_prices)
-    @assert length(action_space) == n_prices^2
-    state_space_lookup = reshape(Int16.(1:length(action_space)), n_prices, n_prices)
-    return state_space_lookup
+function construct_state_space_lookup(action_space, n_prices, activate_extension = false)
+    if activate_extension
+        @assert length(action_space) == n_prices^2 * 2
+        state_space_lookup = reshape(Int16.(1:length(action_space)), n_prices, n_prices, 2)
+        return state_space_lookup
+    else
+        @assert length(action_space) == n_prices^2
+        state_space_lookup = reshape(Int16.(1:length(action_space)), n_prices, n_prices)
+        return state_space_lookup
+    end
 end
 
 
@@ -200,6 +206,11 @@ RLBase.is_terminated(env::AIAPCEnv) = env.is_done[1]
 
 function RLBase.reset!(env::AIAPCEnv)
     env.is_done[1] = false
+
+    # For data / demand / digital extension...
+    if env.activate_extension
+        env.data_demand_digital_params.high_demand_state[1] = get_demand_level(env.data_demand_digital_params.frequency_high_demand) # update high demand state (i.i.d. draws every episode)
+    end
 end
 
 RLBase.players(::AIAPCEnv) = (Symbol(1), Symbol(2))

@@ -53,6 +53,7 @@ struct AIAPCHyperParameters
         max_iter::Int,
         competition_solution::CompetitionSolution;
         convergence_threshold::Int = Int(1e5),
+        activate_extension::Bool = false, # Whether to activate the Data/Demand/Digital extension
     )
         @assert max_iter > convergence_threshold
         ξ = 0.1
@@ -90,3 +91,29 @@ struct AIAPCHyperParameters
         )
     end
 end
+
+
+function construct_action_space(price_index, activate_extension::Bool)
+    if activate_extension
+        Tuple(CartesianIndex{3}(i, j, k) for i in price_index for j in price_index for k in 1:2)
+    else
+        Tuple(CartesianIndex{2}(i, j) for i in price_index for j in price_index)
+    end
+end
+
+function initialize_memory(price_index, n_players::Int, activate_extension::Bool, high_demand_state::Bool)
+    if activate_extension
+        Vector{CartesianIndex}([
+            CartesianIndex{3}(rand(price_index, p.n_players)..., high_demand_state),
+        ])
+    else
+        Vector{CartesianIndex}([
+            CartesianIndex{2}(rand(price_index, p.n_players)...,
+        ])
+    end  
+end
+
+
+# TODO: Add tests!
+# construct_action_space
+# initialize_memory

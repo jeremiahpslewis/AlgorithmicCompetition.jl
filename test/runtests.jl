@@ -55,6 +55,7 @@ using AlgorithmicCompetition:
 using Distributed
 
 include("alpha_beta.jl")
+include("stochastic_demand_stochastic_information.jl")
 include("competitive_equilibrium.jl")
 include("hooks.jl")
 include("policy.jl")
