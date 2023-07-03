@@ -13,3 +13,13 @@ end
     @test get_demand_level(1.0) == true
     @test get_demand_level(1.0) == false
 end
+
+@testset "construct_action_space" begin
+    @test length(construct_action_space(1:15, false)) == 225
+    @test length(construct_action_space(1:15, true)) == 450
+end
+
+@testset "initialize_memory" begin
+    @test length(initialize_memory(1:15, 2, true, true)[1]) == 3
+    @test length(initialize_memory(1:15, 2, false, false)[1]) == 2
+end

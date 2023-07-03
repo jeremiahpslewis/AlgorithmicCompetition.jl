@@ -104,16 +104,11 @@ end
 function initialize_memory(price_index, n_players::Int, activate_extension::Bool, high_demand_state::Bool)
     if activate_extension
         Vector{CartesianIndex}([
-            CartesianIndex{3}(rand(price_index, p.n_players)..., high_demand_state),
+            CartesianIndex{3}(rand(price_index, n_players)..., high_demand_state),
         ])
     else
         Vector{CartesianIndex}([
-            CartesianIndex{2}(rand(price_index, p.n_players)...,
+            CartesianIndex{2}(rand(price_index, n_players)...)
         ])
-    end  
+    end
 end
-
-
-# TODO: Add tests!
-# construct_action_space
-# initialize_memory
