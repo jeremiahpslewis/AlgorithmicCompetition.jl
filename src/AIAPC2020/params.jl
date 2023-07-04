@@ -104,10 +104,10 @@ function construct_action_space(price_index, activate_extension::Bool)
     end
 end
 
-function initialize_memory(price_index, n_players::Int, activate_extension::Bool, high_demand_state::Bool)
+function initialize_memory(price_index, n_players::Int, activate_extension::Bool, is_high_demand_episode::Bool)
     if activate_extension
         Vector{CartesianIndex}([
-            CartesianIndex{3}(rand(price_index, n_players)..., high_demand_state),
+            CartesianIndex{3}(rand(price_index, n_players)..., is_high_demand_episode),
         ])
     else
         Vector{CartesianIndex}([

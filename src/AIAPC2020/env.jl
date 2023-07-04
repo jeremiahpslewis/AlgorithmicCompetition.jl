@@ -71,7 +71,7 @@ struct AIAPCEnv <: AbstractEnv
             p.competition_params_dict,
             p.activate_extension,
             data_demand_digital_params.demand_mode,
-            initialize_memory(price_index, p.n_players, data_demand_digital_params.high_demand_state), # Memory, randomly initialized
+            initialize_memory(price_index, p.n_players, p.activate_extension, data_demand_digital_params.is_high_demand_episode[1]), # Memory, randomly initialized
             state_space,
             state_space_lookup,
             n_prices,
@@ -231,7 +231,7 @@ function RLBase.reset!(env::AIAPCEnv)
 
     # For data / demand / digital extension...
     if env.activate_extension
-        env.data_demand_digital_params.high_demand_state[1] = get_demand_level(env.data_demand_digital_params.frequency_high_demand) # update high demand state (i.i.d. draws every episode)
+        env.data_demand_digital_params.is_high_demand_episode[1] = get_demand_level(env.data_demand_digital_params.frequency_high_demand) # update high demand state (i.i.d. draws every episode)
     end
 end
 

@@ -45,7 +45,7 @@ end
     exper = Experiment(env)
 
     # Find the Nash equilibrium profit
-    params = env.competition_params
+    params = env.competition_params_dict[:high]
     p_Bert_nash_equilibrium = exper.env.p_Bert_nash_equilibrium
     π_min_price =
         π(minimum(exper.env.price_options), minimum(exper.env.price_options), params)[1]
@@ -173,10 +173,12 @@ end
     max_iter = Int(1e6)
     price_index = 1:n_prices
 
-    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
-
-    competition_solution = CompetitionSolution(competition_params)
-
+    competition_params_dict = Dict(
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+    )
+    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+    
     hyperparameters = AIAPCHyperParameters(
         α,
         β,

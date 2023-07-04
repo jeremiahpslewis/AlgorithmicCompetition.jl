@@ -33,7 +33,7 @@ Returns the Nash equilibrium and monopoly optimal profits, based on prices store
 function extract_profit_vars(env::AIAPCEnv)
     p_Bert_nash_equilibrium = env.p_Bert_nash_equilibrium
     p_monop_opt = env.p_monop_opt
-    competition_params = env.competition_params
+    competition_params = env.competition_params_dict[:high]
 
     π_N = π(p_Bert_nash_equilibrium, p_Bert_nash_equilibrium, competition_params)[1]
     π_M = π(p_monop_opt, p_monop_opt, competition_params)[1]
@@ -77,7 +77,7 @@ Helper function. Returns the profit corresponding to the state passed.
 """
 function get_profit_from_state(env::AIAPCEnv, state)
     prices = get_prices_from_state(env, state)
-    return AlgorithmicCompetition.π(prices[1], prices[2], env.competition_params)
+    return AlgorithmicCompetition.π(prices[1], prices[2], env.competition_params_dict[:high])
 end
 
 """
