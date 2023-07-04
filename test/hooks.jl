@@ -32,8 +32,11 @@ using ReinforcementLearningCore
 end
 
 @testset "Convergence Check Hook" begin
-    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
-    competition_solution = CompetitionSolution(competition_params)
+    competition_params_dict = Dict(
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+    )
+    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params[d_]) for d_ in [:high, :low])
 
     env =
         AIAPCHyperParameters(
@@ -41,7 +44,7 @@ end
             Float64(1e-4),
             0.95,
             Int(1e7),
-            competition_solution,
+            competition_solution_dict,
         ) |> AIAPCEnv
     exper = Experiment(env)
     state(env)
@@ -61,8 +64,11 @@ end
 end
 
 @testset "ConvergenceCheck" begin
-    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
-    competition_solution = CompetitionSolution(competition_params)
+    competition_params_dict = Dict(
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+    )
+    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params[d_]) for d_ in [:high, :low])
 
     env =
         AIAPCHyperParameters(
@@ -70,7 +76,7 @@ end
             Float64(2e-5),
             0.95,
             Int(1e7),
-            competition_solution,
+            competition_solution_dict,
         ) |> AIAPCEnv
     policies = env |> AIAPCPolicy
 

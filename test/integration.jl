@@ -7,16 +7,18 @@
     n_prices = 15
     max_iter = 1000
 
-    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
-
-    competition_solution = CompetitionSolution(competition_params)
+    competition_params_dict = Dict(
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+    )
+    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params[d_]) for d_ in [:high, :low])
 
     hyperparameters = AIAPCHyperParameters(
         α,
         β,
         δ,
         max_iter,
-        competition_solution;
+        competition_solution_dict;
         convergence_threshold = 1,
     )
 
@@ -25,8 +27,11 @@
 end
 
 @testset "Profit gain check" begin
-    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
-    competition_solution = CompetitionSolution(competition_params)
+    competition_params_dict = Dict(
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+    )
+    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params[d_]) for d_ in [:high, :low])
 
     env =
         AIAPCHyperParameters(
@@ -34,7 +39,7 @@ end
             Float64(1e-4),
             0.95,
             Int(1e7),
-            competition_solution,
+            competition_solution_dict,
         ) |> AIAPCEnv
     env.memory .= CartesianIndex(Int8(1), Int8(1))
     exper = Experiment(env)
@@ -81,16 +86,18 @@ end
     max_iter = 1000
     price_index = 1:n_prices
 
-    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
-
-    competition_solution = CompetitionSolution(competition_params)
+    competition_params_dict = Dict(
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+    )
+    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params[d_]) for d_ in [:high, :low])
 
     hyperparameters = AIAPCHyperParameters(
         α,
         β,
         δ,
         max_iter,
-        competition_solution;
+        competition_solution_dict;
         convergence_threshold = 1,
     )
 
@@ -136,11 +143,13 @@ end
     max_iter = Int(1e9)
     price_index = 1:n_prices
 
-    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
+    competition_params_dict = Dict(
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+    )
+    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params[d_]) for d_ in [:high, :low])
 
-    competition_solution = CompetitionSolution(competition_params)
-
-    hyperparameters = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution)
+    hyperparameters = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution_dict)
 
     profit_gain_max = 0
     i = 0

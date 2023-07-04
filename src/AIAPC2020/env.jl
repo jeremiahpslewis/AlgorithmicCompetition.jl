@@ -3,6 +3,7 @@ using ReinforcementLearningBase
 using StaticArrays
 
 const player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
+const demand_lookup = (; :high => 1, :low => 2)
 
 """
     AIAPCEnv(p::AIAPCHyperParameters)
@@ -22,8 +23,9 @@ struct AIAPCEnv <: AbstractEnv
     price_options::SVector{15,Float64}      # Price options
     price_index::SVector{15,Int8}           # Price indices
 
-    competition_params::CompetitionParameters
+    competition_params_dict::Dict{Symbol, CompetitionParameters} # Competition parameters, true = high, false = low
     activate_extension::Bool                # Whether to activate the Data/Demand/Digital extension
+    demand_mode::Symbol                      # Demand mode, :high, :low, or :random
     memory::Vector{CartesianIndex}       # Memory vector (previous prices)
     state_space::Base.OneTo{Int16}          # State space
     state_space_lookup::Matrix{Int16}       # State space lookup table
@@ -38,7 +40,7 @@ struct AIAPCEnv <: AbstractEnv
     p_monop_opt::Float64                    # Monopoly optimal price
 
     action_space::Tuple                     # Action space
-    profit_array::Array{Float64,3}          # Profit given price pair as coordinates
+    profit_array::Array{Float64}          # Profit given price pair as coordinates
 
     data_demand_digital_params::DataDemandDigitalParams # Parameters for Data/Demand/Digital AIAPC extension
 
@@ -51,8 +53,11 @@ struct AIAPCEnv <: AbstractEnv
         state_space = Base.OneTo(Int16(n_state_space))
         action_space = construct_action_space(price_index, p.activate_extension)
         profit_array =
-            construct_profit_array(price_options, p.competition_params, n_players)
+            construct_profit_array(price_options, p.competition_params_dict, n_players, p.activate_extension, data_demand_digital_params.demand_mode)
         state_space_lookup = construct_state_space_lookup(action_space, n_prices, p.activate_extension)
+
+        @assert demand_mode ∈ (:high, :low, :random)
+        @assert demand_mode == :random || p.activate_extension == false
 
         new(
             p.α,
@@ -63,8 +68,9 @@ struct AIAPCEnv <: AbstractEnv
             n_players,
             p.price_options,
             price_index,
-            p.competition_params,
+            p.competition_params_dict,
             p.activate_extension,
+            p.demand_mode
             initialize_memory(price_index, p.n_players, data_demand_digital_params.high_demand_state), # Memory, randomly initialized
             state_space,
             state_space_lookup,
@@ -119,17 +125,33 @@ the third dimension is the player index for their profit.
 """
 function construct_profit_array(
     price_options::SVector{15,Float64},
-    params::CompetitionParameters,
-    n_players::Int,
+    competition_params_dict::Dict{Symbol,CompetitionParameters},
+    n_players::Int;
+    activate_extension = false,
+    demand_mode = :high,
 )
     n_prices = length(price_options)
-    # TODO: Carve out into separate function:
-    profit_array = zeros(Float64, n_prices, n_prices, n_players)
-    for k = 1:n_players
-        for i = 1:n_prices
-            for j = 1:n_prices
-                # TODO: Check that player assignment is correct here (should be...?)
-                profit_array[i, j, k] = π(price_options[i], price_options[j], params)[k]
+
+    if activate_extension
+        profit_array = zeros(Float64, n_prices, n_prices, n_players, 2)
+        for l = [:high, :low]
+            for k = 1:n_players
+                for i = 1:n_prices
+                    for j = 1:n_prices
+                        profit_array[i, j, k, demand_lookup[l]] = π(price_options[i], price_options[j], competition_params_dict[l])[k]
+                    end
+                end
+            end
+        end
+    else
+        params_ = competition_params_dict[demand_mode]
+
+        profit_array = zeros(Float64, n_prices, n_prices, n_players)
+        for k = 1:n_players
+            for i = 1:n_prices
+                for j = 1:n_prices
+                    profit_array[i, j, k] = π(price_options[i], price_options[j], params_)[k]
+                end
             end
         end
     end

@@ -24,7 +24,7 @@ end
         β::Float64,
         δ::Float64,
         max_iter::Int,
-        competition_solution::CompetitionSolution;
+        competition_solution_dict::Dict{Symbol,CompetitionSolution};
         convergence_threshold::Int = Int(1e5),
     )
 
@@ -41,7 +41,7 @@ struct AIAPCHyperParameters
     memory_length::Int
     n_players::Int
 
-    competition_params::CompetitionParameters
+    competition_params_dict::Dict{Symbol,CompetitionParameters}
 
     p_Bert_nash_equilibrium::Float64
     p_monop_opt::Float64
@@ -51,7 +51,7 @@ struct AIAPCHyperParameters
         β::Float64,
         δ::Float64,
         max_iter::Int,
-        competition_solution::CompetitionSolution;
+        competition_solution_dict::Dict{Symbol,CompetitionSolution};
         convergence_threshold::Int = Int(1e5),
         activate_extension::Bool = false, # Whether to activate the Data/Demand/Digital extension
     )
@@ -65,13 +65,13 @@ struct AIAPCHyperParameters
         # p_monop defined above
         p_range_pad =
             ξ * (
-                competition_solution.p_monop_opt -
-                competition_solution.p_Bert_nash_equilibrium
+                competition_solution_dict[:high].p_monop_opt -
+                competition_solution_dict[:high].p_Bert_nash_equilibrium
             )
         price_options = [
             range(
-                competition_solution.p_Bert_nash_equilibrium - p_range_pad,
-                competition_solution.p_monop_opt + p_range_pad,
+                competition_solution_dict[:high].p_Bert_nash_equilibrium - p_range_pad,
+                competition_solution_dict[:high].p_monop_opt + p_range_pad,
                 n_prices,
             )...,
         ]
@@ -85,9 +85,9 @@ struct AIAPCHyperParameters
             price_options,
             memory_length,
             n_players,
-            competition_solution.params,
-            competition_solution.p_Bert_nash_equilibrium,
-            competition_solution.p_monop_opt,
+            Dict(d_ => competition_solution_dict[d_].params for d_ in [:high, :low]),
+            competition_solution_dict[:high].p_Bert_nash_equilibrium, # TODO: Fix this so that it works for both high and low demand states
+            competition_solution_dict[:high].p_monop_opt, # TODO: Fix this so that it works for both high and low demand states
         )
     end
 end

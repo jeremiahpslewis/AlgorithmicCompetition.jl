@@ -16,9 +16,11 @@ using DataFrameMacros
 using Statistics
 
 function test_key_AIAPC_points(; n_parameter_iterations = 1000)
-    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
-
-    competition_solution = CompetitionSolution(competition_params)
+    competition_params_dict = Dict(
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+    )
+    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params[d_]) for d_ in [:high, :low])
 
     test_params = DataFrame(
         :α => [0.15, 0.08, 0.2, 0.15, 0.01, 0.04, 0.1, 0.25, 0.2],
@@ -34,7 +36,7 @@ function test_key_AIAPC_points(; n_parameter_iterations = 1000)
             test_params[!, :β],
             (0.95,),
             (Int(1e9),),
-            (competition_solution,),
+            (competition_solution_dict,),
         )
     exp_list_ = AIAPCSummary[]
     exp_list = @showprogress pmap(

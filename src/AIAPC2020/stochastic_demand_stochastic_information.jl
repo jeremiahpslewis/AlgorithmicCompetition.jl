@@ -17,9 +17,10 @@ struct DataDemandDigitalParams
     signal_quality_is_high::Vector{Bool} # true if signal quality is high
     frequency_high_demand::Float64 # probability of high demand for a given episode
     high_demand_state::Vector{Bool} # [true] if demand is high for a given episode
+    demand_mode::Symbol # :high, :low, :random
 
-    function DataDemandDigitalParams()
-        new(0.0, 0.0, [false, false], 0.5, rand(Bool, 1))
+    function DataDemandDigitalParams(; demand_mode::Symbol=:high)
+        new(0.0, 0.0, [false, false], 0.5, rand(Bool, 1), demand_mode)
     end
 end
 

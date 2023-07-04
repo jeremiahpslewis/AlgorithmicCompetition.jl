@@ -23,16 +23,18 @@ price_index = 1:n_prices
 
 const player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
 
-competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
-
-competition_solution = CompetitionSolution(competition_params)
+competition_params_dict = Dict(
+    :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+    :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+)
+competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params[d_]) for d_ in [:high, :low])
 
 hyperparams = AIAPCHyperParameters(
     α,
     β,
     δ,
     max_iter,
-    competition_solution;
+    competition_solution_dict;
     convergence_threshold = convergence_threshold,
 )
 
