@@ -56,8 +56,8 @@ struct AIAPCEnv <: AbstractEnv
             construct_profit_array(price_options, p.competition_params_dict, n_players; p.activate_extension, data_demand_digital_params.demand_mode)
         state_space_lookup = construct_state_space_lookup(action_space, n_prices, p.activate_extension)
 
-        @assert demand_mode ∈ (:high, :low, :random)
-        @assert demand_mode == :random || p.activate_extension == false
+        @assert data_demand_digital_params.demand_mode ∈ (:high, :low, :random)
+        @assert data_demand_digital_params.demand_mode == :random || p.activate_extension == false
 
         new(
             p.α,
@@ -70,7 +70,7 @@ struct AIAPCEnv <: AbstractEnv
             price_index,
             p.competition_params_dict,
             p.activate_extension,
-            p.demand_mode,
+            data_demand_digital_params.demand_mode,
             initialize_memory(price_index, p.n_players, data_demand_digital_params.high_demand_state), # Memory, randomly initialized
             state_space,
             state_space_lookup,
