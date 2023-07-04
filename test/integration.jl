@@ -184,7 +184,7 @@ end
         β,
         δ,
         max_iter,
-        competition_solution;
+        competition_solution_dict[:high];
         convergence_threshold = 10000,
     )
 
@@ -227,7 +227,7 @@ end
             β,
             δ,
             max_iter,
-            competition_solution;
+            competition_solution_dict[:high];
             convergence_threshold = 10,
         ) for α in α_ for β in β_
     ]
@@ -265,7 +265,7 @@ end
         β,
         δ,
         max_iter,
-        competition_solution;
+        competition_solution_dict[:high];
         convergence_threshold = 1,
     )
 
@@ -358,7 +358,7 @@ end
         β,
         δ,
         max_iter,
-        competition_solution;
+        competition_solution_dict[:high];
         convergence_threshold = 5,
     )
     c_out = run(hyperparameters; stop_on_convergence = true)
