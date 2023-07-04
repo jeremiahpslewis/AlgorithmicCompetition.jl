@@ -70,7 +70,7 @@ struct AIAPCEnv <: AbstractEnv
             price_index,
             p.competition_params_dict,
             p.activate_extension,
-            p.demand_mode
+            p.demand_mode,
             initialize_memory(price_index, p.n_players, data_demand_digital_params.high_demand_state), # Memory, randomly initialized
             state_space,
             state_space_lookup,
