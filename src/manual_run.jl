@@ -13,7 +13,7 @@ using Statistics
 # NOTE: for some reason, q-learning updating is not working properly!!!
 
 α = Float64(0.15)
-β = Float64(4e-6)
+β = Float64(4e-1)
 δ = 0.95
 ξ = 0.1
 n_prices = 15

@@ -36,7 +36,6 @@ function run_aiapc(;
     α_ = α_range[α_range.<=max_alpha]
     β_ = β_range[β_range.<=max_beta]
 
-    β_ = β_ * 1e-5 # rescale beta
     δ = 0.95
 
     hyperparameter_vect = [

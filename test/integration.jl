@@ -1,6 +1,6 @@
 @testset "Prepackaged Environment Tests" begin
     α = Float64(0.125)
-    β = Float64(1e-5)
+    β = Float64(1)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -78,7 +78,7 @@ end
 
 @testset "Sequential environment" begin
     α = Float64(0.125)
-    β = Float64(1e-5)
+    β = Float64(1)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -135,7 +135,7 @@ end
 
 @testset "run full AIAPC simulation (with full convergence threshold)" begin
     α = Float64(0.075)
-    β = Float64(0.25e-5)
+    β = Float64(0.25)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -165,7 +165,7 @@ end
 
 @testset "run full AIAPC simulation" begin
     α = Float64(0.125)
-    β = Float64(4e-6)
+    β = Float64(4e-1)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -213,7 +213,7 @@ end
 
     n_parameter_increments = 3
     α_ = Float64.(range(0.0025, 0.25, n_parameter_increments))
-    β_ = Float64.(range(0.025, 2, n_parameter_increments)) * 1e-5
+    β_ = Float64.(range(0.025, 2, n_parameter_increments))
     δ = 0.95
     max_iter = Int(1e8)
 

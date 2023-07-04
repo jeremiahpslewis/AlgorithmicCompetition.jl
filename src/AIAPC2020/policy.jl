@@ -54,7 +54,7 @@ function AIAPCPolicy(env::AIAPCEnv; mode = "baseline")
                         γ = env.δ,
                         n = 0,
                     ),
-                    explorer = AIAPCEpsilonGreedyExplorer(env.β), # * 2 # TODO: Drop this hack / attempt to get conversion to behave
+                    explorer = AIAPCEpsilonGreedyExplorer(env.β * 1e-5),
                 ),
                 Trajectory(
                     CircularArraySARSTraces(;

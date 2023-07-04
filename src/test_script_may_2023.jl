@@ -52,7 +52,7 @@ using Distributed
 RLCore.TimerOutputs.enable_debug_timings(RLCore)
 
 α = Float64(0.125)
-β = Float64(4e-6)
+β = Float64(4e-1)
 δ = 0.95
 ξ = 0.1
 δ = 0.95
