@@ -1,6 +1,6 @@
 @testset "Policy operation test" begin
     α = Float64(0.125)
-    β = Float64(1e-5)
+    β = Float64(1)
     δ = 0.95
     ξ = 0.1
     δ = 0.95

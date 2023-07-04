@@ -2,7 +2,7 @@
     n_prices = 15
     n_state_space = 15^2
     α = Float64(0.125)
-    β = Float64(1e-5)
+    β = Float64(1)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -35,7 +35,7 @@ end
 
 @testset "Q_i_0" begin
     α = Float64(0.125)
-    β = Float64(1e-5)
+    β = Float64(1)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -83,7 +83,7 @@ end
 
 @testset "simple InitMatrix test" begin
     α = Float64(0.125)
-    β = Float64(1e-5)
+    β = Float64(1)
     δ = 0.95
     ξ = 0.1
     δ = 0.95

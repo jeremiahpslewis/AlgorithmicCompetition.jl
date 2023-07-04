@@ -184,7 +184,7 @@ end
         β,
         δ,
         max_iter,
-        competition_solution_dict[:high];
+        competition_solution_dict;
         convergence_threshold = 10000,
     )
 
@@ -227,7 +227,7 @@ end
             β,
             δ,
             max_iter,
-            competition_solution_dict[:high];
+            competition_solution_dict;
             convergence_threshold = 10,
         ) for α in α_ for β in β_
     ]
@@ -246,7 +246,7 @@ end
 
 @testset "Parameter / learning checks" begin
     α = Float64(0.125)
-    β = Float64(1e-5)
+    β = Float64(1)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -265,7 +265,7 @@ end
         β,
         δ,
         max_iter,
-        competition_solution_dict[:high];
+        competition_solution_dict;
         convergence_threshold = 1,
     )
 
@@ -310,7 +310,7 @@ end
 
 @testset "No stop on Convergence stop works" begin
     α = Float64(0.125)
-    β = Float64(1e-5)
+    β = Float64(1)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -329,7 +329,7 @@ end
         β,
         δ,
         max_iter,
-        competition_solution;
+        competition_solution_dict;
         convergence_threshold = 10,
     )
     c_out = run(hyperparameters; stop_on_convergence = false)
@@ -339,7 +339,7 @@ end
 
 @testset "Convergence stop works" begin
     α = Float64(0.125)
-    β = Float64(1e-5)
+    β = Float64(1)
     δ = 0.95
     ξ = 0.1
     δ = 0.95
@@ -358,7 +358,7 @@ end
         β,
         δ,
         max_iter,
-        competition_solution_dict[:high];
+        competition_solution_dict;
         convergence_threshold = 5,
     )
     c_out = run(hyperparameters; stop_on_convergence = true)
