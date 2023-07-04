@@ -15,7 +15,7 @@ competition_params_dict = Dict(
     :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
 )
-competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params[d_]) for d_ in [:high, :low])
+competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
 env =
     AIAPCHyperParameters(

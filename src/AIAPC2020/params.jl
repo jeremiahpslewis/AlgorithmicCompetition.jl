@@ -46,6 +46,8 @@ struct AIAPCHyperParameters
     p_Bert_nash_equilibrium::Float64
     p_monop_opt::Float64
 
+    activate_extension::Bool
+
     function AIAPCHyperParameters(
         α::Float64,
         β::Float64,
@@ -88,6 +90,7 @@ struct AIAPCHyperParameters
             Dict(d_ => competition_solution_dict[d_].params for d_ in [:high, :low]),
             competition_solution_dict[:high].p_Bert_nash_equilibrium, # TODO: Fix this so that it works for both high and low demand states
             competition_solution_dict[:high].p_monop_opt, # TODO: Fix this so that it works for both high and low demand states
+            activate_extension,
         )
     end
 end

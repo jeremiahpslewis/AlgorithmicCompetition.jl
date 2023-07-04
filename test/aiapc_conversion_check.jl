@@ -20,7 +20,7 @@ function test_key_AIAPC_points(; n_parameter_iterations = 1000)
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
-    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params[d_]) for d_ in [:high, :low])
+    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
     test_params = DataFrame(
         :α => [0.15, 0.08, 0.2, 0.15, 0.01, 0.04, 0.1, 0.25, 0.2],

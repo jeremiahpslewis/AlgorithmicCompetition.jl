@@ -11,7 +11,7 @@ end
 
 @testset "get_demand_level" begin
     @test get_demand_level(1.0) == true
-    @test get_demand_level(1.0) == false
+    @test get_demand_level(0.0) == false
 end
 
 @testset "construct_action_space" begin

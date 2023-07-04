@@ -53,7 +53,7 @@ struct AIAPCEnv <: AbstractEnv
         state_space = Base.OneTo(Int16(n_state_space))
         action_space = construct_action_space(price_index, p.activate_extension)
         profit_array =
-            construct_profit_array(price_options, p.competition_params_dict, n_players, p.activate_extension, data_demand_digital_params.demand_mode)
+            construct_profit_array(price_options, p.competition_params_dict, n_players; p.activate_extension, data_demand_digital_params.demand_mode)
         state_space_lookup = construct_state_space_lookup(action_space, n_prices, p.activate_extension)
 
         @assert demand_mode ∈ (:high, :low, :random)
@@ -117,7 +117,7 @@ end
 
 
 """
-    construct_profit_array(price_options, params, n_players)
+    construct_profit_array(price_options, params, n_players; activate_extension, demand_mode)
 
 Construct a 3-dimensional array which holds the profit for each player given a price pair.
 The first dimension is player 1's action, the second dimension is player 2's action, and

@@ -30,15 +30,17 @@ using AlgorithmicCompetition:
     CompetitionParameters,
     CompetitionParameters,
     CompetitionSolution,
+    construct_action_space,
     construct_profit_array,
     construct_state_space_lookup,
     ConvergenceCheck,
     economic_summary,
     Experiment,
+    get_demand_level,
     get_demand_signals,
     get_ϵ,
     InitMatrix,
-    Int8
+    initialize_memory,
     p_BR,
     profit_gain,
     Q_i_0,
@@ -52,7 +54,7 @@ using AlgorithmicCompetition:
     TDLearner,
     α_range,
     β_range,
-    π,
+    π
 using Distributed
 
 include("alpha_beta.jl")
