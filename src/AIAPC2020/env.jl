@@ -12,7 +12,7 @@ const demand_lookup = (; :high => 1, :low => 2)
     
     Calvano, E., Calzolari, G., Denicolò, V., & Pastorello, S. (2020). Artificial Intelligence, Algorithmic Pricing, and Collusion. American Economic Review, 110(10), 3267–3297. https://doi.org/10.1257/aer.20190623
 """
-struct AIAPCEnv{N,M} <: AbstractEnv
+struct AIAPCEnv{N,M} <: AbstractEnv # N is profit_array dimension, M is state_space_lookup dimension, N = M + 1
     α::Float64                              # Learning parameter
     β::Float64                              # Exploration parameter
     δ::Float64                              # Discount factor
@@ -60,11 +60,11 @@ struct AIAPCEnv{N,M} <: AbstractEnv
         @assert data_demand_digital_params.demand_mode == :random || p.activate_extension == false
 
         if p.activate_extension
-            n = 4
-            m = 3
+            n = Int64(4)
+            m = Int64(3)
         else
-            n = 3
-            m = 2
+            n = Int64(3)
+            m = Int64(2)
         end
     
         new{n,m}(
@@ -100,7 +100,7 @@ end
 
 Act in the environment by setting the memory to the given price tuple and setting `is_done` to `true`.
 """
-function RLBase.act!(env::AIAPCEnv, price_tuple::CartesianIndex{N}) where {N <: Integer}
+function RLBase.act!(env::AIAPCEnv{N,M}, price_tuple::CartesianIndex{M}) where {N,M}
     # TODO: Fix support for longer memories
     env.memory[1] = price_tuple
     env.is_done[1] = true
@@ -197,13 +197,13 @@ end
 
 Return the reward for the current state for player `p` as an integer. If the episode is done, return the profit, else return `0`.
 """
-function RLBase.reward(env::AIAPCEnv{N,M}, p::Int)::Float64 where {N<:Integer,M<:Integer}
+function RLBase.reward(env::AIAPCEnv{N,M}, p::Int)::Float64 where {N,M}
     profit_array = env.profit_array
     memory_index_vect = env.memory
     return _reward(profit_array, memory_index_vect[1], p)
 end
 
-function _reward(profit::Array{Float64,M}, memory_index::CartesianIndex{N}, p::Int)::Float64 where {N<:Integer,M<:Integer}
+function _reward(profit::Array{Float64,M}, memory_index::CartesianIndex{N}, p::Int)::Float64 where {N,M}
     return profit[memory_index, p]
 end
 
