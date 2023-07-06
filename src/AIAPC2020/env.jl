@@ -12,7 +12,7 @@ const demand_lookup = (; :high => 1, :low => 2)
     
     Calvano, E., Calzolari, G., Denicolò, V., & Pastorello, S. (2020). Artificial Intelligence, Algorithmic Pricing, and Collusion. American Economic Review, 110(10), 3267–3297. https://doi.org/10.1257/aer.20190623
 """
-struct AIAPCEnv <: AbstractEnv
+struct AIAPCEnv{N,M} <: AbstractEnv
     α::Float64                              # Learning parameter
     β::Float64                              # Exploration parameter
     δ::Float64                              # Discount factor
@@ -26,7 +26,7 @@ struct AIAPCEnv <: AbstractEnv
     competition_params_dict::Dict{Symbol, CompetitionParameters} # Competition parameters, true = high, false = low
     activate_extension::Bool                # Whether to activate the Data/Demand/Digital extension
     demand_mode::Symbol                      # Demand mode, :high, :low, or :random
-    memory::Vector{CartesianIndex}       # Memory vector (previous prices)
+    memory::Vector{CartesianIndex{M}}       # Memory vector (previous prices)
     state_space::Base.OneTo{Int16}          # State space
     state_space_lookup::Matrix{Int16}       # State space lookup table
 
@@ -40,7 +40,7 @@ struct AIAPCEnv <: AbstractEnv
     p_monop_opt::Float64                    # Monopoly optimal price
 
     action_space::Tuple                     # Action space
-    profit_array::Array{Float64}          # Profit given price pair as coordinates
+    profit_array::Array{Float64,N}          # Profit given price pair as coordinates
 
     data_demand_digital_params::DataDemandDigitalParams # Parameters for Data/Demand/Digital AIAPC extension
 
@@ -59,7 +59,15 @@ struct AIAPCEnv <: AbstractEnv
         @assert data_demand_digital_params.demand_mode ∈ (:high, :low, :random)
         @assert data_demand_digital_params.demand_mode == :random || p.activate_extension == false
 
-        new(
+        if p.activate_extension
+            n = 4
+            m = 3
+        else
+            n = 3
+            m = 2
+        end
+    
+        new{n,m}(
             p.α,
             p.β,
             p.δ,
@@ -92,7 +100,7 @@ end
 
 Act in the environment by setting the memory to the given price tuple and setting `is_done` to `true`.
 """
-function RLBase.act!(env::AIAPCEnv, price_tuple::CartesianIndex{2})
+function RLBase.act!(env::AIAPCEnv, price_tuple::CartesianIndex{N}) where {N <: Integer}
     # TODO: Fix support for longer memories
     env.memory[1] = price_tuple
     env.is_done[1] = true
@@ -189,13 +197,13 @@ end
 
 Return the reward for the current state for player `p` as an integer. If the episode is done, return the profit, else return `0`.
 """
-function RLBase.reward(env::AIAPCEnv, p::Int)::Float64
+function RLBase.reward(env::AIAPCEnv{N,M}, p::Int)::Float64 where {N<:Integer,M<:Integer}
     profit_array = env.profit_array
     memory_index_vect = env.memory
     return _reward(profit_array, memory_index_vect[1], p)
 end
 
-function _reward(profit::Array{Float64,3}, memory_index::CartesianIndex{2}, p::Int)::Float64
+function _reward(profit::Array{Float64,M}, memory_index::CartesianIndex{N}, p::Int)::Float64 where {N<:Integer,M<:Integer}
     return profit[memory_index, p]
 end
 
