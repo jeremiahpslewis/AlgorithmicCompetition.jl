@@ -11,7 +11,7 @@ const is_high_demand_to_index = (; :high => 1, :low => 2)
     AIAPCEnv(p::AIAPCHyperParameters)
 
     Build an environment to reproduce the results of the 2020  Calvano, Calzolari, Denicolò & Pastorello AER Paper
-    
+
     Calvano, E., Calzolari, G., Denicolò, V., & Pastorello, S. (2020). Artificial Intelligence, Algorithmic Pricing, and Collusion. American Economic Review, 110(10), 3267–3297. https://doi.org/10.1257/aer.20190623
 """
 struct AIAPCEnv{N,M} <: AbstractEnv # N is profit_array dimension, M is state_space_lookup dimension, N = M + 1
@@ -48,7 +48,8 @@ struct AIAPCEnv{N,M} <: AbstractEnv # N is profit_array dimension, M is state_sp
 
     data_demand_digital_params::DataDemandDigitalParams # Parameters for Data/Demand/Digital AIAPC extension
 
-    function AIAPCEnv(p::AIAPCHyperParameters; data_demand_digital_params::DataDemandDigitalParams = DataDemandDigitalParams())
+    function AIAPCEnv(p::AIAPCHyperParameters;
+        data_demand_digital_params::DataDemandDigitalParams = DataDemandDigitalParams())
         price_options = SVector{15,Float64}(p.price_options)
         n_prices = length(p.price_options)
         price_index = SVector{15,Int8}(Int8.(1:n_prices))
@@ -71,7 +72,7 @@ struct AIAPCEnv{N,M} <: AbstractEnv # N is profit_array dimension, M is state_sp
             n = Int64(3)
             m = Int64(2)
         end
-    
+
         new{n,m}(
             p.α,
             p.β,
@@ -85,7 +86,7 @@ struct AIAPCEnv{N,M} <: AbstractEnv # N is profit_array dimension, M is state_sp
             p.activate_extension,
             data_demand_digital_params.demand_mode,
             initialize_price_memory(price_index, p.n_players), # Memory, randomly initialized
-            get_demand_signals(data_demand_digital_params.demand_mode, is_high_demand_episode[1]),
+            get_demand_signals(data_demand_digital_params, is_high_demand_episode[1]),
             is_high_demand_episode,
             state_space,
             state_space_lookup,
@@ -216,7 +217,7 @@ function RLBase.reward(env::AIAPCEnv{N,M}, p::Int)::Float64 where {N,M}
         profit_array,
         memory_index,
         env.activate_extension,
-        env.is_high_demand_episode,
+        env.is_high_demand_episode[1],
         p
         )
 end
@@ -286,12 +287,12 @@ function RLBase.reset!(env::AIAPCEnv)
 
         # Update demand signals
         env.prev_is_high_demand_signals .= env.is_high_demand_signals
-        env.is_high_demand_signals .= get_demand_signals(is_high_demand_episode, env.data_demand_digital_params)
+        env.is_high_demand_signals .= get_demand_signals(env.data_demand_digital_params, is_high_demand_episode)
 
         # Update demand level
         env.is_high_demand_episode[1] = is_high_demand_episode
 
-        
+
     end
 end
 
