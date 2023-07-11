@@ -22,8 +22,6 @@ struct TDLearnerSARS{Ap,F<:AbstractFloat,I<:Integer} <: AbstractLearner
     n::I
 end
 
-RLCore.forward(L::TDLearnerSARS{Ap,F,I}, env::E) where {Ap,F,I,E<:AbstractEnv} =
-    RLCore.forward(L.approximator, state(env))
 RLCore.forward(L::TDLearnerSARS{Ap,F,I}, s::I1) where {Ap,F,I<:Integer,I1<:Integer} =
     RLCore.forward(L.approximator, s)
 RLCore.forward(

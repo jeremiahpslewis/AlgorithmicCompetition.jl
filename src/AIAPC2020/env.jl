@@ -234,7 +234,7 @@ function _reward(profit::Array{Float64,M},
     end
 
     if activate_extension
-        return profit[memory_index, :, p, demand_index_]
+        return profit[memory_index, p, demand_index_]
     else
         return profit[memory_index, p]
     end
@@ -250,15 +250,14 @@ RLBase.reward(env::AIAPCEnv, p::Symbol) = reward(env, player_lookup[p])
 RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
 
 """
-    RLBase.state(env::AIAPCEnv, ::Observation, p)
+    RLBase.state(env::AIAPCEnv, player::Symbol)
 
 Return the current state as an integer, mapped from the environment memory.
 """
-function RLBase.state(env::AIAPCEnv, ::Observation, p)
+function RLBase.state(env::AIAPCEnv, p::Symbol)
     memory_index = env.memory[1]
     if env.activate_extension
         # State is defined by memory, as in AIAPC, plus demand signal given to a player
-
         is_high_demand_signal_index = is_high_demand_to_index[env.is_high_demand_signals[player_to_index[p]]]
         prev_is_high_demand_signal_index = is_high_demand_to_index[env.prev_is_high_demand_signals[player_to_index[p]]]
 
