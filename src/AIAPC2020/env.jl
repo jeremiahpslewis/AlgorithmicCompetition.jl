@@ -4,6 +4,8 @@ using StaticArrays
 
 const player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
 const demand_lookup = (; :high => 1, :low => 2)
+const player_to_index = (; Symbol(1) => 1, Symbol(2) => 2)
+const is_high_demand_to_index = (; :high => 1, :low => 2)
 
 """
     AIAPCEnv(p::AIAPCHyperParameters)
@@ -195,7 +197,7 @@ Return the reward for the current state. If the episode is done, return the prof
 function RLBase.reward(env::AIAPCEnv)
     if env.activate_extension
         memory_index = env.memory[1]
-        env.is_done[1] ? Tuple{Float64,Float64}(env.profit_array[memory_index, :, env.demand_signal]) : zero_tuple
+        env.is_done[1] ? Tuple{Float64,Float64}(env.profit_array[memory_index, :, is_high_demand_signal_to_index[env.demand_signal]]) : zero_tuple
     else
         memory_index = env.memory[1]
         env.is_done[1] ? Tuple{Float64,Float64}(env.profit_array[memory_index, :]) : zero_tuple
@@ -210,15 +212,22 @@ Return the reward for the current state for player `p` as an integer. If the epi
 function RLBase.reward(env::AIAPCEnv{N,M}, p::Int)::Float64 where {N,M}
     profit_array = env.profit_array
     memory_index = env.memory[1]
-    return _reward(profit_array, memory_index, p)
+    return _reward(
+        profit_array,
+        memory_index,
+        env.activate_extension,
+        env.is_high_demand_episode,
+        p
+        )
 end
 
 function _reward(profit::Array{Float64,M},
     memory_index::CartesianIndex{N},
     activate_extension::Bool,
+    is_high_demand_episode::Bool
     p::Int)::Float64 where {N,M}
     if activate_extension
-        return profit[memory_index, :, p, env.demand_signal]
+        return profit[memory_index, :, p, is_high_demand_to_index[is_high_demand_episode]]
     else
         return profit[memory_index, p]
     end
@@ -233,11 +242,6 @@ RLBase.reward(env::AIAPCEnv, p::Symbol) = reward(env, player_lookup[p])
 
 RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
 
-
-const player_to_index = (; Symbol(1) => 1, Symbol(2) => 2)
-
-const is_high_demand_signal_to_index = (; :high => 1, :low => 2)
-
 """
     RLBase.state(env::AIAPCEnv, ::Observation, p)
 
@@ -247,7 +251,7 @@ function RLBase.state(env::AIAPCEnv, ::Observation, p)
     memory_index = env.memory[1]
     if env.activate_extension
         # State is defined by memory, as in AIAPC, plus demand signal given to a player
-        env.state_space_lookup[memory_index, is_high_demand_signal_to_index[env.is_high_demand_signals[player_to_index[p]]]]
+        env.state_space_lookup[memory_index, is_high_demand_to_index[env.is_high_demand_signals[player_to_index[p]]]]
     else
         env.state_space_lookup[memory_index]
     end
@@ -270,7 +274,7 @@ function RLBase.reset!(env::AIAPCEnv)
         is_high_demand_episode = get_demand_level(env.data_demand_digital_params)
 
         # Update demand signals
-        env.data_demand_digital_params.demand_signals .= get_demand_signals(is_high_demand_episode, env.data_demand_digital_params)
+        env.is_high_demand_signals .= get_demand_signals(is_high_demand_episode, env.data_demand_digital_params)
 
         # Update demand level
         env.is_high_demand_episode[1] = is_high_demand_episode
