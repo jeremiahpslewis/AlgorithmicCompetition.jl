@@ -21,40 +21,44 @@ import ReinforcementLearningCore: RLCore
 using StaticArrays
 using Statistics
 using AlgorithmicCompetition:
+    AIAPCEnv,
+    AIAPCEpsilonGreedyExplorer,
+    AIAPCHyperParameters,
+    AIAPCPolicy,
+    AIAPCSummary,
     AlgorithmicCompetition,
     CompetitionParameters,
     CompetitionParameters,
-    AIAPCHyperParameters,
-    AIAPCPolicy,
-    AIAPCEnv,
     CompetitionSolution,
-    ConvergenceCheck,
-    solve_monopolist,
-    solve_bertrand,
-    p_BR,
-    construct_state_space_lookup,
+    construct_action_space,
     construct_profit_array,
+    construct_state_space_lookup,
+    ConvergenceCheck,
+    economic_summary,
+    Experiment,
+    get_demand_level,
+    get_demand_signals,
+    get_ϵ,
+    InitMatrix,
+    initialize_memory,
+    p_BR,
+    profit_gain,
+    Q_i_0,
     Q,
     Q!,
-    Q_i_0,
-    π,
-    run,
-    run_and_extract,
-    Experiment,
     reward,
-    InitMatrix,
-    get_ϵ,
-    AIAPCEpsilonGreedyExplorer,
-    AIAPCSummary,
+    run_and_extract,
+    run,
+    solve_bertrand,
+    solve_monopolist,
     TDLearner,
-    economic_summary,
-    profit_gain,
-    β_range,
     α_range,
-    Int8
+    β_range,
+    π
 using Distributed
 
 include("alpha_beta.jl")
+include("stochastic_demand_stochastic_information.jl")
 include("competitive_equilibrium.jl")
 include("hooks.jl")
 include("policy.jl")

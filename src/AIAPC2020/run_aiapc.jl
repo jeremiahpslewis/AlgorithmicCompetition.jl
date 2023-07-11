@@ -26,14 +26,16 @@ function run_aiapc(;
     max_beta = 2,
     sample_fraction = 1,
 )
-    competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
-    competition_solution = CompetitionSolution(competition_params)
+    competition_params_dict = Dict(
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+    )
+    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
     # Filter params based on max_alpha and max_beta values
     α_ = α_range[α_range.<=max_alpha]
     β_ = β_range[β_range.<=max_beta]
 
-    β_ = β_ * 1e-5 # rescale beta
     δ = 0.95
 
     hyperparameter_vect = [
@@ -42,7 +44,7 @@ function run_aiapc(;
             β,
             δ,
             max_iter,
-            competition_solution;
+            competition_solution_dict;
             convergence_threshold = convergence_threshold,
         ) for α in α_ for β in β_
     ]

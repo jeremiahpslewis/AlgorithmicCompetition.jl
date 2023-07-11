@@ -8,7 +8,11 @@ using Flux
 Calculate the Q-value for player i at time t=0, given the price chosen by player i and assuming random play over the price options of player -i.
 """
 function Q_i_0(env::AIAPCEnv)
-    Float64[mean(env.profit_array[:, :, 1], dims = 2) ./ (1 - env.δ)...]
+    if env.activate_extension
+        Float64[mean(env.profit_array[:, :, 1, :], dims = 2) ./ (1 - env.δ)...]
+    else
+        Float64[mean(env.profit_array[:, :, 1], dims = 2) ./ (1 - env.δ)...]
+    end
 end
 
 """
@@ -50,7 +54,7 @@ function AIAPCPolicy(env::AIAPCEnv; mode = "baseline")
                         γ = env.δ,
                         n = 0,
                     ),
-                    explorer = AIAPCEpsilonGreedyExplorer(env.β), # * 2 # TODO: Drop this hack / attempt to get conversion to behave
+                    explorer = AIAPCEpsilonGreedyExplorer(env.β * 1e-5),
                 ),
                 Trajectory(
                     CircularArraySARSTraces(;

@@ -11,8 +11,11 @@ using Statistics
 file_name = "simulation_results_2023-06-27T20:52:00.709.csv"
 df = DataFrame(CSV.File(file_name))
 
-competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
-competition_solution = CompetitionSolution(competition_params)
+competition_params_dict = Dict(
+    :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+    :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+)
+competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
 env =
     AIAPCHyperParameters(
@@ -20,7 +23,7 @@ env =
         Float64(1e-4),
         0.95,
         Int(1e7),
-        competition_solution,
+        competition_solution_dict,
     ) |> AIAPCEnv
 
 df_summary = @chain df begin

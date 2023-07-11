@@ -52,7 +52,7 @@ using Distributed
 RLCore.TimerOutputs.enable_debug_timings(RLCore)
 
 α = Float64(0.125)
-β = Float64(4e-6)
+β = Float64(4e-1)
 δ = 0.95
 ξ = 0.1
 δ = 0.95
@@ -60,16 +60,20 @@ n_prices = 15
 max_iter = Int(1e6)
 price_index = 1:n_prices
 
-competition_params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
+competition_params_dict = Dict(
+    :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+    :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+)
 
-competition_solution = CompetitionSolution(competition_params)
+competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+
 
 hyperparams = AIAPCHyperParameters(
     α,
     β,
     δ,
     max_iter,
-    competition_solution;
+    competition_solution_dict;
     convergence_threshold = Int(1e5),
 )
 

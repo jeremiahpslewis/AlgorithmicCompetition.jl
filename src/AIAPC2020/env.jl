@@ -3,6 +3,7 @@ using ReinforcementLearningBase
 using StaticArrays
 
 const player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
+const demand_lookup = (; :high => 1, :low => 2)
 
 """
     AIAPCEnv(p::AIAPCHyperParameters)
@@ -11,7 +12,7 @@ const player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
     
     Calvano, E., Calzolari, G., Denicolò, V., & Pastorello, S. (2020). Artificial Intelligence, Algorithmic Pricing, and Collusion. American Economic Review, 110(10), 3267–3297. https://doi.org/10.1257/aer.20190623
 """
-struct AIAPCEnv <: AbstractEnv
+struct AIAPCEnv{N,M} <: AbstractEnv # N is profit_array dimension, M is state_space_lookup dimension, N = M + 1
     α::Float64                              # Learning parameter
     β::Float64                              # Exploration parameter
     δ::Float64                              # Discount factor
@@ -22,9 +23,10 @@ struct AIAPCEnv <: AbstractEnv
     price_options::SVector{15,Float64}      # Price options
     price_index::SVector{15,Int8}           # Price indices
 
-    competition_params::CompetitionParameters
-
-    memory::Vector{CartesianIndex{2}}                 # Memory vector (previous prices)
+    competition_params_dict::Dict{Symbol, CompetitionParameters} # Competition parameters, true = high, false = low
+    activate_extension::Bool                # Whether to activate the Data/Demand/Digital extension
+    demand_mode::Symbol                      # Demand mode, :high, :low, or :random
+    memory::Vector{CartesianIndex{M}}       # Memory vector (previous prices)
     state_space::Base.OneTo{Int16}          # State space
     state_space_lookup::Matrix{Int16}       # State space lookup table
 
@@ -38,23 +40,34 @@ struct AIAPCEnv <: AbstractEnv
     p_monop_opt::Float64                    # Monopoly optimal price
 
     action_space::Tuple                     # Action space
-    profit_array::Array{Float64,3}            # Profit given price pair as coordinates
+    profit_array::Array{Float64,N}          # Profit given price pair as coordinates
 
-    function AIAPCEnv(p::AIAPCHyperParameters)
+    data_demand_digital_params::DataDemandDigitalParams # Parameters for Data/Demand/Digital AIAPC extension
+
+    function AIAPCEnv(p::AIAPCHyperParameters; data_demand_digital_params::DataDemandDigitalParams = DataDemandDigitalParams())
         price_options = SVector{15,Float64}(p.price_options)
         n_prices = length(p.price_options)
         price_index = SVector{15,Int8}(Int8.(1:n_prices))
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
         state_space = Base.OneTo(Int16(n_state_space))
-        action_space =
-            Tuple(CartesianIndex{2}(i, j) for i in price_index for j in price_index)
-
+        action_space = construct_action_space(price_index, p.activate_extension)
         profit_array =
-            construct_profit_array(price_options, p.competition_params, n_players)
-        state_space_lookup = construct_state_space_lookup(action_space, n_prices)
+            construct_profit_array(price_options, p.competition_params_dict, n_players; p.activate_extension, data_demand_digital_params.demand_mode)
+        state_space_lookup = construct_state_space_lookup(action_space, n_prices, p.activate_extension)
 
-        new(
+        @assert data_demand_digital_params.demand_mode ∈ (:high, :low, :random)
+        @assert data_demand_digital_params.demand_mode == :random || p.activate_extension == false
+
+        if p.activate_extension
+            n = Int64(4)
+            m = Int64(3)
+        else
+            n = Int64(3)
+            m = Int64(2)
+        end
+    
+        new{n,m}(
             p.α,
             p.β,
             p.δ,
@@ -63,10 +76,10 @@ struct AIAPCEnv <: AbstractEnv
             n_players,
             p.price_options,
             price_index,
-            p.competition_params,
-            Vector{CartesianIndex{2}}([
-                CartesianIndex{2}(rand(price_index, p.n_players)...),
-            ]), # Memory, randomly initialized
+            p.competition_params_dict,
+            p.activate_extension,
+            data_demand_digital_params.demand_mode,
+            initialize_memory(price_index, p.n_players, p.activate_extension, data_demand_digital_params.is_high_demand_episode[1]), # Memory, randomly initialized
             state_space,
             state_space_lookup,
             n_prices,
@@ -77,6 +90,7 @@ struct AIAPCEnv <: AbstractEnv
             p.p_monop_opt,
             action_space,
             profit_array,
+            data_demand_digital_params,
         )
     end
 end
@@ -86,7 +100,7 @@ end
 
 Act in the environment by setting the memory to the given price tuple and setting `is_done` to `true`.
 """
-function RLBase.act!(env::AIAPCEnv, price_tuple::CartesianIndex{2})
+function RLBase.act!(env::AIAPCEnv{N,M}, price_tuple::CartesianIndex{M}) where {N,M}
     # TODO: Fix support for longer memories
     env.memory[1] = price_tuple
     env.is_done[1] = true
@@ -97,15 +111,21 @@ end
 
 Construct a lookup table from action space to the state space.
 """
-function construct_state_space_lookup(action_space, n_prices)
-    @assert length(action_space) == n_prices^2
-    state_space_lookup = reshape(Int16.(1:length(action_space)), n_prices, n_prices)
-    return state_space_lookup
+function construct_state_space_lookup(action_space, n_prices, activate_extension = false)
+    if activate_extension
+        @assert length(action_space) == n_prices^2 * 2
+        state_space_lookup = reshape(Int16.(1:length(action_space)), n_prices, n_prices, 2)
+        return state_space_lookup
+    else
+        @assert length(action_space) == n_prices^2
+        state_space_lookup = reshape(Int16.(1:length(action_space)), n_prices, n_prices)
+        return state_space_lookup
+    end
 end
 
 
 """
-    construct_profit_array(price_options, params, n_players)
+    construct_profit_array(price_options, params, n_players; activate_extension, demand_mode)
 
 Construct a 3-dimensional array which holds the profit for each player given a price pair.
 The first dimension is player 1's action, the second dimension is player 2's action, and
@@ -113,17 +133,33 @@ the third dimension is the player index for their profit.
 """
 function construct_profit_array(
     price_options::SVector{15,Float64},
-    params::CompetitionParameters,
-    n_players::Int,
+    competition_params_dict::Dict{Symbol,CompetitionParameters},
+    n_players::Int;
+    activate_extension = false,
+    demand_mode = :high,
 )
     n_prices = length(price_options)
-    # TODO: Carve out into separate function:
-    profit_array = zeros(Float64, n_prices, n_prices, n_players)
-    for k = 1:n_players
-        for i = 1:n_prices
-            for j = 1:n_prices
-                # TODO: Check that player assignment is correct here (should be...?)
-                profit_array[i, j, k] = π(price_options[i], price_options[j], params)[k]
+
+    if activate_extension
+        profit_array = zeros(Float64, n_prices, n_prices, n_players, 2)
+        for l = [:high, :low]
+            for k = 1:n_players
+                for i = 1:n_prices
+                    for j = 1:n_prices
+                        profit_array[i, j, k, demand_lookup[l]] = π(price_options[i], price_options[j], competition_params_dict[l])[k]
+                    end
+                end
+            end
+        end
+    else
+        params_ = competition_params_dict[demand_mode]
+
+        profit_array = zeros(Float64, n_prices, n_prices, n_players)
+        for k = 1:n_players
+            for i = 1:n_prices
+                for j = 1:n_prices
+                    profit_array[i, j, k] = π(price_options[i], price_options[j], params_)[k]
+                end
             end
         end
     end
@@ -161,13 +197,13 @@ end
 
 Return the reward for the current state for player `p` as an integer. If the episode is done, return the profit, else return `0`.
 """
-function RLBase.reward(env::AIAPCEnv, p::Int)::Float64
+function RLBase.reward(env::AIAPCEnv{N,M}, p::Int)::Float64 where {N,M}
     profit_array = env.profit_array
     memory_index_vect = env.memory
     return _reward(profit_array, memory_index_vect[1], p)
 end
 
-function _reward(profit::Array{Float64,3}, memory_index::CartesianIndex{2}, p::Int)::Float64
+function _reward(profit::Array{Float64,M}, memory_index::CartesianIndex{N}, p::Int)::Float64 where {N,M}
     return profit[memory_index, p]
 end
 
@@ -200,6 +236,11 @@ RLBase.is_terminated(env::AIAPCEnv) = env.is_done[1]
 
 function RLBase.reset!(env::AIAPCEnv)
     env.is_done[1] = false
+
+    # For data / demand / digital extension...
+    if env.activate_extension
+        env.data_demand_digital_params.is_high_demand_episode[1] = get_demand_level(env.data_demand_digital_params.frequency_high_demand) # update high demand state (i.i.d. draws every episode)
+    end
 end
 
 RLBase.players(::AIAPCEnv) = (Symbol(1), Symbol(2))
