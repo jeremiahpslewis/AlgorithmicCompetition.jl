@@ -40,7 +40,7 @@ using AlgorithmicCompetition:
     get_demand_signals,
     get_ϵ,
     InitMatrix,
-    initialize_memory,
+    initialize_price_memory,
     p_BR,
     profit_gain,
     Q_i_0,

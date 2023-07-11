@@ -20,6 +20,5 @@ end
 end
 
 @testset "initialize_memory" begin
-    @test length(initialize_memory(1:15, 2, true, true)[1]) == 3
-    @test length(initialize_memory(1:15, 2, false, false)[1]) == 2
+    @test length(initialize_memory(1:15, 2)[1]) == 2
 end

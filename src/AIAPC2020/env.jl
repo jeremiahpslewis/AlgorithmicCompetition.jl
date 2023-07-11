@@ -84,8 +84,8 @@ struct AIAPCEnv{N,M} <: AbstractEnv # N is profit_array dimension, M is state_sp
             p.competition_params_dict,
             p.activate_extension,
             data_demand_digital_params.demand_mode,
-            initialize_memory(price_index, p.n_players), # Memory, randomly initialized
-            get_demand_signals(data_demand_digital_params.demand_mode, is_high_demand_episode[1])
+            initialize_price_memory(price_index, p.n_players), # Memory, randomly initialized
+            get_demand_signals(data_demand_digital_params.demand_mode, is_high_demand_episode[1]),
             is_high_demand_episode,
             state_space,
             state_space_lookup,
@@ -121,7 +121,7 @@ Construct a lookup table from action space to the state space.
 function construct_state_space_lookup(action_space, n_prices, activate_extension = false)
     if activate_extension
         @assert length(action_space) == n_prices^2 * 2
-        state_space_lookup = reshape(Int16.(1:length(action_space)), n_prices, n_prices, 2)
+        state_space_lookup = reshape(Int16.(1:length(action_space)), n_prices, n_prices, 2, 2)
         return state_space_lookup
     else
         @assert length(action_space) == n_prices^2
@@ -224,7 +224,7 @@ end
 function _reward(profit::Array{Float64,M},
     memory_index::CartesianIndex{N},
     activate_extension::Bool,
-    is_high_demand_episode::Bool
+    is_high_demand_episode::Bool,
     p::Int)::Float64 where {N,M}
     if is_high_demand_episode
         demand_index_ = 2
@@ -257,7 +257,12 @@ function RLBase.state(env::AIAPCEnv, ::Observation, p)
     memory_index = env.memory[1]
     if env.activate_extension
         # State is defined by memory, as in AIAPC, plus demand signal given to a player
-        env.state_space_lookup[memory_index, is_high_demand_to_index[env.is_high_demand_signals[player_to_index[p]]]]
+
+        is_high_demand_signal_index = is_high_demand_to_index[env.is_high_demand_signals[player_to_index[p]]]
+        prev_is_high_demand_signal_index = is_high_demand_to_index[env.prev_is_high_demand_signals[player_to_index[p]]]
+
+        # State space is indexed by: memory (price x price, length 2), current demand signal, previous demand signal
+        env.state_space_lookup[memory_index, is_high_demand_signal_index, prev_is_high_demand_signal_index]
     else
         env.state_space_lookup[memory_index]
     end
@@ -280,10 +285,13 @@ function RLBase.reset!(env::AIAPCEnv)
         is_high_demand_episode = get_demand_level(env.data_demand_digital_params)
 
         # Update demand signals
+        env.prev_is_high_demand_signals .= env.is_high_demand_signals
         env.is_high_demand_signals .= get_demand_signals(is_high_demand_episode, env.data_demand_digital_params)
 
         # Update demand level
         env.is_high_demand_episode[1] = is_high_demand_episode
+
+        
     end
 end
 
