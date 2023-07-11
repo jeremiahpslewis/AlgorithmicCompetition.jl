@@ -226,8 +226,14 @@ function _reward(profit::Array{Float64,M},
     activate_extension::Bool,
     is_high_demand_episode::Bool
     p::Int)::Float64 where {N,M}
+    if is_high_demand_episode
+        demand_index_ = 2
+    else
+        demand_index_ = 1
+    end
+
     if activate_extension
-        return profit[memory_index, :, p, is_high_demand_to_index[is_high_demand_episode]]
+        return profit[memory_index, :, p, demand_index_]
     else
         return profit[memory_index, p]
     end
