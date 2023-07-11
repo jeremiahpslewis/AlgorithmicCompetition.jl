@@ -16,17 +16,18 @@ struct DataDemandDigitalParams
     high_signal_quality_boost::Float64 # probability of true signal is 0.5 + low_signal_quality_level + high_signal_quality_boost
     signal_quality_is_high::Vector{Bool} # true if signal quality is high
     frequency_high_demand::Float64 # probability of high demand for a given episode
-    is_high_demand_episode::Vector{Bool} # [true] if demand is high for a given episode
     demand_mode::Symbol # :high, :low, :random
 
     function DataDemandDigitalParams(; demand_mode::Symbol=:high)
-        new(0.0, 0.0, [false, false], 0.5, rand(Bool, 1), demand_mode)
+        new(0.0, 0.0, [false, false], 0.5, demand_mode)
     end
 end
 
 function get_demand_level(frequency_high_demand::Float64)
     rand() < frequency_high_demand ? true : false
 end
+
+get_demand_level(d::DataDemandDigitalParams) = get_demand_level(d.frequency_high_demand)
 
 
 function get_demand_signals(demand_level_is_high::Bool, signal_quality_is_high::Vector{Bool}, low_signal_quality_level::Float64, high_signal_quality_boost::Float64)
@@ -40,3 +41,11 @@ function get_demand_signals(demand_level_is_high::Bool, signal_quality_is_high::
 
     return observed_signal_demand_level_is_high
 end
+
+function get_demand_signals(d::DataDemandDigitalParams, is_high_demand_episode::Bool)
+    get_demand_signals(is_high_demand_episode,
+    d.signal_quality_is_high,
+    d.low_signal_quality_level,
+    d.high_signal_quality_boost)
+end
+

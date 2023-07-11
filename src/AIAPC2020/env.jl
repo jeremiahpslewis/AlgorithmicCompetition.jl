@@ -27,6 +27,8 @@ struct AIAPCEnv{N,M} <: AbstractEnv # N is profit_array dimension, M is state_sp
     activate_extension::Bool                # Whether to activate the Data/Demand/Digital extension
     demand_mode::Symbol                      # Demand mode, :high, :low, or :random
     memory::Vector{CartesianIndex{M}}       # Memory vector (previous prices)
+    is_high_demand_signals::Vector{Bool}    # [true, false] if demand signal is high for player one and low for player two for a given episode
+    is_high_demand_episode::Vector{Bool}    # [true] if demand is high for a given episode
     state_space::Base.OneTo{Int16}          # State space
     state_space_lookup::Matrix{Int16}       # State space lookup table
 
@@ -55,6 +57,7 @@ struct AIAPCEnv{N,M} <: AbstractEnv # N is profit_array dimension, M is state_sp
         profit_array =
             construct_profit_array(price_options, p.competition_params_dict, n_players; p.activate_extension, data_demand_digital_params.demand_mode)
         state_space_lookup = construct_state_space_lookup(action_space, n_prices, p.activate_extension)
+        is_high_demand_episode = rand(Bool, 1)
 
         @assert data_demand_digital_params.demand_mode ∈ (:high, :low, :random)
         @assert data_demand_digital_params.demand_mode == :random || p.activate_extension == false
@@ -79,7 +82,9 @@ struct AIAPCEnv{N,M} <: AbstractEnv # N is profit_array dimension, M is state_sp
             p.competition_params_dict,
             p.activate_extension,
             data_demand_digital_params.demand_mode,
-            initialize_memory(price_index, p.n_players, p.activate_extension, data_demand_digital_params.is_high_demand_episode[1]), # Memory, randomly initialized
+            initialize_memory(price_index, p.n_players), # Memory, randomly initialized
+            get_demand_signals(data_demand_digital_params.demand_mode, is_high_demand_episode[1])
+            is_high_demand_episode,
             state_space,
             state_space_lookup,
             n_prices,
@@ -188,8 +193,13 @@ const zero_tuple = Tuple{Float64,Float64}([0, 0])
 Return the reward for the current state. If the episode is done, return the profit, else return `(0, 0)`.
 """
 function RLBase.reward(env::AIAPCEnv)
-    memory_index = env.memory[1]
-    env.is_done[1] ? Tuple{Float64,Float64}(env.profit_array[memory_index, :]) : zero_tuple
+    if env.activate_extension
+        memory_index = env.memory[1]
+        env.is_done[1] ? Tuple{Float64,Float64}(env.profit_array[memory_index, :, env.demand_signal]) : zero_tuple
+    else
+        memory_index = env.memory[1]
+        env.is_done[1] ? Tuple{Float64,Float64}(env.profit_array[memory_index, :]) : zero_tuple
+    end
 end
 
 """
@@ -199,12 +209,19 @@ Return the reward for the current state for player `p` as an integer. If the epi
 """
 function RLBase.reward(env::AIAPCEnv{N,M}, p::Int)::Float64 where {N,M}
     profit_array = env.profit_array
-    memory_index_vect = env.memory
-    return _reward(profit_array, memory_index_vect[1], p)
+    memory_index = env.memory[1]
+    return _reward(profit_array, memory_index, p)
 end
 
-function _reward(profit::Array{Float64,M}, memory_index::CartesianIndex{N}, p::Int)::Float64 where {N,M}
-    return profit[memory_index, p]
+function _reward(profit::Array{Float64,M},
+    memory_index::CartesianIndex{N},
+    activate_extension::Bool,
+    p::Int)::Float64 where {N,M}
+    if activate_extension
+        return profit[memory_index, :, p, env.demand_signal]
+    else
+        return profit[memory_index, p]
+    end
 end
 
 """
@@ -216,6 +233,11 @@ RLBase.reward(env::AIAPCEnv, p::Symbol) = reward(env, player_lookup[p])
 
 RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
 
+
+const player_to_index = (; Symbol(1) => 1, Symbol(2) => 2)
+
+const is_high_demand_signal_to_index = (; :high => 1, :low => 2)
+
 """
     RLBase.state(env::AIAPCEnv, ::Observation, p)
 
@@ -223,7 +245,12 @@ Return the current state as an integer, mapped from the environment memory.
 """
 function RLBase.state(env::AIAPCEnv, ::Observation, p)
     memory_index = env.memory[1]
-    env.state_space_lookup[memory_index]
+    if env.activate_extension
+        # State is defined by memory, as in AIAPC, plus demand signal given to a player
+        env.state_space_lookup[memory_index, is_high_demand_signal_to_index[env.is_high_demand_signals[player_to_index[p]]]]
+    else
+        env.state_space_lookup[memory_index]
+    end
 end
 
 """
@@ -239,7 +266,14 @@ function RLBase.reset!(env::AIAPCEnv)
 
     # For data / demand / digital extension...
     if env.activate_extension
-        env.data_demand_digital_params.is_high_demand_episode[1] = get_demand_level(env.data_demand_digital_params.frequency_high_demand) # update high demand state (i.i.d. draws every episode)
+        # Determine whether next episode is a high demand episode
+        is_high_demand_episode = get_demand_level(env.data_demand_digital_params)
+
+        # Update demand signals
+        env.data_demand_digital_params.demand_signals .= get_demand_signals(is_high_demand_episode, env.data_demand_digital_params)
+
+        # Update demand level
+        env.is_high_demand_episode[1] = is_high_demand_episode
     end
 end
 
