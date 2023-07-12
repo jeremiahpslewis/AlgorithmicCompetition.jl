@@ -90,57 +90,41 @@ experiment = Experiment(env; stop_on_convergence = true)
 
 @time run(hyperparams; stop_on_convergence = true);
 
-RLCore.to
+# RLCore.to
 
-a = @time run(hyperparams; stop_on_convergence = false);
-
-
-# TODO Debug how this can happen...
-# a.hook[Symbol(1)][1].rewards[end-10:end] Weird oscillation happening here...only for player 1
+# a = @time run(hyperparams; stop_on_convergence = false);
 
 
+# # TODO Debug how this can happen...
+# # a.hook[Symbol(1)][1].rewards[end-10:end] Weird oscillation happening here...only for player 1
 
 
-# AlgorithmicCompetition.π(a.env.price_options[7], a.env.price_options[7], a.env.competition_params)
 
 
-# next_price_set = get_optimal_action(a.env, last_observed_state)
-# next_state = get_state_from_memory(a.env, next_price_set)
-
-# for i in 1:20
-#     a = run(hyperparams; stop_on_convergence = true)
-# end
-
-a_list = run_and_extract.(repeat([hyperparams], 10))
-mean(profit_gain.([g.convergence_profit for g in a_list], (a.env,)))
-
-# @report_opt push!(hook, PostEpisodeStage(), 1.0, 1.0)
-# a.policy.agents[Symbol(1)].trajectory.container[:next_state]
-# 509.952693 seconds (8.40 G allocations: 330.871 GiB, 8.58% gc time, 0.10% compilation time)
-# 626.709955 seconds (8.60 G allocations: 333.888 GiB, 7.34% gc time, 0.10% compilation time) # with circulararraybuffers
+# # AlgorithmicCompetition.π(a.env.price_options[7], a.env.price_options[7], a.env.competition_params)
 
 
-# 53.278634 seconds (859.40 M allocations: 33.351 GiB, 8.71% gc time) # With circular arrays
-# 50.567420 seconds (839.40 M allocations: 33.055 GiB, 8.84% gc time) # With normal hook
+# # next_price_set = get_optimal_action(a.env, last_observed_state)
+# # next_state = get_state_from_memory(a.env, next_price_set)
 
-# @profview run(hyperparams; stop_on_convergence = false);
-@report_opt RLCore._run(
-    experiment.policy,
-    experiment.env,
-    experiment.stop_condition,
-    experiment.hook,
-    ResetAtTerminal(),
-)
+# # for i in 1:20
+# #     a = run(hyperparams; stop_on_convergence = true)
+# # end
 
-RLCore._run(
-    experiment.policy,
-    experiment.env,
-    experiment.stop_condition,
-    experiment.hook,
-    ResetAtTerminal(),
-)
+# a_list = run_and_extract.(repeat([hyperparams], 10))
+# mean(profit_gain.([g.convergence_profit for g in a_list], (a.env,)))
 
-# @profview RLCore._run(
+# # @report_opt push!(hook, PostEpisodeStage(), 1.0, 1.0)
+# # a.policy.agents[Symbol(1)].trajectory.container[:next_state]
+# # 509.952693 seconds (8.40 G allocations: 330.871 GiB, 8.58% gc time, 0.10% compilation time)
+# # 626.709955 seconds (8.60 G allocations: 333.888 GiB, 7.34% gc time, 0.10% compilation time) # with circulararraybuffers
+
+
+# # 53.278634 seconds (859.40 M allocations: 33.351 GiB, 8.71% gc time) # With circular arrays
+# # 50.567420 seconds (839.40 M allocations: 33.055 GiB, 8.84% gc time) # With normal hook
+
+# # @profview run(hyperparams; stop_on_convergence = false);
+# @report_opt RLCore._run(
 #     experiment.policy,
 #     experiment.env,
 #     experiment.stop_condition,
@@ -148,33 +132,49 @@ RLCore._run(
 #     ResetAtTerminal(),
 # )
 
-# RLBase.plan!(experiment.policy.agents[Symbol(1)], env)
-# @report_opt RLBase.plan!(experiment.policy.agents[Symbol(1)], env, Symbol(1))
-# @report_opt RLBase.plan!(experiment.policy, env, Symbol(1))
-# @report_opt RLCore.forward(td_learner, env)
-@report_opt RLBase.plan!(experiment.policy, env)
-# @report_opt RLBase.act!(env, (1,1))
+# RLCore._run(
+#     experiment.policy,
+#     experiment.env,
+#     experiment.stop_condition,
+#     experiment.hook,
+#     ResetAtTerminal(),
+# )
 
-# AlgorithmicCompetition.run_and_extract(hyperparams; stop_on_convergence = true).iterations_until_convergence[1]
-@report_opt AlgorithmicCompetition.economic_summary(experiment)
-n_procs_ = 3
+# # @profview RLCore._run(
+# #     experiment.policy,
+# #     experiment.env,
+# #     experiment.stop_condition,
+# #     experiment.hook,
+# #     ResetAtTerminal(),
+# # )
 
-_procs = addprocs(
-    n_procs_,
-    topology = :master_worker,
-    exeflags = ["--threads=1", "--project=$(Base.active_project())"],
-)
+# # RLBase.plan!(experiment.policy.agents[Symbol(1)], env)
+# # @report_opt RLBase.plan!(experiment.policy.agents[Symbol(1)], env, Symbol(1))
+# # @report_opt RLBase.plan!(experiment.policy, env, Symbol(1))
+# # @report_opt RLCore.forward(td_learner, env)
+# @report_opt RLBase.plan!(experiment.policy, env)
+# # @report_opt RLBase.act!(env, (1,1))
 
-@everywhere begin
-    using Pkg
-    Pkg.instantiate()
-    using AlgorithmicCompetition
-end
+# # AlgorithmicCompetition.run_and_extract(hyperparams; stop_on_convergence = true).iterations_until_convergence[1]
+# @report_opt AlgorithmicCompetition.economic_summary(experiment)
+# n_procs_ = 3
 
-AlgorithmicCompetition.run_aiapc(;
-    n_parameter_iterations = 100,
-    # max_iter = Int(1e6),
-    # convergence_threshold = Int(10),
-)
+# _procs = addprocs(
+#     n_procs_,
+#     topology = :master_worker,
+#     exeflags = ["--threads=1", "--project=$(Base.active_project())"],
+# )
 
-rmprocs(_procs)
+# @everywhere begin
+#     using Pkg
+#     Pkg.instantiate()
+#     using AlgorithmicCompetition
+# end
+
+# AlgorithmicCompetition.run_aiapc(;
+#     n_parameter_iterations = 100,
+#     # max_iter = Int(1e6),
+#     # convergence_threshold = Int(10),
+# )
+
+# rmprocs(_procs)
