@@ -57,7 +57,7 @@ struct AIAPCEnv{N} <: AbstractEnv # N is profit_array dimension
         state_space = Base.OneTo(Int16(n_state_space))
         action_space = construct_action_space(price_index, p.activate_extension)
         profit_array =
-            construct_profit_array(price_options, p.competition_params_dict, n_players; p.activate_extension, data_demand_digital_params.demand_mode)
+            construct_profit_array(price_options, p.competition_params_dict, n_players; p.activate_extension, p.data_demand_digital_params.demand_mode)
         state_space_lookup = construct_state_space_lookup(action_space, n_prices, p.activate_extension)
         is_high_demand_episode = rand(Bool, 1)
 

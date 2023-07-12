@@ -93,6 +93,7 @@ struct AIAPCHyperParameters
             competition_solution_dict[:high].p_Bert_nash_equilibrium, # TODO: Fix this so that it works for both high and low demand states
             competition_solution_dict[:high].p_monop_opt, # TODO: Fix this so that it works for both high and low demand states
             activate_extension,
+            data_demand_digital_params,
         )
     end
 end
