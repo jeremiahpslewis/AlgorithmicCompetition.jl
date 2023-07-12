@@ -151,5 +151,5 @@ end
 
 function RLBase.plan!(explorer::Ex, learner::L, env::E, player::Symbol) where {Ex<:AbstractExplorer,L<:AbstractLearner,E<:AbstractEnv}
     legal_action_space_ = RLBase.legal_action_space_mask(env, player)
-    return RLBase.plan!(explorer, forward(learner, state(env, player)), legal_action_space_)
+    return RLBase.plan!(explorer, RLCore.forward(learner, state(env, player)), legal_action_space_)
 end

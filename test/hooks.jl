@@ -47,7 +47,7 @@ end
             competition_solution_dict,
         ) |> AIAPCEnv
     exper = Experiment(env)
-    state(env)
+    state(env, Symbol(1))
     policies = AIAPCPolicy(env, mode = "zero")
     push!(exper.hook[Symbol(1)][2], Int16(2), Int8(3), false)
     @test exper.hook[Symbol(1)][2].best_response_vector[2] == 3
@@ -84,7 +84,7 @@ end
     push!(convergence_hook, PostActStage(), policies[Symbol(1)], env, Symbol(1))
     @test convergence_hook.convergence_duration == 0
     @test convergence_hook.iterations_until_convergence == 1
-    @test convergence_hook.best_response_vector[state(env, :1)] != 0
+    @test convergence_hook.best_response_vector[state(env, Symbol(1))] != 0
     @test convergence_hook.is_converged != true
 
     convergence_hook_1 = ConvergenceCheck(1)

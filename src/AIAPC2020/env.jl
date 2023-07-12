@@ -249,6 +249,9 @@ RLBase.reward(env::AIAPCEnv, p::Symbol) = reward(env, player_lookup[p])
 
 RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
 
+# State without player spec is a noop
+RLBase.state(env::AIAPCEnv) = nothing
+
 """
     RLBase.state(env::AIAPCEnv, player::Symbol)
 
