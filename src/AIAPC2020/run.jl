@@ -6,8 +6,8 @@ import ReinforcementLearningBase: RLBase
 import ReinforcementLearningCore: RLCore
 
 # Patch to improve type stability and try to speed things up (avoid generator)
-function RLBase.plan!(multiagent::MultiAgentPolicy, env::AIAPCEnv{N,M}) where {N,M}
-    return CartesianIndex{M}(
+function RLBase.plan!(multiagent::MultiAgentPolicy, env::AIAPCEnv{N}) where {N}
+    return CartesianIndex{2}(
         RLBase.plan!(multiagent[Symbol(1)], env, Symbol(1)),
         RLBase.plan!(multiagent[Symbol(2)], env, Symbol(2)),
     )

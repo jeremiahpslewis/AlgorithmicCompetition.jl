@@ -47,6 +47,7 @@ struct AIAPCHyperParameters
     p_monop_opt::Float64
 
     activate_extension::Bool
+    data_demand_digital_params::DataDemandDigitalParams
 
     function AIAPCHyperParameters(
         α::Float64,
@@ -56,6 +57,7 @@ struct AIAPCHyperParameters
         competition_solution_dict::Dict{Symbol,CompetitionSolution};
         convergence_threshold::Int = Int(1e5),
         activate_extension::Bool = false, # Whether to activate the Data/Demand/Digital extension
+        data_demand_digital_params = DataDemandDigitalParams()
     )
         @assert max_iter > convergence_threshold
         ξ = 0.1

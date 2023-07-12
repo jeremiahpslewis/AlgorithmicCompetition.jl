@@ -27,6 +27,7 @@ using AlgorithmicCompetition:
     AIAPCEnv,
     CompetitionSolution,
     ConvergenceCheck,
+    DataDemandDigitalParams,
     solve_monopolist,
     solve_bertrand,
     p_BR,
@@ -67,6 +68,7 @@ competition_params_dict = Dict(
 
 competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
+data_demand_digital_params = DataDemandDigitalParams(demand_mode=:random)
 
 hyperparams = AIAPCHyperParameters(
     α,
@@ -75,7 +77,10 @@ hyperparams = AIAPCHyperParameters(
     max_iter,
     competition_solution_dict;
     convergence_threshold = Int(1e5),
+    activate_extension = true,
+    data_demand_digital_params = data_demand_digital_params,
 )
+
 
 env = AIAPCEnv(hyperparams)
 experiment = Experiment(env; stop_on_convergence = true)

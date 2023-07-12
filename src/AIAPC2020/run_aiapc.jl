@@ -25,6 +25,7 @@ function run_aiapc(;
     max_alpha = 0.25,
     max_beta = 2,
     sample_fraction = 1,
+    activate_extension = false,
 )
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
@@ -46,6 +47,7 @@ function run_aiapc(;
             max_iter,
             competition_solution_dict;
             convergence_threshold = convergence_threshold,
+            activate_extension = activate_extension,
         ) for α in α_ for β in β_
     ]
 
