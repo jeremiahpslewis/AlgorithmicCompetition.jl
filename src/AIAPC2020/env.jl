@@ -5,7 +5,7 @@ using StaticArrays
 const player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
 const demand_lookup = (; :high => 1, :low => 2)
 const player_to_index = (; Symbol(1) => 1, Symbol(2) => 2)
-const is_high_demand_to_index = (; :high => 1, :low => 2)
+const demand_to_index = (; :high => 1, :low => 2)
 
 """
     AIAPCEnv(p::AIAPCHyperParameters)
@@ -198,7 +198,7 @@ Return the reward for the current state. If the episode is done, return the prof
 function RLBase.reward(env::AIAPCEnv)
     if env.activate_extension
         memory_index = env.memory[1]
-        env.is_done[1] ? Tuple{Float64,Float64}(env.profit_array[memory_index, :, is_high_demand_signal_to_index[env.demand_signal]]) : zero_tuple
+        env.is_done[1] ? Tuple{Float64,Float64}(env.profit_array[memory_index, :, demand_to_index[env.demand_signal]]) : zero_tuple
     else
         memory_index = env.memory[1]
         env.is_done[1] ? Tuple{Float64,Float64}(env.profit_array[memory_index, :]) : zero_tuple
@@ -261,11 +261,16 @@ function RLBase.state(env::AIAPCEnv, p::Symbol)
     memory_index = env.memory[1]
     if env.activate_extension
         # State is defined by memory, as in AIAPC, plus demand signal given to a player
-        is_high_demand_signal_index = is_high_demand_to_index[env.is_high_demand_signals[player_to_index[p]]]
-        prev_is_high_demand_signal_index = is_high_demand_to_index[env.prev_is_high_demand_signals[player_to_index[p]]]
+        index_ = player_to_index[p]
+        _is_high_demand_signal = env.is_high_demand_signals[index_]
+        _demand_signal = _is_high_demand_signal ? :high : :low
+        demand_signal_index = demand_to_index[_demand_signal]
+        _prev_is_high_demand_signal = env.prev_is_high_demand_signals[index_]
+        _prev_demand_signal = _prev_is_high_demand_signal ? :high : :low
+        prev_demand_signal_index = demand_to_index[_prev_demand_signal]
 
         # State space is indexed by: memory (price x price, length 2), current demand signal, previous demand signal
-        env.state_space_lookup[memory_index, is_high_demand_signal_index, prev_is_high_demand_signal_index]
+        env.state_space_lookup[memory_index, demand_signal_index, prev_demand_signal_index]
     else
         env.state_space_lookup[memory_index]
     end
@@ -308,3 +313,8 @@ RLBase.StateStyle(::AIAPCEnv) = Observation{Int64}()
 RLBase.RewardStyle(::AIAPCEnv) = STEP_REWARD
 RLBase.UtilityStyle(::AIAPCEnv) = GENERAL_SUM
 RLBase.ChanceStyle(::AIAPCEnv) = DETERMINISTIC
+
+function RLBase.plan!(explorer::Ex, learner::L, env::AIAPCEnv, player::Symbol) where {Ex<:AbstractExplorer,L<:AbstractLearner,E<:AbstractEnv}
+    legal_action_space_ = RLBase.legal_action_space_mask(env, player)
+    return RLBase.plan!(explorer, RLCore.forward(learner, state(env, player)), legal_action_space_)
+end
