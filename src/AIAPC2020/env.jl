@@ -30,6 +30,7 @@ struct AIAPCEnv{N} <: AbstractEnv # N is profit_array dimension
     demand_mode::Symbol                      # Demand mode, :high, :low, or :random
     memory::Vector{CartesianIndex{2}}       # Memory vector (previous prices)
     is_high_demand_signals::Vector{Bool}    # [true, false] if demand signal is high for player one and low for player two for a given episode
+    prev_is_high_demand_signals::Vector{Bool}    # [true, false] if demand signal is high for player one and low for player two for a given episode
     is_high_demand_episode::Vector{Bool}    # [true] if demand is high for a given episode
     state_space::Base.OneTo{Int16}          # State space
     state_space_lookup::Array{Int16, 4}       # State space lookup table
@@ -54,6 +55,9 @@ struct AIAPCEnv{N} <: AbstractEnv # N is profit_array dimension
         price_index = SVector{15,Int8}(Int8.(1:n_prices))
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
+        if p.activate_extension
+            n_state_space *= 4
+        end
         state_space = Base.OneTo(Int16(n_state_space))
         action_space = construct_action_space(price_index, p.activate_extension)
         profit_array =
@@ -83,7 +87,8 @@ struct AIAPCEnv{N} <: AbstractEnv # N is profit_array dimension
             p.activate_extension,
             p.data_demand_digital_params.demand_mode,
             initialize_price_memory(price_index, p.n_players), # Memory, randomly initialized
-            get_demand_signals(p.data_demand_digital_params, is_high_demand_episode[1]),
+            get_demand_signals(p.data_demand_digital_params, is_high_demand_episode[1]), # Current demand, randomly initialized
+            get_demand_signals(p.data_demand_digital_params, is_high_demand_episode[1]), # Previous demand, randomly initialized
             is_high_demand_episode,
             state_space,
             state_space_lookup,

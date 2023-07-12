@@ -3,6 +3,7 @@ using Distributed
 using Random
 using StatsBase
 
+# TODO: Add a second range for extension setup!
 const α_range = Float64.(range(0.0025, 0.25, 100))
 const β_range = Float64.(range(0.02, 2, 100))
 
