@@ -40,8 +40,8 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
     convergence_dict::Dict{Symbol,Bool}     # Convergence status for each player
     is_done::MVector{1,Bool}                # Episode is complete
 
-    p_Bert_nash_equilibrium::Float64        # Nash equilibrium price (Betrand price)
-    p_monop_opt::Float64                    # Monopoly optimal price
+    p_Bert_nash_equilibrium::Dict{Symbol,Float64}        # Nash equilibrium prices for low and high demand (Betrand price)
+    p_monop_opt::Dict{Symbol,Float64}                    # Monopoly optimal prices for low and high demand
 
     action_space::Tuple                     # Action space
     profit_array::Array{Float64,4}          # Profit given price pair as coordinates

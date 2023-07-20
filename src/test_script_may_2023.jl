@@ -45,7 +45,8 @@ using AlgorithmicCompetition:
     TDLearner,
     TabularApproximator,
     economic_summary,
-    extract_sim_results
+    extract_sim_results,
+    DDDCEnv
 # using JET
 # using ProfileView
 using Distributed
@@ -68,7 +69,7 @@ competition_params_dict = Dict(
 
 competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
-data_demand_digital_params = DataDemandDigitalParams(demand_mode=:random)
+data_demand_digital_params = DataDemandDigitalParams()
 
 hyperparams = AIAPCHyperParameters(
     α,
@@ -77,12 +78,11 @@ hyperparams = AIAPCHyperParameters(
     max_iter,
     competition_solution_dict;
     convergence_threshold = Int(1e5),
-    activate_extension = true,
-    data_demand_digital_params = data_demand_digital_params,
+    demand_mode = :random,
 )
 
 
-env = AIAPCEnv(hyperparams)
+env = DDDCEnv(hyperparams)
 experiment = Experiment(env; stop_on_convergence = true)
 
 @report_opt Base.push!(experiment.policy, PostActStage(), experiment.env)

@@ -58,7 +58,7 @@ struct AIAPCHyperParameters
         demand_mode::Symbol = :high,
     )
         @assert max_iter > convergence_threshold
-        @assert demand_mode ∈ [:high, :low, :random]
+        @assert demand_mode ∈ [:high, :low]
         ξ = 0.1
         δ = 0.95
         n_prices = 15
@@ -68,13 +68,13 @@ struct AIAPCHyperParameters
         # p_monop defined above
         p_range_pad =
             ξ * (
-                competition_solution_dict[:high].p_monop_opt -
-                competition_solution_dict[:high].p_Bert_nash_equilibrium
+                competition_solution_dict[demand_mode].p_monop_opt -
+                competition_solution_dict[demand_mode].p_Bert_nash_equilibrium
             )
         price_options = [
             range(
-                competition_solution_dict[:high].p_Bert_nash_equilibrium - p_range_pad,
-                competition_solution_dict[:high].p_monop_opt + p_range_pad,
+                competition_solution_dict[demand_mode].p_Bert_nash_equilibrium - p_range_pad,
+                competition_solution_dict[demand_mode].p_monop_opt + p_range_pad,
                 n_prices,
             )...,
         ]
