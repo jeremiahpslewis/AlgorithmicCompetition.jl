@@ -53,21 +53,16 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
         n_prices = length(p.price_options)
         price_index = SVector{15,Int8}(Int8.(1:n_prices))
         n_players = p.n_players
-        n_state_space = n_prices^(p.memory_length * n_players)
-        if p.activate_extension
-            n_state_space *= 4
-        end
+        n_state_space = 4 * n_prices^(p.memory_length * n_players) # 2^2 = 4 possible demand states (ground truth and signal)
+
         state_space = Base.OneTo(Int16(n_state_space))
         action_space = construct_DDDC2023_action_space(price_index)
         profit_array =
             construct_DDDC_profit_array(price_options, p.competition_params_dict, n_players)
-        state_space_lookup = construct_state_space_lookup(action_space, n_prices, p.activate_extension)
+        state_space_lookup = construct_DDDC_state_space_lookup(action_space, n_prices)
         is_high_demand_episode = rand(Bool, 1)
 
         @assert p.data_demand_digital_params.demand_mode ∈ (:high, :low, :random)
-        @assert p.data_demand_digital_params.demand_mode == :random || p.activate_extension == false
-
-        n = Int64(4)
 
         new(
             p.α,
@@ -79,7 +74,6 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
             p.price_options,
             price_index,
             p.competition_params_dict,
-            p.activate_extension,
             p.data_demand_digital_params.demand_mode,
             initialize_price_memory(price_index, p.n_players), # Memory, randomly initialized
             get_demand_signals(p.data_demand_digital_params, is_high_demand_episode[1]), # Current demand, randomly initialized
@@ -147,7 +141,6 @@ function RLBase.reward(env::DDDCEnv, p::Int)::Float64
     return _reward(
         profit_array,
         memory_index,
-        env.activate_extension,
         env.is_high_demand_episode[1],
         p
         )
@@ -155,7 +148,6 @@ end
 
 function _reward(profit::Array{Float64,M},
     memory_index::CartesianIndex{N},
-    activate_extension::Bool,
     is_high_demand_episode::Bool,
     p::Int)::Float64 where {N,M}
     if is_high_demand_episode
@@ -164,11 +156,7 @@ function _reward(profit::Array{Float64,M},
         demand_index_ = 1
     end
 
-    if activate_extension
-        return profit[memory_index, p, demand_index_]
-    else
-        return profit[memory_index, p]
-    end
+    return profit[memory_index, p, demand_index_]
 end
 
 """
@@ -190,21 +178,17 @@ Return the current state as an integer, mapped from the environment memory.
 """
 function RLBase.state(env::DDDCEnv, p::Symbol)
     memory_index = env.memory[1]
-    if env.activate_extension
-        # State is defined by memory, as in AIAPC, plus demand signal given to a player
-        index_ = player_to_index[p]
-        _is_high_demand_signal = env.is_high_demand_signals[index_]
-        _demand_signal = _is_high_demand_signal ? :high : :low
-        demand_signal_index = demand_to_index[_demand_signal]
-        _prev_is_high_demand_signal = env.prev_is_high_demand_signals[index_]
-        _prev_demand_signal = _prev_is_high_demand_signal ? :high : :low
-        prev_demand_signal_index = demand_to_index[_prev_demand_signal]
+    # State is defined by memory, as in AIAPC, plus demand signal given to a player
+    index_ = player_to_index[p]
+    _is_high_demand_signal = env.is_high_demand_signals[index_]
+    _demand_signal = _is_high_demand_signal ? :high : :low
+    demand_signal_index = demand_to_index[_demand_signal]
+    _prev_is_high_demand_signal = env.prev_is_high_demand_signals[index_]
+    _prev_demand_signal = _prev_is_high_demand_signal ? :high : :low
+    prev_demand_signal_index = demand_to_index[_prev_demand_signal]
 
-        # State space is indexed by: memory (price x price, length 2), current demand signal, previous demand signal
-        env.state_space_lookup[memory_index, demand_signal_index, prev_demand_signal_index]
-    else
-        env.state_space_lookup[memory_index]
-    end
+    # State space is indexed by: memory (price x price, length 2), current demand signal, previous demand signal
+    env.state_space_lookup[memory_index, demand_signal_index, prev_demand_signal_index]
 end
 
 """
