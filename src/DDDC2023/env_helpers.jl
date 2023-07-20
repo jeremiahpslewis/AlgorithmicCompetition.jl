@@ -3,16 +3,10 @@
 
 Construct a lookup table from action space to the state space.
 """
-function construct_DDDC_state_space_lookup(action_space, n_prices, activate_extension = false)
-    if activate_extension
-        @assert length(action_space) == n_prices^2 * 4
-        state_space_lookup = reshape(Int16.(1:length(action_space)), n_prices, n_prices, 2, 2)
-        return state_space_lookup
-    else
-        @assert length(action_space) == n_prices^2
-        state_space_lookup = reshape(Int16.(1:length(action_space)), n_prices, n_prices, 1, 1)
-        return state_space_lookup
-    end
+function construct_DDDC_state_space_lookup(action_space, n_prices)
+    @assert length(action_space) == n_prices^2 * 4
+    state_space_lookup = reshape(Int16.(1:length(action_space)), n_prices, n_prices, 2, 2)
+    return state_space_lookup
 end
 
 

@@ -31,7 +31,7 @@ using AlgorithmicCompetition:
     solve_monopolist,
     solve_bertrand,
     p_BR,
-    construct_state_space_lookup,
+    construct_AIAPC_state_space_lookup,
     construct_AIAPC_profit_array,
     Q,
     run,

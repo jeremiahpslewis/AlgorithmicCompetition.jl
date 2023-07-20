@@ -44,7 +44,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
     p_monop_opt::Float64                    # Monopoly optimal price
 
     action_space::Tuple                     # Action space
-    profit_array::Array{Float64,N}          # Profit given price pair as coordinates
+    profit_array::Array{Float64,4}          # Profit given price pair as coordinates
 
     data_demand_digital_params::DataDemandDigitalParams # Parameters for Data/Demand/Digital AIAPC extension
 
