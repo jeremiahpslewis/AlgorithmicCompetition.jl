@@ -32,7 +32,7 @@ using AlgorithmicCompetition:
     solve_bertrand,
     p_BR,
     construct_state_space_lookup,
-    construct_profit_array,
+    construct_AIAPC_profit_array,
     Q,
     run,
     run_and_extract,
