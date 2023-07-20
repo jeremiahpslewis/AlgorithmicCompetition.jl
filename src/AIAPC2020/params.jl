@@ -46,8 +46,7 @@ struct AIAPCHyperParameters
     p_Bert_nash_equilibrium::Float64
     p_monop_opt::Float64
 
-    activate_extension::Bool
-    data_demand_digital_params::DataDemandDigitalParams
+    demand_mode::Symbol
 
     function AIAPCHyperParameters(
         α::Float64,
@@ -56,10 +55,10 @@ struct AIAPCHyperParameters
         max_iter::Int,
         competition_solution_dict::Dict{Symbol,CompetitionSolution};
         convergence_threshold::Int = Int(1e5),
-        activate_extension::Bool = false, # Whether to activate the Data/Demand/Digital extension
-        data_demand_digital_params = DataDemandDigitalParams()
+        demand_mode::Symbol = :high,
     )
         @assert max_iter > convergence_threshold
+        @assert demand_mode ∈ [:high, :low, :random]
         ξ = 0.1
         δ = 0.95
         n_prices = 15
@@ -86,14 +85,17 @@ struct AIAPCHyperParameters
             δ,
             max_iter,
             convergence_threshold,
+
             price_options,
             memory_length,
             n_players,
+
             Dict(d_ => competition_solution_dict[d_].params for d_ in [:high, :low]),
-            competition_solution_dict[:high].p_Bert_nash_equilibrium, # TODO: Fix this so that it works for both high and low demand states
-            competition_solution_dict[:high].p_monop_opt, # TODO: Fix this so that it works for both high and low demand states
-            activate_extension,
-            data_demand_digital_params,
+
+            competition_solution_dict[demand_mode].p_Bert_nash_equilibrium,
+            competition_solution_dict[demand_mode].p_monop_opt,
+
+            demand_mode,
         )
     end
 end

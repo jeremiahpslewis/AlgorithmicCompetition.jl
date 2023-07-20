@@ -49,15 +49,11 @@ struct AIAPCEnv <: AbstractEnv
         price_index = SVector{15,Int8}(Int8.(1:n_prices))
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
-        if p.activate_extension
-            n_state_space *= 4
-        end
         state_space = Base.OneTo(Int16(n_state_space))
-        action_space = construct_action_space(price_index, p.activate_extension)
+        action_space = construct_AIAPC_action_space(price_index)
         profit_array =
             construct_AIAPC_profit_array(price_options, p.competition_params_dict, n_players; p.demand_mode)
         state_space_lookup = construct_AIAPC_state_space_lookup(action_space, n_prices)
-        is_high_demand_episode = rand(Bool, 1)
 
         @assert p.demand_mode ∈ (:high, :low)
 
@@ -71,7 +67,7 @@ struct AIAPCEnv <: AbstractEnv
             p.price_options,
             price_index,
             p.competition_params_dict,
-            p.data_demand_digital_params.demand_mode,
+            p.demand_mode,
             initialize_price_memory(price_index, p.n_players), # Memory, randomly initialized
             state_space,
             state_space_lookup,
@@ -104,10 +100,10 @@ RLBase.action_space(env::AIAPCEnv, ::SimultaneousPlayer) = env.action_space
 
 RLBase.legal_action_space(env::AIAPCEnv, p) = is_terminated(env) ? () : action_space(env, p)
 
-const legal_action_space_mask_object = [Int8.(1:15)...]
+const legal_action_space_mask_object_AIAPC = [Int8.(1:15)...]
 
 RLBase.legal_action_space_mask(env::AIAPCEnv, player::Symbol) =
-    legal_action_space_mask_object
+legal_action_space_mask_object_AIAPC
 
 RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
@@ -119,13 +115,8 @@ const zero_tuple = Tuple{Float64,Float64}([0, 0])
 Return the reward for the current state. If the episode is done, return the profit, else return `(0, 0)`.
 """
 function RLBase.reward(env::AIAPCEnv)
-    if env.activate_extension
-        memory_index = env.memory[1]
-        env.is_done[1] ? Tuple{Float64,Float64}(env.profit_array[memory_index, :, demand_to_index[env.demand_signal]]) : zero_tuple
-    else
-        memory_index = env.memory[1]
-        env.is_done[1] ? Tuple{Float64,Float64}(env.profit_array[memory_index, :]) : zero_tuple
-    end
+    memory_index = env.memory[1]
+    env.is_done[1] ? Tuple{Float64,Float64}(env.profit_array[memory_index, :]) : zero_tuple
 end
 
 """
@@ -139,28 +130,15 @@ function RLBase.reward(env::AIAPCEnv, p::Int)::Float64
     return _reward(
         profit_array,
         memory_index,
-        env.activate_extension,
-        env.is_high_demand_episode[1],
         p
         )
 end
 
-function _reward(profit::Array{Float64,M},
-    memory_index::CartesianIndex{N},
-    activate_extension::Bool,
-    is_high_demand_episode::Bool,
-    p::Int)::Float64 where {N,M}
-    if is_high_demand_episode
-        demand_index_ = 2
-    else
-        demand_index_ = 1
-    end
+function _reward(profit::Array{Float64,3},
+    memory_index::CartesianIndex{2},
+    p::Int)::Float64
 
-    if activate_extension
-        return profit[memory_index, p, demand_index_]
-    else
-        return profit[memory_index, p]
-    end
+    return profit[memory_index, p]
 end
 
 """
@@ -182,21 +160,8 @@ Return the current state as an integer, mapped from the environment memory.
 """
 function RLBase.state(env::AIAPCEnv, p::Symbol)
     memory_index = env.memory[1]
-    if env.activate_extension
-        # State is defined by memory, as in AIAPC, plus demand signal given to a player
-        index_ = player_to_index[p]
-        _is_high_demand_signal = env.is_high_demand_signals[index_]
-        _demand_signal = _is_high_demand_signal ? :high : :low
-        demand_signal_index = demand_to_index[_demand_signal]
-        _prev_is_high_demand_signal = env.prev_is_high_demand_signals[index_]
-        _prev_demand_signal = _prev_is_high_demand_signal ? :high : :low
-        prev_demand_signal_index = demand_to_index[_prev_demand_signal]
 
-        # State space is indexed by: memory (price x price, length 2), current demand signal, previous demand signal
-        env.state_space_lookup[memory_index, demand_signal_index, prev_demand_signal_index]
-    else
-        env.state_space_lookup[memory_index]
-    end
+    env.state_space_lookup[memory_index]
 end
 
 """

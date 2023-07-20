@@ -62,7 +62,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
         state_space_lookup = construct_DDDC_state_space_lookup(action_space, n_prices)
         is_high_demand_episode = rand(Bool, 1)
 
-        @assert p.data_demand_digital_params.demand_mode ∈ (:high, :low, :random)
+        @assert p.demand_mode == :random
 
         new(
             p.α,
@@ -74,7 +74,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
             p.price_options,
             price_index,
             p.competition_params_dict,
-            p.data_demand_digital_params.demand_mode,
+            p.demand_mode,
             initialize_price_memory(price_index, p.n_players), # Memory, randomly initialized
             get_demand_signals(p.data_demand_digital_params, is_high_demand_episode[1]), # Current demand, randomly initialized
             get_demand_signals(p.data_demand_digital_params, is_high_demand_episode[1]), # Previous demand, randomly initialized
@@ -111,10 +111,10 @@ RLBase.action_space(env::DDDCEnv, ::SimultaneousPlayer) = env.action_space
 
 RLBase.legal_action_space(env::DDDCEnv, p) = is_terminated(env) ? () : action_space(env, p)
 
-const legal_action_space_mask_object = [Int8.(1:15)...]
+const legal_action_space_mask_object_DDDC = [Int8.(1:15)...]
 
 RLBase.legal_action_space_mask(env::DDDCEnv, player::Symbol) =
-    legal_action_space_mask_object
+legal_action_space_mask_object_DDDC
 
 RLBase.action_space(env::DDDCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
@@ -146,10 +146,10 @@ function RLBase.reward(env::DDDCEnv, p::Int)::Float64
         )
 end
 
-function _reward(profit::Array{Float64,M},
-    memory_index::CartesianIndex{N},
+function _reward(profit::Array{Float64,4},
+    memory_index::CartesianIndex{2},
     is_high_demand_episode::Bool,
-    p::Int)::Float64 where {N,M}
+    p::Int)::Float64
     if is_high_demand_episode
         demand_index_ = 2
     else
