@@ -67,13 +67,9 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
         @assert p.data_demand_digital_params.demand_mode ∈ (:high, :low, :random)
         @assert p.data_demand_digital_params.demand_mode == :random || p.activate_extension == false
 
-        if p.activate_extension
-            n = Int64(4)
-        else
-            n = Int64(3)
-        end
+        n = Int64(4)
 
-        new{n}(
+        new(
             p.α,
             p.β,
             p.δ,
@@ -105,54 +101,47 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
 end
 
 """
-    RLBase.act!(env::AIAPCEnv, price_tuple::Tuple{Int8,Int8})
+    RLBase.act!(env::DDDCEnv, price_tuple::Tuple{Int8,Int8})
 
 Act in the environment by setting the memory to the given price tuple and setting `is_done` to `true`.
 """
-function RLBase.act!(env::AIAPCEnv{N}, price_tuple::CartesianIndex{2}) where {N}
+function RLBase.act!(env::DDDCEnv, price_tuple::CartesianIndex{2})
     # TODO: Fix support for longer memories
     env.memory[1] = price_tuple
     env.is_done[1] = true
 end
 
+RLBase.action_space(env::DDDCEnv, ::Symbol) = env.price_index # Choice of price
 
+RLBase.action_space(env::DDDCEnv, ::SimultaneousPlayer) = env.action_space
 
-RLBase.action_space(env::AIAPCEnv, ::Symbol) = env.price_index # Choice of price
-
-RLBase.action_space(env::AIAPCEnv, ::SimultaneousPlayer) = env.action_space
-
-RLBase.legal_action_space(env::AIAPCEnv, p) = is_terminated(env) ? () : action_space(env, p)
+RLBase.legal_action_space(env::DDDCEnv, p) = is_terminated(env) ? () : action_space(env, p)
 
 const legal_action_space_mask_object = [Int8.(1:15)...]
 
-RLBase.legal_action_space_mask(env::AIAPCEnv, player::Symbol) =
+RLBase.legal_action_space_mask(env::DDDCEnv, player::Symbol) =
     legal_action_space_mask_object
 
-RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
+RLBase.action_space(env::DDDCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
 const zero_tuple = Tuple{Float64,Float64}([0, 0])
 
 """
-    RLBase.reward(env::AIAPCEnv)
+    RLBase.reward(env::DDDCEnv)
 
 Return the reward for the current state. If the episode is done, return the profit, else return `(0, 0)`.
 """
-function RLBase.reward(env::AIAPCEnv)
-    if env.activate_extension
-        memory_index = env.memory[1]
-        env.is_done[1] ? Tuple{Float64,Float64}(env.profit_array[memory_index, :, demand_to_index[env.demand_signal]]) : zero_tuple
-    else
-        memory_index = env.memory[1]
-        env.is_done[1] ? Tuple{Float64,Float64}(env.profit_array[memory_index, :]) : zero_tuple
-    end
+function RLBase.reward(env::DDDCEnv)
+    memory_index = env.memory[1]
+    env.is_done[1] ? Tuple{Float64,Float64}(env.profit_array[memory_index, :, demand_to_index[env.demand_signal]]) : zero_tuple
 end
 
 """
-    RLBase.reward(env::AIAPCEnv, p::Int)
+    RLBase.reward(env::DDDCEnv, p::Int)
 
 Return the reward for the current state for player `p` as an integer. If the episode is done, return the profit, else return `0`.
 """
-function RLBase.reward(env::AIAPCEnv{N}, p::Int)::Float64 where {N}
+function RLBase.reward(env::DDDCEnv, p::Int)::Float64
     profit_array = env.profit_array
     memory_index = env.memory[1]
     return _reward(
@@ -183,23 +172,23 @@ function _reward(profit::Array{Float64,M},
 end
 
 """
-    RLBase.reward(env::AIAPCEnv, p::Int)
+    RLBase.reward(env::DDDCEnv, p::Int)
 
 Return the reward for the current state for player `p` as a symbol. If the episode is done, return the profit, else return `0`.
 """
-RLBase.reward(env::AIAPCEnv, p::Symbol) = reward(env, player_lookup[p])
+RLBase.reward(env::DDDCEnv, p::Symbol) = reward(env, player_lookup[p])
 
-RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
+RLBase.state_space(env::DDDCEnv, ::Observation, p) = env.state_space
 
 # State without player spec is a noop
-RLBase.state(env::AIAPCEnv) = nothing
+RLBase.state(env::DDDCEnv) = nothing
 
 """
-    RLBase.state(env::AIAPCEnv, player::Symbol)
+    RLBase.state(env::DDDCEnv, player::Symbol)
 
 Return the current state as an integer, mapped from the environment memory.
 """
-function RLBase.state(env::AIAPCEnv, p::Symbol)
+function RLBase.state(env::DDDCEnv, p::Symbol)
     memory_index = env.memory[1]
     if env.activate_extension
         # State is defined by memory, as in AIAPC, plus demand signal given to a player
@@ -219,44 +208,39 @@ function RLBase.state(env::AIAPCEnv, p::Symbol)
 end
 
 """
-    RLBase.is_terminated(env::AIAPCEnv)
+    RLBase.is_terminated(env::DDDCEnv)
 
 Return whether the episode is done.
 """
-RLBase.is_terminated(env::AIAPCEnv) = env.is_done[1]
+RLBase.is_terminated(env::DDDCEnv) = env.is_done[1]
 
 
-function RLBase.reset!(env::AIAPCEnv)
+function RLBase.reset!(env::DDDCEnv)
     env.is_done[1] = false
 
-    # For data / demand / digital extension...
-    if env.activate_extension
-        # Determine whether next episode is a high demand episode
-        is_high_demand_episode = get_demand_level(env.data_demand_digital_params)
+    # Determine whether next episode is a high demand episode
+    is_high_demand_episode = get_demand_level(env.data_demand_digital_params)
 
-        # Update demand signals
-        env.prev_is_high_demand_signals .= env.is_high_demand_signals
-        env.is_high_demand_signals .= get_demand_signals(env.data_demand_digital_params, is_high_demand_episode)
+    # Update demand signals
+    env.prev_is_high_demand_signals .= env.is_high_demand_signals
+    env.is_high_demand_signals .= get_demand_signals(env.data_demand_digital_params, is_high_demand_episode)
 
-        # Update demand level
-        env.is_high_demand_episode[1] = is_high_demand_episode
-
-
-    end
+    # Update demand level
+    env.is_high_demand_episode[1] = is_high_demand_episode
 end
 
-RLBase.players(::AIAPCEnv) = (Symbol(1), Symbol(2))
-RLBase.current_player(::AIAPCEnv) = SIMULTANEOUS_PLAYER
-RLBase.NumAgentStyle(::AIAPCEnv) = MultiAgent(2)
-RLBase.DynamicStyle(::AIAPCEnv) = SIMULTANEOUS
-RLBase.ActionStyle(::AIAPCEnv) = MINIMAL_ACTION_SET
-RLBase.InformationStyle(::AIAPCEnv) = IMPERFECT_INFORMATION
-RLBase.StateStyle(::AIAPCEnv) = Observation{Int64}()
-RLBase.RewardStyle(::AIAPCEnv) = STEP_REWARD
-RLBase.UtilityStyle(::AIAPCEnv) = GENERAL_SUM
-RLBase.ChanceStyle(::AIAPCEnv) = DETERMINISTIC
+RLBase.players(::DDDCEnv) = (Symbol(1), Symbol(2))
+RLBase.current_player(::DDDCEnv) = SIMULTANEOUS_PLAYER
+RLBase.NumAgentStyle(::DDDCEnv) = MultiAgent(2)
+RLBase.DynamicStyle(::DDDCEnv) = SIMULTANEOUS
+RLBase.ActionStyle(::DDDCEnv) = MINIMAL_ACTION_SET
+RLBase.InformationStyle(::DDDCEnv) = IMPERFECT_INFORMATION
+RLBase.StateStyle(::DDDCEnv) = Observation{Int64}()
+RLBase.RewardStyle(::DDDCEnv) = STEP_REWARD
+RLBase.UtilityStyle(::DDDCEnv) = GENERAL_SUM
+RLBase.ChanceStyle(::DDDCEnv) = DETERMINISTIC
 
-function RLBase.plan!(explorer::Ex, learner::L, env::AIAPCEnv, player::Symbol) where {Ex<:AbstractExplorer,L<:AbstractLearner}
+function RLBase.plan!(explorer::Ex, learner::L, env::DDDCEnv, player::Symbol) where {Ex<:AbstractExplorer,L<:AbstractLearner}
     legal_action_space_ = RLBase.legal_action_space_mask(env, player)
     return RLBase.plan!(explorer, RLCore.forward(learner, state(env, player)), legal_action_space_)
 end
