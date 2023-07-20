@@ -80,14 +80,14 @@ end
         ) |> AIAPCEnv
     policies = env |> AIAPCPolicy
 
-    convergence_hook = ConvergenceCheck(1)
+    convergence_hook = ConvergenceCheck(env.n_state_space, 1)
     push!(convergence_hook, PostActStage(), policies[Symbol(1)], env, Symbol(1))
     @test convergence_hook.convergence_duration == 0
     @test convergence_hook.iterations_until_convergence == 1
     @test convergence_hook.best_response_vector[state(env, Symbol(1))] != 0
     @test convergence_hook.is_converged != true
 
-    convergence_hook_1 = ConvergenceCheck(1)
+    convergence_hook_1 = ConvergenceCheck(env.n_state_space, 1)
     convergence_hook_1.best_response_vector = MVector{225,Int}(fill(8, 225))
     push!(convergence_hook_1, PostActStage(), policies[Symbol(1)], env, Symbol(1))
 
