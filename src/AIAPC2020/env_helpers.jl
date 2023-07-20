@@ -1,5 +1,5 @@
 """
-    construct_state_space_lookup(action_space, n_prices)
+construct_AIAPC_state_space_lookup(action_space, n_prices)
 
 Construct a lookup table from action space to the state space.
 """

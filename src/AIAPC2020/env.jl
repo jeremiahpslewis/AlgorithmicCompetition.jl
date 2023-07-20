@@ -56,7 +56,7 @@ struct AIAPCEnv <: AbstractEnv
         action_space = construct_action_space(price_index, p.activate_extension)
         profit_array =
             construct_AIAPC_profit_array(price_options, p.competition_params_dict, n_players; p.demand_mode)
-        state_space_lookup = construct_state_space_lookup(action_space, n_prices, p.activate_extension)
+        state_space_lookup = construct_AIAPC_state_space_lookup(action_space, n_prices)
         is_high_demand_episode = rand(Bool, 1)
 
         @assert p.demand_mode ∈ (:high, :low)
