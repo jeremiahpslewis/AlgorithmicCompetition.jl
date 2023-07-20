@@ -99,12 +99,8 @@ struct AIAPCHyperParameters
 end
 
 
-function construct_action_space(price_index, activate_extension::Bool)
-    if activate_extension
-        Tuple(CartesianIndex{4}(i, j, k, l) for i in price_index for j in price_index for k in 1:2 for l in 1:2)
-    else
-        Tuple(CartesianIndex{2}(i, j) for i in price_index for j in price_index)
-    end
+function construct_AIAPC_action_space(price_index)
+    Tuple(CartesianIndex{2}(i, j) for i in price_index for j in price_index)
 end
 
 function initialize_price_memory(price_index, n_players::Int)

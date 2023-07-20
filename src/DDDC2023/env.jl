@@ -8,13 +8,13 @@ const player_to_index = (; Symbol(1) => 1, Symbol(2) => 2)
 const demand_to_index = (; :high => 1, :low => 2)
 
 """
-    AIAPCEnv(p::AIAPCHyperParameters)
+    DDDCEnv(p::AIAPCHyperParameters)
 
-    Build an environment to reproduce the results of the 2020  Calvano, Calzolari, Denicolò & Pastorello AER Paper
+    Build an environment to reproduce the results of the Lewis 2023 
 
-    Calvano, E., Calzolari, G., Denicolò, V., & Pastorello, S. (2020). Artificial Intelligence, Algorithmic Pricing, and Collusion. American Economic Review, 110(10), 3267–3297. https://doi.org/10.1257/aer.20190623
+    TODO: Add citation here.
 """
-struct AIAPCEnv{N} <: AbstractEnv # N is profit_array dimension
+struct DDDCEnv <: AbstractEnv # N is profit_array dimension
     α::Float64                              # Learning parameter
     β::Float64                              # Exploration parameter
     δ::Float64                              # Discount factor
@@ -26,7 +26,6 @@ struct AIAPCEnv{N} <: AbstractEnv # N is profit_array dimension
     price_index::SVector{15,Int8}           # Price indices
 
     competition_params_dict::Dict{Symbol, CompetitionParameters} # Competition parameters, true = high, false = low
-    activate_extension::Bool                # Whether to activate the Data/Demand/Digital extension
     demand_mode::Symbol                      # Demand mode, :high, :low, or :random
     memory::Vector{CartesianIndex{2}}       # Memory vector (previous prices)
     is_high_demand_signals::Vector{Bool}    # [true, false] if demand signal is high for player one and low for player two for a given episode
@@ -49,7 +48,7 @@ struct AIAPCEnv{N} <: AbstractEnv # N is profit_array dimension
 
     data_demand_digital_params::DataDemandDigitalParams # Parameters for Data/Demand/Digital AIAPC extension
 
-    function AIAPCEnv(p::AIAPCHyperParameters)
+    function DDDCEnv(p::AIAPCHyperParameters)
         price_options = SVector{15,Float64}(p.price_options)
         n_prices = length(p.price_options)
         price_index = SVector{15,Int8}(Int8.(1:n_prices))
@@ -59,9 +58,9 @@ struct AIAPCEnv{N} <: AbstractEnv # N is profit_array dimension
             n_state_space *= 4
         end
         state_space = Base.OneTo(Int16(n_state_space))
-        action_space = construct_action_space(price_index, p.activate_extension)
+        action_space = construct_DDDC2023_action_space(price_index)
         profit_array =
-            construct_profit_array(price_options, p.competition_params_dict, n_players; p.activate_extension, p.data_demand_digital_params.demand_mode)
+            construct_DDDC_profit_array(price_options, p.competition_params_dict, n_players)
         state_space_lookup = construct_state_space_lookup(action_space, n_prices, p.activate_extension)
         is_high_demand_episode = rand(Bool, 1)
 
@@ -135,28 +134,26 @@ end
 
 
 """
-    construct_AIAPC_profit_array(price_options, params, n_players)
+    construct_DDDC_profit_array(price_options, params, n_players)
 
 Construct a 3-dimensional array which holds the profit for each player given a price pair.
 The first dimension is player 1's action, the second dimension is player 2's action, and
 the third dimension is the player index for their profit.
 """
-function construct_AIAPC_profit_array(
+function construct_DDDC_profit_array(
     price_options::SVector{15,Float64},
     competition_params_dict::Dict{Symbol,CompetitionParameters},
     n_players::Int;
-    demand_mode = :high,
 )
     n_prices = length(price_options)
 
-
-    params_ = competition_params_dict[demand_mode]
-
-    profit_array = zeros(Float64, n_prices, n_prices, n_players)
-    for k = 1:n_players
-        for i = 1:n_prices
-            for j = 1:n_prices
-                profit_array[i, j, k] = π(price_options[i], price_options[j], params_)[k]
+    profit_array = zeros(Float64, n_prices, n_prices, n_players, 2)
+    for l = [:high, :low]
+        for k = 1:n_players
+            for i = 1:n_prices
+                for j = 1:n_prices
+                    profit_array[i, j, k, demand_lookup[l]] = π(price_options[i], price_options[j], competition_params_dict[l])[k]
+                end
             end
         end
     end
