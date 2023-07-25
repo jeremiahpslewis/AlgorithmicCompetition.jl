@@ -23,7 +23,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
 
     n_players::Int                          # Number of players
     price_options::Vector{Float64}      # Price options
-    price_index::SVector{15,Int8}           # Price indices
+    price_index::Vector{Int8}           # Price indices
 
     competition_params_dict::Dict{Symbol, CompetitionParameters} # Competition parameters, true = high, false = low
     memory::Vector{CartesianIndex{2}}       # Memory vector (previous prices)
@@ -50,7 +50,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
     function DDDCEnv(p::DDDCHyperParameters)
         price_options = Vector{Float64}(p.price_options)
         n_prices = length(p.price_options)
-        price_index = SVector{15,Int8}(Int8.(1:n_prices))
+        price_index = Vector{Int8}(Int8.(1:n_prices))
         n_players = p.n_players
         n_state_space = 4 * n_prices^(p.memory_length * n_players) # 2^2 = 4 possible demand states (ground truth and signal)
 

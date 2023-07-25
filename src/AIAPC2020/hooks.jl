@@ -75,9 +75,9 @@ function Base.push!(
     h::ConvergenceCheck,
     ::PostActStage,
     agent::Agent{P,T,C},
-    env::AIAPCEnv,
+    env::E,
     player::Symbol,
-) where {P<:AbstractPolicy,T<:Trajectory,C}
+) where {P<:AbstractPolicy,T<:Trajectory,C, E<:AbstractEnv}
     Base.push!(h, PostActStage(), agent.policy, env, player)
 end
 
@@ -85,9 +85,9 @@ function Base.push!(
     h::ConvergenceCheck,
     ::PostActStage,
     policy::QBasedPolicy{L,Exp},
-    env::AIAPCEnv,
+    env::E,
     player::Symbol,
-) where {L<:AbstractLearner,Exp<:AbstractExplorer}
+) where {L<:AbstractLearner,Exp<:AbstractExplorer, E<:AbstractEnv}
     Base.push!(h, PostActStage(), policy.learner, env, player)
 end
 
@@ -141,8 +141,8 @@ function Base.push!(
     hook::MultiAgentHook,
     stage::AbstractStage,
     policy::MultiAgentPolicy,
-    env::AIAPCEnv,
-)
+    env::E,
+) where {E<:AbstractEnv}
     @simd for p in (Symbol(1), Symbol(2))
         Base.push!(hook[p], stage, policy[p], env, p)
     end
