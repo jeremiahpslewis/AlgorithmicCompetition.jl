@@ -30,16 +30,18 @@ struct DDDCHyperParameters
     p_Bert_nash_equilibrium::Dict{Symbol,Float64}
     p_monop_opt::Dict{Symbol,Float64}
 
-    function AIAPCHyperParameters(
+    data_demand_digital_params::DataDemandDigitalParams
+
+    function DDDCHyperParameters(
         α::Float64,
         β::Float64,
         δ::Float64,
         max_iter::Int,
-        competition_solution_dict::Dict{Symbol,CompetitionSolution};
+        competition_solution_dict::Dict{Symbol,CompetitionSolution},
+        data_demand_digital_params::DataDemandDigitalParams;
         convergence_threshold::Int = Int(1e5),
     )
         @assert max_iter > convergence_threshold
-        @assert demand_mode ∈ [:high, :low]
         ξ = 0.1
         δ = 0.95
         n_prices = 15
@@ -84,7 +86,7 @@ struct DDDCHyperParameters
             Dict(d_ => competition_solution_dict[d_].p_Bert_nash_equilibrium for d_ in [:high, :low]),
             Dict(d_ => competition_solution_dict[d_].p_monop_opt for d_ in [:high, :low]),
 
-            demand_mode,
+            data_demand_digital_params,
         )
     end
 end

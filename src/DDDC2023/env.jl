@@ -22,11 +22,10 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
     convergence_threshold::Int              # Convergence threshold
 
     n_players::Int                          # Number of players
-    price_options::SVector{15,Float64}      # Price options
+    price_options::Vector{Float64}      # Price options
     price_index::SVector{15,Int8}           # Price indices
 
     competition_params_dict::Dict{Symbol, CompetitionParameters} # Competition parameters, true = high, false = low
-    demand_mode::Symbol                      # Demand mode, :high, :low, or :random
     memory::Vector{CartesianIndex{2}}       # Memory vector (previous prices)
     is_high_demand_signals::Vector{Bool}    # [true, false] if demand signal is high for player one and low for player two for a given episode
     prev_is_high_demand_signals::Vector{Bool}    # [true, false] if demand signal is high for player one and low for player two for a given episode
@@ -48,21 +47,19 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
 
     data_demand_digital_params::DataDemandDigitalParams # Parameters for Data/Demand/Digital AIAPC extension
 
-    function DDDCEnv(p::AIAPCHyperParameters)
-        price_options = SVector{15,Float64}(p.price_options)
+    function DDDCEnv(p::DDDCHyperParameters)
+        price_options = Vector{Float64}(p.price_options)
         n_prices = length(p.price_options)
         price_index = SVector{15,Int8}(Int8.(1:n_prices))
         n_players = p.n_players
         n_state_space = 4 * n_prices^(p.memory_length * n_players) # 2^2 = 4 possible demand states (ground truth and signal)
 
         state_space = Base.OneTo(Int16(n_state_space))
-        action_space = construct_DDDC2023_action_space(price_index)
+        action_space = construct_DDDC_action_space(price_index)
         profit_array =
             construct_DDDC_profit_array(price_options, p.competition_params_dict, n_players)
         state_space_lookup = construct_DDDC_state_space_lookup(action_space, n_prices)
         is_high_demand_episode = rand(Bool, 1)
-
-        @assert p.demand_mode == :random
 
         new(
             p.α,
@@ -74,7 +71,6 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
             p.price_options,
             price_index,
             p.competition_params_dict,
-            p.demand_mode,
             initialize_price_memory(price_index, p.n_players), # Memory, randomly initialized
             get_demand_signals(p.data_demand_digital_params, is_high_demand_episode[1]), # Current demand, randomly initialized
             get_demand_signals(p.data_demand_digital_params, is_high_demand_episode[1]), # Previous demand, randomly initialized

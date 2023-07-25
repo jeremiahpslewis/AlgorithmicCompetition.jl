@@ -76,7 +76,15 @@ hyperparams = AIAPCHyperParameters(
 )
 
 env = AIAPCEnv(hyperparams)
-experiment = Experiment(env; stop_on_convergence = true)
+experiment = Experiment(env; stop_on_convergence = false)
 
 @report_opt Base.push!(experiment.policy, PostActStage(), experiment.env)
 @report_opt RLBase.plan!(experiment.policy, experiment.env)
+
+
+@time run(hyperparams; stop_on_convergence = true);
+
+RLCore.to
+
+a = @time run(hyperparams; stop_on_convergence = false);
+

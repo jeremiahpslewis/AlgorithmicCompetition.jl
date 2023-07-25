@@ -18,7 +18,7 @@ The first dimension is player 1's action, the second dimension is player 2's act
 the third dimension is the player index for their profit.
 """
 function construct_DDDC_profit_array(
-    price_options::SVector{15,Float64},
+    price_options::Vector{Float64},
     competition_params_dict::Dict{Symbol,CompetitionParameters},
     n_players::Int;
 )

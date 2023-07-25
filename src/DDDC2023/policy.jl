@@ -34,8 +34,8 @@ end
 
 Create a policy for the AIAPC environment, with symmetric agents, using a tabular Q-learner. Mode deterimines the initialization of the Q-matrix.
 """
-function AIAPCPolicy(env::DDDCEnv; mode = "baseline")
-    aiapc_policy = MultiAgentPolicy(
+function DDDCPolicy(env::DDDCEnv; mode = "baseline")
+    dddc_policy = MultiAgentPolicy(
         NamedTuple(
             p => Agent(
                 QBasedPolicy(;
@@ -68,5 +68,5 @@ function AIAPCPolicy(env::DDDCEnv; mode = "baseline")
         ),
     )
 
-    return aiapc_policy
+    return dddc_policy
 end

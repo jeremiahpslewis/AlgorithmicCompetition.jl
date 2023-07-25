@@ -18,7 +18,7 @@ end
 
 Returns a stop condition that stops when the environment has converged for all players.
 """
-function AIAPCStop(env::AIAPCEnv; stop_on_convergence = true)
+function AIAPCStop(env::E; stop_on_convergence = true) where {E<:AbstractEnv}
     stop_conditions = []
     push!(stop_conditions, StopAfterEpisode(env.max_iter, is_show_progress = false))
     if stop_on_convergence
