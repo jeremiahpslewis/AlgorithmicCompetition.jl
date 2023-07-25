@@ -141,8 +141,8 @@ function Base.push!(
     hook::MultiAgentHook,
     stage::AbstractStage,
     policy::MultiAgentPolicy,
-    env::E,
-) where {E<:AbstractEnv}
+    env::AIAPCEnv,
+)
     @simd for p in (Symbol(1), Symbol(2))
         Base.push!(hook[p], stage, policy[p], env, p)
     end
