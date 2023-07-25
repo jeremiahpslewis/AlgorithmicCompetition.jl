@@ -21,6 +21,7 @@ using Statistics
 using AlgorithmicCompetition:
     AlgorithmicCompetition,
     CompetitionParameters,
+    DDDCHyperParameters,
     CompetitionParameters,
     AIAPCHyperParameters,
     AIAPCPolicy,
@@ -69,26 +70,31 @@ competition_params_dict = Dict(
 
 competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
-data_demand_digital_params = DataDemandDigitalParams()
+# NOTE: low quality probability 0.5+x, high quality boost, is high quality signal, high demand freq
+data_demand_digital_params = DataDemandDigitalParams(
+    low_signal_quality_level=0.5,
+    high_signal_quality_boost=0.0,
+    signal_quality_is_high=[false, true],
+    frequency_high_demand=1)
 
-hyperparams = AIAPCHyperParameters(
+hyperparams = DDDCHyperParameters(
     α,
     β,
     δ,
     max_iter,
-    competition_solution_dict;
+    competition_solution_dict,
+    data_demand_digital_params;
     convergence_threshold = Int(1e5),
-    demand_mode = :random,
 )
 
-
+    
 env = DDDCEnv(hyperparams)
 experiment = Experiment(env; stop_on_convergence = true)
 
 @report_opt Base.push!(experiment.policy, PostActStage(), experiment.env)
 @report_opt RLBase.plan!(experiment.policy, experiment.env)
 
-@time run(hyperparams; stop_on_convergence = true);
+ex = @time run(hyperparams; stop_on_convergence = true);
 
 # RLCore.to
 
