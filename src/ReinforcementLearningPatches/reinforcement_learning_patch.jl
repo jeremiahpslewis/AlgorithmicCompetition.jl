@@ -66,7 +66,7 @@ function RLBase.optimise!(agent::Agent, stage::PostActStage)
 end
 
 function RLBase.optimise!(policy::QBasedPolicy, trajectory::Trajectory)
-    for batch in trajectory
+    for batch in trajectory.container
         optimise!(policy.learner, batch)
     end
 end
@@ -145,4 +145,9 @@ function RLBase.plan!(
 
         return Int8(rand(s.rng, max_vals))
     end
+end
+
+# Handle CartesianIndex actions
+function Base.push!(multiagent::MultiAgentPolicy, ::PostActStage, env::E, actions::CartesianIndex) where {E<:AbstractEnv}
+    Base.push!(multiagent::MultiAgentPolicy, PostActStage(), env, Tuple(actions))
 end

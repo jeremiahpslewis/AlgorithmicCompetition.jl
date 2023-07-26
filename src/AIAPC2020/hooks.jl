@@ -73,10 +73,10 @@ end
 function Base.push!(
     h::ConvergenceCheck,
     ::PostActStage,
-    agent::Agent{P,T,C},
+    agent::Agent{P,T},
     env::E,
     player::Symbol,
-) where {P<:AbstractPolicy,T<:Trajectory,C, E<:AbstractEnv}
+) where {P<:AbstractPolicy,T<:Trajectory, E<:AbstractEnv}
     Base.push!(h, PostActStage(), agent.policy, env, player)
 end
 

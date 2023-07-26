@@ -415,9 +415,9 @@ uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
 [[deps.FillArrays]]
 deps = ["LinearAlgebra", "Random", "SparseArrays", "Statistics"]
-git-tree-sha1 = "f0af9b12329a637e8fba7d6543f915fff6ba0090"
+git-tree-sha1 = "f372472e8672b1d993e93dada09e23139b509f9e"
 uuid = "1a297f60-69ca-5386-bcde-b61e274b549b"
-version = "1.4.2"
+version = "1.5.0"
 
 [[deps.FixedPointNumbers]]
 deps = ["Statistics"]
@@ -942,27 +942,36 @@ version = "1.2.2"
 
 [[deps.ReinforcementLearningBase]]
 deps = ["AbstractTrees", "CommonRLInterface", "CommonRLSpaces", "DomainSets", "Markdown", "Random", "Reexport", "Test"]
-git-tree-sha1 = "846e9a0801b1f43a505202b22498ada7fd486c0d"
+git-tree-sha1 = "ed8803af888578fe15b68d05fce9243f1c5490b0"
+repo-rev = "loop-traj"
+repo-subdir = "src/ReinforcementLearningBase"
+repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"
 uuid = "e575027e-6cd6-5018-9292-cdc6200d2b44"
 version = "0.12.0"
 
 [[deps.ReinforcementLearningCore]]
 deps = ["AbstractTrees", "Adapt", "CUDA", "ChainRulesCore", "CircularArrayBuffers", "Crayons", "Distributions", "FillArrays", "Flux", "Functors", "LinearAlgebra", "Parsers", "ProgressMeter", "Random", "Reexport", "ReinforcementLearningBase", "ReinforcementLearningTrajectories", "Statistics", "StatsBase", "TimerOutputs", "UnicodePlots"]
-git-tree-sha1 = "1978f23da8f48d55e7fdb26e9bdc75a23c18c953"
+git-tree-sha1 = "c8bd6fc2f23dff4bd1cc6a4fd3bb06665be8b17d"
+repo-rev = "loop-traj"
+repo-subdir = "src/ReinforcementLearningCore"
+repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"
 uuid = "de1b191a-4ae0-4afa-a27b-92d07f46b2d6"
-version = "0.11.3"
+version = "0.12.0"
 
 [[deps.ReinforcementLearningEnvironments]]
 deps = ["CommonRLInterface", "DelimitedFiles", "IntervalSets", "LinearAlgebra", "MacroTools", "Markdown", "Pkg", "Random", "ReinforcementLearningBase", "ReinforcementLearningCore", "Requires", "SparseArrays", "StatsBase"]
-git-tree-sha1 = "556a276b65c8e374a307d859c8984ea840e53b02"
+git-tree-sha1 = "bf6f8c119f9d9e3232ef39fc30c5d7982655d14c"
+repo-rev = "loop-traj"
+repo-subdir = "src/ReinforcementLearningEnvironments"
+repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl.git"
 uuid = "25e41dd2-4622-11e9-1641-f1adca772921"
-version = "0.8.1"
+version = "0.8.2"
 
 [[deps.ReinforcementLearningTrajectories]]
-deps = ["Adapt", "CircularArrayBuffers", "ElasticArrays", "MacroTools", "OnlineStats", "Random", "StackViews"]
-git-tree-sha1 = "b393524b54a2181be02351932d5056d6788b22bf"
+deps = ["Adapt", "CircularArrayBuffers", "DataStructures", "ElasticArrays", "MacroTools", "OnlineStats", "Random", "StackViews", "StatsBase"]
+git-tree-sha1 = "b960a7bb90f8eed5122aa7103ca2fc7de7ff3fc9"
 uuid = "6486599b-a3cd-4e92-a99a-2cea90cc8c3c"
-version = "0.1.10"
+version = "0.2.1"
 
 [[deps.Requires]]
 deps = ["UUIDs"]

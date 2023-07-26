@@ -58,25 +58,19 @@ end
     # First three rounds
 
     # t=1
-    push!(policy[Symbol(1)].trajectory, policy[Symbol(1)].cache, state(env, Symbol(1)))
     push!(policy, PreEpisodeStage(), env)
     push!(policy, PreActStage(), env)
-    @test policy.agents[Symbol(1)].cache.reward == nothing
-    @test policy.agents[Symbol(1)].cache.terminal == nothing
     @test length(policy.agents[Symbol(1)].trajectory.container) == 0
     optimise!(policy, PreActStage())
     approx_table_t_1 = copy(policy.agents[Symbol(1)].policy.learner.approximator.table)
     @test approx_table_t_1 == approx_table # test that optimise! in t=1 is a noop
-    action = RLBase.plan!(policy, env)
-    act!(env, action)
+    actions = RLBase.plan!(policy, env)
+    act!(env, actions)
     @test length(policy.agents[Symbol(1)].trajectory.container) == 0 # test that trajectory has not been filled
-    push!(policy, PostActStage(), env)
+    push!(policy, PostActStage(), env, actions)
     @test length(policy.agents[Symbol(1)].trajectory.container) == 1
     optimise!(policy, PostActStage())
-    reward_1 = copy(policy.agents[Symbol(1)].cache.reward)
-    @test reward_1 != 0
     push!(policy, PostEpisodeStage(), env)
-    cache_1 = deepcopy(policy.agents[Symbol(1)].cache)
 
     # t=2
     push!(policy, PreEpisodeStage(), env)
@@ -87,12 +81,9 @@ end
     @test approx_table_t_2 != approx_table_t_1 # test that optimise! in t=2 is not a noop   
     action = RLBase.plan!(policy, env)
     act!(env, action)
-    push!(policy, PostActStage(), env)
+    push!(policy, PostActStage(), env, actions)
     optimise!(policy, PostActStage())
-    reward_2 = copy(policy.agents[Symbol(1)].cache.reward)
-    @test reward_2 != reward_1
     push!(policy, PostEpisodeStage(), env)
-    cache_2 = deepcopy(policy.agents[Symbol(1)].cache)
 
     # t=3
     push!(policy, PreEpisodeStage(), env)
@@ -103,11 +94,7 @@ end
     @test approx_table_t_2 != approx_table_t_3 # test that optimise! in t=2 is not a noop
     action = RLBase.plan!(policy, env)
     act!(env, action)
-    push!(policy, PostActStage(), env)
+    push!(policy, PostActStage(), env, actions)
     optimise!(policy, PostActStage())
-    reward_3 = copy(policy.agents[Symbol(1)].cache.reward)
-    @test reward_3 != reward_2
     push!(policy, PostEpisodeStage(), env)
-    cache_3 = deepcopy(policy.agents[Symbol(1)].cache)
-    @test (cache_2.action != cache_3.action) || (cache_1.action != cache_2.action)
 end

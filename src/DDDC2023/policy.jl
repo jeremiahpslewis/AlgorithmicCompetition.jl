@@ -52,7 +52,7 @@ function DDDCPolicy(env::DDDCEnv; mode = "baseline")
                     explorer = AIAPCEpsilonGreedyExplorer(env.β * 1e-5),
                 ),
                 Trajectory(
-                    CircularArraySARSTraces(;
+                    CircularArraySARTSTraces(;
                         capacity = 1,
                         state = Int64 => (),
                         action = Int8 => (),
@@ -62,7 +62,6 @@ function DDDCPolicy(env::DDDCEnv; mode = "baseline")
                     DummySampler(),
                     InsertSampleRatioController(),
                 ),
-                ART{Int8,Float64,Bool}(),
             ) for p in players(env)
         ),
     )
