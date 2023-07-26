@@ -83,7 +83,7 @@ experiment = Experiment(env; stop_on_convergence = false)
 
 @time run(hyperparams; stop_on_convergence = true);
 
-RLCore.to
+RLCore.timer
 
 a = @time run(hyperparams; stop_on_convergence = false);
 
