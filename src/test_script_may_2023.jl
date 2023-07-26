@@ -5,6 +5,8 @@ using Chain
 using ReinforcementLearningCore:
     PostActStage,
     PreActStage,
+    PreEpisodeStage,
+    PostEpisodeStage,
     state,
     reward,
     current_player,
@@ -14,7 +16,7 @@ using ReinforcementLearningCore:
     MultiAgentPolicy,
     RLCore,
     ResetAtTerminal
-using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy
+using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy, optimise!, act!
 import ReinforcementLearningCore
 using Statistics
 using AlgorithmicCompetition:
@@ -77,9 +79,18 @@ hyperparams = AIAPCHyperParameters(
 env = AIAPCEnv(hyperparams)
 experiment = Experiment(env; stop_on_convergence = false)
 
-@report_opt Base.push!(experiment.policy, PostActStage(), experiment.env)
-@report_opt RLBase.plan!(experiment.policy, experiment.env)
+push!(experiment.policy, PreEpisodeStage(), experiment.env)
+push!(experiment.policy, PreActStage(), experiment.env)
+optimise!(experiment.policy, PreActStage())
+actions = RLBase.plan!(experiment.policy, experiment.env)
+act!(experiment.env, actions)
+push!(experiment.policy, PostActStage(), experiment.env, actions)
+optimise!(experiment.policy, PostActStage())
+push!(experiment.policy, PostEpisodeStage(), env)
 
+@report_opt Base.push!(experiment.policy, PostActStage(), experiment.env, CartesianIndex(1,1))
+@report_opt RLBase.plan!(experiment.policy, experiment.env)
+@report_opt optimise!(experiment.policy, PostActStage())
 
 @time run(hyperparams; stop_on_convergence = true);
 
