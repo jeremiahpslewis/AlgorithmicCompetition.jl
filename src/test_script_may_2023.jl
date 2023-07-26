@@ -16,7 +16,6 @@ using ReinforcementLearningCore:
     ResetAtTerminal
 using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy
 import ReinforcementLearningCore
-using StaticArrays
 using Statistics
 using AlgorithmicCompetition:
     AlgorithmicCompetition,

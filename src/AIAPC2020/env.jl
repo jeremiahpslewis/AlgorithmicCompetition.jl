@@ -1,6 +1,5 @@
 using ReinforcementLearningCore
 using ReinforcementLearningBase
-using StaticArrays
 
 const player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
 const demand_lookup = (; :high => 1, :low => 2)
@@ -22,8 +21,8 @@ struct AIAPCEnv <: AbstractEnv
     convergence_threshold::Int              # Convergence threshold
 
     n_players::Int                          # Number of players
-    price_options::SVector{15,Float64}      # Price options
-    price_index::SVector{15,Int8}           # Price indices
+    price_options::Vector{Float64}      # Price options
+    price_index::Vector{Int8}           # Price indices
 
     competition_params_dict::Dict{Symbol, CompetitionParameters} # Competition parameters, true = high, false = low
     demand_mode::Symbol                      # Demand mode, :high or :low
@@ -35,7 +34,7 @@ struct AIAPCEnv <: AbstractEnv
     n_state_space::Int64                    # Number of states
 
     convergence_dict::Dict{Symbol,Bool}     # Convergence status for each player
-    is_done::MVector{1,Bool}                # Episode is complete
+    is_done::Vector{Bool}                # Episode is complete
 
     p_Bert_nash_equilibrium::Float64        # Nash equilibrium price (Betrand price)
     p_monop_opt::Float64                    # Monopoly optimal price
@@ -44,9 +43,9 @@ struct AIAPCEnv <: AbstractEnv
     profit_array::Array{Float64,3}          # Profit given price pair as coordinates
 
     function AIAPCEnv(p::AIAPCHyperParameters)
-        price_options = SVector{15,Float64}(p.price_options)
+        price_options = Vector{Float64}(p.price_options)
         n_prices = length(p.price_options)
-        price_index = SVector{15,Int8}(Int8.(1:n_prices))
+        price_index = Vector{Int8}(Int8.(1:n_prices))
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
         state_space = Base.OneTo(Int16(n_state_space))
@@ -74,7 +73,7 @@ struct AIAPCEnv <: AbstractEnv
             n_prices,
             n_state_space,
             Dict(Symbol(1) => false, Symbol(2) => false), # Convergence dict
-            MVector{1,Bool}([false]), # Episode is done indicator
+            Vector{Bool}([false]), # Episode is done indicator
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,
             action_space,

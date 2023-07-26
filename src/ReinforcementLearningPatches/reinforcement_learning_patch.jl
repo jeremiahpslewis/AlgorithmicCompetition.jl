@@ -27,7 +27,6 @@ using ReinforcementLearningBase
 import ReinforcementLearningBase: RLBase
 using ReinforcementLearningEnvironments
 using Random
-using StaticArrays
 import Base.push!
 import Base.getindex
 using DataStructures: CircularBuffer

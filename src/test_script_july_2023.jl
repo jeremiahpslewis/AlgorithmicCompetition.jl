@@ -16,7 +16,6 @@ using ReinforcementLearningCore:
     ResetAtTerminal
 using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy
 import ReinforcementLearningCore
-using StaticArrays
 using Statistics
 using AlgorithmicCompetition:
     AlgorithmicCompetition,
@@ -60,7 +59,7 @@ RLCore.TimerOutputs.enable_debug_timings(RLCore)
 ξ = 0.1
 δ = 0.95
 n_prices = 15
-max_iter = Int(1e6)
+max_iter = Int(1e7)
 price_index = 1:n_prices
 
 competition_params_dict = Dict(
@@ -72,10 +71,10 @@ competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_di
 
 # NOTE: low quality probability 0.5+x, high quality boost, is high quality signal, high demand freq
 data_demand_digital_params = DataDemandDigitalParams(
-    low_signal_quality_level=0.5,
-    high_signal_quality_boost=0.0,
-    signal_quality_is_high=[false, true],
-    frequency_high_demand=1)
+    low_signal_quality_level=0.49,
+    high_signal_quality_boost=0.005,
+    signal_quality_is_high=[true, false],
+    frequency_high_demand=0.5)
 
 hyperparams = DDDCHyperParameters(
     α,
@@ -95,7 +94,7 @@ experiment = Experiment(env; stop_on_convergence = true)
 @report_opt RLBase.plan!(experiment.policy, experiment.env)
 
 ex = @time run(hyperparams; stop_on_convergence = true);
-
+ex.hook[Symbol(1)][2].convergence_duration
 # RLCore.to
 
 # a = @time run(hyperparams; stop_on_convergence = false);

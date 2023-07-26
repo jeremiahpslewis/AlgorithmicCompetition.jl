@@ -1,5 +1,4 @@
 using ReinforcementLearningCore
-using StaticArrays
 using Flux
 
 """

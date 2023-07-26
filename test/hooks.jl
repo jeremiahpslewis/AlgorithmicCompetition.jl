@@ -88,7 +88,7 @@ end
     @test convergence_hook.is_converged != true
 
     convergence_hook_1 = ConvergenceCheck(env.n_state_space, 1)
-    convergence_hook_1.best_response_vector = MVector{225,Int}(fill(8, 225))
+    convergence_hook_1.best_response_vector = Vector{Int}(fill(8, 225))
     push!(convergence_hook_1, PostActStage(), policies[Symbol(1)], env, Symbol(1))
 
     @test convergence_hook.iterations_until_convergence == 1

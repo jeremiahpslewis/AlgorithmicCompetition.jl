@@ -1,5 +1,4 @@
 using ReinforcementLearningCore, ReinforcementLearningBase
-using StaticArrays
 import Base.push!
 
 
@@ -8,15 +7,15 @@ import Base.push!
 
 Hook to check convergence, as defined by the best response for each state being stable for a given number of iterations.
 """
-mutable struct ConvergenceCheck{N} <: AbstractHook # N is n-states
+mutable struct ConvergenceCheck <: AbstractHook # N is n-states
     convergence_duration::Int64
     iterations_until_convergence::Int64
-    best_response_vector::MVector{N,Int8} # state x action # TODO: Fix hardcoding of n_states
+    best_response_vector::Vector{Int8} # state x action # TODO: Fix hardcoding of n_states
     is_converged::Bool
     convergence_threshold::Int64
 
     function ConvergenceCheck(n_states::Int64, convergence_threshold::Int64)
-        new{n_states}(0, 0, MVector{n_states,Int8}(zeros(Int8, n_states)), false, convergence_threshold) # TODO: Fix hardcoding of n_states
+        new(0, 0, Vector{Int8}(zeros(Int8, n_states)), false, convergence_threshold) # TODO: Fix hardcoding of n_states
     end
 end
 

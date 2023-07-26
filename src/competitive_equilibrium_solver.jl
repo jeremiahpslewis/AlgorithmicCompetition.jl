@@ -3,7 +3,6 @@ using JuMP
 using Chain
 using Ipopt
 using Flux
-using StaticArrays
 using Statistics
 
 struct CompetitionParameters

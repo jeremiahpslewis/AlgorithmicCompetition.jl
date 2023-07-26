@@ -18,7 +18,6 @@ using ReinforcementLearningCore:
 using ReinforcementLearningBase:
     RLBase, test_interfaces!, test_runnable!, AbstractPolicy, act!, plan!
 import ReinforcementLearningCore: RLCore
-using StaticArrays
 using Statistics
 using AlgorithmicCompetition:
     AIAPCEnv,

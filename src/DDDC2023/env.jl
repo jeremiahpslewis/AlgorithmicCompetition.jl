@@ -1,6 +1,5 @@
 using ReinforcementLearningCore
 using ReinforcementLearningBase
-using StaticArrays
 
 const player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
 const demand_lookup = (; :high => 1, :low => 2)
@@ -37,7 +36,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
     n_state_space::Int64                    # Number of states
 
     convergence_dict::Dict{Symbol,Bool}     # Convergence status for each player
-    is_done::MVector{1,Bool}                # Episode is complete
+    is_done::Vector{Bool}                # Episode is complete
 
     p_Bert_nash_equilibrium::Dict{Symbol,Float64}        # Nash equilibrium prices for low and high demand (Betrand price)
     p_monop_opt::Dict{Symbol,Float64}                    # Monopoly optimal prices for low and high demand
@@ -80,7 +79,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
             n_prices,
             n_state_space,
             Dict(Symbol(1) => false, Symbol(2) => false), # Convergence dict
-            MVector{1,Bool}([false]), # Episode is done indicator
+            Vector{Bool}([false]), # Episode is done indicator
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,
             action_space,
