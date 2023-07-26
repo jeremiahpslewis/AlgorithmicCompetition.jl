@@ -149,5 +149,6 @@ end
 
 # Handle CartesianIndex actions
 function Base.push!(multiagent::MultiAgentPolicy, ::PostActStage, env::E, actions::CartesianIndex) where {E<:AbstractEnv}
-    Base.push!(multiagent::MultiAgentPolicy, PostActStage(), env, Tuple(actions))
+    actions = Tuple(actions)::Tuple{Int64,Int64}
+    Base.push!(multiagent::MultiAgentPolicy, PostActStage(), env, actions)
 end
