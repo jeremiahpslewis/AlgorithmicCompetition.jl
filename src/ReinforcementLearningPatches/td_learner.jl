@@ -54,7 +54,7 @@ function _optimise!(
     Q!(app, s, s_next, a, α, r, γ)
 end
 
-function RLBase.optimise!(L::TDLearnerSARS{Ap,F1,I}, t::@NamedTuple{state::I1, next_state::I1, action::I2, reward::F2, terminal::Bool}) where {Ap,F1<:AbstractFloat,I,I1<:Number,I2<:Number,I3<:Number,Ar<:AbstractArray,F2<:AbstractFloat}
+function RLBase.optimise!(L::TDLearnerSARS{Ap,F1,I}, t::@NamedTuple{state::I1, next_state::I1, action::I2, reward::F2, terminal::Bool}) where {Ap,F1<:AbstractFloat,I,I1<:Number,I2<:Number,F2<:AbstractFloat}
     _optimise!(L.n, L.γ, L.approximator, t.state, t.next_state, t.action, t.reward)
 end
 

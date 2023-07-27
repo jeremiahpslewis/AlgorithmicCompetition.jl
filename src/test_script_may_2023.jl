@@ -98,3 +98,28 @@ RLCore.timer
 
 a = @time run(hyperparams; stop_on_convergence = false);
 
+
+
+
+# player = Symbol(1)
+# next_state = state(env,player)
+# action = 1
+
+# @report_opt Base.push!(experiment.policy[player].trajectory, (state = next_state, action = action, reward = reward(env, player), terminal = true))
+
+# experiment.policy[player].trajectory.container.traces
+
+# using ReinforcementLearningTrajectories: Traces
+
+# @generated function push12(ts, xs::NamedTuple{N,T}) where {N,T}
+#     ex = :()
+#     for n in N
+#         ex = :($ex; push!(ts, Val($(QuoteNode(n))), xs.$n))
+#     end
+#     return :($ex)
+# end
+
+
+# push12(Int64[1,2,3], (a = 1, b = 2, c = 3))
+
+# push7(experiment.policy[Symbol(1)].trajectory.container.traces, (state = next_state, action = action, reward = reward(env, player), terminal = true))
