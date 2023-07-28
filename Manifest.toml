@@ -973,7 +973,7 @@ version = "0.8.2"
 
 [[deps.ReinforcementLearningTrajectories]]
 deps = ["Adapt", "CircularArrayBuffers", "DataStructures", "ElasticArrays", "MacroTools", "OnlineStats", "Random", "StackViews", "StatsBase"]
-git-tree-sha1 = "973b064ca7981af2dec265fbef34319ac100d36b"
+git-tree-sha1 = "a7f0dc9921b9fa0a5dbfd517ef794d242d79334d"
 repo-rev = "jpsl/type-stability-metaprogramming"
 repo-url = "https://github.com/JuliaReinforcementLearning/ReinforcementLearningTrajectories.jl.git"
 uuid = "6486599b-a3cd-4e92-a99a-2cea90cc8c3c"
