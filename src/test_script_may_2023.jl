@@ -98,9 +98,6 @@ RLCore.timer
 
 a = @time run(hyperparams; stop_on_convergence = false);
 
-
-
-
 # player = Symbol(1)
 # next_state = state(env,player)
 # action = 1
