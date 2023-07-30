@@ -1,5 +1,4 @@
 using ReinforcementLearningCore, ReinforcementLearningBase
-using StaticArrays
 import Base.push!
 
 
@@ -8,15 +7,15 @@ import Base.push!
 
 Hook to check convergence, as defined by the best response for each state being stable for a given number of iterations.
 """
-mutable struct ConvergenceCheck <: AbstractHook
+mutable struct ConvergenceCheck <: AbstractHook # N is n-states
     convergence_duration::Int64
     iterations_until_convergence::Int64
-    best_response_vector::MVector{225,Int8} # state x action # TODO: Fix hardcoding of n_states
+    best_response_vector::Vector{Int8} # state x action # TODO: Fix hardcoding of n_states
     is_converged::Bool
     convergence_threshold::Int64
 
-    function ConvergenceCheck(convergence_threshold::Int64)
-        new(0, 0, MVector{225,Int8}(zeros(Int8, 225)), false, convergence_threshold) # TODO: Fix hardcoding of n_states
+    function ConvergenceCheck(n_states::Int64, convergence_threshold::Int64)
+        new(0, 0, Vector{Int8}(zeros(Int8, n_states)), false, convergence_threshold) # TODO: Fix hardcoding of n_states
     end
 end
 
@@ -74,10 +73,10 @@ end
 function Base.push!(
     h::ConvergenceCheck,
     ::PostActStage,
-    agent::Agent{P,T,C},
-    env::AIAPCEnv,
+    agent::Agent{P,T},
+    env::E,
     player::Symbol,
-) where {P<:AbstractPolicy,T<:Trajectory,C}
+) where {P<:AbstractPolicy,T<:Trajectory, E<:AbstractEnv}
     Base.push!(h, PostActStage(), agent.policy, env, player)
 end
 
@@ -85,9 +84,9 @@ function Base.push!(
     h::ConvergenceCheck,
     ::PostActStage,
     policy::QBasedPolicy{L,Exp},
-    env::AIAPCEnv,
+    env::E,
     player::Symbol,
-) where {L<:AbstractLearner,Exp<:AbstractExplorer}
+) where {L<:AbstractLearner,Exp<:AbstractExplorer, E<:AbstractEnv}
     Base.push!(h, PostActStage(), policy.learner, env, player)
 end
 
@@ -131,7 +130,7 @@ function AIAPCHook(env::AbstractEnv)
                 # TotalRewardPerEpisode(; is_display_on_exit = false),
                 TotalRewardPerEpisodeLastN(; max_steps = env.convergence_threshold + 100),
                 # TODO: MultiAgent version of TotalRewardPerEpisode / better player handling for hooks
-                ConvergenceCheck(env.convergence_threshold),
+                ConvergenceCheck(env.n_state_space, env.convergence_threshold),
             ) for p in players(env)
         ),
     )

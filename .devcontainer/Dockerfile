@@ -1,4 +1,4 @@
-FROM julia:1.8
+FROM julia:1.10-rc
 
 RUN apt-get update && apt-get install -y git
 

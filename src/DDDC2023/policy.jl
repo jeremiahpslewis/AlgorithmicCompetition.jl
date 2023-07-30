@@ -2,20 +2,20 @@ using ReinforcementLearningCore
 using Flux
 
 """
-    Q_i_0(env::AIAPCEnv)
+    Q_i_0(env::DDDCEnv)
 
 Calculate the Q-value for player i at time t=0, given the price chosen by player i and assuming random play over the price options of player -i.
 """
-function Q_i_0(env::AIAPCEnv)
-    Float64[mean(env.profit_array[:, :, 1], dims = 2) ./ (1 - env.δ)...]
+function Q_i_0(env::DDDCEnv)
+    Float64[mean(mean(env.profit_array[:, :, 1, :], dims = 2), dims=3) ./ (1 - env.δ)...]
 end
 
 """
-    InitMatrix(env::AIAPCEnv, mode = "zero")
+    InitMatrix(env::DDDCEnv, mode = "zero")
 
 Initialize the Q-matrix for the AIAPC environment.
 """
-function InitMatrix(env::AIAPCEnv; mode = "zero")
+function InitMatrix(env::DDDCEnv; mode = "zero")
     if mode == "zero"
         return zeros(env.n_prices, env.n_state_space)
     elseif mode == "baseline"
@@ -29,12 +29,12 @@ function InitMatrix(env::AIAPCEnv; mode = "zero")
 end
 
 """
-    AIAPCPolicy(env::AIAPCEnv; mode = "baseline")
+    AIAPCPolicy(env::DDDCEnv; mode = "baseline")
 
 Create a policy for the AIAPC environment, with symmetric agents, using a tabular Q-learner. Mode deterimines the initialization of the Q-matrix.
 """
-function AIAPCPolicy(env::AIAPCEnv; mode = "baseline")
-    aiapc_policy = MultiAgentPolicy(
+function DDDCPolicy(env::DDDCEnv; mode = "baseline")
+    dddc_policy = MultiAgentPolicy(
         NamedTuple(
             p => Agent(
                 QBasedPolicy(;
@@ -66,5 +66,5 @@ function AIAPCPolicy(env::AIAPCEnv; mode = "baseline")
         ),
     )
 
-    return aiapc_policy
+    return dddc_policy
 end

@@ -22,8 +22,6 @@ struct TDLearnerSARS{Ap,F<:AbstractFloat,I<:Integer} <: AbstractLearner
     n::I
 end
 
-RLCore.forward(L::TDLearnerSARS{Ap,F,I}, env::E) where {Ap,F,I,E<:AbstractEnv} =
-    RLCore.forward(L.approximator, state(env))
 RLCore.forward(L::TDLearnerSARS{Ap,F,I}, s::I1) where {Ap,F,I<:Integer,I1<:Integer} =
     RLCore.forward(L.approximator, s)
 RLCore.forward(
@@ -56,10 +54,8 @@ function _optimise!(
     Q!(app, s, s_next, a, α, r, γ)
 end
 
-function RLBase.optimise!(L::TDLearnerSARS{Ap,F,I}, t::Traces{Tr}) where {Ap,F,I,Tr}
-    # S, A, R, T = (t[x][1] for x in SART)
-    S, A, R, S_next = extract_sars(t) # Remove this when the above line works without a performance hit
-    _optimise!(L.n, L.γ, L.approximator, S, S_next, A, R)
+function RLBase.optimise!(L::TDLearnerSARS{Ap,F1,I}, t::@NamedTuple{state::I1, next_state::I1, action::I2, reward::F2, terminal::Bool}) where {Ap,F1<:AbstractFloat,I,I1<:Number,I2<:Number,F2<:AbstractFloat}
+    _optimise!(L.n, L.γ, L.approximator, t.state, t.next_state, t.action, t.reward)
 end
 
 function RLBase.priority(L::TDLearnerSARS{Ap,F,I}, transition::Tuple{T}) where {Ap,F,I,T}

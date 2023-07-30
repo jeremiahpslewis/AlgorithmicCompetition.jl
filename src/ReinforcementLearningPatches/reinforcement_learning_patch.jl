@@ -27,7 +27,6 @@ using ReinforcementLearningBase
 import ReinforcementLearningBase: RLBase
 using ReinforcementLearningEnvironments
 using Random
-using StaticArrays
 import Base.push!
 import Base.getindex
 using DataStructures: CircularBuffer
@@ -67,7 +66,7 @@ function RLBase.optimise!(agent::Agent, stage::PostActStage)
 end
 
 function RLBase.optimise!(policy::QBasedPolicy, trajectory::Trajectory)
-    for batch in trajectory
+    for batch in trajectory.container
         optimise!(policy.learner, batch)
     end
 end
@@ -146,4 +145,10 @@ function RLBase.plan!(
 
         return Int8(rand(s.rng, max_vals))
     end
+end
+
+# Handle CartesianIndex actions
+function Base.push!(multiagent::MultiAgentPolicy, ::PostActStage, env::E, actions::CartesianIndex) where {E<:AbstractEnv}
+    actions = Tuple(actions)
+    Base.push!(multiagent, PostActStage(), env, actions)
 end

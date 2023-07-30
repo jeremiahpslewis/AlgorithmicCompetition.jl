@@ -15,11 +15,10 @@ end
 end
 
 @testset "construct_action_space" begin
-    @test length(construct_action_space(1:15, false)) == 225
-    @test length(construct_action_space(1:15, true)) == 450
+    @test length(construct_AIAPC_action_space(1:15)) == 225
+    @test length(construct_DDDC_action_space(1:15)) == 900
 end
 
-@testset "initialize_memory" begin
-    @test length(initialize_memory(1:15, 2, true, true)[1]) == 3
-    @test length(initialize_memory(1:15, 2, false, false)[1]) == 2
+@testset "initialize_price_memory" begin
+    @test length(initialize_price_memory(1:15, 2)[1]) == 2
 end

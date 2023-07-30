@@ -5,6 +5,8 @@ using Chain
 using ReinforcementLearningCore:
     PostActStage,
     PreActStage,
+    PreEpisodeStage,
+    PostEpisodeStage,
     state,
     reward,
     current_player,
@@ -14,9 +16,8 @@ using ReinforcementLearningCore:
     MultiAgentPolicy,
     RLCore,
     ResetAtTerminal
-using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy
+using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy, optimise!, act!
 import ReinforcementLearningCore
-using StaticArrays
 using Statistics
 using AlgorithmicCompetition:
     AlgorithmicCompetition,
@@ -30,8 +31,6 @@ using AlgorithmicCompetition:
     solve_monopolist,
     solve_bertrand,
     p_BR,
-    construct_state_space_lookup,
-    construct_profit_array,
     Q,
     run,
     run_and_extract,
@@ -78,98 +77,46 @@ hyperparams = AIAPCHyperParameters(
 )
 
 env = AIAPCEnv(hyperparams)
-experiment = Experiment(env; stop_on_convergence = true)
+experiment = Experiment(env; stop_on_convergence = false)
 
-@report_opt Base.push!(experiment.policy, PostActStage(), experiment.env)
+push!(experiment.policy, PreEpisodeStage(), experiment.env)
+push!(experiment.policy, PreActStage(), experiment.env)
+optimise!(experiment.policy, PreActStage())
+actions = RLBase.plan!(experiment.policy, experiment.env)
+act!(experiment.env, actions)
+push!(experiment.policy, PostActStage(), experiment.env, actions)
+optimise!(experiment.policy, PostActStage())
+push!(experiment.policy, PostEpisodeStage(), env)
+
+@report_opt Base.push!(experiment.policy, PostActStage(), experiment.env, CartesianIndex(1,1))
 @report_opt RLBase.plan!(experiment.policy, experiment.env)
+@report_opt optimise!(experiment.policy, PostActStage())
 
 @time run(hyperparams; stop_on_convergence = true);
 
-RLCore.to
+RLCore.timer
 
 a = @time run(hyperparams; stop_on_convergence = false);
 
+# player = Symbol(1)
+# next_state = state(env,player)
+# action = 1
 
-# TODO Debug how this can happen...
-# a.hook[Symbol(1)][1].rewards[end-10:end] Weird oscillation happening here...only for player 1
+# @report_opt Base.push!(experiment.policy[player].trajectory, (state = next_state, action = action, reward = reward(env, player), terminal = true))
 
+# experiment.policy[player].trajectory.container.traces
 
+# using ReinforcementLearningTrajectories: Traces
 
-
-# AlgorithmicCompetition.π(a.env.price_options[7], a.env.price_options[7], a.env.competition_params)
-
-
-# next_price_set = get_optimal_action(a.env, last_observed_state)
-# next_state = get_state_from_memory(a.env, next_price_set)
-
-# for i in 1:20
-#     a = run(hyperparams; stop_on_convergence = true)
+# @generated function push12(ts, xs::NamedTuple{N,T}) where {N,T}
+#     ex = :()
+#     for n in N
+#         ex = :($ex; push!(ts, Val($(QuoteNode(n))), xs.$n))
+#     end
+#     return :($ex)
 # end
 
-a_list = run_and_extract.(repeat([hyperparams], 10))
-mean(profit_gain.([g.convergence_profit for g in a_list], (a.env,)))
 
-# @report_opt push!(hook, PostEpisodeStage(), 1.0, 1.0)
-# a.policy.agents[Symbol(1)].trajectory.container[:next_state]
-# 509.952693 seconds (8.40 G allocations: 330.871 GiB, 8.58% gc time, 0.10% compilation time)
-# 626.709955 seconds (8.60 G allocations: 333.888 GiB, 7.34% gc time, 0.10% compilation time) # with circulararraybuffers
+# push12(Int64[1,2,3], (a = 1, b = 2, c = 3))
 
-
-# 53.278634 seconds (859.40 M allocations: 33.351 GiB, 8.71% gc time) # With circular arrays
-# 50.567420 seconds (839.40 M allocations: 33.055 GiB, 8.84% gc time) # With normal hook
-
-# @profview run(hyperparams; stop_on_convergence = false);
-@report_opt RLCore._run(
-    experiment.policy,
-    experiment.env,
-    experiment.stop_condition,
-    experiment.hook,
-    ResetAtTerminal(),
-)
-
-RLCore._run(
-    experiment.policy,
-    experiment.env,
-    experiment.stop_condition,
-    experiment.hook,
-    ResetAtTerminal(),
-)
-
-# @profview RLCore._run(
-#     experiment.policy,
-#     experiment.env,
-#     experiment.stop_condition,
-#     experiment.hook,
-#     ResetAtTerminal(),
-# )
-
-# RLBase.plan!(experiment.policy.agents[Symbol(1)], env)
-# @report_opt RLBase.plan!(experiment.policy.agents[Symbol(1)], env, Symbol(1))
-# @report_opt RLBase.plan!(experiment.policy, env, Symbol(1))
-# @report_opt RLCore.forward(td_learner, env)
-@report_opt RLBase.plan!(experiment.policy, env)
-# @report_opt RLBase.act!(env, (1,1))
-
-# AlgorithmicCompetition.run_and_extract(hyperparams; stop_on_convergence = true).iterations_until_convergence[1]
-@report_opt AlgorithmicCompetition.economic_summary(experiment)
-n_procs_ = 3
-
-_procs = addprocs(
-    n_procs_,
-    topology = :master_worker,
-    exeflags = ["--threads=1", "--project=$(Base.active_project())"],
-)
-
-@everywhere begin
-    using Pkg
-    Pkg.instantiate()
-    using AlgorithmicCompetition
-end
-
-AlgorithmicCompetition.run_aiapc(;
-    n_parameter_iterations = 100,
-    # max_iter = Int(1e6),
-    # convergence_threshold = Int(10),
-)
-
-rmprocs(_procs)
+# push7(experiment.policy[Symbol(1)].trajectory.container.traces, (state = next_state, action = action, reward = reward(env, player), terminal = true))
