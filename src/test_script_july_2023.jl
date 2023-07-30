@@ -1,6 +1,5 @@
 using Test
 using JuMP
-using JET
 using Chain
 using ReinforcementLearningCore:
     PostActStage,
@@ -47,7 +46,8 @@ using AlgorithmicCompetition:
     economic_summary,
     extract_sim_results,
     DDDCEnv
-# using JET
+using JET
+using BenchmarkTools
 # using ProfileView
 using Distributed
 
@@ -92,7 +92,7 @@ hyperparams = DDDCHyperParameters(
 env = DDDCEnv(hyperparams)
 experiment = Experiment(env; stop_on_convergence = true)
 
-@report_opt Base.push!(experiment.policy, PostActStage(), experiment.env)
+@report_opt Base.push!(experiment.policy, PostActStage(), experiment.env, CartesianIndex(1,1))
 @report_opt RLBase.plan!(experiment.policy, experiment.env)
 
 ex = @time run(hyperparams; stop_on_convergence = true);

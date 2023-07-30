@@ -175,7 +175,8 @@ function RLBase.reset!(env::AIAPCEnv)
     env.is_done[1] = false
 end
 
-RLBase.players(::AIAPCEnv) = (Symbol(1), Symbol(2))
+const players_ = (Symbol(1), Symbol(2))
+RLBase.players(::AIAPCEnv) = players_
 RLBase.current_player(::AIAPCEnv) = SIMULTANEOUS_PLAYER
 RLBase.NumAgentStyle(::AIAPCEnv) = MultiAgent(2)
 RLBase.DynamicStyle(::AIAPCEnv) = SIMULTANEOUS

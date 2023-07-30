@@ -52,7 +52,18 @@ end
 Look up the best action for a given state in the q-value matrix
 """
 function _best_action_lookup(state_, table)
-    Int8(@views argmax(table[:, state_]))
+    best_action = 1
+    max_value = table[1, state_]
+
+    for i in 2:size(table, 1)
+        value = table[i, state_]
+        if value > max_value
+            max_value = value
+            best_action = i
+        end
+    end
+
+    return Int8(best_action)
 end
 
 function Base.push!(
@@ -118,7 +129,8 @@ function Base.push!(
     player::Symbol,
 ) where {F<:AbstractFloat,E<:AbstractEnv}
     state_ = RLBase.state(env, player)
-    env.convergence_vect[player_lookup[player]] = Base.push!(h, table, state_)
+    player_index = player_lookup[player]
+    env.convergence_vect[player_index] = Base.push!(h, table, state_)
     return
 end
 
