@@ -33,7 +33,7 @@ struct AIAPCEnv <: AbstractEnv
     n_prices::Int                           # Number of price options
     n_state_space::Int64                    # Number of states
 
-    convergence_dict::Dict{Symbol,Bool}     # Convergence status for each player
+    convergence_vect::Vector{Bool}     # Convergence status for each player
     is_done::Vector{Bool}                # Episode is complete
 
     p_Bert_nash_equilibrium::Float64        # Nash equilibrium price (Betrand price)
@@ -72,7 +72,7 @@ struct AIAPCEnv <: AbstractEnv
             state_space_lookup,
             n_prices,
             n_state_space,
-            Dict(Symbol(1) => false, Symbol(2) => false), # Convergence dict
+            Bool[false, false], # Convergence vector
             Vector{Bool}([false]), # Episode is done indicator
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,

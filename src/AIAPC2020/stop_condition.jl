@@ -10,7 +10,7 @@ Returns true if the environment has converged for all players.
 """
 function RLCore.check_stop(s::StopWhenConverged, agent, env)
     # false until converged, then true
-    return all(values(env.convergence_dict))
+    return all(env.convergence_vect)
 end
 
 """

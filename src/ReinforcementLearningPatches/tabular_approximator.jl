@@ -28,8 +28,6 @@ TabularVApproximator(; n_state, init = 0.0, opt = InvDecay(1.0)) =
 TabularQApproximator(; n_state, n_action, init = 0.0, opt = InvDecay(1.0)) =
     TabularApproximator(fill(init, n_action, n_state), opt)
 
-
-
 RLCore.forward(
     app::TabularApproximator{1,R,O},
     s::I,
@@ -45,32 +43,3 @@ RLCore.forward(
     a::I2,
 ) where {R<:AbstractArray,O,I1<:Integer,I2<:Integer} = @views app.table[a, s]
 
-function RLBase.optimise!(
-    app::TabularApproximator{1,R,O},
-    s::I,
-    e::F,
-) where {R<:AbstractArray,O,I<:Integer,F<:AbstractFloat}
-    x = @view app.table[s]
-    x̄ = @view [e][1]
-    Flux.Optimise.update!(app.optimizer, x, x̄)
-end
-
-function RLBase.optimise!(
-    app::TabularApproximator{2,R,O},
-    s_a::Tuple{I1,I2},
-    e::F,
-) where {R<:AbstractArray,O,I1<:Integer,I2<:Integer,F<:AbstractFloat}
-    (s, a) = s_a
-    x = @view app.table[a, s]
-    x̄ = @view [e][1]
-    Flux.Optimise.update!(app.optimizer, x, x̄)
-end
-
-function RLBase.optimise!(
-    app::TabularApproximator{2,R,O},
-    s::I,
-    errors::Vector{F},
-) where {R<:AbstractArray,O,I<:Integer,F<:AbstractFloat}
-    x = @view app.table[:, s]
-    Flux.Optimise.update!(app.optimizer, x, errors)
-end
