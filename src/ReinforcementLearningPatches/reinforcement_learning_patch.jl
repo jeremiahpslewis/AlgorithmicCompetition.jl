@@ -143,9 +143,23 @@ function RLBase.plan!(
     if rand(s.rng) < ϵ
         return rand(s.rng, full_action_space)
     else
-        max_vals = RLCore.find_all_max(values)[2]
+        max_vals = find_all_max_(values)[2]
         return rand(s.rng, max_vals)
     end
+end
+
+# TODO: Drop this once merged into RLCore
+function find_all_max_(x)
+    v = maximum(x)
+    indices = Vector{Int}(undef, count(==(v), x))
+    j = 1
+    for i in eachindex(x)
+        if x[i] == v
+            indices[j] = i
+            j += 1
+        end
+    end
+    v, indices
 end
 
 # Handle CartesianIndex actions
