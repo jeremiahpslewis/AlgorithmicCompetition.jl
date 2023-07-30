@@ -118,7 +118,7 @@ function Base.push!(
     player::Symbol,
 ) where {F<:AbstractFloat,E<:AbstractEnv}
     state_ = RLBase.state(env, player)
-    env.convergence_dict[player] = Base.push!(h, table, state_)
+    env.convergence_vect[player_lookup[player]] = Base.push!(h, table, state_)
     return
 end
 

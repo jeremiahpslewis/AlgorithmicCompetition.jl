@@ -30,17 +30,6 @@ RLCore.forward(
     a::I2,
 ) where {Ap,F,I,I1<:Integer,I2<:Integer} = RLCore.forward(L.approximator, s, a)
 
-function extract_sars(t::Traces{Tr}) where {Tr}
-    # TODO: Delete this when RLTrajectories.jl is fixed
-    # Hard coded to deal with index type instability in RLTrajectories.jl
-    S = t.traces[1][:state][1]
-    S_next = t.traces[1][:next_state][1]
-    A = t.traces[2][1] # action
-    R = t.traces[3][1] # reward
-    return (S, A, R, S_next)
-end
-
-
 function _optimise!(
     n::I1,
     γ::F,

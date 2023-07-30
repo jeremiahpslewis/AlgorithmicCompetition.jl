@@ -35,7 +35,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
     n_prices::Int                           # Number of price options
     n_state_space::Int64                    # Number of states
 
-    convergence_dict::Dict{Symbol,Bool}     # Convergence status for each player
+    convergence_vect::Vector{Bool}     # Convergence status for each player
     is_done::Vector{Bool}                # Episode is complete
 
     p_Bert_nash_equilibrium::Dict{Symbol,Float64}        # Nash equilibrium prices for low and high demand (Betrand price)
@@ -78,7 +78,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
             state_space_lookup,
             n_prices,
             n_state_space,
-            Dict(Symbol(1) => false, Symbol(2) => false), # Convergence dict
+            Bool[false, false], # Convergence vector
             Vector{Bool}([false]), # Episode is done indicator
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,
@@ -113,16 +113,18 @@ legal_action_space_mask_object_DDDC
 
 RLBase.action_space(env::DDDCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
-const zero_tuple = Tuple{Float64,Float64}([0, 0])
-
 """
     RLBase.reward(env::DDDCEnv)
 
-Return the reward for the current state. If the episode is done, return the profit, else return `(0, 0)`.
+Return the reward for the current state. If the episode is done, return the profit, else return `0, 0`.
 """
 function RLBase.reward(env::DDDCEnv)
     memory_index = env.memory[1]
-    env.is_done[1] ? Tuple{Float64,Float64}(env.profit_array[memory_index, :, demand_to_index[env.demand_signal]]) : zero_tuple
+    if env.is_done[1]
+        return env.profit_array[memory_index, :, demand_to_index[env.demand_signal]]
+    else
+        return zero(Float64), zero(Float64)
+    end
 end
 
 """
@@ -130,7 +132,7 @@ end
 
 Return the reward for the current state for player `p` as an integer. If the episode is done, return the profit, else return `0`.
 """
-function RLBase.reward(env::DDDCEnv, p::Int)::Float64
+function RLBase.reward(env::DDDCEnv, p::Int)
     profit_array = env.profit_array
     memory_index = env.memory[1]
     return _reward(
@@ -144,7 +146,7 @@ end
 function _reward(profit::Array{Float64,4},
     memory_index::CartesianIndex{2},
     is_high_demand_episode::Bool,
-    p::Int)::Float64
+    p::Int)
     if is_high_demand_episode
         demand_index_ = 2
     else
