@@ -113,16 +113,18 @@ legal_action_space_mask_object_DDDC
 
 RLBase.action_space(env::DDDCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
-const zero_tuple = Tuple{Float64,Float64}([0, 0])
-
 """
     RLBase.reward(env::DDDCEnv)
 
-Return the reward for the current state. If the episode is done, return the profit, else return `(0, 0)`.
+Return the reward for the current state. If the episode is done, return the profit, else return `0, 0`.
 """
 function RLBase.reward(env::DDDCEnv)
     memory_index = env.memory[1]
-    env.is_done[1] ? Tuple{Float64,Float64}(env.profit_array[memory_index, :, demand_to_index[env.demand_signal]]) : zero_tuple
+    if env.is_done[1]
+        return env.profit_array[memory_index, :, demand_to_index[env.demand_signal]]
+    else
+        return zero(Float64), zero(Float64)
+    end
 end
 
 """
