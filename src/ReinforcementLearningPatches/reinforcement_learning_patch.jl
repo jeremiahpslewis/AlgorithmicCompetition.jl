@@ -30,16 +30,18 @@ using Random
 import Base.push!
 import Base.getindex
 using DataStructures: CircularBuffer
+using StaticArrays
 
 # Epsilon Greedy Explorer for AIAPC Zoo
 # Note: get_ϵ function in RLCore takes: 600.045 ns (6 allocations: 192 bytes)
 # This one has: 59.003 ns (1 allocation: 16 bytes)
 # Well worth looking into optimizations for RLCore
 # TODO evaluate performance cost of checking all values for max, perhaps only do this in the beginning?
+
 struct AIAPCEpsilonGreedyExplorer{R,F<:AbstractFloat} <: AbstractExplorer
     β::F
     β_neg::F
-    step::Vector{Int}
+    step::MVector{1, Int}
     rng::R
 end
 
@@ -47,7 +49,7 @@ function AIAPCEpsilonGreedyExplorer(β::F) where {F<:AbstractFloat}
     AIAPCEpsilonGreedyExplorer{typeof(Random.GLOBAL_RNG),F}(
         β,
         β * -1,
-        Int[1],
+        (@MVector Int[1]),
         Random.GLOBAL_RNG,
     )
 end
@@ -143,7 +145,7 @@ function RLBase.plan!(
     else
         max_vals = RLCore.find_all_max(values)[2]
 
-        return Int8(rand(s.rng, max_vals))
+        return rand(s.rng, max_vals)
     end
 end
 

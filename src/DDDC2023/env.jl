@@ -130,7 +130,7 @@ end
 
 Return the reward for the current state for player `p` as an integer. If the episode is done, return the profit, else return `0`.
 """
-function RLBase.reward(env::DDDCEnv, p::Int)::Float64
+function RLBase.reward(env::DDDCEnv, p::Int)
     profit_array = env.profit_array
     memory_index = env.memory[1]
     return _reward(
@@ -144,7 +144,7 @@ end
 function _reward(profit::Array{Float64,4},
     memory_index::CartesianIndex{2},
     is_high_demand_episode::Bool,
-    p::Int)::Float64
+    p::Int)
     if is_high_demand_episode
         demand_index_ = 2
     else
