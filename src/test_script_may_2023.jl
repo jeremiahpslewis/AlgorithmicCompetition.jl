@@ -50,7 +50,7 @@ using AlgorithmicCompetition:
 # using ProfileView
 using Distributed
 
-RLCore.TimerOutputs.enable_debug_timings(RLCore)
+# RLCore.TimerOutputs.enable_debug_timings(RLCore)
 
 α = Float64(0.125)
 β = Float64(4e-1)
