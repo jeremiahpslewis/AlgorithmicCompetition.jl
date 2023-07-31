@@ -103,7 +103,7 @@ end
 function economic_summary(env::AbstractEnv, policy::MultiAgentPolicy, hook::AbstractHook)
     convergence_threshold = env.convergence_threshold
     iterations_until_convergence = Int64[
-        hook[player][2].iterations_until_convergence for player in [Symbol(1), Symbol(2)]
+        hook[player][1].iterations_until_convergence for player in [Symbol(1), Symbol(2)]
     ]
 
     is_converged = Bool[]
@@ -111,7 +111,7 @@ function economic_summary(env::AbstractEnv, policy::MultiAgentPolicy, hook::Abst
     convergence_profit = [get_convergence_profit_from_env(env, policy)...]
 
     for i in (Symbol(1), Symbol(2))
-        push!(is_converged, hook[i][2].is_converged)
+        push!(is_converged, hook[i][1].is_converged)
     end
 
     return AIAPCSummary(

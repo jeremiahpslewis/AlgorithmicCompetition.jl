@@ -45,7 +45,7 @@ end
             competition_solution_dict,
         ) |> AIAPCEnv
     env.memory[1] = CartesianIndex(Int8(1), Int8(1))
-    exper = Experiment(env)
+    exper = Experiment(env; debug=true)
 
     # Find the Nash equilibrium profit
     params = env.competition_params_dict[:high]
@@ -55,9 +55,9 @@ end
 
     π_nash = π(p_Bert_nash_equilibrium, p_Bert_nash_equilibrium, params)[1]
     @test π_nash > π_min_price
-    for i = 1:exper.hook[Symbol(1)].hooks[1].rewards.capacity
-        push!(exper.hook[Symbol(1)].hooks[1].rewards, π_nash)
-        push!(exper.hook[Symbol(2)].hooks[1].rewards, 0)
+    for i = 1:exper.hook[Symbol(1)].hooks[2].rewards.capacity
+        push!(exper.hook[Symbol(1)].hooks[2].rewards, π_nash)
+        push!(exper.hook[Symbol(2)].hooks[2].rewards, 0)
     end
 
     ec_summary_ = economic_summary(exper)
@@ -70,9 +70,9 @@ end
         π(maximum(exper.env.price_options), maximum(exper.env.price_options), params)[1]
     @test π_max_price < π_monop
 
-    for i = 1:exper.hook[Symbol(1)].hooks[1].rewards.capacity
-        push!(exper.hook[Symbol(1)].hooks[1].rewards, π_monop)
-        push!(exper.hook[Symbol(2)].hooks[1].rewards, 0)
+    for i = 1:exper.hook[Symbol(1)].hooks[2].rewards.capacity
+        push!(exper.hook[Symbol(1)].hooks[2].rewards, π_monop)
+        push!(exper.hook[Symbol(2)].hooks[2].rewards, 0)
     end
 
     ec_summary_ = economic_summary(exper)
@@ -209,9 +209,9 @@ end
     @test reward(c_out.env) == (0, 0)
     @test reward(c_out.env, 1) != 0
 
-    @test sum(c_out.hook[Symbol(1)][2].best_response_vector == 0) == 0
-    @test c_out.hook[Symbol(1)][2].best_response_vector !=
-          c_out.hook[Symbol(2)][2].best_response_vector
+    @test sum(c_out.hook[Symbol(1)][1].best_response_vector == 0) == 0
+    @test c_out.hook[Symbol(1)][1].best_response_vector !=
+          c_out.hook[Symbol(2)][1].best_response_vector
 end
 
 @testset "Run a set of experiments." begin
@@ -278,14 +278,14 @@ end
     )
 
 
-    c_out = run(hyperparameters; stop_on_convergence = false)
+    c_out = run(hyperparameters; stop_on_convergence = false, debug = true)
 
     # ensure that the policy is updated by the learner
     @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table .!= 0) != 0
     @test sum(c_out.policy[Symbol(2)].policy.learner.approximator.table .!= 0) != 0
     @test c_out.env.is_done[1]
-    @test c_out.hook[Symbol(1)][2].iterations_until_convergence == max_iter
-    @test c_out.hook[Symbol(2)][2].iterations_until_convergence == max_iter
+    @test c_out.hook[Symbol(1)][1].iterations_until_convergence == max_iter
+    @test c_out.hook[Symbol(2)][1].iterations_until_convergence == max_iter
 
 
     @test c_out.policy[Symbol(1)].trajectory.container[:reward][1] .!= 0
@@ -293,20 +293,20 @@ end
 
     @test c_out.policy[Symbol(1)].policy.learner.approximator.table !=
           c_out.policy[Symbol(2)].policy.learner.approximator.table
-    @test c_out.hook[Symbol(1)][2].best_response_vector !=
-          c_out.hook[Symbol(2)][2].best_response_vector
+    @test c_out.hook[Symbol(1)][1].best_response_vector !=
+          c_out.hook[Symbol(2)][1].best_response_vector
 
 
     @test mean(
-        c_out.hook[Symbol(1)][1].rewards[(end-2):end] .!=
-        c_out.hook[Symbol(2)][1].rewards[(end-2):end],
+        c_out.hook[Symbol(1)][2].rewards[(end-2):end] .!=
+        c_out.hook[Symbol(2)][2].rewards[(end-2):end],
     ) >= 0.3
 
     for i in [Symbol(1), Symbol(2)]
-        @test c_out.hook[i][2].convergence_duration >= 0
-        @test c_out.hook[i][2].is_converged
-        @test c_out.hook[i][2].convergence_threshold == 1
-        @test sum(c_out.hook[i][1].rewards .== 0) == 0
+        @test c_out.hook[i][1].convergence_duration >= 0
+        @test c_out.hook[i][1].is_converged
+        @test c_out.hook[i][1].convergence_threshold == 1
+        @test sum(c_out.hook[i][2].rewards .== 0) == 0
     end
 
     @test reward(c_out.env, 1) != 0
@@ -379,8 +379,8 @@ end
     @test RLCore.check_stop(c_out.stop_condition.stop_conditions[1], 1, c_out.env) == false
     @test RLCore.check_stop(c_out.stop_condition.stop_conditions[2], 1, c_out.env) == true
 
-    @test c_out.hook[Symbol(1)][2].convergence_duration >= 5
-    @test c_out.hook[Symbol(2)][2].convergence_duration >= 5
-    @test (c_out.hook[Symbol(2)][2].convergence_duration == 5) ||
-          (c_out.hook[Symbol(1)][2].convergence_duration == 5)
+    @test c_out.hook[Symbol(1)][1].convergence_duration >= 5
+    @test c_out.hook[Symbol(2)][1].convergence_duration >= 5
+    @test (c_out.hook[Symbol(2)][1].convergence_duration == 5) ||
+          (c_out.hook[Symbol(1)][1].convergence_duration == 5)
 end

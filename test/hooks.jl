@@ -10,8 +10,8 @@ using ReinforcementLearningCore
         agent = RandomPolicy()
 
         for i = 1:15
+            push!(hook, PreEpisodeStage(), agent, env)
             push!(hook, PostActStage(), agent, env)
-            push!(hook, PostEpisodeStage(), agent, env)
             @test length(hook.rewards) == min(i, 10)
             @test hook.rewards[min(i, 10)] == reward(env)
         end
@@ -23,8 +23,8 @@ using ReinforcementLearningCore
         agent = RandomPolicy()
 
         for i = 1:15
+            push!(hook, PreEpisodeStage(), agent, env, :Cross)
             push!(hook, PostActStage(), agent, env, :Cross)
-            push!(hook, PostEpisodeStage(), agent, env, :Cross)
             @test length(hook.rewards) == min(i, 10)
             @test hook.rewards[min(i, 10)] == reward(env, :Cross)
         end
@@ -47,21 +47,21 @@ end
             Int(1e7),
             competition_solution_dict,
         ) |> AIAPCEnv
-    exper = Experiment(env)
+    exper = Experiment(env; debug = true)
     state(env, Symbol(1))
     policies = AIAPCPolicy(env, mode = "zero")
-    push!(exper.hook[Symbol(1)][2], Int16(2), Int8(3), false)
-    @test exper.hook[Symbol(1)][2].best_response_vector[2] == 3
+    push!(exper.hook[Symbol(1)][1], Int16(2), Int8(3), false)
+    @test exper.hook[Symbol(1)][1].best_response_vector[2] == 3
 
     policies[Symbol(1)].policy.learner.approximator.table[11, :] .= 10
     push!(
-        exper.hook[Symbol(1)][2],
+        exper.hook[Symbol(1)][1],
         PostActStage(),
         policies[Symbol(1)],
         exper.env,
         Symbol(1),
     )
-    @test exper.hook[Symbol(1)][2].best_response_vector[state(env, Symbol(1))] == 11
+    @test exper.hook[Symbol(1)][1].best_response_vector[state(env, Symbol(1))] == 11
 end
 
 @testset "ConvergenceCheck" begin

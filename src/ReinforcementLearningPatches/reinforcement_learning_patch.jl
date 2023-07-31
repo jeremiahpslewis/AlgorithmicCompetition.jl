@@ -30,7 +30,6 @@ using Random
 import Base.push!
 import Base.getindex
 using DataStructures: CircularBuffer
-using StaticArrays
 
 # Epsilon Greedy Explorer for AIAPC Zoo
 # Note: get_ϵ function in RLCore takes: 600.045 ns (6 allocations: 192 bytes)
@@ -41,7 +40,7 @@ using StaticArrays
 struct AIAPCEpsilonGreedyExplorer{R,F<:AbstractFloat} <: AbstractExplorer
     β::F
     β_neg::F
-    step::MVector{1,Int}
+    step::Vector{Int}
     rng::R
 end
 
@@ -49,7 +48,7 @@ function AIAPCEpsilonGreedyExplorer(β::F) where {F<:AbstractFloat}
     AIAPCEpsilonGreedyExplorer{typeof(Random.GLOBAL_RNG),F}(
         β,
         β * -1,
-        (@MVector Int[1]),
+        Int[1],
         Random.GLOBAL_RNG,
     )
 end
@@ -81,11 +80,10 @@ const SART = (:state, :action, :reward, :terminal)
 
 struct TotalRewardPerEpisodeLastN{F} <: AbstractHook where {F<:AbstractFloat}
     rewards::CircularBuffer{F}
-    reward::Vector{F}
     is_display_on_exit::Bool
 
     function TotalRewardPerEpisodeLastN(; max_steps = 100)
-        new{Float64}(CircularBuffer{Float64}(max_steps), Float64[0.0])
+        new{Float64}(CircularBuffer{Float64}(max_steps))
     end
 end
 
@@ -97,33 +95,23 @@ Base.push!(
     ::PostActStage,
     agent::P,
     env::E,
-) where {P<:AbstractPolicy,E<:AbstractEnv,F<:AbstractFloat} = h.reward[1] += reward(env)
-
-Base.push!(
-    h::TotalRewardPerEpisodeLastN{F},
-    ::PostActStage,
-    agent::P,
-    env::E,
     player::Symbol,
 ) where {P<:AbstractPolicy,E<:AbstractEnv,F<:AbstractFloat} =
-    h.reward[1] += reward(env, player)
+    h.rewards[end] += reward(env, player)
 
 function Base.push!(
     hook::TotalRewardPerEpisodeLastN{F},
-    ::PostEpisodeStage,
+    ::PreEpisodeStage,
     agent,
     env,
 ) where {F<:AbstractFloat}
-    rewards = hook.rewards
-    reward = hook.reward[1]
-    Base.push!(rewards, reward)
-    hook.reward[1] = 0.0
+    Base.push!(hook.rewards, 0.0)
     return
 end
 
 function Base.push!(
     hook::TotalRewardPerEpisodeLastN{F},
-    stage::Union{PostEpisodeStage,PostExperimentStage},
+    stage::Union{PreEpisodeStage,PostEpisodeStage,PostExperimentStage},
     agent,
     env,
     player::Symbol,

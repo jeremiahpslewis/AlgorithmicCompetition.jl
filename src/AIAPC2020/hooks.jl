@@ -7,15 +7,15 @@ import Base.push!
 
 Hook to check convergence, as defined by the best response for each state being stable for a given number of iterations.
 """
-mutable struct ConvergenceCheck <: AbstractHook # N is n-states
+mutable struct ConvergenceCheck <: AbstractHook
     convergence_duration::Int64
     iterations_until_convergence::Int64
-    best_response_vector::Vector{Int8} # state x action # TODO: Fix hardcoding of n_states
+    best_response_vector::Vector{Int8}
     is_converged::Bool
     convergence_threshold::Int64
 
     function ConvergenceCheck(n_states::Int64, convergence_threshold::Int64)
-        new(0, 0, Vector{Int8}(zeros(Int8, n_states)), false, convergence_threshold) # TODO: Fix hardcoding of n_states
+        new(0, 0, Vector{Int8}(zeros(Int8, n_states)), false, convergence_threshold)
     end
 end
 
@@ -52,7 +52,18 @@ end
 Look up the best action for a given state in the q-value matrix
 """
 function _best_action_lookup(state_, table)
-    Int8(@views argmax(table[:, state_]))
+    best_action = 1
+    max_value = table[1, state_]
+
+    for i in 2:size(table, 1)
+        value = table[i, state_]
+        if value > max_value
+            max_value = value
+            best_action = i
+        end
+    end
+
+    return Int8(best_action)
 end
 
 function Base.push!(
@@ -118,19 +129,29 @@ function Base.push!(
     player::Symbol,
 ) where {F<:AbstractFloat,E<:AbstractEnv}
     state_ = RLBase.state(env, player)
-    env.convergence_vect[player_lookup[player]] = Base.push!(h, table, state_)
+    player_index = player_lookup[player]
+    env.convergence_vect[player_index] = Base.push!(h, table, state_)
     return
 end
 
-# TODO: Figure out why the hook results are identical for both players
-function AIAPCHook(env::AbstractEnv)
+function AIAPCPerformanceHook(env::AbstractEnv)
+    MultiAgentHook(
+        NamedTuple(
+            p => ComposedHook(
+                ConvergenceCheck(env.n_state_space, env.convergence_threshold),
+            ) for p in players(env)
+        ),
+    )
+end
+
+function AIAPCDebugHook(env::AbstractEnv)
     MultiAgentHook(
         NamedTuple(
             p => ComposedHook(
                 # TotalRewardPerEpisode(; is_display_on_exit = false),
+                ConvergenceCheck(env.n_state_space, env.convergence_threshold),
                 TotalRewardPerEpisodeLastN(; max_steps = env.convergence_threshold + 100),
                 # TODO: MultiAgent version of TotalRewardPerEpisode / better player handling for hooks
-                ConvergenceCheck(env.n_state_space, env.convergence_threshold),
             ) for p in players(env)
         ),
     )
