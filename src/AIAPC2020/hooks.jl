@@ -149,9 +149,9 @@ function AIAPCDebugHook(env::AbstractEnv)
         NamedTuple(
             p => ComposedHook(
                 # TotalRewardPerEpisode(; is_display_on_exit = false),
+                ConvergenceCheck(env.n_state_space, env.convergence_threshold),
                 TotalRewardPerEpisodeLastN(; max_steps = env.convergence_threshold + 100),
                 # TODO: MultiAgent version of TotalRewardPerEpisode / better player handling for hooks
-                ConvergenceCheck(env.n_state_space, env.convergence_threshold),
             ) for p in players(env)
         ),
     )

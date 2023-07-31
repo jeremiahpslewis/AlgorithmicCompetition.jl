@@ -12,7 +12,7 @@ function Experiment(env::DDDCEnv; stop_on_convergence = true)
         DDDCPolicy(env),
         env,
         AIAPCStop(env; stop_on_convergence = stop_on_convergence),
-        AIAPCHook(env),
+        AIAPCDebugHook(env),
     )
 end
 
