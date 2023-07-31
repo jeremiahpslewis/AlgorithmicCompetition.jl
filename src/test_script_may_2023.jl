@@ -91,20 +91,27 @@ push!(experiment.policy, PostActStage(), experiment.env, actions)
 optimise!(experiment.policy, PostActStage())
 push!(experiment.policy, PostEpisodeStage(), env)
 
-@report_opt Base.push!(
+# @report_opt Base.push!(experiment.policy, PostActStage(), experiment.env, CartesianIndex(1,1))
+# @report_opt RLBase.plan!(experiment.policy, experiment.env)
+# @report_opt optimise!(experiment.policy, PostActStage())
+
+@report_opt RLCore._run(
     experiment.policy,
-    PostActStage(),
     experiment.env,
-    CartesianIndex(1, 1),
+    experiment.stop_condition,
+    experiment.hook,
+    ResetAtTerminal(),
 )
-@report_opt RLBase.plan!(experiment.policy, experiment.env)
-@report_opt optimise!(experiment.policy, PostActStage())
 
 @time run(hyperparams; stop_on_convergence = true);
 
 RLCore.timer
 
-a = @time run(hyperparams; stop_on_convergence = false);
+@btime run(hyperparams; stop_on_convergence = false);
+
+
+
+
 
 # player = Symbol(1)
 # next_state = state(env,player)
