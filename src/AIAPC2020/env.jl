@@ -24,11 +24,11 @@ struct AIAPCEnv <: AbstractEnv
     price_options::Vector{Float64}      # Price options
     price_index::Vector{Int8}           # Price indices
 
-    competition_params_dict::Dict{Symbol, CompetitionParameters} # Competition parameters, true = high, false = low
+    competition_params_dict::Dict{Symbol,CompetitionParameters} # Competition parameters, true = high, false = low
     demand_mode::Symbol                      # Demand mode, :high or :low
     memory::Vector{CartesianIndex{2}}       # Memory vector (previous prices)
     state_space::Base.OneTo{Int16}          # State space
-    state_space_lookup::Array{Int16, 2}       # State space lookup table
+    state_space_lookup::Array{Int16,2}       # State space lookup table
 
     n_prices::Int                           # Number of price options
     n_state_space::Int64                    # Number of states
@@ -50,8 +50,12 @@ struct AIAPCEnv <: AbstractEnv
         n_state_space = n_prices^(p.memory_length * n_players)
         state_space = Base.OneTo(Int16(n_state_space))
         action_space = construct_AIAPC_action_space(price_index)
-        profit_array =
-            construct_AIAPC_profit_array(price_options, p.competition_params_dict, n_players; p.demand_mode)
+        profit_array = construct_AIAPC_profit_array(
+            price_options,
+            p.competition_params_dict,
+            n_players;
+            p.demand_mode,
+        )
         state_space_lookup = construct_AIAPC_state_space_lookup(action_space, n_prices)
 
         @assert p.demand_mode ∈ (:high, :low)
@@ -102,7 +106,7 @@ RLBase.legal_action_space(env::AIAPCEnv, p) = is_terminated(env) ? () : action_s
 const legal_action_space_mask_object_AIAPC = [Int8.(1:15)...]
 
 RLBase.legal_action_space_mask(env::AIAPCEnv, player::Symbol) =
-legal_action_space_mask_object_AIAPC
+    legal_action_space_mask_object_AIAPC
 
 RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
@@ -128,16 +132,10 @@ Return the reward for the current state for player `p` as an integer. If the epi
 function RLBase.reward(env::AIAPCEnv, p::Int)
     profit_array = env.profit_array
     memory_index = env.memory[1]
-    return _reward(
-        profit_array,
-        memory_index,
-        p
-        )
+    return _reward(profit_array, memory_index, p)
 end
 
-function _reward(profit::Array{Float64,3},
-    memory_index::CartesianIndex{2},
-    p::Int)
+function _reward(profit::Array{Float64,3}, memory_index::CartesianIndex{2}, p::Int)
 
     return profit[memory_index, p]
 end
@@ -188,7 +186,16 @@ RLBase.RewardStyle(::AIAPCEnv) = STEP_REWARD
 RLBase.UtilityStyle(::AIAPCEnv) = GENERAL_SUM
 RLBase.ChanceStyle(::AIAPCEnv) = DETERMINISTIC
 
-function RLBase.plan!(explorer::Ex, learner::L, env::AIAPCEnv, player::Symbol) where {Ex<:AbstractExplorer,L<:AbstractLearner}
+function RLBase.plan!(
+    explorer::Ex,
+    learner::L,
+    env::AIAPCEnv,
+    player::Symbol,
+) where {Ex<:AbstractExplorer,L<:AbstractLearner}
     legal_action_space_ = RLBase.legal_action_space_mask(env, player)
-    return RLBase.plan!(explorer, RLCore.forward(learner, state(env, player)), legal_action_space_)
+    return RLBase.plan!(
+        explorer,
+        RLCore.forward(learner, state(env, player)),
+        legal_action_space_,
+    )
 end

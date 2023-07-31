@@ -7,7 +7,7 @@ using Flux
 Calculate the Q-value for player i at time t=0, given the price chosen by player i and assuming random play over the price options of player -i.
 """
 function Q_i_0(env::DDDCEnv)
-    Float64[mean(mean(env.profit_array[:, :, 1, :], dims = 2), dims=3) ./ (1 - env.δ)...]
+    Float64[mean(mean(env.profit_array[:, :, 1, :], dims = 2), dims = 3) ./ (1 - env.δ)...]
 end
 
 """

@@ -25,8 +25,15 @@ end
 get_demand_level(d::DataDemandDigitalParams) = get_demand_level(d.frequency_high_demand)
 
 
-function get_demand_signals(demand_level_is_high::Bool, signal_quality_is_high::Vector{Bool}, low_signal_quality_level::Float64, high_signal_quality_boost::Float64)
-    true_signal_probability = 0.5 + low_signal_quality_level .+ high_signal_quality_boost .* signal_quality_is_high
+function get_demand_signals(
+    demand_level_is_high::Bool,
+    signal_quality_is_high::Vector{Bool},
+    low_signal_quality_level::Float64,
+    high_signal_quality_boost::Float64,
+)
+    true_signal_probability =
+        0.5 + low_signal_quality_level .+
+        high_signal_quality_boost .* signal_quality_is_high
 
     # Probability of true signal is a function of true signal probability
     reveal_true_signal = rand(2) .< true_signal_probability
@@ -38,9 +45,10 @@ function get_demand_signals(demand_level_is_high::Bool, signal_quality_is_high::
 end
 
 function get_demand_signals(d::DataDemandDigitalParams, is_high_demand_episode::Bool)
-    get_demand_signals(is_high_demand_episode,
-    d.signal_quality_is_high,
-    d.low_signal_quality_level,
-    d.high_signal_quality_boost)
+    get_demand_signals(
+        is_high_demand_episode,
+        d.signal_quality_is_high,
+        d.low_signal_quality_level,
+        d.high_signal_quality_boost,
+    )
 end
-

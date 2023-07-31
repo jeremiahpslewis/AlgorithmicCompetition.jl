@@ -11,7 +11,8 @@
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
-    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+    competition_solution_dict =
+        Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
     hyperparameters = AIAPCHyperParameters(
         α,
@@ -32,7 +33,8 @@ end
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
-    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+    competition_solution_dict =
+        Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
     env =
         AIAPCHyperParameters(
@@ -91,7 +93,8 @@ end
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
-    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+    competition_solution_dict =
+        Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
     hyperparameters = AIAPCHyperParameters(
         α,
@@ -148,7 +151,8 @@ end
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
-    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+    competition_solution_dict =
+        Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
     hyperparameters = AIAPCHyperParameters(α, β, δ, max_iter, competition_solution_dict)
 
@@ -178,8 +182,9 @@ end
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
-    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
-    
+    competition_solution_dict =
+        Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+
     hyperparameters = AIAPCHyperParameters(
         α,
         β,
@@ -214,7 +219,8 @@ end
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
-    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+    competition_solution_dict =
+        Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
     n_parameter_increments = 3
     α_ = Float64.(range(0.0025, 0.25, n_parameter_increments))
@@ -259,7 +265,8 @@ end
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
-    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+    competition_solution_dict =
+        Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
     hyperparameters = AIAPCHyperParameters(
         α,
@@ -323,7 +330,8 @@ end
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
-    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+    competition_solution_dict =
+        Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
     hyperparameters = AIAPCHyperParameters(
         α,
@@ -352,7 +360,8 @@ end
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
-    competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+    competition_solution_dict =
+        Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
     hyperparameters = AIAPCHyperParameters(
         α,

@@ -73,7 +73,8 @@ struct AIAPCHyperParameters
             )
         price_options = [
             range(
-                competition_solution_dict[demand_mode].p_Bert_nash_equilibrium - p_range_pad,
+                competition_solution_dict[demand_mode].p_Bert_nash_equilibrium -
+                p_range_pad,
                 competition_solution_dict[demand_mode].p_monop_opt + p_range_pad,
                 n_prices,
             )...,
@@ -85,16 +86,12 @@ struct AIAPCHyperParameters
             δ,
             max_iter,
             convergence_threshold,
-
             price_options,
             memory_length,
             n_players,
-
             Dict(d_ => competition_solution_dict[d_].params for d_ in [:high, :low]),
-
             competition_solution_dict[demand_mode].p_Bert_nash_equilibrium,
             competition_solution_dict[demand_mode].p_monop_opt,
-
             demand_mode,
         )
     end
@@ -106,7 +103,5 @@ function construct_AIAPC_action_space(price_index)
 end
 
 function initialize_price_memory(price_index, n_players::Int)
-        Vector{CartesianIndex}([
-            CartesianIndex{2}(rand(price_index, n_players)...)
-        ])
+    Vector{CartesianIndex}([CartesianIndex{2}(rand(price_index, n_players)...)])
 end
