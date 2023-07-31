@@ -134,8 +134,17 @@ function Base.push!(
     return
 end
 
-# TODO: Figure out why the hook results are identical for both players
-function AIAPCHook(env::AbstractEnv)
+function AIAPCPerformanceHook(env::AbstractEnv)
+    MultiAgentHook(
+        NamedTuple(
+            p => ComposedHook(
+                ConvergenceCheck(env.n_state_space, env.convergence_threshold),
+            ) for p in players(env)
+        ),
+    )
+end
+
+function AIAPCDebugHook(env::AbstractEnv)
     MultiAgentHook(
         NamedTuple(
             p => ComposedHook(

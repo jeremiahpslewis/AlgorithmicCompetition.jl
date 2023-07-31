@@ -12,12 +12,12 @@ function RLBase.plan!(multiagent::MultiAgentPolicy, env::AIAPCEnv)
     )
 end
 
-function Experiment(env::AIAPCEnv; stop_on_convergence = true)
+function Experiment(env::AIAPCEnv; stop_on_convergence = true, debug = false)
     RLCore.Experiment(
         AIAPCPolicy(env),
         env,
         AIAPCStop(env; stop_on_convergence = stop_on_convergence),
-        AIAPCHook(env),
+        debug ? AIAPCDebugHook(env) : AIAPCPerformanceHook(env),
     )
 end
 
@@ -36,9 +36,9 @@ function Base.run(experiments::Vector{ReinforcementLearningCore.Experiment})
     end
 end
 
-function Base.run(hyperparameters::AIAPCHyperParameters; stop_on_convergence = true)
+function Base.run(hyperparameters::AIAPCHyperParameters; stop_on_convergence = true, debug = false)
     env = AIAPCEnv(hyperparameters)
-    experiment = Experiment(env; stop_on_convergence = stop_on_convergence)
+    experiment = Experiment(env; stop_on_convergence = stop_on_convergence, debug = debug)
     RLCore._run(
         experiment.policy,
         experiment.env,
@@ -54,6 +54,6 @@ end
 
 Runs the experiment and returns the economic summary.
 """
-function run_and_extract(hyperparameters::AIAPCHyperParameters; stop_on_convergence = true)
-    economic_summary(run(hyperparameters; stop_on_convergence = stop_on_convergence))
+function run_and_extract(hyperparameters::AIAPCHyperParameters; stop_on_convergence = true, debug = false)
+    economic_summary(run(hyperparameters; stop_on_convergence = stop_on_convergence, debug = debug))
 end

@@ -45,7 +45,7 @@ end
             competition_solution_dict,
         ) |> AIAPCEnv
     env.memory[1] = CartesianIndex(Int8(1), Int8(1))
-    exper = Experiment(env)
+    exper = Experiment(env; debug=true)
 
     # Find the Nash equilibrium profit
     params = env.competition_params_dict[:high]
@@ -278,7 +278,7 @@ end
     )
 
 
-    c_out = run(hyperparameters; stop_on_convergence = false)
+    c_out = run(hyperparameters; stop_on_convergence = false, debug = true)
 
     # ensure that the policy is updated by the learner
     @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table .!= 0) != 0

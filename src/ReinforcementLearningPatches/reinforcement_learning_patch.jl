@@ -30,7 +30,6 @@ using Random
 import Base.push!
 import Base.getindex
 using DataStructures: CircularBuffer
-using StaticArrays
 
 # Epsilon Greedy Explorer for AIAPC Zoo
 # Note: get_ϵ function in RLCore takes: 600.045 ns (6 allocations: 192 bytes)
@@ -41,7 +40,7 @@ using StaticArrays
 struct AIAPCEpsilonGreedyExplorer{R,F<:AbstractFloat} <: AbstractExplorer
     β::F
     β_neg::F
-    step::MVector{1,Int}
+    step::Vector{Int}
     rng::R
 end
 
@@ -49,7 +48,7 @@ function AIAPCEpsilonGreedyExplorer(β::F) where {F<:AbstractFloat}
     AIAPCEpsilonGreedyExplorer{typeof(Random.GLOBAL_RNG),F}(
         β,
         β * -1,
-        (@MVector Int[1]),
+        Int[1],
         Random.GLOBAL_RNG,
     )
 end
