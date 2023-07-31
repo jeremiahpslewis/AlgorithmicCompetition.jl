@@ -16,7 +16,8 @@ using ReinforcementLearningCore:
     MultiAgentPolicy,
     RLCore,
     ResetAtTerminal
-using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy, optimise!, act!
+using ReinforcementLearningBase:
+    RLBase, test_interfaces!, test_runnable!, AbstractPolicy, optimise!, act!
 import ReinforcementLearningCore
 using Statistics
 using AlgorithmicCompetition:
@@ -64,7 +65,8 @@ competition_params_dict = Dict(
     :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
 )
 
-competition_solution_dict = Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+competition_solution_dict =
+    Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
 
 hyperparams = AIAPCHyperParameters(
@@ -88,7 +90,12 @@ push!(experiment.policy, PostActStage(), experiment.env, actions)
 optimise!(experiment.policy, PostActStage())
 push!(experiment.policy, PostEpisodeStage(), env)
 
-@report_opt Base.push!(experiment.policy, PostActStage(), experiment.env, CartesianIndex(1,1))
+@report_opt Base.push!(
+    experiment.policy,
+    PostActStage(),
+    experiment.env,
+    CartesianIndex(1, 1),
+)
 @report_opt RLBase.plan!(experiment.policy, experiment.env)
 @report_opt optimise!(experiment.policy, PostActStage())
 

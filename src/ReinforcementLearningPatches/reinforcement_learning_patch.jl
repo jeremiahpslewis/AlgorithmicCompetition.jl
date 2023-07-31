@@ -41,7 +41,7 @@ using StaticArrays
 struct AIAPCEpsilonGreedyExplorer{R,F<:AbstractFloat} <: AbstractExplorer
     β::F
     β_neg::F
-    step::MVector{1, Int}
+    step::MVector{1,Int}
     rng::R
 end
 
@@ -163,7 +163,12 @@ function find_all_max_(x)
 end
 
 # Handle CartesianIndex actions
-function Base.push!(multiagent::MultiAgentPolicy, ::PostActStage, env::E, actions::CartesianIndex) where {E<:AbstractEnv}
+function Base.push!(
+    multiagent::MultiAgentPolicy,
+    ::PostActStage,
+    env::E,
+    actions::CartesianIndex,
+) where {E<:AbstractEnv}
     actions = Tuple(actions)
     Base.push!(multiagent, PostActStage(), env, actions)
 end

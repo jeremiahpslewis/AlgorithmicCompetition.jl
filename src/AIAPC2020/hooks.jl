@@ -76,7 +76,7 @@ function Base.push!(
     agent::Agent{P,T},
     env::E,
     player::Symbol,
-) where {P<:AbstractPolicy,T<:Trajectory, E<:AbstractEnv}
+) where {P<:AbstractPolicy,T<:Trajectory,E<:AbstractEnv}
     Base.push!(h, PostActStage(), agent.policy, env, player)
 end
 
@@ -86,7 +86,7 @@ function Base.push!(
     policy::QBasedPolicy{L,Exp},
     env::E,
     player::Symbol,
-) where {L<:AbstractLearner,Exp<:AbstractExplorer, E<:AbstractEnv}
+) where {L<:AbstractLearner,Exp<:AbstractExplorer,E<:AbstractEnv}
     Base.push!(h, PostActStage(), policy.learner, env, player)
 end
 

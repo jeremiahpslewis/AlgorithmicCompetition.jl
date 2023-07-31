@@ -77,7 +77,11 @@ Helper function. Returns the profit corresponding to the state passed.
 """
 function get_profit_from_state(env::AIAPCEnv, state)
     prices = get_prices_from_state(env, state)
-    return AlgorithmicCompetition.π(prices[1], prices[2], env.competition_params_dict[:high])
+    return AlgorithmicCompetition.π(
+        prices[1],
+        prices[2],
+        env.competition_params_dict[:high],
+    )
 end
 
 """

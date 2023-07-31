@@ -24,13 +24,13 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
     price_options::Vector{Float64}      # Price options
     price_index::Vector{Int8}           # Price indices
 
-    competition_params_dict::Dict{Symbol, CompetitionParameters} # Competition parameters, true = high, false = low
+    competition_params_dict::Dict{Symbol,CompetitionParameters} # Competition parameters, true = high, false = low
     memory::Vector{CartesianIndex{2}}       # Memory vector (previous prices)
     is_high_demand_signals::Vector{Bool}    # [true, false] if demand signal is high for player one and low for player two for a given episode
     prev_is_high_demand_signals::Vector{Bool}    # [true, false] if demand signal is high for player one and low for player two for a given episode
     is_high_demand_episode::Vector{Bool}    # [true] if demand is high for a given episode
     state_space::Base.OneTo{Int16}          # State space
-    state_space_lookup::Array{Int16, 4}       # State space lookup table
+    state_space_lookup::Array{Int16,4}       # State space lookup table
 
     n_prices::Int                           # Number of price options
     n_state_space::Int64                    # Number of states
@@ -109,7 +109,7 @@ RLBase.legal_action_space(env::DDDCEnv, p) = is_terminated(env) ? () : action_sp
 const legal_action_space_mask_object_DDDC = [Int8.(1:15)...]
 
 RLBase.legal_action_space_mask(env::DDDCEnv, player::Symbol) =
-legal_action_space_mask_object_DDDC
+    legal_action_space_mask_object_DDDC
 
 RLBase.action_space(env::DDDCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
@@ -135,18 +135,15 @@ Return the reward for the current state for player `p` as an integer. If the epi
 function RLBase.reward(env::DDDCEnv, p::Int)
     profit_array = env.profit_array
     memory_index = env.memory[1]
-    return _reward(
-        profit_array,
-        memory_index,
-        env.is_high_demand_episode[1],
-        p
-        )
+    return _reward(profit_array, memory_index, env.is_high_demand_episode[1], p)
 end
 
-function _reward(profit::Array{Float64,4},
+function _reward(
+    profit::Array{Float64,4},
     memory_index::CartesianIndex{2},
     is_high_demand_episode::Bool,
-    p::Int)
+    p::Int,
+)
     if is_high_demand_episode
         demand_index_ = 2
     else
@@ -204,7 +201,8 @@ function RLBase.reset!(env::DDDCEnv)
 
     # Update demand signals
     env.prev_is_high_demand_signals .= env.is_high_demand_signals
-    env.is_high_demand_signals .= get_demand_signals(env.data_demand_digital_params, is_high_demand_episode)
+    env.is_high_demand_signals .=
+        get_demand_signals(env.data_demand_digital_params, is_high_demand_episode)
 
     # Update demand level
     env.is_high_demand_episode[1] = is_high_demand_episode
@@ -221,7 +219,16 @@ RLBase.RewardStyle(::DDDCEnv) = STEP_REWARD
 RLBase.UtilityStyle(::DDDCEnv) = GENERAL_SUM
 RLBase.ChanceStyle(::DDDCEnv) = DETERMINISTIC
 
-function RLBase.plan!(explorer::Ex, learner::L, env::DDDCEnv, player::Symbol) where {Ex<:AbstractExplorer,L<:AbstractLearner}
+function RLBase.plan!(
+    explorer::Ex,
+    learner::L,
+    env::DDDCEnv,
+    player::Symbol,
+) where {Ex<:AbstractExplorer,L<:AbstractLearner}
     legal_action_space_ = RLBase.legal_action_space_mask(env, player)
-    return RLBase.plan!(explorer, RLCore.forward(learner, state(env, player)), legal_action_space_)
+    return RLBase.plan!(
+        explorer,
+        RLCore.forward(learner, state(env, player)),
+        legal_action_space_,
+    )
 end
