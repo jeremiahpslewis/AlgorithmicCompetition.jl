@@ -45,7 +45,7 @@ end
             competition_solution_dict,
         ) |> AIAPCEnv
     env.memory[1] = CartesianIndex(Int8(1), Int8(1))
-    exper = Experiment(env; debug=true)
+    exper = Experiment(env; debug = true)
 
     # Find the Nash equilibrium profit
     params = env.competition_params_dict[:high]

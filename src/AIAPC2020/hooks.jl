@@ -55,7 +55,7 @@ function _best_action_lookup(state_, table)
     best_action = 1
     max_value = table[1, state_]
 
-    for i in 2:size(table, 1)
+    for i = 2:size(table, 1)
         value = table[i, state_]
         if value > max_value
             max_value = value

@@ -92,7 +92,12 @@ hyperparams = DDDCHyperParameters(
 env = DDDCEnv(hyperparams)
 experiment = Experiment(env; stop_on_convergence = true)
 
-@report_opt Base.push!(experiment.policy, PostActStage(), experiment.env, CartesianIndex(1,1))
+@report_opt Base.push!(
+    experiment.policy,
+    PostActStage(),
+    experiment.env,
+    CartesianIndex(1, 1),
+)
 @report_opt RLBase.plan!(experiment.policy, experiment.env)
 
 ex = @time run(hyperparams; stop_on_convergence = true);
