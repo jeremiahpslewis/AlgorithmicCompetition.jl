@@ -20,6 +20,7 @@ function run_dddc(;
     n_grid_increments = 100,
 )
     frequency_high_demand_range = Float64.(range(0, 1, n_grid_increments))
+    signal_quality_per_player = [true, false]
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
         :low => CompetitionParameters(-0.25, 0, (2, 2), (1, 1)), # Akin to Calvano 2020 Stochastic Demand
@@ -34,9 +35,9 @@ function run_dddc(;
     data_demand_digital_param_set = [DataDemandDigitalParams(
         low_signal_quality_level = 0.75,
         high_signal_quality_level = 1.0,
-        signal_quality_is_high = [true, false],
+        signal_quality_is_high = [signal_quality_p1, signal_quality_p2],
         frequency_high_demand = frequency_high_demand,
-    ) for frequency_high_demand in frequency_high_demand_range]
+    ) for frequency_high_demand in frequency_high_demand_range for signal_quality_p1 in signal_quality_per_player for signal_quality_p2 in signal_quality_per_player]
 
     hyperparameter_vect = [DDDCHyperParameters(
         α,
