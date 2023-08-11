@@ -100,7 +100,7 @@ function get_optimal_action(env::AIAPCEnv, policy::MultiAgentPolicy, last_observ
     return CartesianIndex(optimal_action_set...)
 end
 
-function economic_summary(env::AbstractEnv, policy::MultiAgentPolicy, hook::AbstractHook)
+function economic_summary(env::AIAPCEnv, policy::MultiAgentPolicy, hook::AbstractHook)
     convergence_threshold = env.convergence_threshold
     iterations_until_convergence = Int64[
         hook[player][1].iterations_until_convergence for player in [Symbol(1), Symbol(2)]
@@ -128,7 +128,7 @@ end
 
 Returns the average profit of the agent, after convergence, over the convergence state or states (in the case of a cycle).
 """
-function get_convergence_profit_from_env(env::AIAPCEnv, policy::MultiAgentPolicy)
+function get_convergence_profit_from_env(env::E, policy::MultiAgentPolicy) where {E<:AbstractEnv}
     last_observed_state = get_state_from_memory(env)
 
     visited_states = [last_observed_state]
