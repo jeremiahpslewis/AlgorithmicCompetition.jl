@@ -51,7 +51,7 @@ using BenchmarkTools
 # using ProfileView
 using Distributed
 
-RLCore.TimerOutputs.enable_debug_timings(RLCore)
+# RLCore.TimerOutputs.enable_debug_timings(RLCore)
 
 α = Float64(0.125)
 β = Float64(4e-1)
@@ -59,7 +59,7 @@ RLCore.TimerOutputs.enable_debug_timings(RLCore)
 ξ = 0.1
 δ = 0.95
 n_prices = 15
-max_iter = Int(1e7)
+max_iter = Int(1e8)
 price_index = 1:n_prices
 
 competition_params_dict = Dict(
@@ -75,7 +75,7 @@ data_demand_digital_params = DataDemandDigitalParams(
     low_signal_quality_level = 0.49,
     high_signal_quality_boost = 0.005,
     signal_quality_is_high = [true, false],
-    frequency_high_demand = 0.5,
+    frequency_high_demand = 0.9,
 )
 
 hyperparams = DDDCHyperParameters(
@@ -91,17 +91,31 @@ hyperparams = DDDCHyperParameters(
 
 env = DDDCEnv(hyperparams)
 experiment = Experiment(env; stop_on_convergence = true)
+ex = @time run(hyperparams; stop_on_convergence = true);
 
-@report_opt Base.push!(
+
+
+# @report_opt Base.push!(
+#     experiment.policy,
+#     PostActStage(),
+#     experiment.env,
+#     CartesianIndex(1, 1),
+# )
+# @report_opt RLBase.plan!(experiment.policy, experiment.env)
+
+@report_opt RLCore._run(
     experiment.policy,
-    PostActStage(),
     experiment.env,
-    CartesianIndex(1, 1),
+    experiment.stop_condition,
+    experiment.hook,
+    ResetAtTerminal(),
 )
-@report_opt RLBase.plan!(experiment.policy, experiment.env)
 
 ex = @time run(hyperparams; stop_on_convergence = true);
-ex.hook[Symbol(1)][2].convergence_duration
+economic_summary(ex)
+# a = @time run(hyperparams; stop_on_convergence = false);
+
+# ex.hook[Symbol(1)][2].convergence_duration
 # RLCore.to
 
 # a = @time run(hyperparams; stop_on_convergence = false);
