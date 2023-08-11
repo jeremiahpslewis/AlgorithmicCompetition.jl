@@ -20,16 +20,14 @@ _procs = addprocs(
     using AlgorithmicCompetition: run_and_extract
 end
 
-@time exp_list = AlgorithmicCompetition.run_aiapc(;
-    n_parameter_iterations = 1,
-    max_iter = Int(1e9), # TODO: increment to 1e9
-    # max_alpha = 0.05,
-    # max_beta = 0.5,
-    sample_fraction = 1,
+@time exp_list = AlgorithmicCompetition.run_dddc(;
+    n_parameter_iterations = 10,
+    max_iter = Int(1e9),
+    n_grid_increments = 100,
 )
 
 rmprocs(_procs)
 
-file_name = "simulation_results_$start_timestamp.csv"
+file_name = "simulation_results_dddc_$start_timestamp.csv"
 df = AlgorithmicCompetition.extract_sim_results(exp_list)
 CSV.write(file_name, df)
