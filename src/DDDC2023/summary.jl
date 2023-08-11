@@ -40,7 +40,7 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
 
     is_converged = Bool[]
 
-    TODO: convergence_profit = get_convergence_profit_from_hook(hook)
+    convergence_profit = get_convergence_profit_from_hook(hook)
 
     for i in (Symbol(1), Symbol(2))
         push!(is_converged, hook[i][1].is_converged)
@@ -62,9 +62,8 @@ end
 Returns the average profit of the agent, after convergence, over the convergence state or states (in the case of a cycle).
 """
 function get_convergence_profit_from_hook(hook::AbstractHook)
-
+    [mean(hook[p][2].rewards[101:end]) for p in [Symbol(1), Symbol(2)]]
 end
-
 
 """
     extract_sim_results(exp_list::Vector{DDDCSummary})
@@ -80,12 +79,22 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
     avg_profit_result =
         [mean(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
     is_converged = [ex.is_converged for ex in exp_list if !(ex isa Exception)]
+    low_signal_quality_level = [ex.data_demand_digital_params.low_signal_quality_level for ex in exp_list if !(ex isa Exception)]
+    high_signal_quality_boost = [ex.data_demand_digital_params.high_signal_quality_boost for ex in exp_list if !(ex isa Exception)]
+    signal_quality_is_high = [ex.data_demand_digital_params.signal_quality_is_high for ex in exp_list if !(ex isa Exception)]
+    frequency_high_demand = [ex.data_demand_digital_params.frequency_high_demand for ex in exp_list if !(ex isa Exception)]
+
+
     df = DataFrame(
         α = α_result,
         β = β_result,
         π_bar = avg_profit_result,
         iterations_until_convergence = iterations_until_convergence,
         is_converged = is_converged,
+        low_signal_quality_level = low_signal_quality_level,
+        high_signal_quality_boost = high_signal_quality_boost,
+        signal_quality_is_high = signal_quality_is_high,
+        frequency_high_demand = frequency_high_demand,
     )
     return df
 end
