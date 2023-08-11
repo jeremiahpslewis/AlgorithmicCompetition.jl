@@ -16,40 +16,35 @@ function run_dddc(;
     n_parameter_iterations = 1,
     max_iter = Int(1e9),
     convergence_threshold = Int(1e5),
-    # max_alpha = 0.25,
-    # max_beta = 2,
+    n_grid_increments = 100,
 )
+
+    frequency_high_demand_range = Float64.(range(0, 1, n_grid_increments))
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
-        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(-0.25, 0, (2, 2), (1, 1)), # Akin to Calvano 2020 Stochastic Demand
     )
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
     δ = 0.95
 
-    # NOTE: low quality probability 0.5+x, high quality boost, is high quality signal, high demand freq
-    data_demand_digital_params = DataDemandDigitalParams(
-        low_signal_quality_level = 0.99,
-        high_signal_quality_boost = 0.005,
+    data_demand_digital_param_set = [DataDemandDigitalParams(
+        low_signal_quality_level = 0.75,
+        high_signal_quality_level = 1.0,
         signal_quality_is_high = [true, false],
-        frequency_high_demand = 0.9,
-    )
+        frequency_high_demand = frequency_high_demand,
+    ) for frequency_high_demand in frequency_high_demand_range]
 
-    hyperparams = DDDCHyperParameters(
+    hyperparameter_vect = [DDDCHyperParameters(
         α,
         β,
         δ,
         max_iter,
         competition_solution_dict,
-        data_demand_digital_params;
+        ;
         convergence_threshold = Int(1e5),
-    )
-    # Sample fraction of α & β coordinates
-    hyperparameter_vect = sample(
-        hyperparameter_vect,
-        Int(floor(length(hyperparameter_vect) * sample_fraction)),
-    )
+    ) for data_demand_digital_params in data_demand_digital_param_set]
 
     # Shuffle hyperparameter_vect, extend according to number of repetitions
     hyperparameter_vect = shuffle(repeat(hyperparameter_vect, n_parameter_iterations))
