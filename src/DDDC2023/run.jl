@@ -30,7 +30,7 @@ function Base.run(hyperparameters::DDDCHyperParameters; stop_on_convergence = tr
 end
 
 """
-    run_and_extract(hyperparameters::AIAPCHyperParameters; stop_on_convergence = true)
+    run_and_extract(hyperparameters::DDDCHyperParameters; stop_on_convergence = true)
 
 Runs the experiment and returns the economic summary.
 """

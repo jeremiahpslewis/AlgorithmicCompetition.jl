@@ -78,8 +78,10 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
 
     avg_profit_result =
         [mean(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
-    profit_gap =
-        [maximum(ex.convergence_profit) - minimum(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
+    profit_max =
+        [maximum(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
+    profit_min =
+        [minimum(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
 
     is_converged = [ex.is_converged for ex in exp_list if !(ex isa Exception)]
     low_signal_quality_level = [ex.data_demand_digital_params.low_signal_quality_level for ex in exp_list if !(ex isa Exception)]
@@ -92,7 +94,8 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
         α = α_result,
         β = β_result,
         π_bar = avg_profit_result,
-        profit_gap = profit_gap,
+        profit_min = profit_min,
+        profit_max = profit_max,        
         iterations_until_convergence = iterations_until_convergence,
         is_converged = is_converged,
         low_signal_quality_level = low_signal_quality_level,
