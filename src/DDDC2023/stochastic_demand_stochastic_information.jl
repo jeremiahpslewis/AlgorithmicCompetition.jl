@@ -32,7 +32,7 @@ function get_demand_signals(
     high_signal_quality_level::Float64,
 )
     true_signal_probability =
-        (low_signal_quality_level .* (1 - signal_quality_is_high)) .+
+        (low_signal_quality_level .* (1 .- signal_quality_is_high)) .+
         (high_signal_quality_level .* signal_quality_is_high)
 
     # Probability of true signal is a function of true signal probability

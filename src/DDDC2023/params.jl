@@ -11,7 +11,8 @@ end
         β::Float64,
         δ::Float64,
         max_iter::Int,
-        competition_solution_dict::Dict{Symbol,CompetitionSolution};
+        competition_solution_dict::Dict{Symbol,CompetitionSolution},
+        data_demand_digital_params::DataDemandDigitalParams;
         convergence_threshold::Int = Int(1e5),
     )
 
@@ -50,7 +51,6 @@ struct DDDCHyperParameters
         n_prices = 15
         n_players = 2
         memory_length = 1
-
 
         d = Dict(:a => 1, :b => 2)
 

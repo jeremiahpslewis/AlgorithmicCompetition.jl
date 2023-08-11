@@ -113,7 +113,7 @@ end
     @test reward(env) != [0, 0] # reward is zero as at least one player has already played (technically sequental plays)
 end
 
-@testset "run multiprocessing code" begin
+@testset "run AIAPC multiprocessing code" begin
     n_procs_ = 1
 
     _procs = addprocs(
@@ -133,6 +133,26 @@ end
         max_iter = Int(100),
         convergence_threshold = Int(10),
     )
+
+    rmprocs(_procs)
+end
+
+@testset "run DDDC multiprocessing code" begin
+    n_procs_ = 1
+
+    _procs = addprocs(
+        n_procs_,
+        topology = :master_worker,
+        exeflags = ["--threads=1", "--project=$(Base.active_project())"],
+    )
+
+    @everywhere begin
+        using Pkg
+        Pkg.instantiate()
+        using AlgorithmicCompetition
+    end
+
+    AlgorithmicCompetition.run_dddc(n_parameter_iterations=1, max_iter=10, convergence_threshold=1, n_grid_increments=2)
 
     rmprocs(_procs)
 end

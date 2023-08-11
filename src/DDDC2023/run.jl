@@ -35,5 +35,5 @@ end
 Runs the experiment and returns the economic summary.
 """
 function run_and_extract(hyperparameters::DDDCHyperParameters; stop_on_convergence = true)
-    economic_summary(run(env; stop_on_convergence = stop_on_convergence))
+    economic_summary(run(hyperparameters; stop_on_convergence = stop_on_convergence))
 end
