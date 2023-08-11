@@ -19,7 +19,6 @@ function run_dddc(;
     # max_alpha = 0.25,
     # max_beta = 2,
 )
-
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
@@ -29,17 +28,23 @@ function run_dddc(;
 
     δ = 0.95
 
-    hyperparameter_vect = [
-        DDDCHyperParameters(
-            α,
-            β,
-            δ,
-            max_iter,
-            competition_solution_dict;
-            convergence_threshold = convergence_threshold,
-        ) for α in α_ for β in β_
-    ]
+    # NOTE: low quality probability 0.5+x, high quality boost, is high quality signal, high demand freq
+    data_demand_digital_params = DataDemandDigitalParams(
+        low_signal_quality_level = 0.99,
+        high_signal_quality_boost = 0.005,
+        signal_quality_is_high = [true, false],
+        frequency_high_demand = 0.9,
+    )
 
+    hyperparams = DDDCHyperParameters(
+        α,
+        β,
+        δ,
+        max_iter,
+        competition_solution_dict,
+        data_demand_digital_params;
+        convergence_threshold = Int(1e5),
+    )
     # Sample fraction of α & β coordinates
     hyperparameter_vect = sample(
         hyperparameter_vect,

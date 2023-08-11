@@ -12,8 +12,8 @@
 using Flux
 
 @kwdef struct DataDemandDigitalParams
-    low_signal_quality_level::Float64 = 0.0 # probability of true signal is 0.5 + low_signal_quality_level
-    high_signal_quality_boost::Float64 = 0.0 # probability of true signal is 0.5 + low_signal_quality_level + high_signal_quality_boost
+    low_signal_quality_level::Float64 = 0.5 # probability of true signal (0.5 is lowest possible vale)
+    high_signal_quality_boost::Float64 = 0.0 # probability of true signal is low_signal_quality_level + high_signal_quality_boost
     signal_quality_is_high::Vector{Bool} = [false, false] # true if signal quality is high
     frequency_high_demand::Float64 = 0.5 # probability of high demand for a given episode
 end
@@ -32,7 +32,7 @@ function get_demand_signals(
     high_signal_quality_boost::Float64,
 )
     true_signal_probability =
-        0.5 + low_signal_quality_level .+
+        low_signal_quality_level .+
         high_signal_quality_boost .* signal_quality_is_high
 
     # Probability of true signal is a function of true signal probability

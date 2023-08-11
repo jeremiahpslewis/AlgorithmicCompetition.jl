@@ -72,7 +72,7 @@ competition_solution_dict =
 
 # NOTE: low quality probability 0.5+x, high quality boost, is high quality signal, high demand freq
 data_demand_digital_params = DataDemandDigitalParams(
-    low_signal_quality_level = 0.49,
+    low_signal_quality_level = 0.99,
     high_signal_quality_boost = 0.005,
     signal_quality_is_high = [true, false],
     frequency_high_demand = 0.9,
@@ -93,7 +93,7 @@ env = DDDCEnv(hyperparams)
 experiment = Experiment(env; stop_on_convergence = true)
 ex = @time run(hyperparams; stop_on_convergence = true);
 economic_summary(ex)
-
+extract_sim_results([economic_summary(ex)])
 # @report_opt Base.push!(
 #     experiment.policy,
 #     PostActStage(),
