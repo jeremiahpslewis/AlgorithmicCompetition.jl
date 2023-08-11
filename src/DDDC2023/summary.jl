@@ -3,7 +3,7 @@ using ReinforcementLearningCore, ReinforcementLearningBase
 using DataFrames
 
 """
-    DDDCSummary(α, β, is_converged, convergence_profit, iterations_until_convergence)
+    DDDCSummary(α, β, is_converged, data_demand_digital_params, convergence_profit, iterations_until_convergence)
 
 A struct to store the summary of an DDDC experiment.
 """

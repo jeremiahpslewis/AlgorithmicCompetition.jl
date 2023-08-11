@@ -59,7 +59,7 @@ using Distributed
 ξ = 0.1
 δ = 0.95
 n_prices = 15
-max_iter = Int(1e8)
+max_iter = Int(1e6) # 1e8
 price_index = 1:n_prices
 
 competition_params_dict = Dict(
@@ -92,8 +92,7 @@ hyperparams = DDDCHyperParameters(
 env = DDDCEnv(hyperparams)
 experiment = Experiment(env; stop_on_convergence = true)
 ex = @time run(hyperparams; stop_on_convergence = true);
-
-
+economic_summary(ex)
 
 # @report_opt Base.push!(
 #     experiment.policy,
