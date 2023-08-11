@@ -5,7 +5,7 @@
     @test get_demand_signals(false, [true, false], 1.0, 0.0) == [1, 0]
     @test all(
         4500 .<
-        sum(get_demand_signals(false, [true, false], 0.5, 0.0) for i = 1:10000) .<
+        sum(get_demand_signals(false, [true, false], 0.5, 0.5) for i = 1:10000) .<
         5500,
     )
     @test get_demand_signals(false, [true, false], 1.0, 1.0) == [0, 0]
