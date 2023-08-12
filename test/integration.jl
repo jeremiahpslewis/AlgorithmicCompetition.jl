@@ -152,7 +152,12 @@ end
         using AlgorithmicCompetition
     end
 
-    AlgorithmicCompetition.run_dddc(n_parameter_iterations=1, max_iter=10, convergence_threshold=1, n_grid_increments=2)
+    AlgorithmicCompetition.run_dddc(
+        n_parameter_iterations = 1,
+        max_iter = 10,
+        convergence_threshold = 1,
+        n_grid_increments = 2,
+    )
 
     rmprocs(_procs)
 end
