@@ -1,7 +1,7 @@
 using Chain
 using ReinforcementLearningCore, ReinforcementLearningBase
 using DataFrames
-
+using Flux: mse
 """
     DDDCSummary(α, β, is_converged, data_demand_digital_params, convergence_profit, iterations_until_convergence)
 
@@ -138,7 +138,12 @@ function extract_price_vs_demand_signal_counterfactuals(best_response_vector, st
         for j in 1:n_prices
             for k in 1:2
                 # The price that a player would choose if given signal 1 and signal 2 (e.g. high=1 or low=2), conditional on memory (prices and previous signals)
-                price_counterfactuals = price_options[best_response_vector[state_space_lookup[i, j, :, k]]]
+                best_response_price_indices = best_response_vector[state_space_lookup[i, j, :, k]]
+                if all(best_response_price_indices .> 0)
+                    price_counterfactuals = price_options[best_response_price_indices]
+                else
+                    price_counterfactuals = [0, 0]
+                end
                 push!(price_counterfactual_vect, ((i, j, k), price_counterfactuals...))
             end
         end

@@ -193,6 +193,45 @@ end
 
 end
 
+@testset "run full DDDC simulation" begin
+    α = Float64(0.125)
+    β = Float64(4e-1)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = Int(1e6)
+    price_index = 1:n_prices
+    
+    competition_params_dict = Dict(
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(-0.25, 0, (2, 2), (1, 1)),
+    )
+
+    competition_solution_dict =
+        Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+
+    data_demand_digital_params = DataDemandDigitalParams(
+        low_signal_quality_level = 0.99,
+        high_signal_quality_level = 0.995,
+        signal_quality_is_high = [true, false],
+        frequency_high_demand = 0.9,
+    )
+
+    hyperparams = DDDCHyperParameters(
+        α,
+        β,
+        δ,
+        max_iter,
+        competition_solution_dict,
+        data_demand_digital_params;
+        convergence_threshold = Int(1e5),
+    )
+
+    c_out = run(hyperparams; stop_on_convergence = true)
+    economic_summary(c_out)
+end
+
 @testset "run full AIAPC simulation" begin
     α = Float64(0.125)
     β = Float64(4e-1)
