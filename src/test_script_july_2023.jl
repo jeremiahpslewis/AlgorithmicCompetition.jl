@@ -70,7 +70,6 @@ competition_params_dict = Dict(
 competition_solution_dict =
     Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
-# NOTE: low quality probability 0.5+x, high quality boost, is high quality signal, high demand freq
 data_demand_digital_params = DataDemandDigitalParams(
     low_signal_quality_level = 0.99,
     high_signal_quality_level = 0.995,
