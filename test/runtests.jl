@@ -44,6 +44,7 @@ using AlgorithmicCompetition:
     InitMatrix,
     initialize_price_memory,
     p_BR,
+    post_prob_high_low_given_signal,
     profit_gain,
     Q_i_0,
     Q,
