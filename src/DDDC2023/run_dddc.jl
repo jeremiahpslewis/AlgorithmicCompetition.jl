@@ -20,7 +20,7 @@ function run_dddc(;
     n_grid_increments = 100,
 )
     frequency_high_demand_range = Float64.(range(0, 1, n_grid_increments))
-    low_signal_quality_level = Float64.(range(0.5, 1, n_grid_increments/2))
+    low_signal_quality_level_range = Float64.(range(0.5, 1, n_grid_increments/2))
     
     signal_quality_per_player = [true, false]
     competition_params_dict = Dict(
@@ -36,13 +36,14 @@ function run_dddc(;
 
     data_demand_digital_param_set = [
         DataDemandDigitalParams(
-            low_signal_quality_level = 0.75,
+            low_signal_quality_level = low_signal_quality_level,
             high_signal_quality_level = 1.0,
             signal_quality_is_high = [signal_quality_p1, signal_quality_p2],
             frequency_high_demand = frequency_high_demand,
         ) for frequency_high_demand in frequency_high_demand_range for
         signal_quality_p1 in signal_quality_per_player for
-        signal_quality_p2 in signal_quality_per_player
+        signal_quality_p2 in signal_quality_per_player for
+        low_signal_quality_level in low_signal_quality_level_range
     ]
 
     hyperparameter_vect = [
