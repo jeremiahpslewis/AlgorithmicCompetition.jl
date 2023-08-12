@@ -151,5 +151,5 @@ function extract_price_vs_demand_signal_counterfactuals(best_response_vector, st
 
     price_mse = mse(price_counterfactual_df[!, :price_given_high_demand_signal], price_counterfactual_df[!, :price_given_low_demand_signal])
 
-    return price_counterfactual_df, price_mse
+    return price_mse, price_counterfactual_df
 end
