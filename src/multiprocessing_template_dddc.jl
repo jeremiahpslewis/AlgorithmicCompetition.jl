@@ -21,9 +21,9 @@ _procs = addprocs(
 end
 
 @time exp_list = AlgorithmicCompetition.run_dddc(;
-    n_parameter_iterations = 5,
+    n_parameter_iterations = 75,
     max_iter = Int(1e9),
-    n_grid_increments = 10,
+    n_grid_increments = 25,
 )
 
 rmprocs(_procs)
