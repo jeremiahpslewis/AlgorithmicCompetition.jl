@@ -6,8 +6,12 @@ using CSV
 using DataFrames
 using Statistics
 
-file_name = "simulation_results_dddc_2023-08-12T14:02:44.522.csv"
-df = DataFrame(CSV.File(file_name))
+file_name = "simulation_results_dddc_2023-08-12T19:57:38.074"
+df = DataFrame(CSV.File(file_name * ".csv"))
+
+df = @chain df begin
+    @transform(:price_response_to_demand_signal_mse = eval(Meta.parse(:price_response_to_demand_signal_mse)))
+end
 
 plt1 = @chain df begin
     @transform(:signal_quality_is_high = string(:signal_quality_is_high))
@@ -16,12 +20,15 @@ end
 draw(plt1)
 
 df_summary = @chain df begin
+    @transform(:price_response_to_demand_signal_mse_min = minimum(:price_response_to_demand_signal_mse), :price_response_to_demand_signal_mse_max = maximum(:price_response_to_demand_signal_mse))
     @groupby(:signal_quality_is_high, :low_signal_quality_level, :frequency_high_demand)
     @combine(
         mean(:π_bar),
         mean(:iterations_until_convergence),
         mean(:profit_min),
         mean(:profit_max),
+        mean(:price_response_to_demand_signal_mse_min),
+        mean(:price_response_to_demand_signal_mse_max),
     )
 end
 
@@ -51,13 +58,18 @@ plt2 = @chain df_summary begin
     @sort(:frequency_high_demand)
     data(_) * mapping(:frequency_high_demand, :profit_value, color=:profit_variable_name => nonnumeric, layout=:low_signal_quality_level =>nonnumeric) * (visual(Scatter) + visual(Lines))
 end
-draw(plt2)
+draw(plt2, legend=(position=:top, titleposition=:left, framevisible=true, padding=5))
 
 plt21 = @chain df_summary begin
+    stack([:price_response_to_demand_signal_mse_min_mean,
+        :price_response_to_demand_signal_mse_max_mean],
+        variable_name=:price_response_variable_name,
+        value_name=:price_response_value)
     @subset(:signal_quality_is_high == "Bool[0, 0]")
-    data(_) * mapping(:frequency_high_demand, :profit_min_mean, color=:low_signal_quality_level => nonnumeric, layout=:low_signal_quality_level =>nonnumeric) * visual(Scatter)
+    @sort(:frequency_high_demand)
+    data(_) * mapping(:frequency_high_demand, :price_response_value, color=:price_response_variable_name => nonnumeric, layout=:low_signal_quality_level =>nonnumeric) * (visual(Scatter) + visual(Lines))
 end
-draw(plt21)
+draw(plt21, legend=(position=:top, titleposition=:left, framevisible=true, padding=5))
 
 plt3 = @chain df_summary begin
     @sort(:frequency_high_demand)
