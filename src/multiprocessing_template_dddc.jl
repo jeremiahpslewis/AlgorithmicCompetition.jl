@@ -21,7 +21,7 @@ _procs = addprocs(
 end
 
 @time exp_list = AlgorithmicCompetition.run_dddc(;
-    n_parameter_iterations = 75,
+    n_parameter_iterations = 25,
     max_iter = Int(1e9),
     n_grid_increments = 25,
 )
