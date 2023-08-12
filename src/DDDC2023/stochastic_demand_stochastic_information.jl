@@ -52,3 +52,23 @@ function get_demand_signals(d::DataDemandDigitalParams, is_high_demand_episode::
         d.high_signal_quality_level,
     )
 end
+
+function post_prob_high_low_given_signal(pr_high_demand, pr_signal_true)
+    denom_high = pr_high_demand * pr_signal_true + (1 - pr_high_demand) * (1 - pr_signal_true)
+    denom_low = (1 - pr_high_demand) * pr_signal_true + pr_high_demand * (1 - pr_signal_true)
+
+    num_high = pr_high_demand * pr_signal_true
+    num_low = (1 - pr_high_demand) * pr_signal_true
+
+    return [num_high / denom_high, num_low / denom_low]
+end
+
+function post_prob_high_low_given_both_signals(pr_high_demand, pr_signal_true)
+    denom_high = pr_high_demand * pr_signal_true^2 + (1 - pr_high_demand) * (1 - pr_signal_true)^2 + 2 * pr_high_demand * pr_signal_true * (1 - pr_signal_true)
+    denom_low = (1 - pr_high_demand) * pr_signal_true^2 + pr_high_demand * (1 - pr_signal_true)^2 + 2 * (1-pr_high_demand) * pr_signal_true * (1 - pr_signal_true)
+
+    num_high = pr_high_demand * pr_signal_true^2
+    num_low = (1 - pr_high_demand) * pr_signal_true^2
+
+    return [num_high / denom_high, num_low / denom_low]
+end

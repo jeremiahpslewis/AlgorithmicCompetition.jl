@@ -26,3 +26,10 @@ end
 @testset "initialize_price_memory" begin
     @test length(initialize_price_memory(1:15, 2)[1]) == 2
 end
+
+
+@testset "post_prob_high_low_given_signal" begin
+    @test post_prob_high_low_given_signal(0, 1)[2] == 1
+    @test post_prob_high_low_given_signal(1, 0)[2] == 0.0
+    @test post_prob_high_low_given_signal(0.5, 0.5) == [0.5, 0.5]
+end

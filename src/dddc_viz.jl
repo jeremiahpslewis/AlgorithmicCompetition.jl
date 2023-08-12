@@ -6,7 +6,7 @@ using CSV
 using DataFrames
 using Statistics
 
-file_name = "simulation_results_dddc_2023-08-11T22:51:15.158.csv"
+file_name = "simulation_results_dddc_2023-08-12T14:02:44.522.csv"
 df = DataFrame(CSV.File(file_name))
 
 plt1 = @chain df begin
@@ -16,7 +16,7 @@ end
 draw(plt1)
 
 df_summary = @chain df begin
-    @groupby(:signal_quality_is_high, :frequency_high_demand)
+    @groupby(:signal_quality_is_high, :low_signal_quality_level, :frequency_high_demand)
     @combine(
         mean(:π_bar),
         mean(:iterations_until_convergence),
@@ -25,13 +25,45 @@ df_summary = @chain df begin
     )
 end
 
+# Question is how existence of low state destabilizes the high state / overall collusion and to what extent...
+# Question becomes 'given signal, estimated demand state prob, which opponent do I believe I am competing against?' the low demand believing opponent or the high demand one...
+# in the case where own and opponents' signals are public, the high-high signal state yields the following probability curve over high state base frequency:
+
+df_post_prob = DataFrame(vcat([
+    (
+        pr_high_demand,
+        pr_signal_true,
+        post_prob_high_low_given_signal(pr_high_demand, pr_signal_true)[1],
+        post_prob_high_low_given_both_signals(pr_high_demand, pr_signal_true)[1],
+    )
+    for pr_high_demand in 0.5:0.01:1 for pr_signal_true in 0.5:0.1:1
+])) # squared to reflect high-high signals, for each opponent, independently
+rename!(df_post_prob, [:pr_high_demand, :pr_signal_true, :post_prob_high_given_signal_high, :post_prob_high_given_both_signals_high])
+
+
+@chain df_post_prob begin
+    data(_) * mapping(:pr_high_demand, :post_prob_high_given_both_signals_high, color=:pr_signal_true => nonnumeric) * visual(Scatter)
+end |> draw
+
 plt2 = @chain df_summary begin
-    data(_) * mapping(:frequency_high_demand, :π_bar_mean, color=:signal_quality_is_high => nonnumeric) * visual(Scatter)
+    stack([:profit_min_mean, :profit_max_mean], variable_name=:profit_variable_name, value_name=:profit_value)
+    @subset(:signal_quality_is_high == "Bool[0, 0]")
+    @sort(:frequency_high_demand)
+    data(_) * mapping(:frequency_high_demand, :profit_value, color=:profit_variable_name => nonnumeric, layout=:low_signal_quality_level =>nonnumeric) * (visual(Scatter) + visual(Lines))
 end
 draw(plt2)
 
+plt21 = @chain df_summary begin
+    @subset(:signal_quality_is_high == "Bool[0, 0]")
+    data(_) * mapping(:frequency_high_demand, :profit_min_mean, color=:low_signal_quality_level => nonnumeric, layout=:low_signal_quality_level =>nonnumeric) * visual(Scatter)
+end
+draw(plt21)
+
 plt3 = @chain df_summary begin
-    data(_) * mapping(:frequency_high_demand, :iterations_until_convergence_mean, color=:signal_quality_is_high => nonnumeric) * visual(Scatter)
+    @sort(:frequency_high_demand)
+    data(_) * mapping(:frequency_high_demand, :iterations_until_convergence_mean,
+    color=:low_signal_quality_level => nonnumeric,
+    layout=:signal_quality_is_high => nonnumeric) * (visual(Scatter) + visual(Lines))
 end
 draw(plt3)
 
