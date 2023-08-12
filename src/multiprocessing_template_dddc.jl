@@ -21,13 +21,14 @@ _procs = addprocs(
 end
 
 @time exp_list = AlgorithmicCompetition.run_dddc(;
-    n_parameter_iterations = 50,
+    n_parameter_iterations = 100,
     max_iter = Int(1e9),
-    n_grid_increments = 100,
+    n_grid_increments = 250,
 )
 
 rmprocs(_procs)
 
 file_name = "simulation_results_dddc_$start_timestamp.csv"
-df = AlgorithmicCompetition.extract_sim_results(exp_list)
+exp_list_ = AlgorithmicCompetition.DDDCSummary[exp_list...]
+df = AlgorithmicCompetition.extract_sim_results(exp_list_)
 CSV.write(file_name, df)

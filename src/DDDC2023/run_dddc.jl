@@ -20,6 +20,8 @@ function run_dddc(;
     n_grid_increments = 100,
 )
     frequency_high_demand_range = Float64.(range(0, 1, n_grid_increments))
+    low_signal_quality_level = Float64.(range(0.5, 1, n_grid_increments/2))
+    
     signal_quality_per_player = [true, false]
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
@@ -57,7 +59,7 @@ function run_dddc(;
 
     # Shuffle hyperparameter_vect, extend according to number of repetitions
     hyperparameter_vect = shuffle(repeat(hyperparameter_vect, n_parameter_iterations))
-    exp_list_ = []
+    exp_list_ = DDDCSummary[]
     println(
         "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times",
     )
