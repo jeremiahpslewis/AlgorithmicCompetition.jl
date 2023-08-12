@@ -20,7 +20,7 @@ function run_dddc(;
     n_grid_increments = 100,
 )
     frequency_high_demand_range = Float64.(range(0, 1, n_grid_increments))
-    low_signal_quality_level_range = Float64.(range(0.5, 1, n_grid_increments/2))
+    low_signal_quality_level_range = Float64.(range(0.5, 1.0, n_grid_increments/2))
     
     signal_quality_per_player = [true, false]
     competition_params_dict = Dict(
