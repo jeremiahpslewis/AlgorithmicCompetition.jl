@@ -32,22 +32,28 @@ function run_dddc(;
     β = Float64(4e-1)
     δ = 0.95
 
-    data_demand_digital_param_set = [DataDemandDigitalParams(
-        low_signal_quality_level = 0.75,
-        high_signal_quality_level = 1.0,
-        signal_quality_is_high = [signal_quality_p1, signal_quality_p2],
-        frequency_high_demand = frequency_high_demand,
-    ) for frequency_high_demand in frequency_high_demand_range for signal_quality_p1 in signal_quality_per_player for signal_quality_p2 in signal_quality_per_player]
+    data_demand_digital_param_set = [
+        DataDemandDigitalParams(
+            low_signal_quality_level = 0.75,
+            high_signal_quality_level = 1.0,
+            signal_quality_is_high = [signal_quality_p1, signal_quality_p2],
+            frequency_high_demand = frequency_high_demand,
+        ) for frequency_high_demand in frequency_high_demand_range for
+        signal_quality_p1 in signal_quality_per_player for
+        signal_quality_p2 in signal_quality_per_player
+    ]
 
-    hyperparameter_vect = [DDDCHyperParameters(
-        α,
-        β,
-        δ,
-        max_iter,
-        competition_solution_dict,
-        data_demand_digital_params;
-        convergence_threshold = convergence_threshold,
-    ) for data_demand_digital_params in data_demand_digital_param_set]
+    hyperparameter_vect = [
+        DDDCHyperParameters(
+            α,
+            β,
+            δ,
+            max_iter,
+            competition_solution_dict,
+            data_demand_digital_params;
+            convergence_threshold = convergence_threshold,
+        ) for data_demand_digital_params in data_demand_digital_param_set
+    ]
 
     # Shuffle hyperparameter_vect, extend according to number of repetitions
     hyperparameter_vect = shuffle(repeat(hyperparameter_vect, n_parameter_iterations))
@@ -60,4 +66,3 @@ function run_dddc(;
 
     return exp_list_
 end
-

@@ -128,7 +128,10 @@ end
 
 Returns the average profit of the agent, after convergence, over the convergence state or states (in the case of a cycle).
 """
-function get_convergence_profit_from_env(env::E, policy::MultiAgentPolicy) where {E<:AbstractEnv}
+function get_convergence_profit_from_env(
+    env::E,
+    policy::MultiAgentPolicy,
+) where {E<:AbstractEnv}
     last_observed_state = get_state_from_memory(env)
 
     visited_states = [last_observed_state]
