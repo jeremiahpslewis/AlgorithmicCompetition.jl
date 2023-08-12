@@ -19,8 +19,8 @@ function run_dddc(;
     convergence_threshold = Int(1e5),
     n_grid_increments = 100,
 )
-    frequency_high_demand_range = Float64.(range(0, 1, n_grid_increments))
-    low_signal_quality_level_range = Float64.(range(0.5, 1.0, Int(ceil(n_grid_increments/2))))
+    frequency_high_demand_range = Float64.(range(0.5, 1, n_grid_increments+1))
+    low_signal_quality_level_range = Float64.(range(0.5, 1.0, 11))
     
     signal_quality_per_player = [true, false]
     competition_params_dict = Dict(

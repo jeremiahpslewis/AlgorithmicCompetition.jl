@@ -6,7 +6,7 @@ using Distributed
 using Dates
 
 start_timestamp = now()
-n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
+n_procs_ = 63 # up to 8 performance cores on m1 (7 workers + 1 main)
 
 _procs = addprocs(
     n_procs_,
@@ -21,9 +21,9 @@ _procs = addprocs(
 end
 
 @time exp_list = AlgorithmicCompetition.run_dddc(;
-    n_parameter_iterations = 100,
+    n_parameter_iterations = 10,
     max_iter = Int(1e9),
-    n_grid_increments = 250,
+    n_grid_increments = 25,
 )
 
 rmprocs(_procs)

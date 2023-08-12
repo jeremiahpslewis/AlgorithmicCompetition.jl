@@ -51,6 +51,12 @@ using BenchmarkTools
 # using ProfileView
 using Distributed
 
+@time exp_list = AlgorithmicCompetition.run_dddc(;
+    n_parameter_iterations = 10,
+    max_iter = Int(1e9),
+    n_grid_increments = 25,
+)
+
 # RLCore.TimerOutputs.enable_debug_timings(RLCore)
 
 α = Float64(0.125)

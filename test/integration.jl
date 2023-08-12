@@ -156,7 +156,7 @@ end
         n_parameter_iterations = 1,
         max_iter = 10,
         convergence_threshold = 1,
-        n_grid_increments = 2,
+        n_grid_increments = 3,
     )
 
     rmprocs(_procs)
