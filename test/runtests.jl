@@ -36,6 +36,7 @@ using AlgorithmicCompetition:
     construct_AIAPC_state_space_lookup,
     construct_DDDC_state_space_lookup,
     ConvergenceCheck,
+    DDDCHyperParameters,
     DataDemandDigitalParams,
     economic_summary,
     Experiment,
