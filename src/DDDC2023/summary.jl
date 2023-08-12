@@ -48,7 +48,7 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
     end
 
     price_vs_demand_signal_counterfactuals = extract_price_vs_demand_signal_counterfactuals(env, hook)
-    
+
     return DDDCSummary(
         env.α,
         env.β,
@@ -82,7 +82,7 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
 
     avg_profit_result =
         [mean(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
-    profit_vect = [ex.convergence_profit for ex in exp_list if !(ex isa Exception)]        
+    profit_vect = [ex.convergence_profit for ex in exp_list if !(ex isa Exception)]
     profit_max = [maximum(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
     profit_min = [minimum(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
 
@@ -107,19 +107,19 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
     price_response_to_demand_signal_mse = [ex.price_response_to_demand_signal_mse for ex in exp_list if !(ex isa Exception)]
 
     df = DataFrame(
-        α = α_result,
-        β = β_result,
-        π_bar = avg_profit_result,
-        profit_vect = profit_vect,
-        profit_min = profit_min,
-        profit_max = profit_max,        
-        iterations_until_convergence = iterations_until_convergence,
-        is_converged = is_converged,
-        low_signal_quality_level = low_signal_quality_level,
-        high_signal_quality_level = high_signal_quality_level,
-        signal_quality_is_high = signal_quality_is_high,
-        frequency_high_demand = frequency_high_demand,
-        price_response_to_demand_signal_mse = price_response_to_demand_signal_mse,
+        α=α_result,
+        β=β_result,
+        π_bar=avg_profit_result,
+        profit_vect=profit_vect,
+        profit_min=profit_min,
+        profit_max=profit_max,
+        iterations_until_convergence=iterations_until_convergence,
+        is_converged=is_converged,
+        low_signal_quality_level=low_signal_quality_level,
+        high_signal_quality_level=high_signal_quality_level,
+        signal_quality_is_high=signal_quality_is_high,
+        frequency_high_demand=frequency_high_demand,
+        price_response_to_demand_signal_mse=price_response_to_demand_signal_mse,
     )
     return df
 end
@@ -134,11 +134,15 @@ end
 function extract_price_vs_demand_signal_counterfactuals(best_response_vector, state_space_lookup, price_options, n_prices)
     price_counterfactual_vect = []
 
-    for i in 1:n_prices for j in 1:n_prices for k in 1:2
-        # The price that a player would choose if given signal 1 and signal 2 (e.g. high=1 or low=2), conditional on memory (prices and previous signals)
-        price_counterfactuals = price_options[best_response_vector[state_space_lookup[i, j, :, k]]]
-        push!(price_counterfactual_vect, ((i, j, k), price_counterfactuals...))
-    end end end
+    for i in 1:n_prices
+        for j in 1:n_prices
+            for k in 1:2
+                # The price that a player would choose if given signal 1 and signal 2 (e.g. high=1 or low=2), conditional on memory (prices and previous signals)
+                price_counterfactuals = price_options[best_response_vector[state_space_lookup[i, j, :, k]]]
+                push!(price_counterfactual_vect, ((i, j, k), price_counterfactuals...))
+            end
+        end
+    end
 
     price_counterfactual_df = DataFrame(
         price_counterfactual_vect,
