@@ -6,17 +6,17 @@ using CSV
 using DataFrames
 using Statistics
 
-file_name = "simulation_results_dddc_2023-08-13T15:32:41.217"
+file_name = "simulation_results_dddc_2023-08-13T16:50:50.057"
 df_ = DataFrame(CSV.File(file_name * ".csv"))
 
 df = @chain df_ begin
     @transform(
         :price_response_to_demand_signal_mse =
             eval(Meta.parse(:price_response_to_demand_signal_mse)),
-        # :convergence_profit_demand_high =
-        #     eval(Meta.parse(:convergence_profit_demand_high)),
-        # :convergence_profit_demand_low =
-        #     eval(Meta.parse(:convergence_profit_demand_low)),
+        :convergence_profit_demand_high =
+            eval(Meta.parse(:convergence_profit_demand_high)),
+        :convergence_profit_demand_low =
+            eval(Meta.parse(:convergence_profit_demand_low)),
     )
     @transform!(@subset((:frequency_high_demand == 1) & (:low_signal_quality_level == 1)), :price_response_to_demand_signal_mse = missing)
 end
@@ -166,6 +166,31 @@ draw(
 )
 
 # TODO: version of plt22, but where profit is normalized against demand scenario!
+plt23 = @chain df_summary begin
+    stack(
+        [
+            :convergence_profit_demand_high,
+            :convergence_profit_demand_low,
+        ],
+        variable_name = :demand_level,
+        value_name = :profit,
+    )
+    @subset(:signal_quality_is_high == "Bool[0, 0]")
+    @sort(:frequency_high_demand)
+    data(_) *
+    mapping(
+        :frequency_high_demand,
+        :profit,
+        color = :demand_level => nonnumeric,
+        layout = :low_signal_quality_level => nonnumeric,
+    ) *
+    (visual(Scatter) + visual(Lines))
+end
+# NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
+draw(
+    plt23,
+    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+)
 
 
 plt3 = @chain df_summary begin

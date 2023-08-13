@@ -26,8 +26,8 @@ _procs = addprocs(
 end
 
 if Sys.isapple()
-    n_parameter_iterations = 1
-    n_grid_increments = 20
+    n_parameter_iterations = 2
+    n_grid_increments = 25
 else
     n_parameter_iterations = 30
     n_grid_increments = 50
