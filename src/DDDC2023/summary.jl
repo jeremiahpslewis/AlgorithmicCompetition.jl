@@ -13,6 +13,8 @@ struct DDDCSummary
     is_converged::Vector{Bool}
     data_demand_digital_params::DataDemandDigitalParams
     convergence_profit::Vector{Float64}
+    convergence_profit_demand_high::Vector{Float64}
+    convergence_profit_demand_low::Vector{Float64}
     iterations_until_convergence::Vector{Int64}
     price_response_to_demand_signal_mse::Vector{Float64}
 end
@@ -41,7 +43,7 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
 
     is_converged = Bool[]
 
-    convergence_profit = get_convergence_profit_from_hook(hook)
+    convergence_profit, convergence_profit_demand_high, convergence_profit_demand_low = get_convergence_profit_from_hook(hook)
 
     for i in (Symbol(1), Symbol(2))
         push!(is_converged, hook[i][1].is_converged)
@@ -56,6 +58,8 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
         is_converged,
         env.data_demand_digital_params,
         convergence_profit,
+        convergence_profit_demand_high,
+        convergence_profit_demand_low,
         iterations_until_convergence,
         [e_[1] for e_ in price_vs_demand_signal_counterfactuals],
     )
@@ -64,10 +68,12 @@ end
 """
     get_convergence_profit_from_env(env::DDDCEnv, policy::MultiAgentPolicy)
 
-Returns the average profit of the agent, after convergence, over the convergence state or states (in the case of a cycle).
+Returns the average profit of the agent, after convergence, over the convergence state or states (in the case of a cycle). Also returns the average profit for the high and low demand states.
 """
 function get_convergence_profit_from_hook(hook::AbstractHook)
-    [mean(hook[p][2].rewards[101:end]) for p in [Symbol(1), Symbol(2)]]
+    demand_high = hook[Symbol(1)][2].demand_state_high_vect
+    [sum(hook[p][2].rewards[101:end] .* demand_high[101:end]) / sum(demand_high[101:end]) for p in [Symbol(1), Symbol(2)]],
+    [sum(hook[p][2].rewards[101:end] .* .! demand_high[101:end]) / sum(.! demand_high[101:end]) for p in [Symbol(1), Symbol(2)]]
 end
 
 """
@@ -83,6 +89,12 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
 
     avg_profit_result =
         [mean(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
+
+    convergence_profit_demand_high =
+        [mean(ex.convergence_profit_demand_high) for ex in exp_list if !(ex isa Exception)]
+    convergence_profit_demand_low =
+        [mean(ex.convergence_profit_demand_low) for ex in exp_list if !(ex isa Exception)]
+
     profit_vect = [ex.convergence_profit for ex in exp_list if !(ex isa Exception)]
     profit_max = [maximum(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
     profit_min = [minimum(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
@@ -115,6 +127,8 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
         profit_vect = profit_vect,
         profit_min = profit_min,
         profit_max = profit_max,
+        convergence_profit_demand_high = convergence_profit_demand_high,
+        convergence_profit_demand_low = convergence_profit_demand_low,
         iterations_until_convergence = iterations_until_convergence,
         is_converged = is_converged,
         low_signal_quality_level = low_signal_quality_level,
