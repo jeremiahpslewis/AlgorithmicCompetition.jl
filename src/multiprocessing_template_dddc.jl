@@ -6,7 +6,12 @@ using Distributed
 using Dates
 
 start_timestamp = now()
-n_procs_ = 63 # up to 8 performance cores on m1 (7 workers + 1 main)
+
+if Sys.isapple()
+    n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
+else
+    n_procs_ = 63
+end
 
 _procs = addprocs(
     n_procs_,
@@ -20,8 +25,16 @@ _procs = addprocs(
     using AlgorithmicCompetition: run_and_extract
 end
 
+if Sys.isapple()
+    n_parameter_iterations = 1
+    n_grid_increments = 20
+else
+    n_parameter_iterations = 30
+    n_grid_increments = 50
+end
+
 @time exp_list = AlgorithmicCompetition.run_dddc(;
-    n_parameter_iterations = 30,
+    n_parameter_iterations = n_parameter_iterations,
     max_iter = Int(1e9),
     n_grid_increments = 50,
 )
