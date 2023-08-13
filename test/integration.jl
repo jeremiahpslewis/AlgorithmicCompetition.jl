@@ -228,8 +228,9 @@ end
         convergence_threshold = Int(1e5),
     )
 
-    c_out = run(hyperparams; stop_on_convergence = true)
-    economic_summary(c_out)
+    e_out = run(hyperparams; stop_on_convergence = true)
+    e_sum = economic_summary(e_out)
+    @test 0.85 < e_sum.percent_demand_high < 0.95
 end
 
 @testset "run full AIAPC simulation" begin
