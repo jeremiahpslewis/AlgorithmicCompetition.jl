@@ -17,6 +17,7 @@ struct DDDCSummary
     convergence_profit_demand_low::Vector{Float64}
     iterations_until_convergence::Vector{Int64}
     price_response_to_demand_signal_mse::Vector{Float64}
+    percent_demand_high::Float64
 end
 
 """
@@ -41,6 +42,8 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
         hook[player][1].iterations_until_convergence for player in [Symbol(1), Symbol(2)]
     ]
 
+    percent_demand_high = mean(hook[Symbol(1)][2].demand_state_high_vect)
+
     is_converged = Bool[]
 
     convergence_profit, convergence_profit_demand_high, convergence_profit_demand_low = get_convergence_profit_from_hook(hook)
@@ -62,6 +65,7 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
         convergence_profit_demand_low,
         iterations_until_convergence,
         [e_[1] for e_ in price_vs_demand_signal_counterfactuals],
+        percent_demand_high,
     )
 end
 
@@ -84,6 +88,7 @@ Extracts the results of a simulation experiment, given a list of DDDCSummary obj
 function extract_sim_results(exp_list::Vector{DDDCSummary})
     α_result = [ex.α for ex in exp_list if !(ex isa Exception)]
     β_result = [ex.β for ex in exp_list if !(ex isa Exception)]
+    percent_demand_high = [ex.percent_demand_high for ex in exp_list if !(ex isa Exception)]
     iterations_until_convergence =
         [ex.iterations_until_convergence[1] for ex in exp_list if !(ex isa Exception)]
 
@@ -136,6 +141,7 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
         signal_quality_is_high = signal_quality_is_high,
         frequency_high_demand = frequency_high_demand,
         price_response_to_demand_signal_mse = price_response_to_demand_signal_mse,
+        percent_demand_high = percent_demand_high,
     )
     return df
 end
