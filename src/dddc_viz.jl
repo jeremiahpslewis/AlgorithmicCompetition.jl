@@ -7,13 +7,14 @@ using DataFrames
 using Statistics
 
 file_name = "simulation_results_dddc_2023-08-12T19:57:38.074"
-df = DataFrame(CSV.File(file_name * ".csv"))
+df_ = DataFrame(CSV.File(file_name * ".csv"))
 
-df = @chain df begin
+df = @chain df_ begin
     @transform(
         :price_response_to_demand_signal_mse =
             eval(Meta.parse(:price_response_to_demand_signal_mse))
     )
+    @transform!(@subset((:frequency_high_demand == 1) & (:low_signal_quality_level == 1)), :price_response_to_demand_signal_mse = missing)
 end
 
 plt1 = @chain df begin
@@ -32,9 +33,11 @@ draw(plt1)
 df_summary = @chain df begin
     @transform(
         :price_response_to_demand_signal_mse_min =
-            minimum(:price_response_to_demand_signal_mse),
+            @passmissing minimum(:price_response_to_demand_signal_mse)
+    )
+    @transform(
         :price_response_to_demand_signal_mse_max =
-            maximum(:price_response_to_demand_signal_mse)
+            @passmissing maximum(:price_response_to_demand_signal_mse)
     )
     @groupby(:signal_quality_is_high, :low_signal_quality_level, :frequency_high_demand)
     @combine(
@@ -42,8 +45,8 @@ df_summary = @chain df begin
         mean(:iterations_until_convergence),
         mean(:profit_min),
         mean(:profit_max),
-        mean(:price_response_to_demand_signal_mse_min),
-        mean(:price_response_to_demand_signal_mse_max),
+        :price_response_to_demand_signal_mse_min_mean = (@passmissing mean(:price_response_to_demand_signal_mse_min)),
+        :price_response_to_demand_signal_mse_max_mean = (@passmissing mean(:price_response_to_demand_signal_mse_max)),
     )
 end
 
@@ -113,7 +116,7 @@ plt21 = @chain df_summary begin
         variable_name = :price_response_variable_name,
         value_name = :price_response_value,
     )
-    @subset(:signal_quality_is_high == "Bool[0, 0]")
+    @subset((:signal_quality_is_high == "Bool[0, 0]") & !ismissing(:price_response_value))
     @sort(:frequency_high_demand)
     data(_) *
     mapping(
@@ -124,6 +127,7 @@ plt21 = @chain df_summary begin
     ) *
     (visual(Scatter) + visual(Lines))
 end
+# NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 draw(
     plt21,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
