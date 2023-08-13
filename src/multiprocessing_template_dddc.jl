@@ -6,7 +6,7 @@ using Distributed
 using Dates
 
 start_timestamp = now()
-n_procs_ = 64 # up to 8 performance cores on m1 (7 workers + 1 main)
+n_procs_ = 63 # up to 8 performance cores on m1 (7 workers + 1 main)
 
 _procs = addprocs(
     n_procs_,
