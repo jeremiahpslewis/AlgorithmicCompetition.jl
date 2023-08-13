@@ -76,6 +76,7 @@ Returns the average profit of the agent, after convergence, over the convergence
 """
 function get_convergence_profit_from_hook(hook::AbstractHook)
     demand_high = hook[Symbol(1)][2].demand_state_high_vect
+    return mean(hook[p][2].rewards[101:end]),
     [sum(hook[p][2].rewards[101:end] .* demand_high[101:end]) / sum(demand_high[101:end]) for p in [Symbol(1), Symbol(2)]],
     [sum(hook[p][2].rewards[101:end] .* .! demand_high[101:end]) / sum(.! demand_high[101:end]) for p in [Symbol(1), Symbol(2)]]
 end
