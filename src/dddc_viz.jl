@@ -6,7 +6,7 @@ using CSV
 using DataFrames
 using Statistics
 
-file_name = "simulation_results_dddc_2023-08-12T19:57:38.074"
+file_name = "simulation_results_dddc_2023-08-13T15:32:41.217"
 df_ = DataFrame(CSV.File(file_name * ".csv"))
 
 df = @chain df_ begin
@@ -132,6 +132,33 @@ draw(
     plt21,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
 )
+
+plt22 = @chain df_summary begin
+    stack(
+        [
+            :price_response_to_demand_signal_mse_min_mean,
+            :price_response_to_demand_signal_mse_max_mean,
+        ],
+        variable_name = :price_response_variable_name,
+        value_name = :price_response_value,
+    )
+    @subset((:signal_quality_is_high == "Bool[0, 0]") & !ismissing(:price_response_value))
+    @sort(:frequency_high_demand)
+    data(_) *
+    mapping(
+        :frequency_high_demand,
+        :price_response_value,
+        color = :price_response_variable_name => nonnumeric,
+        layout = :low_signal_quality_level => nonnumeric,
+    ) *
+    (visual(Scatter) + visual(Lines))
+end
+# NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
+draw(
+    plt22,
+    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+)
+
 
 plt3 = @chain df_summary begin
     @sort(:frequency_high_demand)

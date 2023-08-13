@@ -97,9 +97,9 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
         [mean(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
 
     convergence_profit_demand_high =
-        [mean(ex.convergence_profit_demand_high) for ex in exp_list if !(ex isa Exception)]
+        [ex.convergence_profit_demand_high for ex in exp_list if !(ex isa Exception)]
     convergence_profit_demand_low =
-        [mean(ex.convergence_profit_demand_low) for ex in exp_list if !(ex isa Exception)]
+        [ex.convergence_profit_demand_low for ex in exp_list if !(ex isa Exception)]
 
     profit_vect = [ex.convergence_profit for ex in exp_list if !(ex isa Exception)]
     profit_max = [maximum(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
