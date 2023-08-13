@@ -137,31 +137,6 @@ end
     rmprocs(_procs)
 end
 
-@testset "run DDDC multiprocessing code" begin
-    n_procs_ = 1
-
-    _procs = addprocs(
-        n_procs_,
-        topology = :master_worker,
-        exeflags = ["--threads=1", "--project=$(Base.active_project())"],
-    )
-
-    @everywhere begin
-        using Pkg
-        Pkg.instantiate()
-        using AlgorithmicCompetition
-    end
-
-    AlgorithmicCompetition.run_dddc(
-        n_parameter_iterations = 1,
-        max_iter = Int(2e5),
-        convergence_threshold = Int(1e5),
-        n_grid_increments = 3,
-    )
-
-    rmprocs(_procs)
-end
-
 @testset "run full AIAPC simulation (with full convergence threshold)" begin
     α = Float64(0.075)
     β = Float64(0.25)
@@ -448,4 +423,29 @@ end
     @test c_out.hook[Symbol(2)][1].convergence_duration >= 5
     @test (c_out.hook[Symbol(2)][1].convergence_duration == 5) ||
           (c_out.hook[Symbol(1)][1].convergence_duration == 5)
+end
+
+@testset "run DDDC multiprocessing code" begin
+    n_procs_ = 1
+
+    _procs = addprocs(
+        n_procs_,
+        topology = :master_worker,
+        exeflags = ["--threads=1", "--project=$(Base.active_project())"],
+    )
+
+    @everywhere begin
+        using Pkg
+        Pkg.instantiate()
+        using AlgorithmicCompetition
+    end
+
+    AlgorithmicCompetition.run_dddc(
+        n_parameter_iterations = 1,
+        max_iter = Int(2e5),
+        convergence_threshold = Int(1e5),
+        n_grid_increments = 3,
+    )
+
+    rmprocs(_procs)
 end
