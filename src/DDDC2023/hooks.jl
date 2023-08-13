@@ -53,3 +53,14 @@ function Base.push!(
         Base.push!(hook[p], stage, policy[p], env, p)
     end
 end
+
+function DDDCHook(env::AbstractEnv)
+    MultiAgentHook(
+        NamedTuple(
+            p => ComposedHook(
+                ConvergenceCheck(env.n_state_space, env.convergence_threshold),
+                DDDCRewardPerEpisodeLastN(; max_steps = env.convergence_threshold + 100),
+            ) for p in players(env)
+        ),
+    )
+end
