@@ -26,14 +26,13 @@ end
 Returns the Nash equilibrium and monopoly optimal profits, based on prices stored in env.
 """
 function extract_profit_vars(env::DDDCEnv)
-    # TODO: Profit extraction, factoring in the demand mode
-    # p_Bert_nash_equilibrium = env.p_Bert_nash_equilibrium
-    # p_monop_opt = env.p_monop_opt
-    # competition_params = env.competition_params_dict[:high]
+    p_Bert_nash_equilibrium = env.p_Bert_nash_equilibrium
+    p_monop_opt = env.p_monop_opt
+    competition_params = env.competition_params_dict
 
-    # π_N = π(p_Bert_nash_equilibrium, p_Bert_nash_equilibrium, competition_params)[1]
-    # π_M = π(p_monop_opt, p_monop_opt, competition_params)[1]
-    # return (π_N, π_M)
+    π_N = Dict(i => π(p_Bert_nash_equilibrium[i], p_Bert_nash_equilibrium[i], competition_params[i])[1] for i in [:high, :low])
+    π_M = Dict(i => π(p_monop_opt[i], p_monop_opt[i], competition_params[i])[1] for i in [:high, :low])
+    return (π_N, π_M)
 end
 
 function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::AbstractHook)
@@ -196,4 +195,19 @@ function extract_price_vs_demand_signal_counterfactuals(
     )
 
     return price_mse, price_counterfactual_df
+end
+
+"""
+    profit_gain(π_hat, env::AIAPCEnv)
+
+Returns the profit gain of the agent based on the current policy.
+"""
+function profit_gain(π_hat, env::DDDCEnv)
+    π_N, π_M = extract_profit_vars(env)
+    profit_gain_ = Dict(i => (mean(π_hat) - π_N[i]) / (π_M[i] - π_N[i]) for i in [:high, :low])
+    π_N_weighted = π_N[:high] * env.data_demand_digital_params.frequency_high_demand + π_N[:low] * (1 - env.data_demand_digital_params.frequency_high_demand)
+    π_M_weighted = π_M[:high] * env.data_demand_digital_params.frequency_high_demand + π_M[:low] * (1 - env.data_demand_digital_params.frequency_high_demand)
+
+    profit_gain_weighted = (mean(π_hat) - π_N_weighted) / (π_N_weighted - π_M_weighted)
+    return profit_gain_[:high], profit_gain_[:low], profit_gain_weighted
 end
