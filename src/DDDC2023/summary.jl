@@ -15,6 +15,9 @@ struct DDDCSummary
     convergence_profit::Vector{Float64}
     convergence_profit_demand_high::Vector{Float64}
     convergence_profit_demand_low::Vector{Float64}
+    profit_gain::Vector{Float64}
+    profit_gain_demand_high::Vector{Float64}
+    profit_gain_demand_low::Vector{Float64}
     iterations_until_convergence::Vector{Int64}
     price_response_to_demand_signal_mse::Vector{Float64}
     percent_demand_high::Float64
@@ -62,6 +65,9 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
         convergence_profit,
         convergence_profit_demand_high,
         convergence_profit_demand_low,
+        profit_gain(convergence_profit, env)[:weighted],
+        profit_gain(convergence_profit_demand_high, env)[:high],
+        profit_gain(convergence_profit_demand_low, env)[:low],
         iterations_until_convergence,
         [e_[1] for e_ in price_vs_demand_signal_counterfactuals],
         percent_demand_high,
@@ -209,5 +215,5 @@ function profit_gain(π_hat, env::DDDCEnv)
     π_M_weighted = π_M[:high] * env.data_demand_digital_params.frequency_high_demand + π_M[:low] * (1 - env.data_demand_digital_params.frequency_high_demand)
 
     profit_gain_weighted = (mean(π_hat) - π_N_weighted) / (π_N_weighted - π_M_weighted)
-    return profit_gain_[:high], profit_gain_[:low], profit_gain_weighted
+    return Dict(:high => profit_gain_[:high], :low => profit_gain_[:low], :weighted => profit_gain_weighted)
 end
