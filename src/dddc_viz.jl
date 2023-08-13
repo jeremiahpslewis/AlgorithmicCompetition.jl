@@ -12,7 +12,11 @@ df_ = DataFrame(CSV.File(file_name * ".csv"))
 df = @chain df_ begin
     @transform(
         :price_response_to_demand_signal_mse =
-            eval(Meta.parse(:price_response_to_demand_signal_mse))
+            eval(Meta.parse(:price_response_to_demand_signal_mse)),
+        # :convergence_profit_demand_high =
+        #     eval(Meta.parse(:convergence_profit_demand_high)),
+        # :convergence_profit_demand_low =
+        #     eval(Meta.parse(:convergence_profit_demand_low)),
     )
     @transform!(@subset((:frequency_high_demand == 1) & (:low_signal_quality_level == 1)), :price_response_to_demand_signal_mse = missing)
 end
@@ -47,6 +51,8 @@ df_summary = @chain df begin
         mean(:profit_max),
         :price_response_to_demand_signal_mse_min_mean = (@passmissing mean(:price_response_to_demand_signal_mse_min)),
         :price_response_to_demand_signal_mse_max_mean = (@passmissing mean(:price_response_to_demand_signal_mse_max)),
+        :convergence_profit_demand_high = mean(:convergence_profit_demand_high),
+        :convergence_profit_demand_low = mean(:convergence_profit_demand_low),
     )
 end
 
@@ -136,19 +142,19 @@ draw(
 plt22 = @chain df_summary begin
     stack(
         [
-            :price_response_to_demand_signal_mse_min_mean,
-            :price_response_to_demand_signal_mse_max_mean,
+            :convergence_profit_demand_high,
+            :convergence_profit_demand_low,
         ],
-        variable_name = :price_response_variable_name,
-        value_name = :price_response_value,
+        variable_name = :demand_level,
+        value_name = :profit,
     )
-    @subset((:signal_quality_is_high == "Bool[0, 0]") & !ismissing(:price_response_value))
+    @subset(:signal_quality_is_high == "Bool[0, 0]")
     @sort(:frequency_high_demand)
     data(_) *
     mapping(
         :frequency_high_demand,
-        :price_response_value,
-        color = :price_response_variable_name => nonnumeric,
+        :profit,
+        color = :demand_level => nonnumeric,
         layout = :low_signal_quality_level => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
@@ -158,6 +164,8 @@ draw(
     plt22,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
 )
+
+# TODO: version of plt22, but where profit is normalized against demand scenario!
 
 
 plt3 = @chain df_summary begin
