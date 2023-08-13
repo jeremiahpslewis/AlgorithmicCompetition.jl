@@ -19,9 +19,9 @@ function run_dddc(;
     convergence_threshold = Int(1e5),
     n_grid_increments = 100,
 )
-    frequency_high_demand_range = Float64.(range(0.5, 1, n_grid_increments+1))
+    frequency_high_demand_range = Float64.(range(0.5, 1, n_grid_increments + 1))
     low_signal_quality_level_range = Float64.(range(0.5, 1.0, 6))
-    
+
     signal_quality_vect = [[true, false], [true, true], [false, false]]
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
