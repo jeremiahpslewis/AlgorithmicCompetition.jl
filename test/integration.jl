@@ -154,8 +154,8 @@ end
 
     AlgorithmicCompetition.run_dddc(
         n_parameter_iterations = 1,
-        max_iter = 10,
-        convergence_threshold = 1,
+        max_iter = Int(2e5),
+        convergence_threshold = Int(1e5),
         n_grid_increments = 3,
     )
 
