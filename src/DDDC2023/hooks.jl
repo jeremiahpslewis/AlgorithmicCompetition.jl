@@ -19,7 +19,7 @@ Base.push!(
     player::Symbol,
 ) where {P<:AbstractPolicy,E<:AbstractEnv,F<:AbstractFloat} =
     h.rewards[end] += reward(env, player)
-    
+
 
 function Base.push!(
     hook::DDDCRewardPerEpisodeLastN{F},
