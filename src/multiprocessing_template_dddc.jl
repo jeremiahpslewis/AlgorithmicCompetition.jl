@@ -29,8 +29,8 @@ if Sys.isapple()
     n_parameter_iterations = 15
     n_grid_increments = 25
 else
-    n_parameter_iterations = 5 # 30
-    n_grid_increments = 25 # 50
+    n_parameter_iterations = 30
+    n_grid_increments = 5
 end
 
 @time exp_list = AlgorithmicCompetition.run_dddc(;

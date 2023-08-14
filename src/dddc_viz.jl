@@ -6,7 +6,7 @@ using CSV
 using DataFrames
 using Statistics
 
-file_name = "simulation_results_dddc_2023-08-13T22:05:07.295"
+file_name = "simulation_results_dddc_2023-08-14T09:55:55.042"
 df_ = DataFrame(CSV.File(file_name * ".csv"))
 
 df = @chain df_ begin
@@ -187,8 +187,8 @@ draw(
 # TODO: version of plt22, but where profit is normalized against demand scenario!
 plt23 = @chain df_summary begin
     stack(
-        [:profit_gain_min, #:profit_gain_demand_high_min, :profit_gain_demand_low_min,
-            :profit_gain_max],#, :profit_gain_demand_high_max, :profit_gain_demand_low_max],
+        [:profit_gain_demand_high_min, :profit_gain_demand_low_min,
+            :profit_gain_demand_high_max, :profit_gain_demand_low_max],
         variable_name = :profit_gain_type,
         value_name = :profit_gain,
     )
@@ -208,7 +208,6 @@ draw(
     plt23,
     # legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
 )
-
 
 plt3 = @chain df_summary begin
     @sort(:frequency_high_demand)
