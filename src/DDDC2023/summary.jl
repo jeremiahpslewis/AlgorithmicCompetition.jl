@@ -33,8 +33,17 @@ function extract_profit_vars(env::DDDCEnv)
     p_monop_opt = env.p_monop_opt
     competition_params = env.competition_params_dict
 
-    π_N = Dict(i => π(p_Bert_nash_equilibrium[i], p_Bert_nash_equilibrium[i], competition_params[i])[1] for i in [:high, :low])
-    π_M = Dict(i => π(p_monop_opt[i], p_monop_opt[i], competition_params[i])[1] for i in [:high, :low])
+    π_N = Dict(
+        i => π(
+            p_Bert_nash_equilibrium[i],
+            p_Bert_nash_equilibrium[i],
+            competition_params[i],
+        )[1] for i in [:high, :low]
+    )
+    π_M = Dict(
+        i => π(p_monop_opt[i], p_monop_opt[i], competition_params[i])[1] for
+        i in [:high, :low]
+    )
     return (π_N, π_M)
 end
 
@@ -48,7 +57,8 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
 
     is_converged = Bool[]
 
-    convergence_profit, convergence_profit_demand_high, convergence_profit_demand_low = get_convergence_profit_from_hook(hook)
+    convergence_profit, convergence_profit_demand_high, convergence_profit_demand_low =
+        get_convergence_profit_from_hook(hook)
 
     for i in (Symbol(1), Symbol(2))
         push!(is_converged, hook[i][1].is_converged)
@@ -82,8 +92,14 @@ Returns the average profit of the agent, after convergence, over the convergence
 function get_convergence_profit_from_hook(hook::AbstractHook)
     demand_high = hook[Symbol(1)][2].demand_state_high_vect
     return [mean(hook[p][2].rewards[101:end]) for p in [Symbol(1), Symbol(2)]],
-    [sum(hook[p][2].rewards[101:end] .* demand_high[101:end]) / sum(demand_high[101:end]) for p in [Symbol(1), Symbol(2)]],
-    [sum(hook[p][2].rewards[101:end] .* .! demand_high[101:end]) / sum(.! demand_high[101:end]) for p in [Symbol(1), Symbol(2)]]
+    [
+        sum(hook[p][2].rewards[101:end] .* demand_high[101:end]) /
+        sum(demand_high[101:end]) for p in [Symbol(1), Symbol(2)]
+    ],
+    [
+        sum(hook[p][2].rewards[101:end] .* .!demand_high[101:end]) /
+        sum(.!demand_high[101:end]) for p in [Symbol(1), Symbol(2)]
+    ]
 end
 
 """
@@ -111,8 +127,10 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
     profit_min = [minimum(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
 
     profit_gain = [ex.profit_gain for ex in exp_list if !(ex isa Exception)]
-    profit_gain_demand_high = [ex.profit_gain_demand_high for ex in exp_list if !(ex isa Exception)]
-    profit_gain_demand_low = [ex.profit_gain_demand_low for ex in exp_list if !(ex isa Exception)]
+    profit_gain_demand_high =
+        [ex.profit_gain_demand_high for ex in exp_list if !(ex isa Exception)]
+    profit_gain_demand_low =
+        [ex.profit_gain_demand_low for ex in exp_list if !(ex isa Exception)]
 
     is_converged = [ex.is_converged for ex in exp_list if !(ex isa Exception)]
     low_signal_quality_level = [
@@ -217,10 +235,19 @@ Returns the profit gain of the agent based on the current policy.
 """
 function profit_gain(π_hat, env::DDDCEnv)
     π_N, π_M = extract_profit_vars(env)
-    profit_gain_ = Dict(i => (mean(π_hat) - π_N[i]) / (π_M[i] - π_N[i]) for i in [:high, :low])
-    π_N_weighted = π_N[:high] * env.data_demand_digital_params.frequency_high_demand + π_N[:low] * (1 - env.data_demand_digital_params.frequency_high_demand)
-    π_M_weighted = π_M[:high] * env.data_demand_digital_params.frequency_high_demand + π_M[:low] * (1 - env.data_demand_digital_params.frequency_high_demand)
+    profit_gain_ =
+        Dict(i => (mean(π_hat) - π_N[i]) / (π_M[i] - π_N[i]) for i in [:high, :low])
+    π_N_weighted =
+        π_N[:high] * env.data_demand_digital_params.frequency_high_demand +
+        π_N[:low] * (1 - env.data_demand_digital_params.frequency_high_demand)
+    π_M_weighted =
+        π_M[:high] * env.data_demand_digital_params.frequency_high_demand +
+        π_M[:low] * (1 - env.data_demand_digital_params.frequency_high_demand)
 
     profit_gain_weighted = (mean(π_hat) - π_N_weighted) / (π_N_weighted - π_M_weighted)
-    return Dict(:high => profit_gain_[:high], :low => profit_gain_[:low], :weighted => profit_gain_weighted)
+    return Dict(
+        :high => profit_gain_[:high],
+        :low => profit_gain_[:low],
+        :weighted => profit_gain_weighted,
+    )
 end

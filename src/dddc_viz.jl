@@ -18,7 +18,10 @@ df = @chain df_ begin
         :convergence_profit_demand_low =
             eval(Meta.parse(:convergence_profit_demand_low)),
     )
-    @transform!(@subset((:frequency_high_demand == 1) & (:low_signal_quality_level == 1)), :price_response_to_demand_signal_mse = missing)
+    @transform!(
+        @subset((:frequency_high_demand == 1) & (:low_signal_quality_level == 1)),
+        :price_response_to_demand_signal_mse = missing
+    )
 end
 
 plt1 = @chain df begin
@@ -49,8 +52,10 @@ df_summary = @chain df begin
         mean(:iterations_until_convergence),
         mean(:profit_min),
         mean(:profit_max),
-        :price_response_to_demand_signal_mse_min_mean = (@passmissing mean(:price_response_to_demand_signal_mse_min)),
-        :price_response_to_demand_signal_mse_max_mean = (@passmissing mean(:price_response_to_demand_signal_mse_max)),
+        :price_response_to_demand_signal_mse_min_mean =
+            (@passmissing mean(:price_response_to_demand_signal_mse_min)),
+        :price_response_to_demand_signal_mse_max_mean =
+            (@passmissing mean(:price_response_to_demand_signal_mse_max)),
         :convergence_profit_demand_high = mean(:convergence_profit_demand_high),
         :convergence_profit_demand_low = mean(:convergence_profit_demand_low),
     )
@@ -141,10 +146,7 @@ draw(
 
 plt22 = @chain df_summary begin
     stack(
-        [
-            :convergence_profit_demand_high,
-            :convergence_profit_demand_low,
-        ],
+        [:convergence_profit_demand_high, :convergence_profit_demand_low],
         variable_name = :demand_level,
         value_name = :profit,
     )
@@ -168,10 +170,7 @@ draw(
 # TODO: version of plt22, but where profit is normalized against demand scenario!
 plt23 = @chain df_summary begin
     stack(
-        [
-            :convergence_profit_demand_high,
-            :convergence_profit_demand_low,
-        ],
+        [:convergence_profit_demand_high, :convergence_profit_demand_low],
         variable_name = :demand_level,
         value_name = :profit,
     )
