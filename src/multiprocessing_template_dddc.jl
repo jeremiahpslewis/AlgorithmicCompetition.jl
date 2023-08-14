@@ -29,14 +29,14 @@ if Sys.isapple()
     n_parameter_iterations = 15
     n_grid_increments = 25
 else
-    n_parameter_iterations = 30
-    n_grid_increments = 5
+    n_parameter_iterations = 5
+    n_grid_increments = 25
 end
 
 @time exp_list = AlgorithmicCompetition.run_dddc(;
     n_parameter_iterations = n_parameter_iterations,
     max_iter = Int(1e9),
-    n_grid_increments = 50,
+    n_grid_increments = n_grid_increments,
 )
 
 rmprocs(_procs)
