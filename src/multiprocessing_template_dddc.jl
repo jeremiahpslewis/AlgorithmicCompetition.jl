@@ -9,8 +9,14 @@ start_timestamp = now()
 
 if Sys.isapple()
     n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
+
+    n_parameter_iterations = 15
+    n_grid_increments = 25
 else
     n_procs_ = 63
+
+    n_parameter_iterations = 5
+    n_grid_increments = 25
 end
 
 _procs = addprocs(
@@ -23,14 +29,6 @@ _procs = addprocs(
     using Pkg
     Pkg.instantiate()
     using AlgorithmicCompetition: run_and_extract
-end
-
-if Sys.isapple()
-    n_parameter_iterations = 15
-    n_grid_increments = 25
-else
-    n_parameter_iterations = 5
-    n_grid_increments = 25
 end
 
 @time exp_list = AlgorithmicCompetition.run_dddc(;
