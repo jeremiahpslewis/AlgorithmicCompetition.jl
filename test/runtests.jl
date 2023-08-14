@@ -39,6 +39,7 @@ using AlgorithmicCompetition:
     DDDCHyperParameters,
     DataDemandDigitalParams,
     economic_summary,
+    extract_profit_vars,
     Experiment,
     get_demand_level,
     get_demand_signals,

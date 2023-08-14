@@ -47,6 +47,7 @@ function extract_profit_vars(env::DDDCEnv)
     return (π_N, π_M)
 end
 
+
 function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::AbstractHook)
     convergence_threshold = env.convergence_threshold
     iterations_until_convergence = Int64[

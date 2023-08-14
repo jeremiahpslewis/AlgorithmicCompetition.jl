@@ -6,7 +6,7 @@ using CSV
 using DataFrames
 using Statistics
 
-file_name = "simulation_results_dddc_2023-08-13T16:50:50.057"
+file_name = "simulation_results_dddc_2023-08-13T22:05:07.295"
 df_ = DataFrame(CSV.File(file_name * ".csv"))
 
 df = @chain df_ begin
@@ -17,6 +17,9 @@ df = @chain df_ begin
             eval(Meta.parse(:convergence_profit_demand_high)),
         :convergence_profit_demand_low =
             eval(Meta.parse(:convergence_profit_demand_low)),
+        :profit_gain = eval(Meta.parse(:profit_gain)),
+        :profit_gain_demand_high = eval(Meta.parse(:profit_gain_demand_high)),
+        :profit_gain_demand_low = eval(Meta.parse(:profit_gain_demand_low)),
     )
     @transform!(
         @subset((:frequency_high_demand == 1) & (:low_signal_quality_level == 1)),
@@ -46,12 +49,26 @@ df_summary = @chain df begin
         :price_response_to_demand_signal_mse_max =
             @passmissing maximum(:price_response_to_demand_signal_mse)
     )
+    @transform(
+        :profit_gain_max = maximum(:profit_gain),
+        :profit_gain_demand_high_max = maximum(:profit_gain_demand_high),
+        :profit_gain_demand_low_max = maximum(:profit_gain_demand_low),
+        :profit_gain_min = minimum(:profit_gain),
+        :profit_gain_demand_high_min = minimum(:profit_gain_demand_high),
+        :profit_gain_demand_low_min = minimum(:profit_gain_demand_low),
+    )
     @groupby(:signal_quality_is_high, :low_signal_quality_level, :frequency_high_demand)
     @combine(
         mean(:π_bar),
         mean(:iterations_until_convergence),
         mean(:profit_min),
         mean(:profit_max),
+        :profit_gain_min = mean(:profit_gain_min),
+        :profit_gain_demand_high_min = mean(:profit_gain_demand_high_min),
+        :profit_gain_demand_low_min = mean(:profit_gain_demand_low_min),
+        :profit_gain_max = mean(:profit_gain_max),
+        :profit_gain_demand_high_max = mean(:profit_gain_demand_high_max),
+        :profit_gain_demand_low_max = mean(:profit_gain_demand_low_max),
         :price_response_to_demand_signal_mse_min_mean =
             (@passmissing mean(:price_response_to_demand_signal_mse_min)),
         :price_response_to_demand_signal_mse_max_mean =
@@ -170,17 +187,18 @@ draw(
 # TODO: version of plt22, but where profit is normalized against demand scenario!
 plt23 = @chain df_summary begin
     stack(
-        [:convergence_profit_demand_high, :convergence_profit_demand_low],
-        variable_name = :demand_level,
-        value_name = :profit,
+        [:profit_gain_min, #:profit_gain_demand_high_min, :profit_gain_demand_low_min,
+            :profit_gain_max],#, :profit_gain_demand_high_max, :profit_gain_demand_low_max],
+        variable_name = :profit_gain_type,
+        value_name = :profit_gain,
     )
     @subset(:signal_quality_is_high == "Bool[0, 0]")
     @sort(:frequency_high_demand)
     data(_) *
     mapping(
         :frequency_high_demand,
-        :profit,
-        color = :demand_level => nonnumeric,
+        :profit_gain,
+        color = :profit_gain_type => nonnumeric,
         layout = :low_signal_quality_level => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
@@ -188,7 +206,7 @@ end
 # NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 draw(
     plt23,
-    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+    # legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
 )
 
 
