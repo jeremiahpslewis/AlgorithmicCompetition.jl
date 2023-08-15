@@ -7,6 +7,8 @@ using DataFrames
 using Statistics
 using Test
 
+using AlgorithmicCompetition: post_prob_high_low_given_signal, post_prob_high_low_given_both_signals
+
 folder_name = "v0.0.1_data"
 
 df_ = DataFrame.(CSV.File.(readdir(folder_name, join=true)))
@@ -78,10 +80,8 @@ df = @chain df___ begin
     # )
 end
 
-# @chain df1[!, [:signal_quality_is_high, :signal_quality_is_low_vect, :signal_quality_is_high_vect, :profit_gain_demand_high_low_signal_player, :profit_gain_demand_high_high_signal_player]] @subset(:signal_quality_is_high ∉ ("Bool[0, 0]", "Bool[1, 1]"))
-
 # Basic correctness assurance tests...
-@test mean(mean.(df[!, :signal_quality_is_low_vect] .+ df1[!, :signal_quality_is_high_vect])) == 1
+@test mean(mean.(df[!, :signal_quality_is_low_vect] .+ df[!, :signal_quality_is_high_vect])) == 1
 
 @chain df begin
     @subset(:signal_quality_is_high ∉ ("Bool[0, 0]", "Bool[1, 1]"))
