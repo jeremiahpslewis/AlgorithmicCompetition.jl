@@ -133,7 +133,8 @@ plt1 = @chain df begin
     ) *
     visual(Scatter)
 end
-draw(plt1)
+f1 = draw(plt1)
+save("plot_1.svg", f1)
 
 df_summary = @chain df begin
     @transform!(
@@ -208,7 +209,7 @@ rename!(
 )
 
 
-@chain df_post_prob begin
+f11 = @chain df_post_prob begin
     data(_) *
     mapping(
         :pr_high_demand,
@@ -217,6 +218,7 @@ rename!(
     ) *
     visual(Scatter)
 end |> draw
+save("plot_11.svg", f11)
 
 plt2 = @chain df_summary begin
     stack(
@@ -235,10 +237,11 @@ plt2 = @chain df_summary begin
     ) *
     (visual(Scatter) + visual(Lines))
 end
-draw(
+f2 = draw(
     plt2,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
 )
+save("plot_2.svg", f2)
 
 plt21 = @chain df_summary begin
     stack(
@@ -261,10 +264,11 @@ plt21 = @chain df_summary begin
     (visual(Scatter) + visual(Lines))
 end
 # NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
-draw(
+f21 = draw(
     plt21,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
 )
+save("plot_21.svg", f21)
 
 plt22 = @chain df_summary begin
     stack(
@@ -284,10 +288,11 @@ plt22 = @chain df_summary begin
     (visual(Scatter) + visual(Lines))
 end
 # NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
-draw(
+f22 = draw(
     plt22,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
 )
+save("plot_22.svg", f22)
 
 # TODO: version of plt22, but where profit is normalized against demand scenario!
 plt23 = @chain df_summary begin
@@ -313,10 +318,11 @@ plt23 = @chain df_summary begin
     (visual(Scatter) + visual(Lines))
 end
 # NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
-draw(
+f23 = draw(
     plt23,
     # legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
 )
+save("plot_23.svg", f23)
 
 plt24 = @chain df_summary begin
     stack(
@@ -337,10 +343,11 @@ plt24 = @chain df_summary begin
     (visual(Scatter) + visual(Lines))
 end
 # NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
-draw(
+f24 = draw(
     plt24,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
 )
+save("plot_24.svg", f24)
 
 plt25 = @chain df_summary begin
     stack(
@@ -361,10 +368,11 @@ plt25 = @chain df_summary begin
     (visual(Scatter) + visual(Lines))
 end
 # NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
-draw(
+f25 = draw(
     plt25,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
 )
+save("plot_25.svg", f25)
 
 
 plt3 = @chain df_summary begin
@@ -378,7 +386,8 @@ plt3 = @chain df_summary begin
     ) *
     (visual(Scatter) + visual(Lines))
 end
-draw(plt3)
+f3 = draw(plt3)
+save("plot_3.svg", f3)
 
 
 # TODO: Make this profit for low signal agent
@@ -391,7 +400,8 @@ plt4 = @chain df_summary begin
     ) *
     (visual(Scatter) + linear())
 end
-draw(plt4)
+f4 = draw(plt4)
+save("plot_4.svg", f4)
 
 # TODO: Make this profit for high signal agent
 plt5 = @chain df_summary begin
@@ -403,7 +413,8 @@ plt5 = @chain df_summary begin
     ) *
     (visual(Scatter) + linear())
 end
-draw(plt5)
+f5 = draw(plt5)
+save("plot_5.svg", f5)
 
 
 # TODO: Look into different levels of low signal quality, whether the 'drop-off' happens subtly or abruptly
