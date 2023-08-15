@@ -182,7 +182,7 @@ end
         :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
     )
-    
+
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
@@ -206,7 +206,10 @@ end
     e_out = run(hyperparams; stop_on_convergence = true)
     e_sum = economic_summary(e_out)
     @test 0.85 < e_sum.percent_demand_high < 0.95
-    @test extract_profit_vars(e_out.env) == (Dict(:high => 0.2386460385715974, :low => 0.19331233681405383), Dict(:high => 0.4317126027908472, :low => 0.25))
+    @test extract_profit_vars(e_out.env) == (
+        Dict(:high => 0.2386460385715974, :low => 0.19331233681405383),
+        Dict(:high => 0.4317126027908472, :low => 0.25),
+    )
 end
 
 @testset "run full AIAPC simulation" begin

@@ -187,8 +187,12 @@ draw(
 # TODO: version of plt22, but where profit is normalized against demand scenario!
 plt23 = @chain df_summary begin
     stack(
-        [:profit_gain_demand_high_min, :profit_gain_demand_low_min,
-            :profit_gain_demand_high_max, :profit_gain_demand_low_max],
+        [
+            :profit_gain_demand_high_min,
+            :profit_gain_demand_low_min,
+            :profit_gain_demand_high_max,
+            :profit_gain_demand_low_max,
+        ],
         variable_name = :profit_gain_type,
         value_name = :profit_gain,
     )
