@@ -26,7 +26,7 @@ end
 """
     extract_profit_vars(env::DDDCEnv)
 
-Returns the Nash equilibrium and monopoly optimal profits, based on prices stored in env.
+Returns the Nash equilibrium and monopoly optimal profits, based on prices stored in `env`.
 """
 function extract_profit_vars(env::DDDCEnv)
     p_Bert_nash_equilibrium = env.p_Bert_nash_equilibrium
@@ -42,6 +42,30 @@ function extract_profit_vars(env::DDDCEnv)
     )
     π_M = Dict(
         i => π(p_monop_opt[i], p_monop_opt[i], competition_params[i])[1] for
+        i in [:high, :low]
+    )
+    return (π_N, π_M)
+end
+
+"""
+extract_quantity_vars(env::DDDCEnv)
+
+Returns the Nash equilibrium and monopoly optimal quantities, based on prices stored in `env`.
+"""
+function extract_quantity_vars(env::DDDCEnv)
+    p_Bert_nash_equilibrium = env.p_Bert_nash_equilibrium
+    p_monop_opt = env.p_monop_opt
+    competition_params = env.competition_params_dict
+
+    π_N = Dict(
+        i => Q(
+            p_Bert_nash_equilibrium[i],
+            p_Bert_nash_equilibrium[i],
+            competition_params[i],
+        )[1] for i in [:high, :low]
+    )
+    π_M = Dict(
+        i => Q(p_monop_opt[i], p_monop_opt[i], competition_params[i])[1] for
         i in [:high, :low]
     )
     return (π_N, π_M)

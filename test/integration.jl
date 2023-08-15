@@ -179,8 +179,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :low => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
-        :high => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
+        :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
     )
 
     competition_solution_dict =
@@ -210,6 +210,8 @@ end
         Dict(:high => 0.2386460385715974, :low => 0.19331233681405383),
         Dict(:high => 0.4317126027908472, :low => 0.25),
     )
+
+    extract_quantity_vars(e_out.env)
 end
 
 @testset "run full AIAPC simulation" begin
