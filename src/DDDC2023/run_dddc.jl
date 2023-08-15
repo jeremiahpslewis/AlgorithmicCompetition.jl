@@ -27,7 +27,7 @@ function run_dddc(;
         :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)), # Akin to Calvano 2020 Stochastic Demand
     )
-    
+
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
