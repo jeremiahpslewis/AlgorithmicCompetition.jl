@@ -142,12 +142,8 @@ df_summary = @chain df begin
         :signal_quality_is_high = "Bool[1, 0]",
     )
     @transform(
-        :price_response_to_demand_signal_mse_min =
+        :price_response_to_demand_signal_mse_mean =
             @passmissing minimum(:price_response_to_demand_signal_mse)
-    )
-    @transform(
-        :price_response_to_demand_signal_mse_max =
-            @passmissing maximum(:price_response_to_demand_signal_mse)
     )
     @transform(
         :profit_gain_max = maximum(:profit_gain),
@@ -175,10 +171,8 @@ df_summary = @chain df begin
         :convergence_profit_demand_low_high_signal_player = mean(:convergence_profit_demand_low_high_signal_player),
         # :convergence_profit_low_signal_player = mean(:convergence_profit_low_signal_player),
         # :convergence_profit_high_signal_player = mean(:convergence_profit_high_signal_player),
-        :price_response_to_demand_signal_mse_min_mean =
-            (@passmissing mean(:price_response_to_demand_signal_mse_min)),
-        :price_response_to_demand_signal_mse_max_mean =
-            (@passmissing mean(:price_response_to_demand_signal_mse_max)),
+        :price_response_to_demand_signal_mse =
+            (@passmissing mean(:price_response_to_demand_signal_mse_mean)),
         :convergence_profit_demand_high = mean(:convergence_profit_demand_high),
         :convergence_profit_demand_low = mean(:convergence_profit_demand_low),
     )
@@ -244,22 +238,16 @@ f2 = draw(
 save("plots/plot_2.svg", f2)
 
 plt21 = @chain df_summary begin
-    stack(
-        [
-            :price_response_to_demand_signal_mse_min_mean,
-            :price_response_to_demand_signal_mse_max_mean,
-        ],
-        variable_name = :price_response_variable_name,
-        value_name = :price_response_value,
+    @subset(
+        (:signal_quality_is_high == "Bool[0, 0]") &
+        !ismissing(:price_response_to_demand_signal_mse)
     )
-    @subset((:signal_quality_is_high == "Bool[0, 0]") & !ismissing(:price_response_value))
     @sort(:frequency_high_demand)
     data(_) *
     mapping(
         :frequency_high_demand,
-        :price_response_value,
-        color = :price_response_variable_name => nonnumeric,
-        layout = :low_signal_quality_level => nonnumeric,
+        :price_response_to_demand_signal_mse,
+        color = :low_signal_quality_level => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
 end
