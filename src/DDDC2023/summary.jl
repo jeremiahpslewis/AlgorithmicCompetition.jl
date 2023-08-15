@@ -164,6 +164,7 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
         profit_gain = profit_gain,
         profit_gain_demand_high = profit_gain_demand_high,
         profit_gain_demand_low = profit_gain_demand_low,
+        convergence_profit = convergence_profit,
         convergence_profit_demand_high = convergence_profit_demand_high,
         convergence_profit_demand_low = convergence_profit_demand_low,
         iterations_until_convergence = iterations_until_convergence,
