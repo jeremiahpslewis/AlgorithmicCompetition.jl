@@ -23,6 +23,8 @@ df__ = @chain df_ begin
             eval(Meta.parse(:convergence_profit_demand_high)),
         :convergence_profit_demand_low =
             eval(Meta.parse(:convergence_profit_demand_low)),
+        :profit_vect =
+            eval(Meta.parse(:profit_vect)),
         :profit_gain = eval(Meta.parse(:profit_gain)),
         :profit_gain_demand_high = eval(Meta.parse(:profit_gain_demand_high)),
         :profit_gain_demand_low = eval(Meta.parse(:profit_gain_demand_low)),
@@ -36,6 +38,7 @@ end
 
 df___ = @chain df__ begin
     @transform(:signal_quality_is_low_vect = :signal_quality_is_high_vect .!= 1)
+    @transform(:profit_mean = mean(:profit_vect))
     @transform(
         :profit_gain_demand_low_low_signal_player =
             (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
@@ -275,6 +278,23 @@ f2 = draw(
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
 )
 save("plots/plot_2.svg", f2)
+
+plt20 = @chain df_summary begin
+    @subset(:signal_quality_is_high == "Bool[0, 0]")
+    @sort(:frequency_high_demand)
+    data(_) *
+    mapping(
+        :frequency_high_demand,
+        :profit_mean,
+        color = :low_signal_quality_level => nonnumeric,
+    ) *
+    (visual(Scatter) + visual(Lines))
+end
+f20 = draw(
+    plt20,
+    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+)
+save("plots/plot_20.svg", f20)
 
 plt21 = @chain df_summary begin
     @subset(

@@ -139,7 +139,7 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
     iterations_until_convergence =
         [ex.iterations_until_convergence[1] for ex in exp_list if !(ex isa Exception)]
 
-    avg_profit_result =
+    convergence_profit =
         [mean(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
 
     convergence_profit_demand_high =
@@ -181,7 +181,6 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
     df = DataFrame(
         α = α_result,
         β = β_result,
-        π_bar = avg_profit_result,
         profit_vect = profit_vect,
         profit_min = profit_min,
         profit_max = profit_max,

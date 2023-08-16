@@ -5,6 +5,7 @@ using CSV
 using Distributed
 using Dates
 
+version = 0.2
 start_timestamp = now()
 
 if Sys.isapple()
@@ -39,7 +40,7 @@ end
 
 rmprocs(_procs)
 
-file_name = "simulation_results_dddc_$start_timestamp.csv"
+file_name = "simulation_results_v$(version)_dddc_$(start_timestamp).csv"
 exp_list_ = AlgorithmicCompetition.DDDCSummary[exp_list...]
 df = AlgorithmicCompetition.extract_sim_results(exp_list_)
 CSV.write(file_name, df)
