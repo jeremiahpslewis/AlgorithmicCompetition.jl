@@ -21,9 +21,8 @@ _procs = addprocs(
 end
 
 @time exp_list = AlgorithmicCompetition.run_aiapc(;
-    n_parameter_iterations = 1,
+    n_parameter_iterations = 20,
     max_iter = Int(1e9),
-    sample_fraction = 1,
 )
 
 rmprocs(_procs)
