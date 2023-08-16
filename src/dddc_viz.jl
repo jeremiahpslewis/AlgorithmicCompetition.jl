@@ -7,11 +7,12 @@ using DataFrames
 using Statistics
 using Test
 
-using AlgorithmicCompetition: post_prob_high_low_given_signal, post_prob_high_low_given_both_signals
+using AlgorithmicCompetition:
+    post_prob_high_low_given_signal, post_prob_high_low_given_both_signals
 
 folder_name = "v0.0.1_data"
 
-df_ = DataFrame.(CSV.File.(readdir(folder_name, join=true)))
+df_ = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
 df_ = vcat(df_...)
 
 df__ = @chain df_ begin
@@ -36,39 +37,63 @@ end
 df___ = @chain df__ begin
     @transform(:signal_quality_is_low_vect = :signal_quality_is_high_vect .!= 1)
     @transform(
-        :profit_gain_demand_low_low_signal_player = (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) | (:frequency_high_demand == 1) ? missing : :profit_gain_demand_low[:signal_quality_is_low_vect][1],
+        :profit_gain_demand_low_low_signal_player =
+            (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
+            (:frequency_high_demand == 1) ? missing :
+            :profit_gain_demand_low[:signal_quality_is_low_vect][1],
     )
     @transform(
-        :profit_gain_demand_low_high_signal_player = (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) | (:frequency_high_demand == 1) ? missing : :profit_gain_demand_low[:signal_quality_is_high_vect][1],
+        :profit_gain_demand_low_high_signal_player =
+            (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
+            (:frequency_high_demand == 1) ? missing :
+            :profit_gain_demand_low[:signal_quality_is_high_vect][1],
     )
     @transform(
-        :profit_gain_demand_high_low_signal_player = (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing : :profit_gain_demand_high[:signal_quality_is_low_vect][1],
+        :profit_gain_demand_high_low_signal_player =
+            (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            :profit_gain_demand_high[:signal_quality_is_low_vect][1],
     )
     @transform(
-        :profit_gain_demand_high_high_signal_player = (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing : :profit_gain_demand_high[:signal_quality_is_high_vect][1],
+        :profit_gain_demand_high_high_signal_player =
+            (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            :profit_gain_demand_high[:signal_quality_is_high_vect][1],
     )
 
     @transform(
-        :profit_gain_low_signal_player = (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing : :profit_gain[:signal_quality_is_low_vect][1],
+        :profit_gain_low_signal_player =
+            (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            :profit_gain[:signal_quality_is_low_vect][1],
     )
     @transform(
-        :profit_gain_high_signal_player = (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing : :profit_gain[:signal_quality_is_high_vect][1],
+        :profit_gain_high_signal_player =
+            (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            :profit_gain[:signal_quality_is_high_vect][1],
     )
 end
 
 df = @chain df___ begin
     @transform(:signal_quality_is_low_vect = :signal_quality_is_high_vect .!= 1)
     @transform(
-        :convergence_profit_demand_low_low_signal_player = (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) | (:frequency_high_demand == 1) ? missing : :convergence_profit_demand_low[:signal_quality_is_low_vect][1],
+        :convergence_profit_demand_low_low_signal_player =
+            (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
+            (:frequency_high_demand == 1) ? missing :
+            :convergence_profit_demand_low[:signal_quality_is_low_vect][1],
     )
     @transform(
-        :convergence_profit_demand_low_high_signal_player = (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) | (:frequency_high_demand == 1) ? missing : :convergence_profit_demand_low[:signal_quality_is_high_vect][1],
+        :convergence_profit_demand_low_high_signal_player =
+            (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
+            (:frequency_high_demand == 1) ? missing :
+            :convergence_profit_demand_low[:signal_quality_is_high_vect][1],
     )
     @transform(
-        :convergence_profit_demand_high_low_signal_player = (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing : :convergence_profit_demand_high[:signal_quality_is_low_vect][1],
+        :convergence_profit_demand_high_low_signal_player =
+            (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            :convergence_profit_demand_high[:signal_quality_is_low_vect][1],
     )
     @transform(
-        :convergence_profit_demand_high_high_signal_player = (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing : :convergence_profit_demand_high[:signal_quality_is_high_vect][1],
+        :convergence_profit_demand_high_high_signal_player =
+            (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            :convergence_profit_demand_high[:signal_quality_is_high_vect][1],
     )
 
     # TODO: Uncomment for later versions...
@@ -81,17 +106,18 @@ df = @chain df___ begin
 end
 
 # Basic correctness assurance tests...
-@test mean(mean.(df[!, :signal_quality_is_low_vect] .+ df[!, :signal_quality_is_high_vect])) == 1
+@test mean(
+    mean.(df[!, :signal_quality_is_low_vect] .+ df[!, :signal_quality_is_high_vect]),
+) == 1
 
 @chain df begin
     @subset(:signal_quality_is_high ∉ ("Bool[0, 0]", "Bool[1, 1]"))
     @transform(
-        :profit_gain_sum_1 = (:profit_gain_low_signal_player + :profit_gain_high_signal_player),
+        :profit_gain_sum_1 =
+            (:profit_gain_low_signal_player + :profit_gain_high_signal_player),
         :profit_gain_sum_2 = sum(:profit_gain),
     )
-    @transform(
-        :profit_gain_check = :profit_gain_sum_1 != :profit_gain_sum_2
-    )
+    @transform(:profit_gain_check = :profit_gain_sum_1 != :profit_gain_sum_2)
     @combine(sum(:profit_gain_check))
     @test _[1, :profit_gain_check_sum] == 0
 end
@@ -99,25 +125,30 @@ end
 @chain df begin
     @subset(:signal_quality_is_high ∉ ("Bool[0, 0]", "Bool[1, 1]"))
     @transform(
-        :profit_gain_sum_1 = (:profit_gain_demand_high_low_signal_player + :profit_gain_demand_high_high_signal_player),
+        :profit_gain_sum_1 = (
+            :profit_gain_demand_high_low_signal_player +
+            :profit_gain_demand_high_high_signal_player
+        ),
         :profit_gain_sum_2 = sum(:profit_gain_demand_high),
     )
-    @transform(
-        :profit_gain_check = :profit_gain_sum_1 != :profit_gain_sum_2
-    )
+    @transform(:profit_gain_check = :profit_gain_sum_1 != :profit_gain_sum_2)
     @combine(sum(:profit_gain_check))
     @test _[1, :profit_gain_check_sum] == 0
 end
 
 @chain df begin
-    @subset((:signal_quality_is_high ∉ ("Bool[0, 0]", "Bool[1, 1]")) & (:frequency_high_demand != 1))
+    @subset(
+        (:signal_quality_is_high ∉ ("Bool[0, 0]", "Bool[1, 1]")) &
+        (:frequency_high_demand != 1)
+    )
     @transform(
-        :profit_gain_sum_1 = (:profit_gain_demand_low_low_signal_player + :profit_gain_demand_low_high_signal_player),
+        :profit_gain_sum_1 = (
+            :profit_gain_demand_low_low_signal_player +
+            :profit_gain_demand_low_high_signal_player
+        ),
         :profit_gain_sum_2 = sum(:profit_gain_demand_low),
     )
-    @transform(
-        :profit_gain_check = :profit_gain_sum_1 != :profit_gain_sum_2
-    )
+    @transform(:profit_gain_check = :profit_gain_sum_1 != :profit_gain_sum_2)
     @combine(sum(:profit_gain_check))
     @test _[1, :profit_gain_check_sum] == 0
 end
@@ -159,16 +190,24 @@ df_summary = @chain df begin
         mean(:iterations_until_convergence),
         mean(:profit_min),
         mean(:profit_max),
-        :profit_gain_demand_high_low_signal_player = mean(:profit_gain_demand_high_low_signal_player),
-        :profit_gain_demand_low_low_signal_player = mean(:profit_gain_demand_low_low_signal_player),
-        :profit_gain_demand_high_high_signal_player = mean(:profit_gain_demand_high_high_signal_player),
-        :profit_gain_demand_low_high_signal_player = mean(:profit_gain_demand_low_high_signal_player),
+        :profit_gain_demand_high_low_signal_player =
+            mean(:profit_gain_demand_high_low_signal_player),
+        :profit_gain_demand_low_low_signal_player =
+            mean(:profit_gain_demand_low_low_signal_player),
+        :profit_gain_demand_high_high_signal_player =
+            mean(:profit_gain_demand_high_high_signal_player),
+        :profit_gain_demand_low_high_signal_player =
+            mean(:profit_gain_demand_low_high_signal_player),
         :profit_gain_low_signal_player = mean(:profit_gain_low_signal_player),
         :profit_gain_high_signal_player = mean(:profit_gain_high_signal_player),
-        :convergence_profit_demand_high_low_signal_player = mean(:convergence_profit_demand_high_low_signal_player),
-        :convergence_profit_demand_low_low_signal_player = mean(:convergence_profit_demand_low_low_signal_player),
-        :convergence_profit_demand_high_high_signal_player = mean(:convergence_profit_demand_high_high_signal_player),
-        :convergence_profit_demand_low_high_signal_player = mean(:convergence_profit_demand_low_high_signal_player),
+        :convergence_profit_demand_high_low_signal_player =
+            mean(:convergence_profit_demand_high_low_signal_player),
+        :convergence_profit_demand_low_low_signal_player =
+            mean(:convergence_profit_demand_low_low_signal_player),
+        :convergence_profit_demand_high_high_signal_player =
+            mean(:convergence_profit_demand_high_high_signal_player),
+        :convergence_profit_demand_low_high_signal_player =
+            mean(:convergence_profit_demand_low_high_signal_player),
         # :convergence_profit_low_signal_player = mean(:convergence_profit_low_signal_player),
         # :convergence_profit_high_signal_player = mean(:convergence_profit_high_signal_player),
         :price_response_to_demand_signal_mse =
@@ -314,8 +353,12 @@ save("plots/plot_23.svg", f23)
 
 plt24 = @chain df_summary begin
     stack(
-        [:profit_gain_demand_high_low_signal_player, :profit_gain_demand_low_low_signal_player,
-            :profit_gain_demand_high_high_signal_player, :profit_gain_demand_low_high_signal_player],
+        [
+            :profit_gain_demand_high_low_signal_player,
+            :profit_gain_demand_low_low_signal_player,
+            :profit_gain_demand_high_high_signal_player,
+            :profit_gain_demand_low_high_signal_player,
+        ],
         variable_name = :profit_gain_type,
         value_name = :profit_gain,
     )
@@ -339,8 +382,12 @@ save("plots/plot_24.svg", f24)
 
 plt25 = @chain df_summary begin
     stack(
-        [:convergence_profit_demand_high_low_signal_player, :convergence_profit_demand_low_low_signal_player,
-            :convergence_profit_demand_high_high_signal_player, :convergence_profit_demand_low_high_signal_player],
+        [
+            :convergence_profit_demand_high_low_signal_player,
+            :convergence_profit_demand_low_low_signal_player,
+            :convergence_profit_demand_high_high_signal_player,
+            :convergence_profit_demand_low_high_signal_player,
+        ],
         variable_name = :convergence_profit_type,
         value_name = :convergence_profit,
     )
