@@ -8,7 +8,7 @@ using Statistics
 using Test
 
 using AlgorithmicCompetition:
-    post_prob_high_low_given_signal, post_prob_high_low_given_both_signals
+    post_prob_high_low_given_signal, post_prob_high_low_given_both_signals, draw_price_diagnostic, CompetitionParameters, CompetitionSolution, DataDemandDigitalParams, DDDCHyperParameters
 
 folder_name = "v0.0.1_data"
 
@@ -470,5 +470,42 @@ end
 f5 = draw(plt5)
 save("plots/plot_5.svg", f5)
 
+α = Float64(0.125)
+β = Float64(4e-1)
+δ = 0.95
+ξ = 0.1
+δ = 0.95
+n_prices = 15
+max_iter = Int(1e6) # 1e8
+price_index = 1:n_prices
+
+competition_params_dict = Dict(
+    :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
+    :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
+)
+
+competition_solution_dict =
+    Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+
+data_demand_digital_params = DataDemandDigitalParams(
+    low_signal_quality_level = 0.99,
+    high_signal_quality_level = 0.995,
+    signal_quality_is_high = [true, false],
+    frequency_high_demand = 0.9,
+)
+
+hyperparams = DDDCHyperParameters(
+    α,
+    β,
+    δ,
+    max_iter,
+    competition_solution_dict,
+    data_demand_digital_params;
+    convergence_threshold = Int(1e5),
+)
+
+plt = draw_price_diagnostic(hyperparams)
+f6 = draw(plt, axis=(title="Profit Levels across Price Options", subtitle="(Solid line is profit for symmetric prices, shaded region shows range based on price options)", xlabel="Competitor's Price Choice",))
+save("plots/plot_6.svg", f6)
 
 # TODO: Look into different levels of low signal quality, whether the 'drop-off' happens subtly or abruptly

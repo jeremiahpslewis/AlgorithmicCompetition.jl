@@ -1,61 +1,3 @@
-using Test
-using JuMP
-using Chain
-using ReinforcementLearningCore:
-    PostActStage,
-    PreActStage,
-    state,
-    reward,
-    current_player,
-    action_space,
-    EpsilonGreedyExplorer,
-    RandomPolicy,
-    MultiAgentPolicy,
-    RLCore,
-    ResetAtTerminal
-using ReinforcementLearningBase: RLBase, test_interfaces!, test_runnable!, AbstractPolicy
-import ReinforcementLearningCore
-using Statistics
-using AlgorithmicCompetition:
-    AlgorithmicCompetition,
-    CompetitionParameters,
-    DDDCHyperParameters,
-    CompetitionParameters,
-    AIAPCHyperParameters,
-    AIAPCPolicy,
-    AIAPCEnv,
-    CompetitionSolution,
-    ConvergenceCheck,
-    DataDemandDigitalParams,
-    solve_monopolist,
-    solve_bertrand,
-    p_BR,
-    construct_AIAPC_state_space_lookup,
-    construct_AIAPC_profit_array,
-    Q,
-    run,
-    run_and_extract,
-    Experiment,
-    reward,
-    InitMatrix,
-    get_ϵ,
-    AIAPCEpsilonGreedyExplorer,
-    AIAPCSummary,
-    TDLearner,
-    TabularApproximator,
-    economic_summary,
-    extract_sim_results,
-    extract_profit_vars,
-    profit_gain,
-    DDDCEnv,
-    π
-using JET
-using BenchmarkTools
-# using ProfileView
-using Distributed
-
-# RLCore.TimerOutputs.enable_debug_timings(RLCore)
-
 using AlgebraOfGraphics
 using CairoMakie
 using DataFrames
@@ -82,7 +24,7 @@ end
 
 function generate_profit_df(hyperparams::HyperParameters, profit_for_price_function, label) where {HyperParameters <: Union{AIAPCHyperParameters, DDDCHyperParameters}}
     profit_df = Dict(demand => profit_for_price_function(hyperparams.price_options, hyperparams.competition_params_dict[demand]) for demand in [:low, :high])
-    profit_df = extract_profit_results(profit_df, price_options)
+    profit_df = extract_profit_results(profit_df, hyperparams.price_options)
     profit_df[!, :label] .= label
     return profit_df
 end
@@ -95,123 +37,65 @@ function generate_profit_df(hyperparams::HyperParameters) where {HyperParameters
     return profit_df
 end
 
+function draw_price_diagnostic(hyperparams::AIAPCHyperParameters)
+    profit_df = generate_profit_df(hyperparams)
+    profit_df = unstack(profit_df, :label, :profit)
 
+    critical_prices = [hyperparams.p_Bert_nash_equilibrium, hyperparams.p_monop_opt]
+    plt_1 = data((price = critical_prices, profit = symmetric_profit(critical_prices, hyperparams.competition_params_dict[:high]), label = ["Bertrand Nash", "Monopoly"])) *
+        mapping(
+            :price,
+            :profit,
+            color = :label,
+        ) *
+        visual(Scatter)
 
-α = Float64(0.125)
-β = Float64(4e-1)
-δ = 0.95
-ξ = 0.1
-δ = 0.95
-n_prices = 15
-max_iter = Int(1e6) # 1e8
-price_index = 1:n_prices
+    plt = @chain profit_df begin
+        @subset(:demand == "high")
+        data(_) *
+        mapping(
+            :price_options => "Price",
+            :symmetric_profit => "Profit",
+            lower = :min_profit,
+            upper = :max_profit,
+        ) *
+        (visual(Scatter) + visual(LinesFill))
+    end
+    return plt + plt_1
+end
 
-competition_params_dict = Dict(
-    :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
-    :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
-)
+function draw_price_diagnostic(hyperparams::DDDCHyperParameters)
+    profit_df = generate_profit_df(hyperparams)
+    profit_df = unstack(profit_df, :label, :profit)
 
-competition_solution_dict =
-    Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+    critical_prices = vcat([[hyperparams.p_Bert_nash_equilibrium[demand], hyperparams.p_monop_opt[demand]] for demand in [:high, :low]]...)
+    critical_profits = vcat([symmetric_profit([hyperparams.p_Bert_nash_equilibrium[demand], hyperparams.p_monop_opt[demand]], hyperparams.competition_params_dict[demand]) for demand in [:high, :low]]...)
+    plt_1 = data(
+        (
+            price = critical_prices,
+            profit = critical_profits,
+            label = repeat(["Bertrand Nash", "Monopoly"], outer=2),
+            demand = repeat(["high", "low"], inner=2),
+        )
+        ) *
+        mapping(
+            :price,
+            :profit,
+            color = :label,
+            row = :demand,
+        ) *
+        visual(Scatter)
 
-data_demand_digital_params = DataDemandDigitalParams(
-    low_signal_quality_level = 0.99,
-    high_signal_quality_level = 0.995,
-    signal_quality_is_high = [true, false],
-    frequency_high_demand = 0.9,
-)
-
-hyperparams = DDDCHyperParameters(
-    α,
-    β,
-    δ,
-    max_iter,
-    competition_solution_dict,
-    data_demand_digital_params;
-    convergence_threshold = Int(1e5),
-)
-
-profit_df = generate_profit_df(hyperparams)
-profit_df = unstack(profit_df, :label, :profit)
-
-critical_prices = vcat([[hyperparams.p_Bert_nash_equilibrium[demand], hyperparams.p_monop_opt[demand]] for demand in [:high, :low]]...)
-critical_profits = vcat([symmetric_profit([hyperparams.p_Bert_nash_equilibrium[demand], hyperparams.p_monop_opt[demand]], hyperparams.competition_params_dict[demand]) for demand in [:high, :low]]...)
-plt_1 = data(
-    (
-        price = critical_prices,
-        profit = critical_profits,
-        label = repeat(["Bertrand Nash", "Monopoly"], outer=2),
-        demand = repeat(["high", "low"], inner=2),
-    )
-    ) *
-    mapping(
-        :price,
-        :profit,
-        color = :label,
-        row = :demand,
-    ) *
-    visual(Scatter)
-
-plt = data(profit_df) *
-    mapping(
-        :price_options => "Price",
-        :symmetric_profit => "Profit",
-        lower = :min_profit,
-        upper = :max_profit,
-        row = :demand => "Demand Level",
-    ) *
-    (visual(Scatter) + visual(LinesFill))
-draw(plt + plt_1, axis=(title="Profit Levels across Price Options", subtitle="(Solid line is profit for symmetric prices, shaded region shows range based on competitor prices)", xlabel="Competitor's Price Choice",))
-
-
-α = Float64(0.125)
-β = Float64(4e-1)
-δ = 0.95
-ξ = 0.1
-δ = 0.95
-n_prices = 15
-max_iter = Int(1e6)
-price_index = 1:n_prices
-
-competition_params_dict = Dict(
-    :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
-    :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
-)
-
-competition_solution_dict =
-    Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
-
-
-hyperparams = AIAPCHyperParameters(
-    α,
-    β,
-    δ,
-    max_iter,
-    competition_solution_dict;
-    convergence_threshold = Int(1e5),
-)
-
-profit_df = generate_profit_df(hyperparams)
-profit_df = unstack(profit_df, :label, :profit)
-
-critical_prices = [hyperparams.p_Bert_nash_equilibrium, hyperparams.p_monop_opt]
-plt_1 = data((price = critical_prices, profit = symmetric_profit(critical_prices, hyperparams.competition_params_dict[:high]), label = ["Bertrand Nash", "Monopoly"])) *
-    mapping(
-        :price,
-        :profit,
-        color = :label,
-    ) *
-    visual(Scatter)
-
-plt = data(profit_df) *
-    mapping(
-        :price_options => "Price",
-        :symmetric_profit => "Profit",
-        lower = :min_profit,
-        upper = :max_profit,
-        color = :demand => "Demand Level",
-    ) *
-    (visual(Scatter) + visual(LinesFill))
-draw(plt + plt_1, axis=(title="Profit Levels across Price Options", subtitle="(Solid line is profit for symmetric prices, shaded region shows range based on competitor prices)",))
+    plt = data(profit_df) *
+        mapping(
+            :price_options => "Price",
+            :symmetric_profit => "Profit",
+            lower = :min_profit,
+            upper = :max_profit,
+            row = :demand => "Demand Level",
+        ) *
+        (visual(Scatter) + visual(LinesFill))
+    return plt + plt_1
+end
 
 
