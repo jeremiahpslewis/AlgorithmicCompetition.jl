@@ -230,10 +230,10 @@ end
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
     data_demand_digital_params = DataDemandDigitalParams(
-        low_signal_quality_level = 0.99,
-        high_signal_quality_level = 0.995,
+        low_signal_quality_level = 1,
+        high_signal_quality_level = 1,
         signal_quality_is_high = [true, false],
-        frequency_high_demand = 0.9,
+        frequency_high_demand = 0.5,
     )
 
     hyperparams = DDDCHyperParameters(
@@ -247,8 +247,14 @@ end
     )
 
     e_out = run(hyperparams; stop_on_convergence = true)
+    @test e_out.hook[Symbol(1)][2].demand_state_high_vect[end] ==  e_out.env.is_high_demand_episode[1]
+    @test mean(e_out.env.profit_array[:,:,:,1]) > mean(e_out.env.profit_array[:,:,:,2])
     e_sum = economic_summary(e_out)
-    @test 0.85 < e_sum.percent_demand_high < 0.95
+    @test 0.45 < e_sum.percent_demand_high < 0.55
+    @test all(e_sum.convergence_profit_demand_high > e_sum.convergence_profit_demand_low)
+    @test all(1 .> e_sum.profit_gain .> 0)
+    @test all(1 .> e_sum.profit_gain_demand_low .> 0)
+    @test all(1 .> e_sum.profit_gain_demand_high .> 0)
     @test extract_profit_vars(e_out.env) == (
         Dict(:high => 0.2386460385715974, :low => 0.19331233681405383),
         Dict(:high => 0.4317126027908472, :low => 0.25),

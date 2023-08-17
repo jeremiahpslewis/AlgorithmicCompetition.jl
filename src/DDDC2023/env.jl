@@ -2,7 +2,6 @@ using ReinforcementLearningCore
 using ReinforcementLearningBase
 
 const player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
-const demand_lookup = (; :high => 1, :low => 2)
 const player_to_index = (; Symbol(1) => 1, Symbol(2) => 2)
 const demand_to_index = (; :high => 1, :low => 2)
 

@@ -3,7 +3,7 @@ using ReinforcementLearningCore, ReinforcementLearningBase
 using DataFrames
 using Flux: mse
 """
-    DDDCSummary(α, β, is_converged, data_demand_digital_params, convergence_profit, iterations_until_convergence)
+    DDDCSummary(α, β, is_converged, data_demand_digital_params, convergence_profit, convergence_profit_demand_high, convergence_profit_demand_low, profit_gain, profit_gain_demand_high, profit_gain_demand_low, iterations_until_convergence, price_response_to_demand_signal_mse, percent_demand_high)
 
 A struct to store the summary of an DDDC experiment.
 """
@@ -119,12 +119,10 @@ function get_convergence_profit_from_hook(hook::AbstractHook)
     return Dict(
         :all => [mean(hook[p][2].rewards[101:end]) for p in [Symbol(1), Symbol(2)]],
     :high => [
-        sum(hook[p][2].rewards[101:end] .* demand_high[101:end]) /
-        sum(demand_high[101:end]) for p in [Symbol(1), Symbol(2)]
+        mean(hook[p][2].rewards[101:end][demand_high[101:end]]) for p in [Symbol(1), Symbol(2)]
     ],
     :low => [
-        sum(hook[p][2].rewards[101:end] .* .!demand_high[101:end]) /
-        sum(.!demand_high[101:end]) for p in [Symbol(1), Symbol(2)]
+        mean(hook[p][2].rewards[101:end][.!demand_high[101:end]]) for p in [Symbol(1), Symbol(2)]
     ]
     )
 end

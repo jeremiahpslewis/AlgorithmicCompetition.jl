@@ -47,7 +47,9 @@ using AlgorithmicCompetition:
     extract_sim_results,
     extract_profit_vars,
     profit_gain,
-    DDDCEnv
+    DDDCEnv,
+    π,
+    profit_gain
 using JET
 using BenchmarkTools
 # using ProfileView

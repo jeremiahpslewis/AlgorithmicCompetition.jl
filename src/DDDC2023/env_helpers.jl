@@ -29,7 +29,7 @@ function construct_DDDC_profit_array(
         for k = 1:n_players
             for i = 1:n_prices
                 for j = 1:n_prices
-                    profit_array[i, j, k, demand_lookup[l]] =
+                    profit_array[i, j, k, demand_to_index[l]] =
                         π(price_options[i], price_options[j], competition_params_dict[l])[k]
                 end
             end
