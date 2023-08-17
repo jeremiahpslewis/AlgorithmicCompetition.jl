@@ -23,8 +23,7 @@ df__ = @chain df_ begin
             eval(Meta.parse(:convergence_profit_demand_high)),
         :convergence_profit_demand_low =
             eval(Meta.parse(:convergence_profit_demand_low)),
-        :profit_vect =
-            eval(Meta.parse(:profit_vect)),
+        :profit_vect = eval(Meta.parse(:profit_vect)),
         :profit_gain = eval(Meta.parse(:profit_gain)),
         :profit_gain_demand_high = eval(Meta.parse(:profit_gain_demand_high)),
         :profit_gain_demand_low = eval(Meta.parse(:profit_gain_demand_low)),
