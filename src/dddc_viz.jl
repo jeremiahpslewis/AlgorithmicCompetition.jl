@@ -10,7 +10,7 @@ using Test
 using AlgorithmicCompetition:
     post_prob_high_low_given_signal, post_prob_high_low_given_both_signals, draw_price_diagnostic, CompetitionParameters, CompetitionSolution, DataDemandDigitalParams, DDDCHyperParameters
 
-folder_name = "v0.0.1_data"
+folder_name = "v0.0.2_data"
 
 df_ = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
 df_ = vcat(df_...)
@@ -160,7 +160,7 @@ plt1 = @chain df begin
     data(_) *
     mapping(
         :frequency_high_demand,
-        :π_bar,
+        :profit_mean,
         color = :signal_quality_is_high => nonnumeric,
         row = :signal_quality_is_high,
     ) *
@@ -188,7 +188,7 @@ df_summary = @chain df begin
     )
     @groupby(:signal_quality_is_high, :low_signal_quality_level, :frequency_high_demand)
     @combine(
-        mean(:π_bar),
+        :profit_mean = mean(:profit_mean),
         mean(:iterations_until_convergence),
         mean(:profit_min),
         mean(:profit_max),
@@ -202,6 +202,10 @@ df_summary = @chain df begin
             mean(:profit_gain_demand_low_high_signal_player),
         :profit_gain_low_signal_player = mean(:profit_gain_low_signal_player),
         :profit_gain_high_signal_player = mean(:profit_gain_high_signal_player),
+        :profit_gain_demand_high_min = mean(:profit_gain_demand_high_min),
+        :profit_gain_demand_low_min = mean(:profit_gain_demand_low_min),
+        :profit_gain_demand_high_max = mean(:profit_gain_demand_high_max),
+        :profit_gain_demand_low_max = mean(:profit_gain_demand_low_max),
         :convergence_profit_demand_high_low_signal_player =
             mean(:convergence_profit_demand_high_low_signal_player),
         :convergence_profit_demand_low_low_signal_player =
