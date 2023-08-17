@@ -192,6 +192,8 @@ df_summary = @chain df begin
         mean(:iterations_until_convergence),
         mean(:profit_min),
         mean(:profit_max),
+        :profit_gain_min = mean(:profit_gain_min),
+        :profit_gain_max = mean(:profit_gain_max),
         :profit_gain_demand_high_low_signal_player =
             mean(:profit_gain_demand_high_low_signal_player),
         :profit_gain_demand_low_low_signal_player =
@@ -343,6 +345,30 @@ f22 = draw(
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
 )
 save("plots/plot_22.svg", f22)
+
+plt221 = @chain df_summary begin
+    stack(
+        [:profit_gain_min, :profit_gain_max],
+        variable_name = :min_max,
+        value_name = :profit_gain,
+    )
+    @sort(:frequency_high_demand)
+    data(_) *
+    mapping(
+        :frequency_high_demand,
+        :profit_gain,
+        color = :min_max => nonnumeric,
+        # columns = :low_signal_quality_level => nonnumeric,
+        rows = :signal_quality_is_high => nonnumeric,
+    ) *
+    (visual(Scatter) + visual(Lines))
+end
+# NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
+f221 = draw(
+    plt221,
+    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+)
+save("plots/plot_221.svg", f22)
 
 # TODO: version of plt22, but where profit is normalized against demand scenario!
 plt23 = @chain df_summary begin

@@ -28,7 +28,50 @@
     # @test test_runnable!(AIAPCEnv(hyperparameters))
 end
 
-@testset "Profit gain check" begin
+@testset "Profit gain DDDC" begin
+    α = Float64(0.125)
+    β = Float64(4e-1)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = Int(1e6) # 1e8
+    price_index = 1:n_prices
+    
+    competition_params_dict = Dict(
+        :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
+    )
+    
+    competition_solution_dict =
+        Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+    
+    data_demand_digital_params = DataDemandDigitalParams(
+        low_signal_quality_level = 0.99,
+        high_signal_quality_level = 0.995,
+        signal_quality_is_high = [true, false],
+        frequency_high_demand = 0.9,
+    )
+    
+    hyperparams = DDDCHyperParameters(
+        α,
+        β,
+        δ,
+        max_iter,
+        competition_solution_dict,
+        data_demand_digital_params;
+        convergence_threshold = Int(1e5),
+    )
+    
+    
+    env = DDDCEnv(hyperparams)    
+    for demand in [:high, :low]
+        @test profit_gain(π(env.p_monop_opt[demand], env.p_monop_opt[demand], env.competition_params_dict[demand])[1], env)[demand] == 1
+        @test profit_gain(π(env.p_Bert_nash_equilibrium[demand], env.p_Bert_nash_equilibrium[demand], env.competition_params_dict[demand])[1], env)[demand] == 0
+    end
+end
+
+@testset "Profit gain check AIAPC" begin
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),

@@ -82,8 +82,8 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
 
     is_converged = Bool[]
 
-    convergence_profit, convergence_profit_demand_high, convergence_profit_demand_low =
-        get_convergence_profit_from_hook(hook)
+    convergence_profit = get_convergence_profit_from_hook(hook)
+        
 
     for i in (Symbol(1), Symbol(2))
         push!(is_converged, hook[i][1].is_converged)
@@ -100,9 +100,9 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
         convergence_profit,
         convergence_profit_demand_high,
         convergence_profit_demand_low,
-        get.(profit_gain.(convergence_profit, (env,)), :weighted, ""),
-        get.(profit_gain.(convergence_profit_demand_high, (env,)), :high, ""),
-        get.(profit_gain.(convergence_profit_demand_low, (env,)), :low, ""),
+        get.(profit_gain.(convergence_profit[:all], (env,)), :weighted, ""),
+        get.(profit_gain.(convergence_profit[:high], (env,)), :high, ""),
+        get.(profit_gain.(convergence_profit[:low], (env,)), :low, ""),
         iterations_until_convergence,
         [e_[1] for e_ in price_vs_demand_signal_counterfactuals],
         percent_demand_high,
@@ -116,15 +116,17 @@ Returns the average profit of the agent, after convergence, over the convergence
 """
 function get_convergence_profit_from_hook(hook::AbstractHook)
     demand_high = hook[Symbol(1)][2].demand_state_high_vect
-    return [mean(hook[p][2].rewards[101:end]) for p in [Symbol(1), Symbol(2)]],
-    [
+    return Dict(
+        :all => [mean(hook[p][2].rewards[101:end]) for p in [Symbol(1), Symbol(2)]],
+    :high => [
         sum(hook[p][2].rewards[101:end] .* demand_high[101:end]) /
         sum(demand_high[101:end]) for p in [Symbol(1), Symbol(2)]
     ],
-    [
+    :low => [
         sum(hook[p][2].rewards[101:end] .* .!demand_high[101:end]) /
         sum(.!demand_high[101:end]) for p in [Symbol(1), Symbol(2)]
     ]
+    )
 end
 
 """
@@ -269,7 +271,7 @@ function profit_gain(π_hat, env::DDDCEnv)
         π_M[:high] * env.data_demand_digital_params.frequency_high_demand +
         π_M[:low] * (1 - env.data_demand_digital_params.frequency_high_demand)
 
-    profit_gain_weighted = (mean(π_hat) - π_N_weighted) / (π_N_weighted - π_M_weighted)
+    profit_gain_weighted = (mean(π_hat) - π_N_weighted) / (π_M_weighted - π_N_weighted)
     return Dict(
         :high => profit_gain_[:high],
         :low => profit_gain_[:low],
