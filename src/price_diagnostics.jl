@@ -62,10 +62,10 @@ using DataFrames
 using Chain
 using DataFrameMacros
 
-max_profit_for_price(price::Float64, price_options::Vector{Float64}, competition_params::CompetitionParameters) = maximum(first.(π.((price,), price_options, (competition_params,))))
+max_profit_for_price(price::Float64, price_options::Vector{Float64}, competition_params::CompetitionParameters) = maximum(first.(π.(price_options, (price,), (competition_params,))))
 max_profit_for_price(price_options::Vector{Float64}, competition_params::CompetitionParameters) = max_profit_for_price.(price_options, (price_options,), (competition_params,))
 
-min_profit_for_price(price::Float64, price_options::Vector{Float64}, competition_params::CompetitionParameters) = minimum(first.(π.((price,), price_options, (competition_params,))))
+min_profit_for_price(price::Float64, price_options::Vector{Float64}, competition_params::CompetitionParameters) = minimum(first.(π.(price_options, (price,), (competition_params,))))
 min_profit_for_price(price_options::Vector{Float64}, competition_params::CompetitionParameters) = min_profit_for_price.(price_options, (price_options,), (competition_params,))
 
 symmetric_profit(price::Float64, competition_params::CompetitionParameters) = first(π(price, price, competition_params))
@@ -134,13 +134,14 @@ hyperparams = DDDCHyperParameters(
 profit_df = generate_profit_df(hyperparams)
 profit_df = unstack(profit_df, :label, :profit)
 
-critical_prices = [values(hyperparams.p_Bert_nash_equilibrium)..., values(hyperparams.p_monop_opt)...]
+critical_prices = vcat([[hyperparams.p_Bert_nash_equilibrium[demand], hyperparams.p_monop_opt[demand]] for demand in [:high, :low]]...)
+critical_profits = vcat([symmetric_profit([hyperparams.p_Bert_nash_equilibrium[demand], hyperparams.p_monop_opt[demand]], hyperparams.competition_params_dict[demand]) for demand in [:high, :low]]...)
 plt_1 = data(
     (
-        price = repeat(critical_prices, outer=2),
-        profit = vcat([symmetric_profit(critical_prices, hyperparams.competition_params_dict[demand]) for demand in [:high, :low]]...),
-        label = repeat(["Bertrand Nash", "Monopoly"], inner=2),
-        demand = repeat(["high", "low"], outer=2),
+        price = critical_prices,
+        profit = critical_profits,
+        label = repeat(["Bertrand Nash", "Monopoly"], outer=2),
+        demand = repeat(["high", "low"], inner=2),
     )
     ) *
     mapping(
@@ -160,7 +161,7 @@ plt = data(profit_df) *
         row = :demand => "Demand Level",
     ) *
     (visual(Scatter) + visual(LinesFill))
-draw(plt + plt_1, axis=(title="Profit Levels across Price Options", subtitle="(Solid line is profit for symmetric prices, shaded region shows range based on competitor prices)",))
+draw(plt + plt_1, axis=(title="Profit Levels across Price Options", subtitle="(Solid line is profit for symmetric prices, shaded region shows range based on competitor prices)", xlabel="Competitor's Price Choice",))
 
 
 α = Float64(0.125)
