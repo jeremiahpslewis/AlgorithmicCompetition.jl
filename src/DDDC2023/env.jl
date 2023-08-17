@@ -1,7 +1,6 @@
 using ReinforcementLearningCore
 using ReinforcementLearningBase
 
-const player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
 const player_to_index = (; Symbol(1) => 1, Symbol(2) => 2)
 const demand_to_index = (; :high => 1, :low => 2)
 
@@ -157,7 +156,7 @@ end
 
 Return the reward for the current state for player `p` as a symbol. If the episode is done, return the profit, else return `0`.
 """
-RLBase.reward(env::DDDCEnv, p::Symbol) = reward(env, player_lookup[p])
+RLBase.reward(env::DDDCEnv, p::Symbol) = reward(env, player_to_index[p])
 
 RLBase.state_space(env::DDDCEnv, ::Observation, p) = env.state_space
 

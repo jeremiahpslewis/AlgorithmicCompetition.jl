@@ -19,7 +19,7 @@ function Base.push!(
     player::Symbol,
 ) where {P<:AbstractPolicy,E<:AbstractEnv,F<:AbstractFloat}
     push!(h.rewards, reward(env, player))
-    push!(hook.demand_state_high_vect, env.is_high_demand_episode[1])
+    push!(h.demand_state_high_vect, env.is_high_demand_episode[1])
 end
 
 function Base.push!(
