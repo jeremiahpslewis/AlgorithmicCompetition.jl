@@ -247,7 +247,7 @@ end
         low_signal_quality_level = 1,
         high_signal_quality_level = 1,
         signal_quality_is_high = [false, false],
-        frequency_high_demand = 0.5,
+        frequency_high_demand = 0.9,
     )
 
     hyperparams = DDDCHyperParameters(
@@ -266,7 +266,7 @@ end
     @test mean(e_out.hook[Symbol(1)][2].rewards[e_out.hook[Symbol(1)][2].demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_high[1] atol = 1e-2
     @test mean(e_out.hook[Symbol(1)][2].rewards[.!e_out.hook[Symbol(1)][2].demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_low[1] atol = 1e-2
     @test mean(e_out.env.profit_array[:,:,:,1]) > mean(e_out.env.profit_array[:,:,:,2])
-    @test 0.45 < e_sum.percent_demand_high < 0.55
+    @test 0.85 < e_sum.percent_demand_high < 0.95
     @test all(e_sum.convergence_profit_demand_high > e_sum.convergence_profit_demand_low)
     @test all(1 .> e_sum.profit_gain .> 0)
     @test all(1 .> e_sum.profit_gain_demand_low .> 0)
