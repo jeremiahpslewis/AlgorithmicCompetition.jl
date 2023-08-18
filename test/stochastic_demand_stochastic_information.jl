@@ -24,7 +24,7 @@ end
 end
 
 @testset "initialize_price_memory" begin
-    @test length(initialize_price_memory(1:15, 2)[1]) == 2
+    @test length(initialize_price_memory(1:15, 2)) == 2
 end
 
 

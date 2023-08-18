@@ -8,6 +8,7 @@ mutable struct DDDCMemory
     prices::CartesianIndex{2}
     signals::Vector{Bool}
     demand_state::Symbol
+    reward::Vector{Float64} # NOTE: Not strictly part of the state-defining memory, but used to store reward for each player
 end
 
 """
@@ -81,15 +82,16 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
                 initialize_price_memory(price_index, p.n_players),
                 get_demand_signals(p.data_demand_digital_params, is_high_demand_prev_episode),
                 is_high_demand_prev_episode ? :high : :low,
+                [0.0,0.0],
             ),
             get_demand_signals(p.data_demand_digital_params, is_high_demand_episode), # Current demand, randomly initialized
-            is_high_demand_episode,
+            Bool[is_high_demand_episode],
             state_space,
             state_space_lookup,
             n_prices,
             n_state_space,
             Bool[false, false], # Convergence vector
-            Vector{Bool}([false]), # Episode is done indicator
+            Bool[false], # Episode is done indicator
             p.p_Bert_nash_equilibrium,
             p.p_monop_opt,
             action_space,
@@ -110,7 +112,7 @@ function RLBase.act!(env::DDDCEnv, price_tuple::CartesianIndex{2})
     demand_state = env.is_high_demand_episode[1] ? :high : :low
 
     # Reward is based on prices chosen & demand state
-    env.reward .= env.profit_array[price_tuple, :, demand_to_index[demand_state]]
+    env.memory.reward .= env.profit_array[price_tuple, :, demand_to_index[demand_state]]
 
     # Update 'memory' data for next episode
     env.memory.prices = price_tuple
@@ -122,7 +124,7 @@ function RLBase.act!(env::DDDCEnv, price_tuple::CartesianIndex{2})
 
     # Update demand signals
     env.is_high_demand_signals .=
-        get_demand_signals(env.data_demand_digital_params, is_high_demand_episode)
+        get_demand_signals(env.data_demand_digital_params, env.is_high_demand_episode[1])
     env.is_done[1] = true
 end
 
@@ -140,7 +142,7 @@ RLBase.legal_action_space_mask(env::DDDCEnv, player::Symbol) =
 RLBase.action_space(env::DDDCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
 
-RLBase.reward(env::DDDCEnv, p::Symbol) = env.is_done[1] ? env.reward[player_to_index[p]] : zero(Float64)
+RLBase.reward(env::DDDCEnv, p::Symbol) = env.is_done[1] ? env.memory.reward[player_to_index[p]] : zero(Float64)
 
 RLBase.state_space(env::DDDCEnv, ::Observation, p) = env.state_space
 

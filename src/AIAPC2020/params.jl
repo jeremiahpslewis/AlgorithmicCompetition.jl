@@ -103,5 +103,5 @@ function construct_AIAPC_action_space(price_index)
 end
 
 function initialize_price_memory(price_index, n_players::Int)
-    Vector{CartesianIndex}([CartesianIndex{2}(rand(price_index, n_players)...)])
+    CartesianIndex{2}(rand(price_index, n_players)...)
 end

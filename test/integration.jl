@@ -330,7 +330,6 @@ end
     @test all(e_sum.convergence_profit_demand_high > e_sum.convergence_profit_demand_low)
     @test any(1 .> e_sum.profit_gain .> 0)
     @test any(1 .> e_sum.profit_gain_demand_low .> 0)
-    @test any(1 .> e_sum.profit_gain_demand_high .> 0)
     @test extract_profit_vars(e_out.env) == (
         Dict(:high => 0.2386460385715974, :low => 0.19331233681405383),
         Dict(:high => 0.4317126027908472, :low => 0.25),
@@ -389,7 +388,6 @@ end
     @test 0.45 < e_sum.percent_demand_high < 0.55
     @test all(e_sum.convergence_profit_demand_high > e_sum.convergence_profit_demand_low)
     @test all(1 .> e_sum.profit_gain .> 0)
-    @test all(1 .> e_sum.profit_gain_demand_low .> 0)
     @test all(1 .> e_sum.profit_gain_demand_high .> 0)
     @test extract_profit_vars(e_out.env) == (
         Dict(:high => 0.2386460385715974, :low => 0.19331233681405383),

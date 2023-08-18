@@ -73,7 +73,7 @@ struct AIAPCEnv <: AbstractEnv
             price_index,
             p.competition_params_dict,
             p.demand_mode,
-            initialize_price_memory(price_index, p.n_players), # Memory, randomly initialized
+            CartesianIndex{2}[initialize_price_memory(price_index, p.n_players)], # Memory, randomly initialized
             state_space,
             state_space_lookup,
             n_prices,
