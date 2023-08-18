@@ -4,6 +4,12 @@ using ReinforcementLearningBase
 const player_to_index = (; Symbol(1) => 1, Symbol(2) => 2)
 const demand_to_index = (; :high => 1, :low => 2)
 
+mutable struct DDDCMemory
+    prices::CartesianIndex{2}
+    signals::Vector{Bool}
+    demand_state::Symbol
+end
+
 """
     DDDCEnv(p::AIAPCHyperParameters)
 
@@ -23,9 +29,8 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
     price_index::Vector{Int8}           # Price indices
 
     competition_params_dict::Dict{Symbol,CompetitionParameters} # Competition parameters, true = high, false = low
-    memory::Vector{CartesianIndex{2}}       # Memory vector (previous prices)
+    memory::DDDCMemory       # Memory struct (previous prices, signals, demand state)
     is_high_demand_signals::Vector{Bool}    # [true, false] if demand signal is high for player one and low for player two for a given episode
-    prev_is_high_demand_signals::Vector{Bool}    # [true, false] if demand signal is high for player one and low for player two for a given episode
     is_high_demand_episode::Vector{Bool}    # [true] if demand is high for a given episode
     state_space::Base.OneTo{Int16}          # State space
     state_space_lookup::Array{Int16,4}       # State space lookup table
@@ -58,7 +63,9 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
         profit_array =
             construct_DDDC_profit_array(price_options, p.competition_params_dict, n_players)
         state_space_lookup = construct_DDDC_state_space_lookup(action_space, n_prices)
-        is_high_demand_episode = rand(Bool, 1)
+
+        is_high_demand_prev_episode = rand(Bool)
+        is_high_demand_episode = rand(Bool)
 
         new(
             p.α,
@@ -70,9 +77,12 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
             p.price_options,
             price_index,
             p.competition_params_dict,
-            initialize_price_memory(price_index, p.n_players), # Memory, randomly initialized
-            get_demand_signals(p.data_demand_digital_params, is_high_demand_episode[1]), # Current demand, randomly initialized
-            get_demand_signals(p.data_demand_digital_params, is_high_demand_episode[1]), # Previous demand, randomly initialized
+            DDDCMemory( # Memory, randomly initialized
+                initialize_price_memory(price_index, p.n_players),
+                get_demand_signals(p.data_demand_digital_params, is_high_demand_prev_episode),
+                demand_to_index[is_high_demand_prev_episode],
+            ),
+            get_demand_signals(p.data_demand_digital_params, is_high_demand_episode), # Current demand, randomly initialized
             is_high_demand_episode,
             state_space,
             state_space_lookup,
@@ -97,10 +107,22 @@ Act in the environment by setting the memory to the given price tuple and settin
 """
 function RLBase.act!(env::DDDCEnv, price_tuple::CartesianIndex{2})
     # TODO: Fix support for longer memories
-    memory_index = env.memory[1]
     demand_state = env.is_high_demand_episode[1] ? :high : :low
-    env.reward .= env.profit_array[memory_index, :, demand_to_index[demand_state]]
-    env.memory[1] = price_tuple
+
+    # Reward is based on prices chosen & demand state
+    env.reward .= env.profit_array[price_tuple, :, demand_to_index[demand_state]]
+
+    # Update 'memory' data for next episode
+    env.memory.prices = price_tuple
+    env.memory.signals = env.is_high_demand_signals
+    env.memory.demand_state = demand_state
+
+    # Determine whether next episode is a high demand episode and update
+    env.is_high_demand_episode[1] = get_demand_level(env.data_demand_digital_params)
+
+    # Update demand signals
+    env.is_high_demand_signals .=
+        get_demand_signals(env.data_demand_digital_params, is_high_demand_episode)
     env.is_done[1] = true
 end
 
@@ -131,13 +153,13 @@ RLBase.state(env::DDDCEnv) = nothing
 Return the current state as an integer, mapped from the environment memory.
 """
 function RLBase.state(env::DDDCEnv, p::Symbol)
-    memory_index = env.memory[1]
+    memory_index = env.memory.prices
     # State is defined by memory, as in AIAPC, plus demand signal given to a player
     index_ = player_to_index[p]
     _is_high_demand_signal = env.is_high_demand_signals[index_]
     _demand_signal = _is_high_demand_signal ? :high : :low
     demand_signal_index = demand_to_index[_demand_signal]
-    _prev_is_high_demand_signal = env.prev_is_high_demand_signals[index_]
+    _prev_is_high_demand_signal = env.memory.signals[index_]
     _prev_demand_signal = _prev_is_high_demand_signal ? :high : :low
     prev_demand_signal_index = demand_to_index[_prev_demand_signal]
 
@@ -155,17 +177,6 @@ RLBase.is_terminated(env::DDDCEnv) = env.is_done[1]
 
 function RLBase.reset!(env::DDDCEnv)
     env.is_done[1] = false
-
-    # Determine whether next episode is a high demand episode
-    is_high_demand_episode = get_demand_level(env.data_demand_digital_params)
-
-    # Update demand signals
-    env.prev_is_high_demand_signals .= env.is_high_demand_signals
-    env.is_high_demand_signals .=
-        get_demand_signals(env.data_demand_digital_params, is_high_demand_episode)
-
-    # Update demand level
-    env.is_high_demand_episode[1] = is_high_demand_episode
 end
 
 RLBase.players(::DDDCEnv) = (Symbol(1), Symbol(2))
