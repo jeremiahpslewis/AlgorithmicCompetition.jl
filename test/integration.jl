@@ -260,18 +260,12 @@ end
         convergence_threshold = Int(1e5),
     )
 
-    e_out = run(hyperparams; stop_on_convergence = true)
-    @test e_out.hook[Symbol(1)][2].demand_state_high_vect[end] ==
-          e_out.env.is_high_demand_episode[1]
-    @test mean(
-        e_out.hook[Symbol(1)][2].rewards[e_out.hook[Symbol(1)][2].demand_state_high_vect],
-    ) ≈ e_sum.convergence_profit_demand_high[1] atol = 1e-2
-    @test mean(
-        e_out.hook[Symbol(1)][2].rewards[.!e_out.hook[Symbol(1)][2].demand_state_high_vect],
-    ) ≈ e_sum.convergence_profit_demand_low[1] atol = 1e-2
-    @test mean(e_out.env.profit_array[:, :, :, 1]) >
-          mean(e_out.env.profit_array[:, :, :, 2])
+    e_out = run(hyperparams; stop_on_convergence = true);
     e_sum = economic_summary(e_out)
+    @test e_out.hook[Symbol(1)][2].demand_state_high_vect[end] ==  e_out.env.is_high_demand_episode[1]
+    @test mean(e_out.hook[Symbol(1)][2].rewards[e_out.hook[Symbol(1)][2].demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_high[1] atol = 1e-2
+    @test mean(e_out.hook[Symbol(1)][2].rewards[.!e_out.hook[Symbol(1)][2].demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_low[1] atol = 1e-2
+    @test mean(e_out.env.profit_array[:,:,:,1]) > mean(e_out.env.profit_array[:,:,:,2])
     @test 0.45 < e_sum.percent_demand_high < 0.55
     @test all(e_sum.convergence_profit_demand_high > e_sum.convergence_profit_demand_low)
     @test all(1 .> e_sum.profit_gain .> 0)
@@ -282,7 +276,8 @@ end
         Dict(:high => 0.4317126027908472, :low => 0.25),
     )
 
-    extract_quantity_vars(e_out.env)
+    @test extract_quantity_vars(e_out.env)[1][:high] > extract_quantity_vars(e_out.env)[1][:low]
+    @test extract_quantity_vars(e_out.env)[2][:high] > extract_quantity_vars(e_out.env)[2][:low]
 end
 
 @testset "run full AIAPC simulation" begin

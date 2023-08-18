@@ -44,6 +44,8 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
 
     data_demand_digital_params::DataDemandDigitalParams # Parameters for Data/Demand/Digital AIAPC extension
 
+    reward::
+
     function DDDCEnv(p::DDDCHyperParameters)
         price_options = Vector{Float64}(p.price_options)
         n_prices = length(p.price_options)
@@ -94,6 +96,9 @@ Act in the environment by setting the memory to the given price tuple and settin
 """
 function RLBase.act!(env::DDDCEnv, price_tuple::CartesianIndex{2})
     # TODO: Fix support for longer memories
+    memory_index = env.memory[1]
+    demand_state = env.is_high_demand_episode[1] ? :high : :low
+    env.reward .= env.profit_array[memory_index, :, demand_to_index[demand_state]]
     env.memory[1] = price_tuple
     env.is_done[1] = true
 end
@@ -111,52 +116,8 @@ RLBase.legal_action_space_mask(env::DDDCEnv, player::Symbol) =
 
 RLBase.action_space(env::DDDCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
-"""
-    RLBase.reward(env::DDDCEnv)
 
-Return the reward for the current state. If the episode is done, return the profit, else return `0, 0`.
-"""
-function RLBase.reward(env::DDDCEnv)
-    memory_index = env.memory[1]
-    if env.is_done[1]
-        return env.profit_array[memory_index, :, demand_to_index[env.demand_signal]]
-    else
-        return zero(Float64), zero(Float64)
-    end
-end
-
-"""
-    RLBase.reward(env::DDDCEnv, p::Int)
-
-Return the reward for the current state for player `p` as an integer. If the episode is done, return the profit, else return `0`.
-"""
-function RLBase.reward(env::DDDCEnv, p::Int)
-    profit_array = env.profit_array
-    memory_index = env.memory[1]
-    return _reward(profit_array, memory_index, env.is_high_demand_episode[1], p)
-end
-
-function _reward(
-    profit::Array{Float64,4},
-    memory_index::CartesianIndex{2},
-    is_high_demand_episode::Bool,
-    p::Int,
-)
-    if is_high_demand_episode
-        demand_index_ = 2
-    else
-        demand_index_ = 1
-    end
-
-    return profit[memory_index, p, demand_index_]
-end
-
-"""
-    RLBase.reward(env::DDDCEnv, p::Int)
-
-Return the reward for the current state for player `p` as a symbol. If the episode is done, return the profit, else return `0`.
-"""
-RLBase.reward(env::DDDCEnv, p::Symbol) = reward(env, player_to_index[p])
+RLBase.reward(env::DDDCEnv, p::Symbol) = env.is_done[1] ? env.reward[player_to_index[p]] : zero(Float64)
 
 RLBase.state_space(env::DDDCEnv, ::Observation, p) = env.state_space
 
