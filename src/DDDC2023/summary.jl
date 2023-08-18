@@ -83,7 +83,7 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
     is_converged = Bool[]
 
     convergence_profit = get_convergence_profit_from_hook(hook)
-        
+
 
     for i in (Symbol(1), Symbol(2))
         push!(is_converged, hook[i][1].is_converged)
@@ -118,12 +118,14 @@ function get_convergence_profit_from_hook(hook::AbstractHook)
     demand_high = hook[Symbol(1)][2].demand_state_high_vect
     return Dict(
         :all => [mean(hook[p][2].rewards[101:end]) for p in [Symbol(1), Symbol(2)]],
-    :high => [
-        mean(hook[p][2].rewards[101:end][demand_high[101:end]]) for p in [Symbol(1), Symbol(2)]
-    ],
-    :low => [
-        mean(hook[p][2].rewards[101:end][.!demand_high[101:end]]) for p in [Symbol(1), Symbol(2)]
-    ]
+        :high => [
+            mean(hook[p][2].rewards[101:end][demand_high[101:end]]) for
+            p in [Symbol(1), Symbol(2)]
+        ],
+        :low => [
+            mean(hook[p][2].rewards[101:end][.!demand_high[101:end]]) for
+            p in [Symbol(1), Symbol(2)]
+        ],
     )
 end
 
