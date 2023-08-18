@@ -44,7 +44,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
 
     data_demand_digital_params::DataDemandDigitalParams # Parameters for Data/Demand/Digital AIAPC extension
 
-    reward::
+    reward::Vector{Float64}
 
     function DDDCEnv(p::DDDCHyperParameters)
         price_options = Vector{Float64}(p.price_options)
@@ -85,6 +85,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
             action_space,
             profit_array,
             p.data_demand_digital_params,
+            Float64[0.0, 0.0],
         )
     end
 end
