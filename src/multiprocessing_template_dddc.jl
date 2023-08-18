@@ -16,7 +16,7 @@ if Sys.isapple()
 else
     n_procs_ = 63
 
-    n_parameter_iterations = 5
+    n_parameter_iterations = 2
     n_grid_increments = 10
 end
 
