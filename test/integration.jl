@@ -225,7 +225,67 @@ end
 
 end
 
-@testset "run full DDDC simulation" begin
+@testset "run full DDDC simulation low-low" begin
+    α = Float64(0.125)
+    β = Float64(4e-1)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = Int(1e6)
+    price_index = 1:n_prices
+
+    competition_params_dict = Dict(
+        :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
+        :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
+    )
+
+    competition_solution_dict =
+        Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+
+    data_demand_digital_params = DataDemandDigitalParams(
+        low_signal_quality_level = 1,
+        high_signal_quality_level = 1,
+        signal_quality_is_high = [false, false],
+        frequency_high_demand = 0.5,
+    )
+
+    hyperparams = DDDCHyperParameters(
+        α,
+        β,
+        δ,
+        max_iter,
+        competition_solution_dict,
+        data_demand_digital_params;
+        convergence_threshold = Int(1e5),
+    )
+
+    e_out = run(hyperparams; stop_on_convergence = true);
+    e_sum = economic_summary(e_out)
+    @test e_out.hook[Symbol(1)][2].demand_state_high_vect[end] ==  (e_out.env.memory.demand_state == :high)
+    @test mean(e_out.hook[Symbol(1)][2].rewards[e_out.hook[Symbol(1)][2].demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_high[1] atol = 1e-2
+    @test mean(e_out.hook[Symbol(1)][2].rewards[.!e_out.hook[Symbol(1)][2].demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_low[1] atol = 1e-2
+    @test mean(e_out.env.profit_array[:,:,:,1]) > mean(e_out.env.profit_array[:,:,:,2])
+    @test 0.45 < e_sum.percent_demand_high < 0.55
+    @test all(e_sum.convergence_profit_demand_high > e_sum.convergence_profit_demand_low)
+    @test all(1 .> e_sum.profit_gain .> 0)
+    @test all(1 .> e_sum.profit_gain_demand_low .> 0)
+    @test all(1 .> e_sum.profit_gain_demand_high .> 0)
+    @test extract_profit_vars(e_out.env) == (
+        Dict(:high => 0.2386460385715974, :low => 0.19331233681405383),
+        Dict(:high => 0.4317126027908472, :low => 0.25),
+    )
+
+    @test extract_profit_vars(e_out.env) == (
+        Dict(:high => 0.2386460385715974, :low => 0.19331233681405383),
+        Dict(:high => 0.4317126027908472, :low => 0.25),
+    )
+
+    @test extract_quantity_vars(e_out.env)[1][:high] > extract_quantity_vars(e_out.env)[1][:low]
+    @test extract_quantity_vars(e_out.env)[2][:high] > extract_quantity_vars(e_out.env)[2][:low]
+end
+
+@testset "run full DDDC simulation high-low" begin
     α = Float64(0.125)
     β = Float64(4e-1)
     δ = 0.95
@@ -262,7 +322,67 @@ end
 
     e_out = run(hyperparams; stop_on_convergence = true);
     e_sum = economic_summary(e_out)
-    @test e_out.hook[Symbol(1)][2].demand_state_high_vect[end] ==  e_out.env.is_high_demand_episode[1]
+    @test e_out.hook[Symbol(1)][2].demand_state_high_vect[end] ==  (e_out.env.memory.demand_state == :high)
+    @test mean(e_out.hook[Symbol(1)][2].rewards[e_out.hook[Symbol(1)][2].demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_high[1] atol = 1e-2
+    @test mean(e_out.hook[Symbol(1)][2].rewards[.!e_out.hook[Symbol(1)][2].demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_low[1] atol = 1e-2
+    @test mean(e_out.env.profit_array[:,:,:,1]) > mean(e_out.env.profit_array[:,:,:,2])
+    @test 0.45 < e_sum.percent_demand_high < 0.55
+    @test all(e_sum.convergence_profit_demand_high > e_sum.convergence_profit_demand_low)
+    @test any(1 .> e_sum.profit_gain .> 0)
+    @test any(1 .> e_sum.profit_gain_demand_low .> 0)
+    @test any(1 .> e_sum.profit_gain_demand_high .> 0)
+    @test extract_profit_vars(e_out.env) == (
+        Dict(:high => 0.2386460385715974, :low => 0.19331233681405383),
+        Dict(:high => 0.4317126027908472, :low => 0.25),
+    )
+
+    @test extract_profit_vars(e_out.env) == (
+        Dict(:high => 0.2386460385715974, :low => 0.19331233681405383),
+        Dict(:high => 0.4317126027908472, :low => 0.25),
+    )
+
+    @test extract_quantity_vars(e_out.env)[1][:high] > extract_quantity_vars(e_out.env)[1][:low]
+    @test extract_quantity_vars(e_out.env)[2][:high] > extract_quantity_vars(e_out.env)[2][:low]
+end
+
+@testset "run full DDDC simulation high-high" begin
+    α = Float64(0.125)
+    β = Float64(4e-1)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = Int(1e6)
+    price_index = 1:n_prices
+
+    competition_params_dict = Dict(
+        :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
+        :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
+    )
+
+    competition_solution_dict =
+        Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+
+    data_demand_digital_params = DataDemandDigitalParams(
+        low_signal_quality_level = 1,
+        high_signal_quality_level = 1,
+        signal_quality_is_high = [true, true],
+        frequency_high_demand = 0.5,
+    )
+
+    hyperparams = DDDCHyperParameters(
+        α,
+        β,
+        δ,
+        max_iter,
+        competition_solution_dict,
+        data_demand_digital_params;
+        convergence_threshold = Int(1e5),
+    )
+
+    e_out = run(hyperparams; stop_on_convergence = true);
+    e_sum = economic_summary(e_out)
+    @test e_out.hook[Symbol(1)][2].demand_state_high_vect[end] ==  (e_out.env.memory.demand_state == :high)
     @test mean(e_out.hook[Symbol(1)][2].rewards[e_out.hook[Symbol(1)][2].demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_high[1] atol = 1e-2
     @test mean(e_out.hook[Symbol(1)][2].rewards[.!e_out.hook[Symbol(1)][2].demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_low[1] atol = 1e-2
     @test mean(e_out.env.profit_array[:,:,:,1]) > mean(e_out.env.profit_array[:,:,:,2])
