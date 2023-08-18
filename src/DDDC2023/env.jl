@@ -158,9 +158,11 @@ function RLBase.state(env::DDDCEnv, p::Symbol)
     memory_index = env.memory.prices
     # State is defined by memory, as in AIAPC, plus demand signal given to a player
     index_ = player_to_index[p]
+
     _is_high_demand_signal = env.is_high_demand_signals[index_]
     _demand_signal = _is_high_demand_signal ? :high : :low
     demand_signal_index = demand_to_index[_demand_signal]
+
     _prev_is_high_demand_signal = env.memory.signals[index_]
     _prev_demand_signal = _prev_is_high_demand_signal ? :high : :low
     prev_demand_signal_index = demand_to_index[_prev_demand_signal]
