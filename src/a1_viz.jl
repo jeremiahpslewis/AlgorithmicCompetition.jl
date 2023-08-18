@@ -19,12 +19,12 @@ competition_solution_dict =
     Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
 hyperparams = AIAPCHyperParameters(
-        Float64(0.1),
-        Float64(1e-4),
-        0.95,
-        Int(1e7),
-        competition_solution_dict,
-    )
+    Float64(0.1),
+    Float64(1e-4),
+    0.95,
+    Int(1e7),
+    competition_solution_dict,
+)
 env = AIAPCEnv(hyperparams)
 
 df_summary = @chain df begin
@@ -37,7 +37,14 @@ df_summary = @chain df begin
 end
 
 plt0 = draw_price_diagnostic(hyperparams)
-draw(plt0, axis=(title="Profit Levels across Price Options", subtitle="(Solid line is profit for symmetric prices, shaded region shows range based on price options)", xlabel="Competitor's Price Choice",))
+draw(
+    plt0,
+    axis = (
+        title = "Profit Levels across Price Options",
+        subtitle = "(Solid line is profit for symmetric prices, shaded region shows range based on price options)",
+        xlabel = "Competitor's Price Choice",
+    ),
+)
 
 
 plt1 = @chain df_summary begin

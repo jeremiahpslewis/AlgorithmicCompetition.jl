@@ -8,7 +8,13 @@ using Statistics
 using Test
 
 using AlgorithmicCompetition:
-    post_prob_high_low_given_signal, post_prob_high_low_given_both_signals, draw_price_diagnostic, CompetitionParameters, CompetitionSolution, DataDemandDigitalParams, DDDCHyperParameters
+    post_prob_high_low_given_signal,
+    post_prob_high_low_given_both_signals,
+    draw_price_diagnostic,
+    CompetitionParameters,
+    CompetitionSolution,
+    DataDemandDigitalParams,
+    DDDCHyperParameters
 
 folder_name = "v0.0.2_data"
 
@@ -535,7 +541,14 @@ hyperparams = DDDCHyperParameters(
 )
 
 plt = draw_price_diagnostic(hyperparams)
-f6 = draw(plt, axis=(title="Profit Levels across Price Options", subtitle="(Solid line is profit for symmetric prices, shaded region shows range based on price options)", xlabel="Competitor's Price Choice",))
+f6 = draw(
+    plt,
+    axis = (
+        title = "Profit Levels across Price Options",
+        subtitle = "(Solid line is profit for symmetric prices, shaded region shows range based on price options)",
+        xlabel = "Competitor's Price Choice",
+    ),
+)
 save("plots/plot_6.svg", f6)
 
 # TODO: Look into different levels of low signal quality, whether the 'drop-off' happens subtly or abruptly

@@ -37,22 +37,22 @@ end
     n_prices = 15
     max_iter = Int(1e6) # 1e8
     price_index = 1:n_prices
-    
+
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
     )
-    
+
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
-    
+
     data_demand_digital_params = DataDemandDigitalParams(
         low_signal_quality_level = 0.99,
         high_signal_quality_level = 0.995,
         signal_quality_is_high = [true, false],
         frequency_high_demand = 0.9,
     )
-    
+
     hyperparams = DDDCHyperParameters(
         α,
         β,
@@ -62,12 +62,26 @@ end
         data_demand_digital_params;
         convergence_threshold = Int(1e5),
     )
-    
-    
-    env = DDDCEnv(hyperparams)    
+
+
+    env = DDDCEnv(hyperparams)
     for demand in [:high, :low]
-        @test profit_gain(π(env.p_monop_opt[demand], env.p_monop_opt[demand], env.competition_params_dict[demand])[1], env)[demand] == 1
-        @test profit_gain(π(env.p_Bert_nash_equilibrium[demand], env.p_Bert_nash_equilibrium[demand], env.competition_params_dict[demand])[1], env)[demand] == 0
+        @test profit_gain(
+            π(
+                env.p_monop_opt[demand],
+                env.p_monop_opt[demand],
+                env.competition_params_dict[demand],
+            )[1],
+            env,
+        )[demand] == 1
+        @test profit_gain(
+            π(
+                env.p_Bert_nash_equilibrium[demand],
+                env.p_Bert_nash_equilibrium[demand],
+                env.competition_params_dict[demand],
+            )[1],
+            env,
+        )[demand] == 0
     end
 end
 
@@ -247,10 +261,16 @@ end
     )
 
     e_out = run(hyperparams; stop_on_convergence = true)
-    @test e_out.hook[Symbol(1)][2].demand_state_high_vect[end] ==  e_out.env.is_high_demand_episode[1]
-    @test mean(e_out.hook[Symbol(1)][2].rewards[e_out.hook[Symbol(1)][2].demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_high[1] atol = 1e-2
-    @test mean(e_out.hook[Symbol(1)][2].rewards[.!e_out.hook[Symbol(1)][2].demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_low[1] atol = 1e-2
-    @test mean(e_out.env.profit_array[:,:,:,1]) > mean(e_out.env.profit_array[:,:,:,2])
+    @test e_out.hook[Symbol(1)][2].demand_state_high_vect[end] ==
+          e_out.env.is_high_demand_episode[1]
+    @test mean(
+        e_out.hook[Symbol(1)][2].rewards[e_out.hook[Symbol(1)][2].demand_state_high_vect],
+    ) ≈ e_sum.convergence_profit_demand_high[1] atol = 1e-2
+    @test mean(
+        e_out.hook[Symbol(1)][2].rewards[.!e_out.hook[Symbol(1)][2].demand_state_high_vect],
+    ) ≈ e_sum.convergence_profit_demand_low[1] atol = 1e-2
+    @test mean(e_out.env.profit_array[:, :, :, 1]) >
+          mean(e_out.env.profit_array[:, :, :, 2])
     e_sum = economic_summary(e_out)
     @test 0.45 < e_sum.percent_demand_high < 0.55
     @test all(e_sum.convergence_profit_demand_high > e_sum.convergence_profit_demand_low)
