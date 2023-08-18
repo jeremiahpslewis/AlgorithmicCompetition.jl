@@ -42,6 +42,8 @@ struct AIAPCEnv <: AbstractEnv
     action_space::Tuple                     # Action space
     profit_array::Array{Float64,3}          # Profit given price pair as coordinates
 
+    reward::Vector{Float64}                 # Reward vector
+
     function AIAPCEnv(p::AIAPCHyperParameters)
         price_options = Vector{Float64}(p.price_options)
         n_prices = length(p.price_options)
@@ -82,6 +84,7 @@ struct AIAPCEnv <: AbstractEnv
             p.p_monop_opt,
             action_space,
             profit_array,
+            Float64[0.0, 0.0], # Reward vector
         )
     end
 end
@@ -93,6 +96,9 @@ Act in the environment by setting the memory to the given price tuple and settin
 """
 function RLBase.act!(env::AIAPCEnv, price_tuple::CartesianIndex{2})
     # TODO: Fix support for longer memories
+    memory_index = env.memory[1]
+    env.reward .= env.profit_array[memory_index, :]
+
     env.memory[1] = price_tuple
     env.is_done[1] = true
 end
@@ -116,12 +122,7 @@ RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 Return the reward for the current state. If the episode is done, return the profit, else return `0, 0`.
 """
 function RLBase.reward(env::AIAPCEnv)
-    memory_index = env.memory[1]
-    if env.is_done[1]
-        return env.profit_array[memory_index, 1], env.profit_array[memory_index, 2]
-    else
-        return zero(Float64), zero(Float64)
-    end
+    env.is_done[1] ? env.reward : (zero(Float64), zero(Float64))
 end
 
 """
@@ -130,14 +131,7 @@ end
 Return the reward for the current state for player `p` as an integer. If the episode is done, return the profit, else return `0`.
 """
 function RLBase.reward(env::AIAPCEnv, p::Int)
-    profit_array = env.profit_array
-    memory_index = env.memory[1]
-    return _reward(profit_array, memory_index, p)
-end
-
-function _reward(profit::Array{Float64,3}, memory_index::CartesianIndex{2}, p::Int)
-
-    return profit[memory_index, p]
+    return env.reward[p]
 end
 
 """
