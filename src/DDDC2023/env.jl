@@ -80,7 +80,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
             DDDCMemory( # Memory, randomly initialized
                 initialize_price_memory(price_index, p.n_players),
                 get_demand_signals(p.data_demand_digital_params, is_high_demand_prev_episode),
-                demand_to_index[is_high_demand_prev_episode],
+                is_high_demand_prev_episode ? :high : :low,
             ),
             get_demand_signals(p.data_demand_digital_params, is_high_demand_episode), # Current demand, randomly initialized
             is_high_demand_episode,
