@@ -5,19 +5,19 @@ using CSV
 using Distributed
 using Dates
 
-version = 0.2
+version = 0.3
 start_timestamp = now()
 
 if Sys.isapple()
     n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
 
-    n_parameter_iterations = 15
-    n_grid_increments = 25
+    n_parameter_iterations = 1
+    n_grid_increments = 10
 else
     n_procs_ = 63
 
     n_parameter_iterations = 5
-    n_grid_increments = 25
+    n_grid_increments = 10
 end
 
 _procs = addprocs(

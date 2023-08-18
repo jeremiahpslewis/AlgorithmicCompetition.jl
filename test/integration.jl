@@ -276,6 +276,11 @@ end
         Dict(:high => 0.4317126027908472, :low => 0.25),
     )
 
+    @test extract_profit_vars(env) == (
+        Dict(:high => 0.2386460385715974, :low => 0.19331233681405383),
+        Dict(:high => 0.4317126027908472, :low => 0.25),
+    )
+
     @test extract_quantity_vars(e_out.env)[1][:high] > extract_quantity_vars(e_out.env)[1][:low]
     @test extract_quantity_vars(e_out.env)[2][:high] > extract_quantity_vars(e_out.env)[2][:low]
 end
