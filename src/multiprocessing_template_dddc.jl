@@ -5,7 +5,7 @@ using CSV
 using Distributed
 using Dates
 
-version = 0.4
+version = 0.5
 start_timestamp = now()
 
 if Sys.isapple()
@@ -16,7 +16,7 @@ if Sys.isapple()
 else
     n_procs_ = 63
 
-    n_parameter_iterations = 75
+    n_parameter_iterations = 2
     n_grid_increments = 10
 end
 

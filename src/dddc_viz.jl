@@ -14,7 +14,8 @@ using AlgorithmicCompetition:
     CompetitionParameters,
     CompetitionSolution,
     DataDemandDigitalParams,
-    DDDCHyperParameters
+    DDDCHyperParameters,
+    draw_price_diagnostic
 
 folder_name = "v0.0.4_data"
 

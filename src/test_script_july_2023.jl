@@ -111,8 +111,6 @@ extract_price_vs_demand_signal_counterfactuals(
                    env.n_prices,
                )
 
-
-
 economic_summary(ex)
 extract_sim_results([economic_summary(ex)])
 # @report_opt Base.push!(
