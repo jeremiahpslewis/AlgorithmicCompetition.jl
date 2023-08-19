@@ -253,11 +253,17 @@ function extract_price_vs_demand_signal_counterfactuals(
         [:memory_index, :price_given_high_demand_signal, :price_given_low_demand_signal],
     )
 
-    price_mse = mse(
-        price_counterfactual_df[!, :price_given_high_demand_signal],
-        price_counterfactual_df[!, :price_given_low_demand_signal],
-    )
-
+    # NOTE: mse is calculated only over the states explored by the agent for both signal levels
+    price_mse = @chain price_counterfactual_df begin
+        @subset(
+            (:price_given_high_demand_signal != 0) &
+            (:price_given_low_demand_signal != 0)
+        )
+        mse(
+            :price_given_high_demand_signal,
+            :price_given_low_demand_signal,
+        )
+    end
     return price_mse, price_counterfactual_df
 end
 
