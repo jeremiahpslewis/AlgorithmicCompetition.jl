@@ -34,7 +34,7 @@
     @test 0.0625 == Q!(app, 1, 1, 1, 0.125, 0.5, 0.95)
 end
 
-@testset "Q_i_0" begin
+@testset "Q_i_0 AIAPC" begin
     α = Float64(0.125)
     β = Float64(1)
     δ = 0.95
@@ -65,6 +65,48 @@ end
 
     @test minimum(test_prices) ≈ 4.111178690372623 atol = 0.001
     @test maximum(test_prices) ≈ 6.278004857861001 atol = 0.001
+end
+
+@testset "Q_i_0 DDDC" begin
+    α = Float64(0.125)
+    β = Float64(4e-1)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = Int(1e6) # 1e8
+    price_index = 1:n_prices
+    
+    competition_params_dict = Dict(
+        :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
+    )
+    
+    competition_solution_dict =
+        Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+    
+    data_demand_digital_params = DataDemandDigitalParams(
+        low_signal_quality_level = 0.5,
+        high_signal_quality_level = 0.5,
+        signal_quality_is_high = [true, false],
+        frequency_high_demand = 0.5,
+    )
+    
+    hyperparams = DDDCHyperParameters(
+        α,
+        β,
+        δ,
+        max_iter,
+        competition_solution_dict,
+        data_demand_digital_params;
+        convergence_threshold = Int(1e5),
+    )
+    
+    
+    env = DDDCEnv(hyperparams)
+
+    @test minimum(Q_i_0(env)) == 0.2003206598478015
+    @test maximum(Q_i_0(env)) == 0.3694013307458184
 end
 
 @testset "Q" begin
