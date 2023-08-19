@@ -183,6 +183,9 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
     price_response_to_demand_signal_mse =
         [ex.price_response_to_demand_signal_mse for ex in exp_list if !(ex isa Exception)]
 
+    percent_unexplored_states =
+        [ex.percent_unexplored_states for ex in exp_list if !(ex isa Exception)]
+
     df = DataFrame(
         α = α_result,
         β = β_result,
@@ -203,6 +206,7 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
         frequency_high_demand = frequency_high_demand,
         price_response_to_demand_signal_mse = price_response_to_demand_signal_mse,
         percent_demand_high = percent_demand_high,
+        percent_unexplored_states = percent_unexplored_states,
     )
     return df
 end
