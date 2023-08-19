@@ -163,12 +163,12 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
         [ex.profit_gain_demand_low for ex in exp_list if !(ex isa Exception)]
 
     is_converged = [ex.is_converged for ex in exp_list if !(ex isa Exception)]
-    low_signal_quality_level = [
-        ex.data_demand_digital_params.low_signal_quality_level for
+    weak_signal_quality_level = [
+        ex.data_demand_digital_params.weak_signal_quality_level for
         ex in exp_list if !(ex isa Exception)
     ]
-    high_signal_quality_level = [
-        ex.data_demand_digital_params.high_signal_quality_level for
+    strong_signal_quality_level = [
+        ex.data_demand_digital_params.strong_signal_quality_level for
         ex in exp_list if !(ex isa Exception)
     ]
     signal_quality_is_high = [
@@ -200,8 +200,8 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
         convergence_profit_demand_low = convergence_profit_demand_low,
         iterations_until_convergence = iterations_until_convergence,
         is_converged = is_converged,
-        low_signal_quality_level = low_signal_quality_level,
-        high_signal_quality_level = high_signal_quality_level,
+        weak_signal_quality_level = weak_signal_quality_level,
+        strong_signal_quality_level = strong_signal_quality_level,
         signal_quality_is_high = signal_quality_is_high,
         frequency_high_demand = frequency_high_demand,
         price_response_to_demand_signal_mse = price_response_to_demand_signal_mse,

@@ -6,14 +6,14 @@
 # env.frequency_high_demand = 0.5
 # env.demand_level_is_high = true / false
 # env.high_demand_signal = [true, false]
-# env.high_signal_quality_level = 0.3 # high signal quality -> additive deviation from coin flip zero information signal
-# env.low_signal_quality_level = 0.1 # low signal quality -> base deviation from coin flip zero information signal
+# env.strong_signal_quality_level = 0.3 # high signal quality -> additive deviation from coin flip zero information signal
+# env.weak_signal_quality_level = 0.1 # low signal quality -> base deviation from coin flip zero information signal
 
 using Flux
 
 @kwdef struct DataDemandDigitalParams
-    low_signal_quality_level::Float64 = 0.5 # probability of true signal (0.5 is lowest possible vale)
-    high_signal_quality_level::Float64 = 1.0 # probability of true signal (0.5 is lowest possible vale)
+    weak_signal_quality_level::Float64 = 0.5 # probability of true signal (0.5 is lowest possible vale)
+    strong_signal_quality_level::Float64 = 1.0 # probability of true signal (0.5 is lowest possible vale)
     signal_quality_is_high::Vector{Bool} = [false, false] # true if signal quality is high
     frequency_high_demand::Float64 = 0.5 # probability of high demand for a given episode
 end
@@ -28,12 +28,12 @@ get_demand_level(d::DataDemandDigitalParams) = get_demand_level(d.frequency_high
 function get_demand_signals(
     demand_level_is_high::Bool,
     signal_quality_is_high::Vector{Bool},
-    low_signal_quality_level::Float64,
-    high_signal_quality_level::Float64,
+    weak_signal_quality_level::Float64,
+    strong_signal_quality_level::Float64,
 )
     true_signal_probability =
-        (low_signal_quality_level .* .!signal_quality_is_high) .+
-        (high_signal_quality_level .* signal_quality_is_high)
+        (weak_signal_quality_level .* .!signal_quality_is_high) .+
+        (strong_signal_quality_level .* signal_quality_is_high)
 
     # Probability of true signal is a function of true signal probability
     reveal_true_signal = rand(2) .< true_signal_probability
@@ -48,8 +48,8 @@ function get_demand_signals(d::DataDemandDigitalParams, is_high_demand_episode::
     get_demand_signals(
         is_high_demand_episode,
         d.signal_quality_is_high,
-        d.low_signal_quality_level,
-        d.high_signal_quality_level,
+        d.weak_signal_quality_level,
+        d.strong_signal_quality_level,
     )
 end
 

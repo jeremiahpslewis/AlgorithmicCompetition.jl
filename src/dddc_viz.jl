@@ -38,7 +38,7 @@ df__ = @chain df_ begin
         :percent_unexplored_states = eval(Meta.parse(:percent_unexplored_states)),
     )
     @transform!(
-        @subset((:frequency_high_demand == 1) & (:low_signal_quality_level == 1)),
+        @subset((:frequency_high_demand == 1) & (:weak_signal_quality_level == 1)),
         :price_response_to_demand_signal_mse = missing
     )
 end
@@ -48,57 +48,57 @@ df___ = @chain df__ begin
     @transform(:profit_mean = mean(:profit_vect))
     @transform(:percent_unexplored_states = mean(:percent_unexplored_states))
     @transform(
-        :percent_unexplored_states_demand_low_low_signal_player =
+        :percent_unexplored_states_demand_low_weak_signal_player =
             (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
             (:frequency_high_demand == 1) ? missing :
             :percent_unexplored_states[:signal_quality_is_low_vect][1],
     )
     @transform(
-        :percent_unexplored_states_demand_low_high_signal_player =
+        :percent_unexplored_states_demand_low_strong_signal_player =
             (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
             (:frequency_high_demand == 1) ? missing :
             :percent_unexplored_states[:signal_quality_is_high_vect][1],
     )
     @transform(
-        :percent_unexplored_states_demand_high_low_signal_player =
+        :percent_unexplored_states_demand_high_weak_signal_player =
             (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
             :percent_unexplored_states[:signal_quality_is_low_vect][1],
     )
     @transform(
-        :percent_unexplored_states_demand_high_high_signal_player =
+        :percent_unexplored_states_demand_high_strong_signal_player =
             (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
             :percent_unexplored_states[:signal_quality_is_high_vect][1],
     )
     @transform(
-        :profit_gain_demand_low_low_signal_player =
+        :profit_gain_demand_low_weak_signal_player =
             (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
             (:frequency_high_demand == 1) ? missing :
             :profit_gain_demand_low[:signal_quality_is_low_vect][1],
     )
     @transform(
-        :profit_gain_demand_low_high_signal_player =
+        :profit_gain_demand_low_strong_signal_player =
             (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
             (:frequency_high_demand == 1) ? missing :
             :profit_gain_demand_low[:signal_quality_is_high_vect][1],
     )
     @transform(
-        :profit_gain_demand_high_low_signal_player =
+        :profit_gain_demand_high_weak_signal_player =
             (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
             :profit_gain_demand_high[:signal_quality_is_low_vect][1],
     )
     @transform(
-        :profit_gain_demand_high_high_signal_player =
+        :profit_gain_demand_high_strong_signal_player =
             (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
             :profit_gain_demand_high[:signal_quality_is_high_vect][1],
     )
 
     @transform(
-        :profit_gain_low_signal_player =
+        :profit_gain_weak_signal_player =
             (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
             :profit_gain[:signal_quality_is_low_vect][1],
     )
     @transform(
-        :profit_gain_high_signal_player =
+        :profit_gain_strong_signal_player =
             (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
             :profit_gain[:signal_quality_is_high_vect][1],
     )
@@ -107,34 +107,34 @@ end
 df = @chain df___ begin
     @transform(:signal_quality_is_low_vect = :signal_quality_is_high_vect .!= 1)
     @transform(
-        :convergence_profit_demand_low_low_signal_player =
+        :convergence_profit_demand_low_weak_signal_player =
             (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
             (:frequency_high_demand == 1) ? missing :
             :convergence_profit_demand_low[:signal_quality_is_low_vect][1],
     )
     @transform(
-        :convergence_profit_demand_low_high_signal_player =
+        :convergence_profit_demand_low_strong_signal_player =
             (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
             (:frequency_high_demand == 1) ? missing :
             :convergence_profit_demand_low[:signal_quality_is_high_vect][1],
     )
     @transform(
-        :convergence_profit_demand_high_low_signal_player =
+        :convergence_profit_demand_high_weak_signal_player =
             (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
             :convergence_profit_demand_high[:signal_quality_is_low_vect][1],
     )
     @transform(
-        :convergence_profit_demand_high_high_signal_player =
+        :convergence_profit_demand_high_strong_signal_player =
             (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
             :convergence_profit_demand_high[:signal_quality_is_high_vect][1],
     )
 
     # TODO: Uncomment for later versions...
     # @transform(
-    #     :convergence_profit_low_signal_player = (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing : :convergence_profit[:signal_quality_is_low_vect][1],
+    #     :convergence_profit_weak_signal_player = (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing : :convergence_profit[:signal_quality_is_low_vect][1],
     # )
     # @transform(
-    #     :convergence_profit_high_signal_player = (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing : :convergence_profit[:signal_quality_is_high_vect][1],
+    #     :convergence_profit_strong_signal_player = (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing : :convergence_profit[:signal_quality_is_high_vect][1],
     # )
 end
 
@@ -147,7 +147,7 @@ end
     @subset(:signal_quality_is_high ∉ ("Bool[0, 0]", "Bool[1, 1]"))
     @transform(
         :profit_gain_sum_1 =
-            (:profit_gain_low_signal_player + :profit_gain_high_signal_player),
+            (:profit_gain_weak_signal_player + :profit_gain_strong_signal_player),
         :profit_gain_sum_2 = sum(:profit_gain),
     )
     @transform(:profit_gain_check = :profit_gain_sum_1 != :profit_gain_sum_2)
@@ -159,8 +159,8 @@ end
     @subset(:signal_quality_is_high ∉ ("Bool[0, 0]", "Bool[1, 1]"))
     @transform(
         :profit_gain_sum_1 = (
-            :profit_gain_demand_high_low_signal_player +
-            :profit_gain_demand_high_high_signal_player
+            :profit_gain_demand_high_weak_signal_player +
+            :profit_gain_demand_high_strong_signal_player
         ),
         :profit_gain_sum_2 = sum(:profit_gain_demand_high),
     )
@@ -176,8 +176,8 @@ end
     )
     @transform(
         :profit_gain_sum_1 = (
-            :profit_gain_demand_low_low_signal_player +
-            :profit_gain_demand_low_high_signal_player
+            :profit_gain_demand_low_weak_signal_player +
+            :profit_gain_demand_low_strong_signal_player
         ),
         :profit_gain_sum_2 = sum(:profit_gain_demand_low),
     )
@@ -217,7 +217,7 @@ df_summary = @chain df begin
         :profit_gain_demand_high_min = minimum(:profit_gain_demand_high),
         :profit_gain_demand_low_min = minimum(:profit_gain_demand_low),
     )
-    @groupby(:signal_quality_is_high, :low_signal_quality_level, :frequency_high_demand)
+    @groupby(:signal_quality_is_high, :weak_signal_quality_level, :frequency_high_demand)
     @combine(
         :profit_mean = mean(:profit_mean),
         mean(:iterations_until_convergence),
@@ -225,39 +225,39 @@ df_summary = @chain df begin
         mean(:profit_max),
         :profit_gain_min = mean(:profit_gain_min),
         :profit_gain_max = mean(:profit_gain_max),
-        :profit_gain_demand_high_low_signal_player =
-            mean(:profit_gain_demand_high_low_signal_player),
-        :profit_gain_demand_low_low_signal_player =
-            mean(:profit_gain_demand_low_low_signal_player),
-        :profit_gain_demand_high_high_signal_player =
-            mean(:profit_gain_demand_high_high_signal_player),
-        :profit_gain_demand_low_high_signal_player =
-            mean(:profit_gain_demand_low_high_signal_player),
+        :profit_gain_demand_high_weak_signal_player =
+            mean(:profit_gain_demand_high_weak_signal_player),
+        :profit_gain_demand_low_weak_signal_player =
+            mean(:profit_gain_demand_low_weak_signal_player),
+        :profit_gain_demand_high_strong_signal_player =
+            mean(:profit_gain_demand_high_strong_signal_player),
+        :profit_gain_demand_low_strong_signal_player =
+            mean(:profit_gain_demand_low_strong_signal_player),
         :percent_unexplored_states = mean(:percent_unexplored_states),
-        :percent_unexplored_states_demand_low_low_signal_player =
-            mean(:percent_unexplored_states_demand_low_low_signal_player),
-        :percent_unexplored_states_demand_low_high_signal_player =
-            mean(:percent_unexplored_states_demand_low_high_signal_player),
-        :percent_unexplored_states_demand_high_low_signal_player =
-            mean(:percent_unexplored_states_demand_high_low_signal_player),
-        :percent_unexplored_states_demand_high_high_signal_player =
-            mean(:percent_unexplored_states_demand_high_high_signal_player),
-        :profit_gain_low_signal_player = mean(:profit_gain_low_signal_player),
-        :profit_gain_high_signal_player = mean(:profit_gain_high_signal_player),
+        :percent_unexplored_states_demand_low_weak_signal_player =
+            mean(:percent_unexplored_states_demand_low_weak_signal_player),
+        :percent_unexplored_states_demand_low_strong_signal_player =
+            mean(:percent_unexplored_states_demand_low_strong_signal_player),
+        :percent_unexplored_states_demand_high_weak_signal_player =
+            mean(:percent_unexplored_states_demand_high_weak_signal_player),
+        :percent_unexplored_states_demand_high_strong_signal_player =
+            mean(:percent_unexplored_states_demand_high_strong_signal_player),
+        :profit_gain_weak_signal_player = mean(:profit_gain_weak_signal_player),
+        :profit_gain_strong_signal_player = mean(:profit_gain_strong_signal_player),
         :profit_gain_demand_high_min = mean(:profit_gain_demand_high_min),
         :profit_gain_demand_low_min = mean(:profit_gain_demand_low_min),
         :profit_gain_demand_high_max = mean(:profit_gain_demand_high_max),
         :profit_gain_demand_low_max = mean(:profit_gain_demand_low_max),
-        :convergence_profit_demand_high_low_signal_player =
-            mean(:convergence_profit_demand_high_low_signal_player),
-        :convergence_profit_demand_low_low_signal_player =
-            mean(:convergence_profit_demand_low_low_signal_player),
-        :convergence_profit_demand_high_high_signal_player =
-            mean(:convergence_profit_demand_high_high_signal_player),
-        :convergence_profit_demand_low_high_signal_player =
-            mean(:convergence_profit_demand_low_high_signal_player),
-        # :convergence_profit_low_signal_player = mean(:convergence_profit_low_signal_player),
-        # :convergence_profit_high_signal_player = mean(:convergence_profit_high_signal_player),
+        :convergence_profit_demand_high_weak_signal_player =
+            mean(:convergence_profit_demand_high_weak_signal_player),
+        :convergence_profit_demand_low_weak_signal_player =
+            mean(:convergence_profit_demand_low_weak_signal_player),
+        :convergence_profit_demand_high_strong_signal_player =
+            mean(:convergence_profit_demand_high_strong_signal_player),
+        :convergence_profit_demand_low_strong_signal_player =
+            mean(:convergence_profit_demand_low_strong_signal_player),
+        # :convergence_profit_weak_signal_player = mean(:convergence_profit_weak_signal_player),
+        # :convergence_profit_strong_signal_player = mean(:convergence_profit_strong_signal_player),
         :price_response_to_demand_signal_mse =
             (@passmissing mean(:price_response_to_demand_signal_mse_mean)),
         :convergence_profit_demand_high = mean(:convergence_profit_demand_high),
@@ -314,7 +314,7 @@ plt2 = @chain df_summary begin
         :frequency_high_demand,
         :profit_value,
         color = :profit_variable_name => nonnumeric,
-        layout = :low_signal_quality_level => nonnumeric,
+        layout = :weak_signal_quality_level => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
 end
@@ -331,7 +331,7 @@ plt20 = @chain df_summary begin
     mapping(
         :frequency_high_demand,
         :profit_mean,
-        color = :low_signal_quality_level => nonnumeric,
+        color = :weak_signal_quality_level => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
 end
@@ -351,11 +351,11 @@ plt21 = @chain df_summary begin
     mapping(
         :frequency_high_demand,
         :price_response_to_demand_signal_mse,
-        color = :low_signal_quality_level => nonnumeric,
+        color = :weak_signal_quality_level => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
 end
-# NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
+# NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f21 = draw(
     plt21,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
@@ -375,11 +375,11 @@ plt22 = @chain df_summary begin
         :frequency_high_demand,
         :profit,
         color = :demand_level => nonnumeric,
-        layout = :low_signal_quality_level => nonnumeric,
+        layout = :weak_signal_quality_level => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
 end
-# NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
+# NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f22 = draw(
     plt22,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
@@ -398,12 +398,12 @@ plt221 = @chain df_summary begin
         :frequency_high_demand,
         :profit_gain,
         color = :min_max => nonnumeric,
-        # columns = :low_signal_quality_level => nonnumeric,
+        # columns = :weak_signal_quality_level => nonnumeric,
         rows = :signal_quality_is_high => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
 end
-# NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
+# NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f221 = draw(
     plt221,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
@@ -429,11 +429,11 @@ plt23 = @chain df_summary begin
         :frequency_high_demand,
         :profit_gain,
         color = :profit_gain_type => nonnumeric,
-        layout = :low_signal_quality_level => nonnumeric,
+        layout = :weak_signal_quality_level => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
 end
-# NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
+# NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f23 = draw(
     plt23,
     # legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
@@ -443,10 +443,10 @@ save("plots/plot_23.svg", f23)
 plt24 = @chain df_summary begin
     stack(
         [
-            :profit_gain_demand_high_low_signal_player,
-            :profit_gain_demand_low_low_signal_player,
-            :profit_gain_demand_high_high_signal_player,
-            :profit_gain_demand_low_high_signal_player,
+            :profit_gain_demand_high_weak_signal_player,
+            :profit_gain_demand_low_weak_signal_player,
+            :profit_gain_demand_high_strong_signal_player,
+            :profit_gain_demand_low_strong_signal_player,
         ],
         variable_name = :profit_gain_type,
         value_name = :profit_gain,
@@ -458,11 +458,11 @@ plt24 = @chain df_summary begin
         :frequency_high_demand,
         :profit_gain,
         color = :profit_gain_type => nonnumeric,
-        layout = :low_signal_quality_level => nonnumeric,
+        layout = :weak_signal_quality_level => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
 end
-# NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
+# NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f24 = draw(
     plt24,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
@@ -472,10 +472,10 @@ save("plots/plot_24.svg", f24)
 plt25 = @chain df_summary begin
     stack(
         [
-            :convergence_profit_demand_high_low_signal_player,
-            :convergence_profit_demand_low_low_signal_player,
-            :convergence_profit_demand_high_high_signal_player,
-            :convergence_profit_demand_low_high_signal_player,
+            :convergence_profit_demand_high_weak_signal_player,
+            :convergence_profit_demand_low_weak_signal_player,
+            :convergence_profit_demand_high_strong_signal_player,
+            :convergence_profit_demand_low_strong_signal_player,
         ],
         variable_name = :convergence_profit_type,
         value_name = :convergence_profit,
@@ -488,11 +488,11 @@ plt25 = @chain df_summary begin
         :frequency_high_demand,
         :convergence_profit,
         color = :convergence_profit_type => nonnumeric,
-        layout = :low_signal_quality_level => nonnumeric,
+        layout = :weak_signal_quality_level => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
 end
-# NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
+# NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f25 = draw(
     plt25,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5,
@@ -504,10 +504,10 @@ save("plots/plot_25.svg", f25)
 plt26 = @chain df_summary begin
     stack(
         [
-            :percent_unexplored_states_demand_high_low_signal_player,
-            :percent_unexplored_states_demand_low_low_signal_player,
-            :percent_unexplored_states_demand_high_high_signal_player,
-            :percent_unexplored_states_demand_low_high_signal_player,
+            :percent_unexplored_states_demand_high_weak_signal_player,
+            :percent_unexplored_states_demand_low_weak_signal_player,
+            :percent_unexplored_states_demand_high_strong_signal_player,
+            :percent_unexplored_states_demand_low_strong_signal_player,
         ],
         variable_name = :profit_gain_type,
         value_name = :profit_gain,
@@ -519,11 +519,11 @@ plt26 = @chain df_summary begin
         :frequency_high_demand,
         :profit_gain,
         color = :profit_gain_type => nonnumeric,
-        layout = :low_signal_quality_level => nonnumeric,
+        layout = :weak_signal_quality_level => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
 end
-# NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
+# NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f26 = draw(
     plt26,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
@@ -536,7 +536,7 @@ plt3 = @chain df_summary begin
     mapping(
         :frequency_high_demand,
         :iterations_until_convergence_mean,
-        color = :low_signal_quality_level => nonnumeric,
+        color = :weak_signal_quality_level => nonnumeric,
         layout = :signal_quality_is_high => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
@@ -589,8 +589,8 @@ competition_solution_dict =
     Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
 data_demand_digital_params = DataDemandDigitalParams(
-    low_signal_quality_level = 0.99,
-    high_signal_quality_level = 0.995,
+    weak_signal_quality_level = 0.99,
+    strong_signal_quality_level = 0.995,
     signal_quality_is_high = [true, false],
     frequency_high_demand = 0.9,
 )
