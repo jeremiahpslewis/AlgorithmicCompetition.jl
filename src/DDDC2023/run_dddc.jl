@@ -23,7 +23,7 @@ function run_dddc(;
     low_signal_quality_level_range = Float64.(range(0.5, 1.0, 6))
     # Capture 'extreme' values
     low_signal_quality_level_range = [low_signal_quality_level_range...] # TODO: 0.975, 0.99 (?)
-    signal_quality_vect = [[true, false], [true, true], [false, false]]
+    signal_quality_vect = [[true, false], [false, false]]
     competition_params_dict = Dict(
         :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
         :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)), # Parameter values aligned with Calvano 2020 Stochastic Demand case
