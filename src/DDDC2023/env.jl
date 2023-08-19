@@ -80,9 +80,12 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
             p.competition_params_dict,
             DDDCMemory( # Memory, randomly initialized
                 initialize_price_memory(price_index, p.n_players),
-                get_demand_signals(p.data_demand_digital_params, is_high_demand_prev_episode),
+                get_demand_signals(
+                    p.data_demand_digital_params,
+                    is_high_demand_prev_episode,
+                ),
                 is_high_demand_prev_episode ? :high : :low,
-                [0.0,0.0],
+                [0.0, 0.0],
             ),
             get_demand_signals(p.data_demand_digital_params, is_high_demand_episode), # Current demand, randomly initialized
             Bool[is_high_demand_episode],
@@ -142,7 +145,8 @@ RLBase.legal_action_space_mask(env::DDDCEnv, player::Symbol) =
 RLBase.action_space(env::DDDCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
 
-RLBase.reward(env::DDDCEnv, p::Symbol) = env.is_done[1] ? env.memory.reward[player_to_index[p]] : zero(Float64)
+RLBase.reward(env::DDDCEnv, p::Symbol) =
+    env.is_done[1] ? env.memory.reward[player_to_index[p]] : zero(Float64)
 
 RLBase.state_space(env::DDDCEnv, ::Observation, p) = env.state_space
 
