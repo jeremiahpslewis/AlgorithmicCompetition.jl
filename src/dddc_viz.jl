@@ -16,7 +16,7 @@ using AlgorithmicCompetition:
     DataDemandDigitalParams,
     DDDCHyperParameters
 
-folder_name = "v0.0.2_data"
+folder_name = "v0.0.4_data"
 
 df_ = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
 df_ = vcat(df_...)
