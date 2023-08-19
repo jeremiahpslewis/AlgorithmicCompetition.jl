@@ -17,7 +17,7 @@ using AlgorithmicCompetition:
     DDDCHyperParameters,
     draw_price_diagnostic
 
-folder_name = "v0.0.4_data"
+folder_name = "v0.0.5_data"
 
 df_ = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
 df_ = vcat(df_...)
@@ -35,7 +35,7 @@ df__ = @chain df_ begin
         :profit_gain_demand_high = eval(Meta.parse(:profit_gain_demand_high)),
         :profit_gain_demand_low = eval(Meta.parse(:profit_gain_demand_low)),
         :signal_is_strong_vect = eval(Meta.parse(:signal_is_strong)),
-        :percent_unexplored_states = eval(Meta.parse(:percent_unexplored_states)),
+        :percent_unexplored_states_vect = eval(Meta.parse(:percent_unexplored_states)),
     )
     @transform!(
         @subset((:frequency_high_demand == 1) & (:weak_signal_quality_level == 1)),
@@ -46,28 +46,28 @@ end
 df___ = @chain df__ begin
     @transform(:signal_is_weak_vect = :signal_is_strong_vect .!= 1)
     @transform(:profit_mean = mean(:profit_vect))
-    @transform(:percent_unexplored_states = mean(:percent_unexplored_states))
+    @transform(:percent_unexplored_states = mean(:percent_unexplored_states_vect))
     @transform(
         :percent_unexplored_states_demand_low_weak_signal_player =
             (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
             (:frequency_high_demand == 1) ? missing :
-            :percent_unexplored_states[:signal_is_weak_vect][1],
+            :percent_unexplored_states_vect[:signal_is_weak_vect][1],
     )
     @transform(
         :percent_unexplored_states_demand_low_strong_signal_player =
             (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
             (:frequency_high_demand == 1) ? missing :
-            :percent_unexplored_states[:signal_is_strong_vect][1],
+            :percent_unexplored_states_vect[:signal_is_strong_vect][1],
     )
     @transform(
         :percent_unexplored_states_demand_high_weak_signal_player =
             (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
-            :percent_unexplored_states[:signal_is_weak_vect][1],
+            :percent_unexplored_states_vect[:signal_is_weak_vect][1],
     )
     @transform(
         :percent_unexplored_states_demand_high_strong_signal_player =
             (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
-            :percent_unexplored_states[:signal_is_strong_vect][1],
+            :percent_unexplored_states_vect[:signal_is_strong_vect][1],
     )
     @transform(
         :profit_gain_demand_low_weak_signal_player =
@@ -529,6 +529,38 @@ f26 = draw(
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
 )
 save("plots/plot_26.svg", f24)
+
+plt27 = @chain df_summary begin
+    stack(
+        [
+            :profit_gain_demand_high_weak_signal_player,
+            :profit_gain_demand_low_weak_signal_player,
+            :profit_gain_demand_high_strong_signal_player,
+            :profit_gain_demand_low_strong_signal_player,
+        ],
+        variable_name = :profit_gain_type,
+        value_name = :profit_gain,
+    )
+    @subset((:signal_is_strong == "Bool[1, 0]") & (:frequency_high_demand != 1))
+    @sort(:frequency_high_demand)
+    @transform(:demand_level = replace(:profit_gain_type, r"profit_gain_demand_([a-z]+)_.*" => s"\1"))
+    @transform(:signal_type = replace(:profit_gain_type, r"profit_gain_demand_[a-z]+_([a-z_]+)_signal_player" => s"\1"))
+    data(_) *
+    mapping(
+        :frequency_high_demand,
+        :profit_gain,
+        color = :weak_signal_quality_level => nonnumeric,
+        col = :demand_level => nonnumeric,
+        row = :signal_type => nonnumeric,
+    ) *
+    (visual(Scatter) + visual(Lines))
+end
+# NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
+f27 = draw(
+    plt27,
+    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+)
+save("plots/plot_27.svg", f24)
 
 plt3 = @chain df_summary begin
     @sort(:frequency_high_demand)
