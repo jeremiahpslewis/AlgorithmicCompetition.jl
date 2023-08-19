@@ -11,9 +11,9 @@ start_timestamp = now()
 if Sys.isapple()
     n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
 
-    n_parameter_iterations = 20
+    n_parameter_iterations = 2
 else
-    n_procs_ = 63
+    n_procs_ = 32
 
     n_parameter_iterations = 20
 end

@@ -16,7 +16,7 @@ if Sys.isapple()
 else
     n_procs_ = 63
 
-    n_parameter_iterations = 40
+    n_parameter_iterations = 40 * 14 # 40 takes about an hour on 63 cores
     n_grid_increments = 10
 end
 
