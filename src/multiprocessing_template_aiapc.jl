@@ -5,8 +5,19 @@ using CSV
 using Distributed
 using Dates
 
+version = "v0.0.1"
 start_timestamp = now()
-n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
+
+if Sys.isapple()
+    n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
+
+    n_parameter_iterations = 20
+else
+    n_procs_ = 63
+
+    n_parameter_iterations = 500
+end
+
 
 _procs = addprocs(
     n_procs_,
@@ -25,6 +36,6 @@ end
 
 rmprocs(_procs)
 
-file_name = "simulation_results_aiapc_$start_timestamp.csv"
+file_name = "simulation_results_aiapc_$(version)_$(start_timestamp).csv"
 df = AlgorithmicCompetition.extract_sim_results(exp_list)
 CSV.write(file_name, df)
