@@ -21,6 +21,7 @@ struct DDDCSummary
     iterations_until_convergence::Vector{Int64}
     price_response_to_demand_signal_mse::Vector{Float64}
     percent_demand_high::Float64
+    percent_unexplored_states::Vector{Float64}
 end
 
 """
@@ -81,12 +82,13 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
     percent_demand_high = mean(hook[Symbol(1)][2].demand_state_high_vect)
 
     is_converged = Bool[]
-
+    percent_unexplored_states = Float64[]
     convergence_profit = get_convergence_profit_from_hook(hook)
 
 
-    for i in (Symbol(1), Symbol(2))
-        push!(is_converged, hook[i][1].is_converged)
+    for player_ in (Symbol(1), Symbol(2))
+        push!(is_converged, hook[player_][1].is_converged)
+        push!(percent_unexplored_states, mean(hook[player_][1].best_response_vector .== 0))
     end
 
     price_vs_demand_signal_counterfactuals =
@@ -106,6 +108,7 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
         iterations_until_convergence,
         [e_[1] for e_ in price_vs_demand_signal_counterfactuals],
         percent_demand_high,
+        percent_unexplored_states,
     )
 end
 
@@ -206,7 +209,6 @@ end
 
 
 function extract_price_vs_demand_signal_counterfactuals(env::DDDCEnv, hook::AbstractHook)
-    best_response_vector = hook[Symbol(1)][1].best_response_vector
     price_vs_demand_signal_counterfactuals = [
         extract_price_vs_demand_signal_counterfactuals(
             hook[player_][1].best_response_vector,

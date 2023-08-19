@@ -119,7 +119,7 @@ function RLBase.act!(env::DDDCEnv, price_tuple::CartesianIndex{2})
 
     # Update 'memory' data for next episode
     env.memory.prices = price_tuple
-    env.memory.signals = env.is_high_demand_signals
+    env.memory.signals = copy(env.is_high_demand_signals)
     env.memory.demand_state = demand_state
 
     # Determine whether next episode is a high demand episode and update

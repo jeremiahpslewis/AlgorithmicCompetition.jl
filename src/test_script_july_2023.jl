@@ -49,7 +49,8 @@ using AlgorithmicCompetition:
     profit_gain,
     DDDCEnv,
     π,
-    profit_gain
+    profit_gain,
+    extract_price_vs_demand_signal_counterfactuals
 using JET
 using BenchmarkTools
 # using ProfileView
@@ -75,10 +76,10 @@ competition_solution_dict =
     Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
 data_demand_digital_params = DataDemandDigitalParams(
-    low_signal_quality_level = 0.99,
-    high_signal_quality_level = 0.995,
+    low_signal_quality_level = 0.5,
+    high_signal_quality_level = 0.5,
     signal_quality_is_high = [true, false],
-    frequency_high_demand = 0.9,
+    frequency_high_demand = 0.5,
 )
 
 hyperparams = DDDCHyperParameters(
@@ -99,6 +100,19 @@ env = DDDCEnv(hyperparams)
 )
 experiment = Experiment(env; stop_on_convergence = true)
 ex = @time run(hyperparams; stop_on_convergence = true);
+
+hook = ex.hook
+env = ex.env
+player_ = Symbol(1)
+extract_price_vs_demand_signal_counterfactuals(
+                   hook[player_][1].best_response_vector,
+                   env.state_space_lookup,
+                   env.price_options,
+                   env.n_prices,
+               )
+
+
+
 economic_summary(ex)
 extract_sim_results([economic_summary(ex)])
 # @report_opt Base.push!(

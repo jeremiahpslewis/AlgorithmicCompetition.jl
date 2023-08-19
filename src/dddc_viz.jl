@@ -173,7 +173,7 @@ plt1 = @chain df begin
     visual(Scatter)
 end
 f1 = draw(plt1)
-save("plots/plot_1.svg", f1)
+# save("plots/plot_1.svg", f1)
 
 df_summary = @chain df begin
     @transform!(
@@ -448,6 +448,7 @@ plt25 = @chain df_summary begin
     )
     @subset((:signal_quality_is_high == "Bool[1, 0]") & (:frequency_high_demand != 1))
     @sort(:frequency_high_demand)
+    @transform(:convergence_profit_type = replace(:convergence_profit_type, "convergence_profit_" => ""))
     data(_) *
     mapping(
         :frequency_high_demand,
@@ -460,7 +461,9 @@ end
 # NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f25 = draw(
     plt25,
-    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5,
+    titlesize=10, labelsize=10),
+    # axis = (width = 100, height = 100),
 )
 save("plots/plot_25.svg", f25)
 

@@ -291,6 +291,7 @@ end
           extract_quantity_vars(e_out.env)[1][:low]
     @test extract_quantity_vars(e_out.env)[2][:high] >
           extract_quantity_vars(e_out.env)[2][:low]
+    @test all(e_sum.price_response_to_demand_signal_mse .> 0)
 end
 
 @testset "run full DDDC simulation high-low" begin
@@ -330,17 +331,23 @@ end
 
     e_out = run(hyperparams; stop_on_convergence = true)
     e_sum = economic_summary(e_out)
-    @test e_out.hook[Symbol(1)][2].demand_state_high_vect[end] ==
-          (e_out.env.memory.demand_state == :high)
-    @test mean(
-        e_out.hook[Symbol(1)][2].rewards[e_out.hook[Symbol(1)][2].demand_state_high_vect],
-    ) ≈ e_sum.convergence_profit_demand_high[1] atol = 1e-2
-    @test mean(
-        e_out.hook[Symbol(1)][2].rewards[.!e_out.hook[Symbol(1)][2].demand_state_high_vect],
-    ) ≈ e_sum.convergence_profit_demand_low[1] atol = 1e-2
+    
+    for player_ in [1, 2]
+        @test e_out.hook[Symbol(player_)][2].demand_state_high_vect[end] ==
+            (e_out.env.memory.demand_state == :high)
+        @test mean(
+            e_out.hook[Symbol(player_)][2].rewards[e_out.hook[Symbol(player_)][2].demand_state_high_vect],
+        ) ≈ e_sum.convergence_profit_demand_high[player_] atol = 1e-2
+        @test mean(
+            e_out.hook[Symbol(player_)][2].rewards[.!e_out.hook[Symbol(player_)][2].demand_state_high_vect],
+        ) ≈ e_sum.convergence_profit_demand_low[player_] atol = 1e-2
+        @test mean(e_out.hook[Symbol(player_)][1].best_response_vector .== 0) < 0.05
+    end
+
     @test mean(e_out.env.profit_array[:, :, :, 1]) >
           mean(e_out.env.profit_array[:, :, :, 2])
     @test 0.45 < e_sum.percent_demand_high < 0.55
+    
     @test all(e_sum.convergence_profit_demand_high > e_sum.convergence_profit_demand_low)
     @test any(1 .> e_sum.profit_gain .> 0)
     @test any(1 .> e_sum.profit_gain_demand_low .> 0)
@@ -358,6 +365,7 @@ end
           extract_quantity_vars(e_out.env)[1][:low]
     @test extract_quantity_vars(e_out.env)[2][:high] >
           extract_quantity_vars(e_out.env)[2][:low]
+    @test all(e_sum.price_response_to_demand_signal_mse .> 0)
 end
 
 @testset "run full DDDC simulation high-high" begin
