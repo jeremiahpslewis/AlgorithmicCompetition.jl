@@ -88,7 +88,7 @@ end
     data_demand_digital_params = DataDemandDigitalParams(
         weak_signal_quality_level = 0.5,
         strong_signal_quality_level = 0.5,
-        signal_quality_is_high = [true, false],
+        signal_is_strong = [true, false],
         frequency_high_demand = 0.5,
     )
     

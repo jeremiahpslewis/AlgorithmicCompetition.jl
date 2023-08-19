@@ -49,7 +49,7 @@ end
     data_demand_digital_params = DataDemandDigitalParams(
         weak_signal_quality_level = 0.99,
         strong_signal_quality_level = 0.995,
-        signal_quality_is_high = [true, false],
+        signal_is_strong = [true, false],
         frequency_high_demand = 0.9,
     )
 
@@ -246,7 +246,7 @@ end
     data_demand_digital_params = DataDemandDigitalParams(
         weak_signal_quality_level = 1,
         strong_signal_quality_level = 1,
-        signal_quality_is_high = [false, false],
+        signal_is_strong = [false, false],
         frequency_high_demand = 0.9,
     )
 
@@ -315,7 +315,7 @@ end
     data_demand_digital_params = DataDemandDigitalParams(
         weak_signal_quality_level = 1,
         strong_signal_quality_level = 1,
-        signal_quality_is_high = [true, false],
+        signal_is_strong = [true, false],
         frequency_high_demand = 0.5,
     )
 
@@ -389,7 +389,7 @@ end
     data_demand_digital_params = DataDemandDigitalParams(
         weak_signal_quality_level = 1,
         strong_signal_quality_level = 1,
-        signal_quality_is_high = [true, true],
+        signal_is_strong = [true, true],
         frequency_high_demand = 0.5,
     )
 

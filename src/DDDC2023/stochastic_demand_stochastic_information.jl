@@ -14,7 +14,7 @@ using Flux
 @kwdef struct DataDemandDigitalParams
     weak_signal_quality_level::Float64 = 0.5 # probability of true signal (0.5 is lowest possible vale)
     strong_signal_quality_level::Float64 = 1.0 # probability of true signal (0.5 is lowest possible vale)
-    signal_quality_is_high::Vector{Bool} = [false, false] # true if signal quality is high
+    signal_is_strong::Vector{Bool} = [false, false] # true if signal quality is high
     frequency_high_demand::Float64 = 0.5 # probability of high demand for a given episode
 end
 
@@ -27,13 +27,13 @@ get_demand_level(d::DataDemandDigitalParams) = get_demand_level(d.frequency_high
 
 function get_demand_signals(
     demand_level_is_high::Bool,
-    signal_quality_is_high::Vector{Bool},
+    signal_is_strong::Vector{Bool},
     weak_signal_quality_level::Float64,
     strong_signal_quality_level::Float64,
 )
     true_signal_probability =
-        (weak_signal_quality_level .* .!signal_quality_is_high) .+
-        (strong_signal_quality_level .* signal_quality_is_high)
+        (weak_signal_quality_level .* .!signal_is_strong) .+
+        (strong_signal_quality_level .* signal_is_strong)
 
     # Probability of true signal is a function of true signal probability
     reveal_true_signal = rand(2) .< true_signal_probability
@@ -47,7 +47,7 @@ end
 function get_demand_signals(d::DataDemandDigitalParams, is_high_demand_episode::Bool)
     get_demand_signals(
         is_high_demand_episode,
-        d.signal_quality_is_high,
+        d.signal_is_strong,
         d.weak_signal_quality_level,
         d.strong_signal_quality_level,
     )
