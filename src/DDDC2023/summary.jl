@@ -2,6 +2,8 @@ using Chain
 using ReinforcementLearningCore, ReinforcementLearningBase
 using DataFrames
 using Flux: mse
+using DataFrameMacros
+
 """
     DDDCSummary(α, β, is_converged, data_demand_digital_params, convergence_profit, convergence_profit_demand_high, convergence_profit_demand_low, profit_gain, profit_gain_demand_high, profit_gain_demand_low, iterations_until_convergence, price_response_to_demand_signal_mse, percent_demand_high)
 
@@ -259,10 +261,11 @@ function extract_price_vs_demand_signal_counterfactuals(
             (:price_given_high_demand_signal != 0) &
             (:price_given_low_demand_signal != 0)
         )
-        mse(
+        @combine(:price_mse = mse(
             :price_given_high_demand_signal,
             :price_given_low_demand_signal,
-        )
+        ))
+        _[1, :mse]
     end
     return price_mse, price_counterfactual_df
 end
