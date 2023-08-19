@@ -35,6 +35,7 @@ df__ = @chain df_ begin
         :profit_gain_demand_high = eval(Meta.parse(:profit_gain_demand_high)),
         :profit_gain_demand_low = eval(Meta.parse(:profit_gain_demand_low)),
         :signal_quality_is_high_vect = eval(Meta.parse(:signal_quality_is_high)),
+        :percent_unexplored_states = eval(Meta.parse(:percent_unexplored_states)),
     )
     @transform!(
         @subset((:frequency_high_demand == 1) & (:low_signal_quality_level == 1)),
@@ -45,6 +46,29 @@ end
 df___ = @chain df__ begin
     @transform(:signal_quality_is_low_vect = :signal_quality_is_high_vect .!= 1)
     @transform(:profit_mean = mean(:profit_vect))
+    @transform(:percent_unexplored_states = mean(:percent_unexplored_states))
+    @transform(
+        :percent_unexplored_states_demand_low_low_signal_player =
+            (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
+            (:frequency_high_demand == 1) ? missing :
+            :percent_unexplored_states[:signal_quality_is_low_vect][1],
+    )
+    @transform(
+        :percent_unexplored_states_demand_low_high_signal_player =
+            (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
+            (:frequency_high_demand == 1) ? missing :
+            :percent_unexplored_states[:signal_quality_is_high_vect][1],
+    )
+    @transform(
+        :percent_unexplored_states_demand_high_low_signal_player =
+            (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            :percent_unexplored_states[:signal_quality_is_low_vect][1],
+    )
+    @transform(
+        :percent_unexplored_states_demand_high_high_signal_player =
+            (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            :percent_unexplored_states[:signal_quality_is_high_vect][1],
+    )
     @transform(
         :profit_gain_demand_low_low_signal_player =
             (:signal_quality_is_high ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
@@ -209,6 +233,15 @@ df_summary = @chain df begin
             mean(:profit_gain_demand_high_high_signal_player),
         :profit_gain_demand_low_high_signal_player =
             mean(:profit_gain_demand_low_high_signal_player),
+        :percent_unexplored_states = mean(:percent_unexplored_states),
+        :percent_unexplored_states_demand_low_low_signal_player =
+            mean(:percent_unexplored_states_demand_low_low_signal_player),
+        :percent_unexplored_states_demand_low_high_signal_player =
+            mean(:percent_unexplored_states_demand_low_high_signal_player),
+        :percent_unexplored_states_demand_high_low_signal_player =
+            mean(:percent_unexplored_states_demand_high_low_signal_player),
+        :percent_unexplored_states_demand_high_high_signal_player =
+            mean(:percent_unexplored_states_demand_high_high_signal_player),
         :profit_gain_low_signal_player = mean(:profit_gain_low_signal_player),
         :profit_gain_high_signal_player = mean(:profit_gain_high_signal_player),
         :profit_gain_demand_high_min = mean(:profit_gain_demand_high_min),
@@ -468,6 +501,34 @@ f25 = draw(
 )
 save("plots/plot_25.svg", f25)
 
+plt26 = @chain df_summary begin
+    stack(
+        [
+            :percent_unexplored_states_demand_high_low_signal_player,
+            :percent_unexplored_states_demand_low_low_signal_player,
+            :percent_unexplored_states_demand_high_high_signal_player,
+            :percent_unexplored_states_demand_low_high_signal_player,
+        ],
+        variable_name = :profit_gain_type,
+        value_name = :profit_gain,
+    )
+    @subset((:signal_quality_is_high == "Bool[1, 0]") & (:frequency_high_demand != 1))
+    @sort(:frequency_high_demand)
+    data(_) *
+    mapping(
+        :frequency_high_demand,
+        :profit_gain,
+        color = :profit_gain_type => nonnumeric,
+        layout = :low_signal_quality_level => nonnumeric,
+    ) *
+    (visual(Scatter) + visual(Lines))
+end
+# NOTE: freq_high_demand == 1 intersect low_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
+f26 = draw(
+    plt26,
+    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+)
+save("plots/plot_26.svg", f24)
 
 plt3 = @chain df_summary begin
     @sort(:frequency_high_demand)
