@@ -28,7 +28,7 @@ hyperparams = AIAPCHyperParameters(
 env = AIAPCEnv(hyperparams)
 
 df_summary = @chain df begin
-    @transform(:β = round(:β, digits = 3), :α = round(:α, digits = 3))
+    # @transform(:β = round(:β, digits = 3), :α = round(:α, digits = 3))
     @groupby(:α, :β)
     @combine(
         :Δ_π_bar = profit_gain(mean(:π_bar), env),
