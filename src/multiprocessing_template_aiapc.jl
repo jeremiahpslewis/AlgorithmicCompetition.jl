@@ -5,7 +5,7 @@
     using Distributed
     using Dates
 
-    version = "v0.0.1"
+    version = "v0.0.2"
     start_timestamp = now()
 
     if Sys.isapple()
@@ -15,7 +15,7 @@
     else
         n_procs_ = 60
 
-        n_parameter_iterations = 20
+        n_parameter_iterations = 40
     end
 
 
