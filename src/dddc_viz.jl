@@ -449,19 +449,19 @@ plt24 = @chain df_summary begin
         variable_name=:profit_gain_type,
         value_name=:profit_gain,
     )
-    @subset((:signal_is_strong == "Bool[1, 0]") & (:frequency_high_demand != 1))
+    @subset((:signal_is_strong == "Bool[1, 0]"))
     @sort(:frequency_high_demand)
-    @transform(
-        :profit_gain_type =
-            replace(:profit_gain_type, "profit_gain_" => "")
-    )
+    @transform(:demand_level = replace(:profit_gain_type, r"profit_gain_demand_([a-z]+)_.*" => s"\1"))
+    @transform(:signal_type = replace(:profit_gain_type, r"profit_gain_demand_[a-z]+_([a-z_]+)_signal_player" => s"\1"))
     @transform(:weak_signal_quality_level = string("Weak Signal Strength: ", :weak_signal_quality_level))
+    @subset((:frequency_high_demand < 1) | (:demand_level == "high"))
     data(_) *
     mapping(
         :frequency_high_demand,
         :profit_gain,
-        color=:profit_gain_type => nonnumeric,
-        layout=:weak_signal_quality_level => nonnumeric,
+        marker=:demand_level => nonnumeric => "Demand Level",
+        layout= :weak_signal_quality_level => nonnumeric,
+        color=:signal_type => "Signal Strength",
     ) *
     (visual(Scatter) + visual(Lines))
 end
@@ -481,6 +481,10 @@ f24 = draw(
         # subtitle = "(Solid line is profit for symmetric prices, shaded region shows range based on price options)",
         xlabel="High Demand Frequency",
         ylabel="Profit Gain",
+        xticks=0.5:0.1:1,
+        yticks=0:0.2:1,
+        aspect=1,
+        limits=(0.5, 1.05, 0.0, 1.0)
     ),)
 save("plots/plot_24.svg", f24)
 
