@@ -270,6 +270,7 @@ df_post_prob = DataFrame(
             pr_signal_true,
             post_prob_high_low_given_signal(pr_high_demand, pr_signal_true)[1],
             post_prob_high_low_given_both_signals(pr_high_demand, pr_signal_true)[1],
+            pr_high_demand^2 * pr_signal_true,
         ) for pr_high_demand = 0.5:0.01:1 for pr_signal_true = 0.5:0.1:1
     ]),
 ) # squared to reflect high-high signals, for each opponent, independently
@@ -280,6 +281,7 @@ rename!(
         :pr_signal_true,
         :post_prob_high_given_signal_high,
         :post_prob_high_given_both_signals_high,
+        :state_and_signals_agree_prob,
     ],
 )
 
@@ -288,11 +290,19 @@ f11 = @chain df_post_prob begin
     data(_) *
     mapping(
         :pr_high_demand,
-        :post_prob_high_given_both_signals_high,
-        color=:pr_signal_true => nonnumeric,
+        :state_and_signals_agree_prob,
+        color=:pr_signal_true => nonnumeric => "Signal Strength",
     ) *
     visual(Scatter)
-end |> draw
+    draw(
+        axis=(
+            xticks=0.5:0.1:1,
+            yticks=0:0.1:1,
+            xlabel="Probability High Demand",
+            ylabel="Probability High Demand and Opponent Signal High Given Own Signal High",
+        )
+    )
+end
 save("plots/plot_11.svg", f11)
 
 plt2 = @chain df_summary begin
