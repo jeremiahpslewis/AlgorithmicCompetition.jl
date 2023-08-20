@@ -1,6 +1,8 @@
 using Test
 using JuMP
 using Chain
+using DataFrames
+using DataFrameMacros
 using ReinforcementLearningCore:
     RLCore,
     PostActStage,
