@@ -630,16 +630,21 @@ save("plots/plot_27.svg", f24)
 
 plt3 = @chain df_summary begin
     @sort(:frequency_high_demand)
+    @transform(:signal_is_strong = :signal_is_strong == "Bool[0, 0]" ? "Weak-Weak" : "Strong-Weak")
     data(_) *
     mapping(
-        :frequency_high_demand,
-        :iterations_until_convergence_mean,
-        color=:weak_signal_quality_level => nonnumeric,
+        :frequency_high_demand => "High Demand Frequency",
+        :iterations_until_convergence_mean => "Iterations Until Convergence",
+        color=:weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
         layout=:signal_is_strong => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
 end
-f3 = draw(plt3)
+f3 = draw(plt3,
+    axis=(
+        xticks=0.5:0.1:1,
+    )
+)
 save("plots/plot_3.svg", f3)
 
 
