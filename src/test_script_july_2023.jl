@@ -105,11 +105,11 @@ hook = ex.hook
 env = ex.env
 player_ = Symbol(1)
 extract_price_vs_demand_signal_counterfactuals(
-                   hook[player_][1].best_response_vector,
-                   env.state_space_lookup,
-                   env.price_options,
-                   env.n_prices,
-               )
+    hook[player_][1].best_response_vector,
+    env.state_space_lookup,
+    env.price_options,
+    env.n_prices,
+)
 
 economic_summary(ex)
 extract_sim_results([economic_summary(ex)])

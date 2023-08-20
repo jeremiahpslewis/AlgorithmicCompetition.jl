@@ -139,9 +139,7 @@ df = @chain df___ begin
 end
 
 # Basic correctness assurance tests...
-@test mean(
-    mean.(df[!, :signal_is_weak_vect] .+ df[!, :signal_is_strong_vect]),
-) == 1
+@test mean(mean.(df[!, :signal_is_weak_vect] .+ df[!, :signal_is_strong_vect])) == 1
 
 @chain df begin
     @subset(:signal_is_strong ∉ ("Bool[0, 0]", "Bool[1, 1]"))
@@ -171,8 +169,7 @@ end
 
 @chain df begin
     @subset(
-        (:signal_is_strong ∉ ("Bool[0, 0]", "Bool[1, 1]")) &
-        (:frequency_high_demand != 1)
+        (:signal_is_strong ∉ ("Bool[0, 0]", "Bool[1, 1]")) & (:frequency_high_demand != 1)
     )
     @transform(
         :profit_gain_sum_1 = (
@@ -201,10 +198,7 @@ f1 = draw(plt1)
 # save("plots/plot_1.svg", f1)
 
 df_summary = @chain df begin
-    @transform!(
-        @subset(:signal_is_strong == "Bool[0, 1]"),
-        :signal_is_strong = "Bool[1, 0]",
-    )
+    @transform!(@subset(:signal_is_strong == "Bool[0, 1]"), :signal_is_strong = "Bool[1, 0]",)
     @transform(
         :price_response_to_demand_signal_mse_mean =
             @passmissing minimum(:price_response_to_demand_signal_mse)
@@ -482,7 +476,10 @@ plt25 = @chain df_summary begin
     )
     @subset((:signal_is_strong == "Bool[1, 0]") & (:frequency_high_demand != 1))
     @sort(:frequency_high_demand)
-    @transform(:convergence_profit_type = replace(:convergence_profit_type, "convergence_profit_" => ""))
+    @transform(
+        :convergence_profit_type =
+            replace(:convergence_profit_type, "convergence_profit_" => "")
+    )
     data(_) *
     mapping(
         :frequency_high_demand,
@@ -495,8 +492,14 @@ end
 # NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f25 = draw(
     plt25,
-    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5,
-    titlesize=10, labelsize=10),
+    legend = (
+        position = :top,
+        titleposition = :left,
+        framevisible = true,
+        padding = 5,
+        titlesize = 10,
+        labelsize = 10,
+    ),
     # axis = (width = 100, height = 100),
 )
 save("plots/plot_25.svg", f25)
@@ -543,8 +546,16 @@ plt27 = @chain df_summary begin
     )
     @subset((:signal_is_strong == "Bool[1, 0]") & (:frequency_high_demand != 1))
     @sort(:frequency_high_demand)
-    @transform(:demand_level = replace(:profit_gain_type, r"profit_gain_demand_([a-z]+)_.*" => s"\1"))
-    @transform(:signal_type = replace(:profit_gain_type, r"profit_gain_demand_[a-z]+_([a-z_]+)_signal_player" => s"\1"))
+    @transform(
+        :demand_level =
+            replace(:profit_gain_type, r"profit_gain_demand_([a-z]+)_.*" => s"\1")
+    )
+    @transform(
+        :signal_type = replace(
+            :profit_gain_type,
+            r"profit_gain_demand_[a-z]+_([a-z_]+)_signal_player" => s"\1",
+        )
+    )
     data(_) *
     mapping(
         :frequency_high_demand,
