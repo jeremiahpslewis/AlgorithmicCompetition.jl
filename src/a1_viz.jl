@@ -8,7 +8,7 @@ using CSV
 using DataFrames
 using Statistics
 
-file_name = "simulation_results_2023-06-27T20:52:00.709.csv"
+file_name = "simulation_results_aiapc_v0.0.1_2023-08-19T21:26:16.300.csv"
 df = DataFrame(CSV.File(file_name))
 
 competition_params_dict = Dict(
@@ -28,7 +28,7 @@ hyperparams = AIAPCHyperParameters(
 env = AIAPCEnv(hyperparams)
 
 df_summary = @chain df begin
-    @transform(:β = round(:β, digits = 7), :α = round(:α, digits = 2))
+    @transform(:β = round(:β, digits = 3), :α = round(:α, digits = 3))
     @groupby(:α, :β)
     @combine(
         :Δ_π_bar = profit_gain(mean(:π_bar), env),
