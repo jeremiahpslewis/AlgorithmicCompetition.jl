@@ -17,7 +17,7 @@ using AlgorithmicCompetition:
     DDDCHyperParameters,
     draw_price_diagnostic
 
-folder_name = "v0.0.5_data"
+folder_name = "v0.0.6_data"
 
 df_ = DataFrame.(CSV.File.(readdir(folder_name, join=true)))
 df_ = vcat(df_...)

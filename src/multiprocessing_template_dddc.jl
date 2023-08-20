@@ -5,7 +5,7 @@ using CSV
 using Distributed
 using Dates
 
-version = 0.5
+version = 0.6
 start_timestamp = now()
 
 if Sys.isapple()

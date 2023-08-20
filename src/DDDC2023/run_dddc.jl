@@ -32,7 +32,7 @@ function run_dddc(;
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
-    α = Float64(0.125)
+    α = Float64(0.15)
     β = Float64(4e-1)
     δ = 0.95
 
