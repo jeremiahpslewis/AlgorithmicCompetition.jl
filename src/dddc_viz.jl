@@ -17,7 +17,7 @@ using AlgorithmicCompetition:
     DDDCHyperParameters,
     draw_price_diagnostic
 
-folder_name = "v0.0.6_data"
+folder_name = "v0.0.5_data"
 
 df_ = DataFrame.(CSV.File.(readdir(folder_name, join=true)))
 df_ = vcat(df_...)
@@ -381,28 +381,40 @@ f22 = draw(
 save("plots/plot_22.svg", f22)
 
 plt221 = @chain df_summary begin
+    @subset(:signal_is_strong == "Bool[0, 0]")
     stack(
         [:profit_gain_min, :profit_gain_max],
         variable_name=:min_max,
         value_name=:profit_gain,
     )
+    @transform(:min_max = (:min_max == "profit_gain_min" ? "Per-Trial Min" : "Per-Trial Max" ))
     @sort(:frequency_high_demand)
+    @transform(:weak_signal_quality_level = string("Weak Signal Strength: ", :weak_signal_quality_level))
     data(_) *
     mapping(
         :frequency_high_demand,
         :profit_gain,
-        color=:min_max => nonnumeric,
+        color=:min_max => nonnumeric => "",
         # columns = :weak_signal_quality_level => nonnumeric,
-        rows=:signal_is_strong => nonnumeric,
+        layout=:weak_signal_quality_level => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
 end
 # NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f221 = draw(
     plt221,
-    legend=(position=:top, titleposition=:left, framevisible=true, padding=5),
+    legend=(
+        position=:top,
+        titleposition=:left,
+        framevisible=true,
+        padding=5,
+    ),
+    axis=(
+    xlabel="High Demand Frequency",
+    ylabel="Profit Gain",
+    ),
 )
-save("plots/plot_221.svg", f22)
+save("plots/plot_221.svg", f221)
 
 # TODO: version of plt22, but where profit is normalized against demand scenario!
 plt23 = @chain df_summary begin
