@@ -124,9 +124,9 @@ function draw_price_diagnostic(hyperparams::DDDCHyperParameters)
             price = critical_prices,
             profit = critical_profits,
             label = repeat(["Bertrand Nash", "Monopoly"], outer = 2),
-            demand = repeat(["high", "low"], inner = 2),
+            demand = repeat(["High", "Low"], inner = 2),
         )) *
-        mapping(:price, :profit, color = :label, row = :demand) *
+        mapping(:price, :profit, color = :label => "Equilibria", row = :demand) *
         visual(Scatter)
 
     plt =

@@ -716,6 +716,7 @@ f6 = draw(
         subtitle="(Solid line is profit for symmetric prices, shaded region shows range based on price options)",
         xlabel="Competitor's Price Choice",
     ),
+    legend=(position=:bottom, titleposition=:left, framevisible=true, padding=5),
 )
 save("plots/plot_6.svg", f6)
 
