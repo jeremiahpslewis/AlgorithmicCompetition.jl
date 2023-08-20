@@ -522,6 +522,33 @@ end
     @test all(experiments[1].is_converged)
 end
 
+@testset "AIAPC Hyperparameter Set" begin
+    α_vect = Float64.(range(0.0025, 0.25, 3))
+    β_vect = Float64.(range(0.025, 2, 3))
+    max_iter = Int(1e8)
+    convergence_threshold = 10
+    δ = 0.95
+
+    competition_params_dict = Dict(
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+    )
+    competition_solution_dict =
+        Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+
+    hyperparameter_vect = build_hyperparameter_set(α_vect,
+        β_vect,
+        δ,
+        max_iter,
+        competition_solution_dict,
+        convergence_threshold)
+
+    df_1 = DataFrame([(hyperparameter.α, hyperparameter.β, 1) for hyperparameter in hyperparameter_vect])
+    rename!(df_1, [:α, :β, :count])
+    df_ = @chain df_1 @groupby(:α, :β) @combine(length(:count))
+    @test all(df_[!, :count_length] .== 2)
+end
+
 @testset "Parameter / learning checks" begin
     α = Float64(0.125)
     β = Float64(1)

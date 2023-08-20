@@ -26,6 +26,7 @@ using AlgorithmicCompetition:
     AIAPCPolicy,
     AIAPCSummary,
     AlgorithmicCompetition,
+    build_hyperparameter_set,
     CompetitionParameters,
     CompetitionParameters,
     CompetitionSolution,
