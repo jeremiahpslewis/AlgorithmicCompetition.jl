@@ -528,6 +528,7 @@ end
     max_iter = Int(1e8)
     convergence_threshold = 10
     δ = 0.95
+    n_parameter_iterations = 2
 
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
@@ -536,12 +537,15 @@ end
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
-    hyperparameter_vect = build_hyperparameter_set(α_vect,
+    hyperparameter_vect = build_hyperparameter_set(
+        α_vect,
         β_vect,
         δ,
         max_iter,
         competition_solution_dict,
-        convergence_threshold)
+        convergence_threshold,
+        n_parameter_iterations
+        )
 
     df_1 = DataFrame([(hyperparameter.α, hyperparameter.β, 1) for hyperparameter in hyperparameter_vect])
     rename!(df_1, [:α, :β, :count])

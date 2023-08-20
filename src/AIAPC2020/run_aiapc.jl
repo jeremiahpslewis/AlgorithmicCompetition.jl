@@ -16,7 +16,7 @@ function build_hyperparameter_set(
     competition_solution_dict,
     convergence_threshold,
     n_parameter_iterations)
-    return [
+    hyperparameter_vect = [
         AIAPCHyperParameters(
             α,
             β,
@@ -29,6 +29,7 @@ function build_hyperparameter_set(
 
     # Shuffle hyperparameter_vect, extend according to number of repetitions
     hyperparameter_vect = shuffle(repeat(hyperparameter_vect, n_parameter_iterations))
+    return hyperparameter_vect
 end
 
 
