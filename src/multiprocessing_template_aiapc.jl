@@ -31,8 +31,10 @@ _procs = addprocs(
     using AlgorithmicCompetition: run_and_extract
 end
 
-@time exp_list =
-    AlgorithmicCompetition.run_aiapc(; n_parameter_iterations = n_parameter_iterations, max_iter = Int(1e9))
+@time exp_list = AlgorithmicCompetition.run_aiapc(;
+    n_parameter_iterations = n_parameter_iterations,
+    max_iter = Int(1e9),
+)
 
 rmprocs(_procs)
 

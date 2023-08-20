@@ -9,7 +9,9 @@ Calculate the Q-value for player i at time t=0, given the price chosen by player
 function Q_i_0(env::DDDCEnv)
     freq_high_demand = env.data_demand_digital_params.frequency_high_demand
     avg_profit_by_demand_state = mean(env.profit_array[:, :, 1, :], dims = 2)
-    avg_profit = (avg_profit_by_demand_state[:, :, 1] .* freq_high_demand) .+ ((1 - freq_high_demand) .* avg_profit_by_demand_state[:, :, 1])
+    avg_profit =
+        (avg_profit_by_demand_state[:, :, 1] .* freq_high_demand) .+
+        ((1 - freq_high_demand) .* avg_profit_by_demand_state[:, :, 1])
     return Float64[avg_profit...]
 end
 
