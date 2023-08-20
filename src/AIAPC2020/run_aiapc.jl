@@ -3,11 +3,6 @@ using Distributed
 using Random
 using StatsBase
 
-# TODO: Add a second range for extension setup!
-const α_range = Float64.(range(0.0025, 0.25, 100))
-const β_range = Float64.(range(0.02, 2, 100))
-
-
 function build_hyperparameter_set(
     α_vect,
     β_vect,
@@ -48,7 +43,9 @@ Run AIAPC, given a configuration for a set of experiments.
 function run_aiapc(;
     n_parameter_iterations=1,
     max_iter=Int(1e9),
-    convergence_threshold=Int(1e5)
+    convergence_threshold=Int(1e5),
+    α_range=Float64.(range(0.0025, 0.25, 100)),
+    β_range=Float64.(range(0.02, 2, 100)),
 )
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
