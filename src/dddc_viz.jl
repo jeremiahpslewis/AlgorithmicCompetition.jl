@@ -430,8 +430,6 @@ save("plots/plot_221.svg", f221)
 # TODO: version of plt22, but where profit is normalized against demand scenario!
 plt23 = @chain df_summary begin
     @subset(:signal_is_strong == "Bool[0, 0]")
-    @sort(:weak_signal_quality_level, :frequency_high_demand)
-    # @select(:profit_gain_type, :profit_gain, :frequency_high_demand, :weak_signal_quality_level)
     @transform(
         :profit_gain_demand_all_min = :profit_gain_min,
         :profit_gain_demand_all_max = :profit_gain_max,
@@ -463,18 +461,16 @@ plt23 = @chain df_summary begin
         )
     )
     @select(:statistic, :profit_gain, :demand_level, :weak_signal_quality_level, :frequency_high_demand)
-    unstack(:statistic, :profit_gain)
+    @sort(:frequency_high_demand)
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        # :min => "Profit Gain",
-        # marker = :statistic => nonnumeric => "Metric",
-        color=:demand_level => nonnumeric => "Demand Level",
+        :profit_gain => "Profit Gain",
+        marker = :statistic => nonnumeric => "Metric",
+        color = :demand_level => nonnumeric => "Demand Level",
         layout=:weak_signal_quality_level => nonnumeric,
-        lower=:min,
-        upper=:max,
     ) *
-    visual(Band)
+    (visual(Lines) + visual(Scatter))
 end
 # NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f23 = draw(
