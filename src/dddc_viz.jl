@@ -26,9 +26,9 @@ df__ = @chain df_ begin
     @transform(
         :price_response_to_demand_signal_mse =
             eval(Meta.parse(:price_response_to_demand_signal_mse)),
-        :convergence_profit_demand_high =
+        :convergence_profit_demand_high_vect =
             eval(Meta.parse(:convergence_profit_demand_high)),
-        :convergence_profit_demand_low =
+        :convergence_profit_demand_low_vect =
             eval(Meta.parse(:convergence_profit_demand_low)),
         :profit_vect = eval(Meta.parse(:profit_vect)),
         :profit_gain = eval(Meta.parse(:profit_gain)),
@@ -110,23 +110,23 @@ df = @chain df___ begin
         :convergence_profit_demand_low_weak_signal_player =
             (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
             (:frequency_high_demand == 1) ? missing :
-            :convergence_profit_demand_low[:signal_is_weak_vect][1],
+            :convergence_profit_demand_low_vect[:signal_is_weak_vect][1],
     )
     @transform(
         :convergence_profit_demand_low_strong_signal_player =
             (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
             (:frequency_high_demand == 1) ? missing :
-            :convergence_profit_demand_low[:signal_is_strong_vect][1],
+            :convergence_profit_demand_low_vect[:signal_is_strong_vect][1],
     )
     @transform(
         :convergence_profit_demand_high_weak_signal_player =
             (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
-            :convergence_profit_demand_high[:signal_is_weak_vect][1],
+            :convergence_profit_demand_high_vect[:signal_is_weak_vect][1],
     )
     @transform(
         :convergence_profit_demand_high_strong_signal_player =
             (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
-            :convergence_profit_demand_high[:signal_is_strong_vect][1],
+            :convergence_profit_demand_high_vect[:signal_is_strong_vect][1],
     )
 
     # TODO: Uncomment for later versions...
@@ -210,6 +210,8 @@ df_summary = @chain df begin
         :profit_gain_min = minimum(:profit_gain),
         :profit_gain_demand_high_min = minimum(:profit_gain_demand_high),
         :profit_gain_demand_low_min = minimum(:profit_gain_demand_low),
+        :convergence_profit_demand_high = mean(:convergence_profit_demand_high_vect),
+        :convergence_profit_demand_low = mean(:convergence_profit_demand_low_vect),
     )
     @groupby(:signal_is_strong, :weak_signal_quality_level, :frequency_high_demand)
     @combine(
@@ -252,12 +254,14 @@ df_summary = @chain df begin
             mean(:convergence_profit_demand_low_strong_signal_player),
         # :convergence_profit_weak_signal_player = mean(:convergence_profit_weak_signal_player),
         # :convergence_profit_strong_signal_player = mean(:convergence_profit_strong_signal_player),
-        :price_response_to_demand_signal_mse =
-            (@passmissing mean(:price_response_to_demand_signal_mse_mean)),
+        # :price_response_to_demand_signal_mse =
+            # (@passmissing mean(:price_response_to_demand_signal_mse_mean)),
         :convergence_profit_demand_high = mean(:convergence_profit_demand_high),
         :convergence_profit_demand_low = mean(:convergence_profit_demand_low),
     )
 end
+
+@assert nrows(df_summary) == 132
 
 # Question is how existence of low state destabilizes the high state / overall collusion and to what extent...
 # Question becomes 'given signal, estimated demand state prob, which opponent do I believe I am competing against?' the low demand believing opponent or the high demand one...
@@ -425,32 +429,65 @@ save("plots/plot_221.svg", f221)
 
 # TODO: version of plt22, but where profit is normalized against demand scenario!
 plt23 = @chain df_summary begin
+    @subset(:signal_is_strong == "Bool[0, 0]")    
+    @sort(:weak_signal_quality_level, :frequency_high_demand)
+    # @select(:profit_gain_type, :profit_gain, :frequency_high_demand, :weak_signal_quality_level)
+    @transform(
+        :profit_gain_demand_all_min = :profit_gain_min,
+        :profit_gain_demand_all_max = :profit_gain_max,
+    )
     stack(
         [
             :profit_gain_demand_high_min,
-            :profit_gain_demand_low_min,
             :profit_gain_demand_high_max,
+            :profit_gain_demand_low_min,
             :profit_gain_demand_low_max,
+            :profit_gain_demand_all_min,
+            :profit_gain_demand_all_max,
         ],
         variable_name = :profit_gain_type,
         value_name = :profit_gain,
     )
-    @subset(:signal_is_strong == "Bool[0, 0]")
-    @sort(:frequency_high_demand)
-    @transform(:profit_gain_type = replace(:profit_gain_type, "profit_gain_" => ""))
+    @transform(
+        :demand_level =
+            replace(:profit_gain_type, r"profit_gain_demand_([a-z]+)_.*" => s"\1")
+    )
+    @transform(
+        :weak_signal_quality_level =
+            string("Signal Strength: ", :weak_signal_quality_level)
+    )
+    @transform(
+        :statistic = replace(
+            :profit_gain_type,
+            r"profit_gain_demand_[a-z]+_([a-z_]+)" => s"\1",
+        )
+    )
+    @select(:statistic, :profit_gain, :demand_level, :weak_signal_quality_level, :frequency_high_demand, :profit_gain_type)
+    unstack(:statistic, :profit_gain)
+    @select(:min, :max, :demand_level, :weak_signal_quality_level, :frequency_high_demand)
     data(_) *
     mapping(
-        :frequency_high_demand,
-        :profit_gain,
-        color = :profit_gain_type => nonnumeric,
+        :frequency_high_demand => "High Demand Frequency",
+        # :profit_gain => "Profit Gain",
+        # marker = :statistic => nonnumeric => "Metric",
+        color = :demand_level => nonnumeric => "Demand Level",
         layout = :weak_signal_quality_level => nonnumeric,
+        lower = :min,
+        upper = :max,
     ) *
-    (visual(Scatter) + visual(Lines))
+    visual(LinesFill)
 end
 # NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f23 = draw(
     plt23,
-    # legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+    axis = (
+        xticks = 0.5:0.1:1,
+        yticks = 0:0.1:1.2,
+        aspect = 1,
+        limits = (0.5, 1.05, 0.2, 1.2),
+    ),
+
 )
 save("plots/plot_23.svg", f23)
 
