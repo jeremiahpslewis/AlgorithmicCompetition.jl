@@ -79,7 +79,7 @@ function run_aiapc(;
 
     for i in 1:n_parameter_iterations
         println("Parameter iteration $i of $n_parameter_iterations")
-        file_name = "$(folder_name)/simulation_results_aiapc_$(i)_.csv"
+        file_name = "$(folder_name)/simulation_results_aiapc_$(i).csv"
         
 
         exp_list_ = AIAPCSummary[]

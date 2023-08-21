@@ -33,7 +33,7 @@ end
 
 @time exp_df = AlgorithmicCompetition.run_aiapc(;
     n_parameter_iterations = n_parameter_iterations,
-    max_iter = Int(1e9),
+    max_iter = Int(2e5),
     version = version,
     start_timestamp = start_timestamp,
 )
