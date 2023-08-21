@@ -339,7 +339,7 @@ plt20 = @chain df_summary begin
     mapping(
         :frequency_high_demand,
         :profit_mean,
-        color=:weak_signal_quality_level => nonnumeric,
+        color=:weak_signal_quality_level => nonnumeric => "Weak Signal Strength",,
     ) *
     (visual(Scatter) + visual(Lines))
 end
@@ -359,7 +359,7 @@ plt21 = @chain df_summary begin
     mapping(
         :frequency_high_demand,
         :price_response_to_demand_signal_mse,
-        color=:weak_signal_quality_level => nonnumeric,
+        color=:weak_signal_quality_level => nonnumeric => "Weak Signal Strength",,
     ) *
     (visual(Scatter) + visual(Lines))
 end
@@ -674,6 +674,19 @@ f27 = draw(
     ),
 )
 save("plots/plot_27.svg", f24)
+
+plt_28 = @chain df_weak_weak_outcomes begin
+    data(_) *
+    mapping(
+        :frequency_high_demand => "High Demand Frequency",
+        :pct_compensating_profit_gain => "Percent of Weak-Weak Outcomes with Compensating Profit Gain",
+        color=:weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
+    ) *
+    visual(Lines)
+    
+end
+f28 = draw(plt_28)
+save("plots/plots_28.svg", f28)
 
 plt3 = @chain df_summary begin
     @sort(:frequency_high_demand)
