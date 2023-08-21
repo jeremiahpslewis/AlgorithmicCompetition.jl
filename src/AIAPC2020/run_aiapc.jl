@@ -71,7 +71,7 @@ function run_aiapc(;
         1)
 
     println(
-        "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times",
+        "About to run $(length(hyperparameter_vect)) parameter settings, each $n_parameter_iterations times",
     )
 
     folder_name = "aiapc_$(version)_$(start_timestamp)"
