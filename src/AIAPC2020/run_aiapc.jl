@@ -2,6 +2,8 @@ import ProgressMeter: @showprogress
 using Distributed
 using Random
 using StatsBase
+using DataFrames
+using CSV
 
 function build_hyperparameter_set(
     α_vect,
@@ -47,6 +49,8 @@ function run_aiapc(;
     convergence_threshold = Int(1e5),
     α_range = Float64.(range(0.0025, 0.25, 100)),
     β_range = Float64.(range(0.02, 2, 100)),
+    version = "v0.0.0",
+    start_timestamp = now(),
 )
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
@@ -64,15 +68,28 @@ function run_aiapc(;
         max_iter,
         competition_solution_dict,
         convergence_threshold,
-        n_parameter_iterations,
-    )
+        1)
 
-    exp_list_ = AIAPCSummary[]
     println(
         "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times",
     )
-    exp_list = @showprogress pmap(run_and_extract, hyperparameter_vect; on_error = identity)
-    append!(exp_list_, exp_list)
 
-    return exp_list_
+    folder_name = "aiapc_$(version)_$(start_timestamp)"
+    mkpath(folder_name)
+
+    for i in 1:n_parameter_iterations
+        file_name = "$(folder_name)/simulation_results_aiapc_$(i)_.csv"
+        
+
+        exp_list_ = AIAPCSummary[]
+        exp_list = @showprogress pmap(run_and_extract, hyperparameter_vect; on_error=identity)
+        
+        df = AlgorithmicCompetition.extract_sim_results(exp_list)
+        CSV.write(file_name, df)
+    end
+
+    exp_df = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
+    exp_df = vcat(exp_df...)
+
+    return exp_df
 end
