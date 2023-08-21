@@ -126,11 +126,18 @@ function draw_price_diagnostic(hyperparams::DDDCHyperParameters)
             label = repeat(["Bertrand Nash", "Monopoly"], outer = 2),
             demand = repeat(["High Demand", "Low Demand"], inner = 2),
         )) *
-        mapping(:price, :profit, color = :label => "Equilibria", row = :demand) *
+        mapping(
+            :price,
+            :profit => "Profit",
+            color = :label => "Equilibria",
+            row = :demand
+        ) *
         visual(Scatter)
 
     plt =
-        data(profit_df) *
+        @chain profit_df begin
+        @transform(:demand = :demand == "high" ? "High Demand" : "Low Demand")
+        data(_) *
         mapping(
             :price_options => "Price",
             :symmetric_profit => "Profit",

@@ -8,8 +8,11 @@ using CSV
 using DataFrames
 using Statistics
 
-file_name = "simulation_results_aiapc_v0.0.1_2023-08-19T21:26:16.300.csv"
+folder_name = "aiapc_v0.0.2_data"
 df = DataFrame(CSV.File(file_name))
+
+df_ = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
+df_ = vcat(df_...)
 
 competition_params_dict = Dict(
     :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
