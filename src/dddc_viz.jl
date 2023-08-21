@@ -686,7 +686,7 @@ plt_28 = @chain df_weak_weak_outcomes begin
     
 end
 f28 = draw(plt_28)
-save("plots/plots_28.svg", f28)
+save("plots/plot_28.svg", f28)
 
 plt3 = @chain df_summary begin
     @sort(:frequency_high_demand)
