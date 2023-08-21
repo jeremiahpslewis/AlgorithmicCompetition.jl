@@ -675,6 +675,18 @@ f27 = draw(
 )
 save("plots/plot_27.svg", f24)
 
+df_weak_weak_outcomes = @chain df begin
+    @subset((:signal_is_strong == "Bool[0, 0]") & (:frequency_high_demand < 1.0))
+    @transform(
+        :compensating_profit_gain = (:profit_gain_demand_high[1] > :profit_gain_demand_high[2]) != (:profit_gain_demand_low[1] > :profit_gain_demand_low[2])
+    )
+    @groupby(:weak_signal_quality_level, :frequency_high_demand)
+    @combine(
+        :pct_compensating_profit_gain = mean(:compensating_profit_gain),
+    )
+    @sort(:frequency_high_demand)
+end
+
 plt_28 = @chain df_weak_weak_outcomes begin
     data(_) *
     mapping(
