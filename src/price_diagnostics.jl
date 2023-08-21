@@ -146,5 +146,6 @@ function draw_price_diagnostic(hyperparams::DDDCHyperParameters)
             row = :demand => "Demand Level",
         ) *
         (visual(Scatter) + visual(LinesFill))
+    end
     return plt + plt_1
 end
