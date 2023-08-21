@@ -544,10 +544,12 @@ end
         max_iter,
         competition_solution_dict,
         convergence_threshold,
-        n_parameter_iterations
-        )
+        n_parameter_iterations,
+    )
 
-    df_1 = DataFrame([(hyperparameter.α, hyperparameter.β, 1) for hyperparameter in hyperparameter_vect])
+    df_1 = DataFrame([
+        (hyperparameter.α, hyperparameter.β, 1) for hyperparameter in hyperparameter_vect
+    ])
     rename!(df_1, [:α, :β, :count])
     df_ = @chain df_1 @groupby(:α, :β) @combine(length(:count))
     @test all(df_[!, :count_length] .== 2)
