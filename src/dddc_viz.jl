@@ -565,20 +565,20 @@ plt26 = @chain df_summary begin
             :percent_unexplored_states_demand_high_strong_signal_player,
             :percent_unexplored_states_demand_low_strong_signal_player,
         ],
-        variable_name = :profit_gain_type,
-        value_name = :profit_gain,
+        variable_name = :percent_unexplored_states_type,
+        value_name = :percent_unexplored_states_value,
     )
     @subset((:signal_is_strong == "Bool[1, 0]") & (:frequency_high_demand != 1))
     @sort(:frequency_high_demand)
     @transform(
-        :convergence_profit_type =
-            replace(:convergence_profit_type, "convergence_profit_" => "")
+        :percent_unexplored_states_type =
+            replace(:percent_unexplored_states_type, "convergence_profit_" => "")
     )
     data(_) *
     mapping(
         :frequency_high_demand,
-        :profit_gain,
-        color = :profit_gain_type => nonnumeric,
+        :percent_unexplored_states_value,
+        color = :percent_unexplored_states_type => nonnumeric,
         layout = :weak_signal_quality_level => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
@@ -595,7 +595,7 @@ f26 = draw(
         labelsize = 10,
     ),
 )
-save("plots/plot_26.svg", f24)
+save("plots/plot_26.svg", f26)
 
 plt27 = @chain df_summary begin
     stack(
