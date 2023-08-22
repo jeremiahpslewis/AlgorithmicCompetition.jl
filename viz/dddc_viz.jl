@@ -49,14 +49,12 @@ df___ = @chain df__ begin
     @transform(:percent_unexplored_states = mean(:percent_unexplored_states_vect))
     @transform(
         :percent_unexplored_states_demand_low_weak_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
-            (:frequency_high_demand == 1) ? missing :
+            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
             :percent_unexplored_states_vect[:signal_is_weak_vect][1],
     )
     @transform(
         :percent_unexplored_states_demand_low_strong_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
-            (:frequency_high_demand == 1) ? missing :
+            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
             :percent_unexplored_states_vect[:signal_is_strong_vect][1],
     )
     @transform(
@@ -604,7 +602,7 @@ plt26 = @chain df_summary begin
         variable_name=:percent_unexplored_states_type,
         value_name=:percent_unexplored_states_value,
     )
-    @subset((:signal_is_strong == "Bool[1, 0]") & (:frequency_high_demand != 1))
+    @subset((:signal_is_strong == "Bool[1, 0]"))
     @sort(:frequency_high_demand)
     @transform(
         :percent_unexplored_states_type =
@@ -635,6 +633,11 @@ f26 = draw(
         labelsize=10,
         nbanks = 2
     ),
+    axis=(
+        yticks=0:0.1:1,
+        xticks=0:0.1:1,
+        limits=(0.5, 1.02, 0.0, 0.85),
+    )
 )
 save("plots/dddc/plot_26.svg", f26)
 
