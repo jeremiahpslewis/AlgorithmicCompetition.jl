@@ -187,7 +187,7 @@ plt1 = @chain df begin
     @transform(:signal_is_strong = string(:signal_is_strong))
     data(_) *
     mapping(
-        :frequency_high_demand,
+        :frequency_high_demand => "High Demand Frequency",
         :profit_mean,
         color=:signal_is_strong => nonnumeric,
         row=:signal_is_strong,
@@ -319,7 +319,7 @@ plt2 = @chain df_summary begin
     @sort(:frequency_high_demand)
     data(_) *
     mapping(
-        :frequency_high_demand,
+        :frequency_high_demand => "High Demand Frequency",
         :profit_value,
         color=:profit_variable_name => nonnumeric,
         layout=:weak_signal_quality_level => nonnumeric,
@@ -337,8 +337,8 @@ plt20 = @chain df_summary begin
     @sort(:frequency_high_demand)
     data(_) *
     mapping(
-        :frequency_high_demand,
-        :profit_mean,
+        :frequency_high_demand => "High Demand Frequency",
+        :profit_mean => "Average Profit",
         color=:weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
     ) *
     (visual(Scatter) + visual(Lines))
@@ -357,7 +357,7 @@ plt21 = @chain df_summary begin
     @sort(:frequency_high_demand)
     data(_) *
     mapping(
-        :frequency_high_demand,
+        :frequency_high_demand => "High Demand Frequency",
         :price_response_to_demand_signal_mse,
         color=:weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
     ) *
@@ -380,7 +380,7 @@ plt22 = @chain df_summary begin
     @sort(:frequency_high_demand)
     data(_) *
     mapping(
-        :frequency_high_demand,
+        :frequency_high_demand => "High Demand Frequency",
         :profit,
         color=:demand_level => nonnumeric,
         layout=:weak_signal_quality_level => nonnumeric,
@@ -411,7 +411,7 @@ plt221 = @chain df_summary begin
     )
     data(_) *
     mapping(
-        :frequency_high_demand,
+        :frequency_high_demand => "High Demand Frequency",
         :profit_gain,
         color=:min_max => nonnumeric => "",
         # columns = :weak_signal_quality_level => nonnumeric,
@@ -515,7 +515,7 @@ plt24 = @chain df_summary begin
     @subset((:frequency_high_demand < 1) | (:demand_level == "high"))
     data(_) *
     mapping(
-        :frequency_high_demand,
+        :frequency_high_demand => "High Demand Frequency",
         :profit_gain,
         marker=:demand_level => nonnumeric => "Demand Level",
         layout=:weak_signal_quality_level => nonnumeric,
@@ -566,7 +566,7 @@ plt25 = @chain df_summary begin
     )
     data(_) *
     mapping(
-        :frequency_high_demand,
+        :frequency_high_demand => "High Demand Frequency",
         :convergence_profit,
         color=:convergence_profit_type => nonnumeric,
         layout=:weak_signal_quality_level => nonnumeric,
@@ -607,7 +607,7 @@ plt26 = @chain df_summary begin
     )
     data(_) *
     mapping(
-        :frequency_high_demand,
+        :frequency_high_demand => "High Demand Frequency",
         :percent_unexplored_states_value,
         color=:percent_unexplored_states_type => nonnumeric,
         layout=:weak_signal_quality_level => nonnumeric,
@@ -653,7 +653,7 @@ plt27 = @chain df_summary begin
     )
     data(_) *
     mapping(
-        :frequency_high_demand,
+        :frequency_high_demand => "High Demand Frequency",
         :profit_gain,
         color=:weak_signal_quality_level => nonnumeric,
         col=:demand_level => nonnumeric,
@@ -723,7 +723,7 @@ save("plots/dddc/plot_3.svg", f3)
 plt4 = @chain df_summary begin
     data(_) *
     mapping(
-        :frequency_high_demand,
+        :frequency_high_demand => "High Demand Frequency",
         :profit_min_mean,
         color=:signal_is_strong => nonnumeric,
     ) *
@@ -736,7 +736,7 @@ save("plots/dddc/plot_4.svg", f4)
 plt5 = @chain df_summary begin
     data(_) *
     mapping(
-        :frequency_high_demand,
+        :frequency_high_demand => "High Demand Frequency",
         :profit_max_mean,
         color=:signal_is_strong => nonnumeric,
     ) *
