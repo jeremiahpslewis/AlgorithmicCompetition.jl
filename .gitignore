@@ -27,3 +27,4 @@ settings.json
 *.csv
 *.png
 *.svg
+!viz/**/*.csv
