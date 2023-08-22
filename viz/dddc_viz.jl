@@ -633,6 +633,7 @@ f26 = draw(
         padding=5,
         titlesize=10,
         labelsize=10,
+        nbanks = 2
     ),
 )
 save("plots/dddc/plot_26.svg", f26)
