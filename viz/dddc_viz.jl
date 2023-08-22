@@ -188,7 +188,7 @@ plt1 = @chain df begin
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        :profit_mean,
+        :profit_mean => "Average Profit",
         color=:signal_is_strong => nonnumeric,
         row=:signal_is_strong,
     ) *
@@ -358,7 +358,7 @@ plt21 = @chain df_summary begin
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        :price_response_to_demand_signal_mse,
+        :price_response_to_demand_signal_mse => "Mean Squared Error Price Difference by Demand Signal",
         color=:weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
     ) *
     (visual(Scatter) + visual(Lines))
