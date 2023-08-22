@@ -195,7 +195,7 @@ plt1 = @chain df begin
     visual(Scatter)
 end
 f1 = draw(plt1)
-# save("plots/plot_1.svg", f1)
+# save("plots/dddc/plot_1.svg", f1)
 
 df_summary = @chain df begin
     @transform!(@subset(:signal_is_strong == "Bool[0, 1]"), :signal_is_strong = "Bool[1, 0]",)
@@ -307,7 +307,7 @@ f11 = @chain df_post_prob begin
         ),
     )
 end
-save("plots/plot_11.svg", f11)
+save("plots/dddc/plot_11.svg", f11)
 
 plt2 = @chain df_summary begin
     stack(
@@ -330,7 +330,7 @@ f2 = draw(
     plt2,
     legend=(position=:top, titleposition=:left, framevisible=true, padding=5),
 )
-save("plots/plot_2.svg", f2)
+save("plots/dddc/plot_2.svg", f2)
 
 plt20 = @chain df_summary begin
     @subset(:signal_is_strong == "Bool[0, 0]")
@@ -347,7 +347,7 @@ f20 = draw(
     plt20,
     legend=(position=:top, titleposition=:left, framevisible=true, padding=5),
 )
-save("plots/plot_20.svg", f20)
+save("plots/dddc/plot_20.svg", f20)
 
 plt21 = @chain df_summary begin
     @subset(
@@ -368,7 +368,7 @@ f21 = draw(
     plt21,
     legend=(position=:top, titleposition=:left, framevisible=true, padding=5),
 )
-save("plots/plot_21.svg", f21)
+save("plots/dddc/plot_21.svg", f21)
 
 plt22 = @chain df_summary begin
     stack(
@@ -392,7 +392,7 @@ f22 = draw(
     plt22,
     legend=(position=:top, titleposition=:left, framevisible=true, padding=5),
 )
-save("plots/plot_22.svg", f22)
+save("plots/dddc/plot_22.svg", f22)
 
 plt221 = @chain df_summary begin
     @subset(:signal_is_strong == "Bool[0, 0]")
@@ -425,7 +425,7 @@ f221 = draw(
     legend=(position=:top, titleposition=:left, framevisible=true, padding=5),
     axis=(xlabel="High Demand Frequency", ylabel="Profit Gain"),
 )
-save("plots/plot_221.svg", f221)
+save("plots/dddc/plot_221.svg", f221)
 
 # TODO: version of plt22, but where profit is normalized against demand scenario!
 plt23 = @chain df_summary begin
@@ -483,7 +483,7 @@ f23 = draw(
         limits=(0.5, 1.05, 0.2, 1.2),
     ),
 )
-save("plots/plot_23.svg", f23)
+save("plots/dddc/plot_23.svg", f23)
 
 plt24 = @chain df_summary begin
     stack(
@@ -545,7 +545,7 @@ f24 = draw(
         limits=(0.5, 1.05, 0.0, 1.0),
     ),
 )
-save("plots/plot_24.svg", f24)
+save("plots/dddc/plot_24.svg", f24)
 
 plt25 = @chain df_summary begin
     stack(
@@ -586,7 +586,7 @@ f25 = draw(
     ),
     # axis = (width = 100, height = 100),
 )
-save("plots/plot_25.svg", f25)
+save("plots/dddc/plot_25.svg", f25)
 
 plt26 = @chain df_summary begin
     stack(
@@ -626,7 +626,7 @@ f26 = draw(
         labelsize=10,
     ),
 )
-save("plots/plot_26.svg", f26)
+save("plots/dddc/plot_26.svg", f26)
 
 plt27 = @chain df_summary begin
     stack(
@@ -673,7 +673,7 @@ f27 = draw(
         labelsize=10,
     ),
 )
-save("plots/plot_27.svg", f24)
+save("plots/dddc/plot_27.svg", f24)
 
 df_weak_weak_outcomes = @chain df begin
     @subset((:signal_is_strong == "Bool[0, 0]") & (:frequency_high_demand < 1.0))
@@ -698,7 +698,7 @@ plt_28 = @chain df_weak_weak_outcomes begin
     
 end
 f28 = draw(plt_28)
-save("plots/plot_28.svg", f28)
+save("plots/dddc/plot_28.svg", f28)
 
 plt3 = @chain df_summary begin
     @sort(:frequency_high_demand)
@@ -716,7 +716,7 @@ plt3 = @chain df_summary begin
     (visual(Scatter) + visual(Lines))
 end
 f3 = draw(plt3, axis=(xticks=0.5:0.1:1,))
-save("plots/plot_3.svg", f3)
+save("plots/dddc/plot_3.svg", f3)
 
 
 # TODO: Make this profit for low signal agent
@@ -730,7 +730,7 @@ plt4 = @chain df_summary begin
     (visual(Scatter) + linear())
 end
 f4 = draw(plt4)
-save("plots/plot_4.svg", f4)
+save("plots/dddc/plot_4.svg", f4)
 
 # TODO: Make this profit for high signal agent
 plt5 = @chain df_summary begin
@@ -743,7 +743,7 @@ plt5 = @chain df_summary begin
     (visual(Scatter) + linear())
 end
 f5 = draw(plt5)
-save("plots/plot_5.svg", f5)
+save("plots/dddc/plot_5.svg", f5)
 
 α = Float64(0.125)
 β = Float64(4e-1)
@@ -789,6 +789,6 @@ f6 = draw(
     ),
     legend=(position=:bottom, titleposition=:left, framevisible=true, padding=5),
 )
-save("plots/plot_6.svg", f6)
+save("plots/dddc/plot_6.svg", f6)
 
 # TODO: Look into different levels of low signal quality, whether the 'drop-off' happens subtly or abruptly
