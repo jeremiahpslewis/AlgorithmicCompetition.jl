@@ -130,12 +130,12 @@ df = @chain df___ begin
     )
 
     # TODO: Uncomment for later versions...
-    # @transform(
-    #     :convergence_profit_weak_signal_player = (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing : :convergence_profit[:signal_is_weak_vect][1],
-    # )
-    # @transform(
-    #     :convergence_profit_strong_signal_player = (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing : :convergence_profit[:signal_is_strong_vect][1],
-    # )
+    @transform(
+        :convergence_profit_weak_signal_player = (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing : :profit_vect[:signal_is_weak_vect][1],
+    )
+    @transform(
+        :convergence_profit_strong_signal_player = (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing : :profit_vect[:signal_is_strong_vect][1],
+    )
 end
 
 # Basic correctness assurance tests...
@@ -252,10 +252,10 @@ df_summary = @chain df begin
             mean(:convergence_profit_demand_high_strong_signal_player),
         :convergence_profit_demand_low_strong_signal_player =
             mean(:convergence_profit_demand_low_strong_signal_player),
-        # :convergence_profit_weak_signal_player = mean(:convergence_profit_weak_signal_player),
-        # :convergence_profit_strong_signal_player = mean(:convergence_profit_strong_signal_player),
-        # :price_response_to_demand_signal_mse =
-        # (@passmissing mean(:price_response_to_demand_signal_mse_mean)),
+        :convergence_profit_weak_signal_player = mean(:convergence_profit_weak_signal_player),
+        :convergence_profit_strong_signal_player = mean(:convergence_profit_strong_signal_player),
+        :price_response_to_demand_signal_mse =
+            (@passmissing mean(:price_response_to_demand_signal_mse_mean)),
         :convergence_profit_demand_high = mean(:convergence_profit_demand_high),
         :convergence_profit_demand_low = mean(:convergence_profit_demand_low),
     )
@@ -339,7 +339,7 @@ plt20 = @chain df_summary begin
     mapping(
         :frequency_high_demand,
         :profit_mean,
-        color=:weak_signal_quality_level => nonnumeric => "Weak Signal Strength",,
+        color=:weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
     ) *
     (visual(Scatter) + visual(Lines))
 end
@@ -359,7 +359,7 @@ plt21 = @chain df_summary begin
     mapping(
         :frequency_high_demand,
         :price_response_to_demand_signal_mse,
-        color=:weak_signal_quality_level => nonnumeric => "Weak Signal Strength",,
+        color=:weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
     ) *
     (visual(Scatter) + visual(Lines))
 end

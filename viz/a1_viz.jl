@@ -3,7 +3,7 @@ using Chain
 using DataFrameMacros
 using AlgebraOfGraphics
 using AlgorithmicCompetition:
-    AIAPCHyperParameters, AIAPCEnv, CompetitionParameters, CompetitionSolution, profit_gain
+    AIAPCHyperParameters, AIAPCEnv, CompetitionParameters, CompetitionSolution, profit_gain, draw_price_diagnostic
 using CSV
 using DataFrames
 using Statistics
