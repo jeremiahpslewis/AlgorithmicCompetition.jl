@@ -48,22 +48,12 @@ df___ = @chain df__ begin
     @transform(:profit_mean = mean(:profit_vect))
     @transform(:percent_unexplored_states = mean(:percent_unexplored_states_vect))
     @transform(
-        :percent_unexplored_states_demand_low_weak_signal_player =
+        :percent_unexplored_states_weak_signal_player =
             (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
             :percent_unexplored_states_vect[:signal_is_weak_vect][1],
     )
     @transform(
-        :percent_unexplored_states_demand_low_strong_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
-            :percent_unexplored_states_vect[:signal_is_strong_vect][1],
-    )
-    @transform(
-        :percent_unexplored_states_demand_high_weak_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
-            :percent_unexplored_states_vect[:signal_is_weak_vect][1],
-    )
-    @transform(
-        :percent_unexplored_states_demand_high_strong_signal_player =
+        :percent_unexplored_states_strong_signal_player =
             (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
             :percent_unexplored_states_vect[:signal_is_strong_vect][1],
     )
@@ -228,14 +218,10 @@ df_summary = @chain df begin
         :profit_gain_demand_low_strong_signal_player =
             mean(:profit_gain_demand_low_strong_signal_player),
         :percent_unexplored_states = mean(:percent_unexplored_states),
-        :percent_unexplored_states_demand_low_weak_signal_player =
-            mean(:percent_unexplored_states_demand_low_weak_signal_player),
-        :percent_unexplored_states_demand_low_strong_signal_player =
-            mean(:percent_unexplored_states_demand_low_strong_signal_player),
-        :percent_unexplored_states_demand_high_weak_signal_player =
-            mean(:percent_unexplored_states_demand_high_weak_signal_player),
-        :percent_unexplored_states_demand_high_strong_signal_player =
-            mean(:percent_unexplored_states_demand_high_strong_signal_player),
+        :percent_unexplored_states_weak_signal_player =
+            mean(:percent_unexplored_states_weak_signal_player),
+        :percent_unexplored_states_strong_signal_player =
+            mean(:percent_unexplored_states_strong_signal_player),
         :profit_gain_weak_signal_player = mean(:profit_gain_weak_signal_player),
         :profit_gain_strong_signal_player = mean(:profit_gain_strong_signal_player),
         :profit_gain_demand_high_min = mean(:profit_gain_demand_high_min),
@@ -594,10 +580,8 @@ save("plots/dddc/plot_25.svg", f25)
 plt26 = @chain df_summary begin
     stack(
         [
-            :percent_unexplored_states_demand_high_weak_signal_player,
-            :percent_unexplored_states_demand_low_weak_signal_player,
-            :percent_unexplored_states_demand_high_strong_signal_player,
-            :percent_unexplored_states_demand_low_strong_signal_player,
+            :percent_unexplored_states_weak_signal_player,
+            :percent_unexplored_states_strong_signal_player,
         ],
         variable_name=:percent_unexplored_states_type,
         value_name=:percent_unexplored_states_value,
@@ -616,7 +600,7 @@ plt26 = @chain df_summary begin
     mapping(
         :frequency_high_demand => "High Demand Frequency",
         :percent_unexplored_states_value => "Percent Unexplored States",
-        color=:percent_unexplored_states_type => nonnumeric => "Demand Level and Signal Strength",
+        color=:percent_unexplored_states_type => nonnumeric => "Signal Strength",
         layout=:weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
     ) *
     (visual(Scatter) + visual(Lines))
