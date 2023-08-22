@@ -18,7 +18,7 @@ using AlgorithmicCompetition:
     draw_price_diagnostic
 
 folder_name = "dddc_v0.0.6_data"
-
+mkpath("plots/dddc")
 df_ = DataFrame.(CSV.File.(readdir(folder_name, join=true)))
 df_ = vcat(df_...)
 
@@ -261,7 +261,7 @@ df_summary = @chain df begin
     )
 end
 
-@assert nrows(df_summary) == 132
+@assert nrow(df_summary) == 132
 
 # Question is how existence of low state destabilizes the high state / overall collusion and to what extent...
 # Question becomes 'given signal, estimated demand state prob, which opponent do I believe I am competing against?' the low demand believing opponent or the high demand one...

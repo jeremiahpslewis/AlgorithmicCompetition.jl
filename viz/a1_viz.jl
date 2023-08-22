@@ -9,10 +9,9 @@ using DataFrames
 using Statistics
 
 folder_name = "aiapc_v0.0.2_data"
-df = DataFrame(CSV.File(file_name))
-
 df_ = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
-df_ = vcat(df_...)
+df = vcat(df_...)
+mkpath("plots/aiapc")
 
 competition_params_dict = Dict(
     :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
@@ -29,8 +28,6 @@ hyperparams = AIAPCHyperParameters(
     competition_solution_dict,
 )
 env = AIAPCEnv(hyperparams)
-
-@chain df @subset(:α == 0.0025)
 
 df_summary = @chain df begin
     @groupby(:α, :β)
