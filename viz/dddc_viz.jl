@@ -610,11 +610,15 @@ plt26 = @chain df_summary begin
         :percent_unexplored_states_type =
             replace(:percent_unexplored_states_type, "percent_unexplored_states_" => "")
     )
+    @transform(
+        :percent_unexplored_states_type =
+            replace(:percent_unexplored_states_type, "_" => " ")
+    )
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
         :percent_unexplored_states_value => "Percent Unexplored States",
-        color=:percent_unexplored_states_type => nonnumeric => ,
+        color=:percent_unexplored_states_type => nonnumeric => "Demand Level and Signal Strength",
         layout=:weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
     ) *
     (visual(Scatter) + visual(Lines))
