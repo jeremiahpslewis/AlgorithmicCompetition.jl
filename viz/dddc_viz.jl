@@ -377,12 +377,17 @@ plt22 = @chain df_summary begin
         value_name=:profit,
     )
     @subset(:signal_is_strong == "Bool[0, 0]")
+    @transform(:demand_level = replace(:demand_level, "convergence_profit_demand_" => ""))
+    @transform(
+        :weak_signal_quality_level =
+            string("Weak Signal Strength: ", :weak_signal_quality_level)
+    )
     @sort(:frequency_high_demand)
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        :profit,
-        color=:demand_level => nonnumeric,
+        :profit => "Average Profit",
+        color=:demand_level => nonnumeric => "Demand Level",
         layout=:weak_signal_quality_level => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
@@ -567,8 +572,8 @@ plt25 = @chain df_summary begin
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        :convergence_profit,
-        color=:convergence_profit_type => nonnumeric,
+        :convergence_profit => "Average Profit",
+        color=:convergence_profit_type => nonnumeric => "Demand Level",
         layout=:weak_signal_quality_level => nonnumeric,
     ) *
     (visual(Scatter) + visual(Lines))
@@ -603,14 +608,14 @@ plt26 = @chain df_summary begin
     @sort(:frequency_high_demand)
     @transform(
         :percent_unexplored_states_type =
-            replace(:percent_unexplored_states_type, "convergence_profit_" => "")
+            replace(:percent_unexplored_states_type, "percent_unexplored_states_" => "")
     )
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        :percent_unexplored_states_value,
-        color=:percent_unexplored_states_type => nonnumeric,
-        layout=:weak_signal_quality_level => nonnumeric,
+        :percent_unexplored_states_value => "Percent Unexplored States",
+        color=:percent_unexplored_states_type => nonnumeric => ,
+        layout=:weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
     ) *
     (visual(Scatter) + visual(Lines))
 end
