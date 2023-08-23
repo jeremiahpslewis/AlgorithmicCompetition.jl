@@ -3,7 +3,12 @@ using Chain
 using DataFrameMacros
 using AlgebraOfGraphics
 using AlgorithmicCompetition:
-    AIAPCHyperParameters, AIAPCEnv, CompetitionParameters, CompetitionSolution, profit_gain, draw_price_diagnostic
+    AIAPCHyperParameters,
+    AIAPCEnv,
+    CompetitionParameters,
+    CompetitionSolution,
+    profit_gain,
+    draw_price_diagnostic
 using CSV
 using DataFrames
 using Statistics
@@ -46,27 +51,18 @@ fig_0 = draw(
         xlabel = "Competitor's Price Choice",
     ),
 )
-save(
-    "plots/aiapc/fig_0.svg",
-    fig_0,
-)
+save("plots/aiapc/fig_0.svg", fig_0)
 
 plt1 = @chain df_summary begin
     data(_) * mapping(:β, :α, :Δ_π_bar) * visual(Heatmap)
 end
 
 fig_1 = draw(plt1)
-save(
-    "plots/aiapc/fig_1.svg",
-    fig_1,
-)
+save("plots/aiapc/fig_1.svg", fig_1)
 
 plt2 = @chain df_summary begin
     data(_) * mapping(:β, :α, :iterations_until_convergence) * visual(Heatmap)
 end
 
 fig_2 = draw(plt2)
-save(
-    "plots/aiapc/fig_2.svg",
-    fig_2,
-)
+save("plots/aiapc/fig_2.svg", fig_2)
