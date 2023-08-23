@@ -452,10 +452,6 @@ plt23 = @chain df_summary begin
             replace(:profit_gain_type, r"profit_gain_demand_([a-z]+)_.*" => s"\1")
     )
     @transform(
-        :weak_signal_quality_level =
-            string("Signal Strength: ", :weak_signal_quality_level)
-    )
-    @transform(
         :statistic =
             replace(:profit_gain_type, r"profit_gain_demand_[a-z]+_([a-z_]+)" => s"\1")
     )
@@ -463,7 +459,7 @@ plt23 = @chain df_summary begin
         :statistic,
         :profit_gain,
         :demand_level,
-        :weak_signal_quality_level,
+        :weak_signal_quality_level_str,
         :frequency_high_demand
     )
     @sort(:frequency_high_demand)
