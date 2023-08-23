@@ -82,7 +82,7 @@ function draw_price_diagnostic(hyperparams::AIAPCHyperParameters)
             ),
             label = ["Bertrand Nash", "Monopoly"],
         )) *
-        mapping(:price, :profit, color = :label) *
+        mapping(:price, :profit, color = :label => "Equilibria") *
         visual(Scatter)
 
     plt = @chain profit_df begin
