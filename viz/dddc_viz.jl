@@ -319,7 +319,7 @@ plt2 = @chain df_summary begin
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        :profit_value,
+        :profit_value => "Average Profit",
         color=:profit_variable_name => nonnumeric,
         layout=:weak_signal_quality_level_str => nonnumeric,
     ) *
@@ -738,7 +738,7 @@ plt4 = @chain df_summary begin
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        :profit_min_mean,
+        :profit_min_mean => "Minimum Player Profit per Trial",
         color=:signal_is_strong => nonnumeric,
     ) *
     (visual(Scatter) + linear())
@@ -751,7 +751,7 @@ plt5 = @chain df_summary begin
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        :profit_max_mean,
+        :profit_max_mean => "Maximum Player Profit per Trial",
         color=:signal_is_strong => nonnumeric,
     ) *
     (visual(Scatter) + linear())
