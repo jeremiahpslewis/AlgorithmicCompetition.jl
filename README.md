@@ -1,5 +1,7 @@
 # AlgorithmicCompetition.jl
 
+[![DOI](https://zenodo.org/badge/570286360.svg)](https://zenodo.org/badge/latestdoi/570286360)
+
 Reinforcement learning models of algorithmic competition
 
 ## How to Run
