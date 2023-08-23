@@ -101,7 +101,7 @@
         0.2475,
         0.25,
     ]
-    @test α_range == alpha_range
+    @test Float64.(range(0.0025, 0.25, 100)) == alpha_range
 
     beta_range = [
         0.005,
@@ -206,5 +206,5 @@
         0.5,
     ]
 
-    @test β_range == beta_range * 4 # weird quadruple counting issue with original paper
+    @test Float64.(range(0.02, 2, 100)) == beta_range * 4 # weird quadruple counting issue with original paper
 end

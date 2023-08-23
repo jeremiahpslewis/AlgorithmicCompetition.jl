@@ -63,8 +63,6 @@ using AlgorithmicCompetition:
     solve_bertrand,
     solve_monopolist,
     TDLearner,
-    α_range,
-    β_range,
     π
 using Distributed
 
