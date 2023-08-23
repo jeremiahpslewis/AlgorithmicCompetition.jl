@@ -61,7 +61,7 @@ fig_1 = draw(plt1)
 save("plots/aiapc/fig_1.svg", fig_1)
 
 plt2 = @chain df_summary begin
-    data(_) * mapping(:β, :α, :iterations_until_convergence => "Iterations until convergence") * visual(Heatmap)
+    data(_) * mapping(:β, :α, log(:iterations_until_convergence) => "Log Iterations until convergence") * visual(Heatmap)
 end
 
 fig_2 = draw(plt2)
