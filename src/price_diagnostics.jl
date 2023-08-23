@@ -130,12 +130,11 @@ function draw_price_diagnostic(hyperparams::DDDCHyperParameters)
             :price,
             :profit => "Profit",
             color = :label => "Equilibria",
-            row = :demand
+            row = :demand,
         ) *
         visual(Scatter)
 
-    plt =
-        @chain profit_df begin
+    plt = @chain profit_df begin
         @transform(:demand = :demand == "high" ? "High Demand" : "Low Demand")
         data(_) *
         mapping(
