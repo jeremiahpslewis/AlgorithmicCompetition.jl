@@ -651,7 +651,7 @@ plt27 = @chain df_summary begin
             r"profit_gain_demand_[a-z]+_([a-z_]+)_signal_player" => s"\1",
         )
     )
-    @transform(:signal_type = uppercasefirst(:signal_type) * " Signal")
+    @transform(:signal_type = uppercasefirst(:signal_type) * " Signal Player")
     @transform(:demand_level = uppercasefirst(:demand_level) * " Demand")
     data(_) *
     mapping(
@@ -705,6 +705,7 @@ f28 = draw(plt_28,
         yticks = 0:0.1:1,
         limits = (0.5, 1.02, 0.0, 1.0),
     ),
+)
 save("plots/dddc/plot_28.svg", f28)
 
 plt3 = @chain df_summary begin
