@@ -22,6 +22,9 @@ mkpath("plots/dddc")
 df_ = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
 df_ = vcat(df_...)
 
+n_simulations_dddc = @chain df_ @subset((:weak_signal_quality_level == 1) & (:frequency_high_demand == 1) & (:signal_is_strong == "Bool[0, 0]")) nrow()
+@test (132 * n_simulations_dddc) == nrow(df_)
+
 df__ = @chain df_ begin
     @transform(
         :price_response_to_demand_signal_mse =

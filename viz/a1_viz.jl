@@ -16,6 +16,9 @@ using Statistics
 folder_name = "aiapc_v0.0.2_data"
 df_ = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
 df = vcat(df_...)
+
+n_simulations_aiapc = @chain df @groupby(:α, :β) @combine(:n_simulations = length(:π_bar)) _[1, :n_simulations]
+
 mkpath("plots/aiapc")
 
 competition_params_dict = Dict(
