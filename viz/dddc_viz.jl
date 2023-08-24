@@ -699,7 +699,12 @@ plt_28 = @chain df_weak_weak_outcomes begin
     visual(Lines)
 
 end
-f28 = draw(plt_28)
+f28 = draw(plt_28,
+    axis = (
+        xticks = 0.5:0.1:1,
+        yticks = 0:0.1:1,
+        limits = (0.5, 1.02, 0.0, 1.0),
+    ),
 save("plots/dddc/plot_28.svg", f28)
 
 plt3 = @chain df_summary begin
