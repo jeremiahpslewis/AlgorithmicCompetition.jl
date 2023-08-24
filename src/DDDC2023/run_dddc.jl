@@ -22,7 +22,7 @@ function run_dddc(;
     frequency_high_demand_range = Float64.(range(0.5, 1, n_grid_increments + 1))
     weak_signal_quality_level_range = Float64.(range(0.5, 1.0, 6))
     # Capture 'extreme' values
-    weak_signal_quality_level_range = [weak_signal_quality_level_range...] # TODO: 0.975, 0.99 (?)
+    weak_signal_quality_level_range = [weak_signal_quality_level_range...]
     signal_quality_vect = [[true, false], [false, false]]
     competition_params_dict = Dict(
         :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),

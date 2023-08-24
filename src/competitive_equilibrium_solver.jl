@@ -97,19 +97,3 @@ function solve_bertrand(params::CompetitionParameters)
 
     return model, (value(p_i), value(p_min_i)), i
 end
-
-# function Q_0_i(p::T, p_vect::Vector{T}, δ::T) where {T<:Real} 
-#     @chain p begin
-#         π_i.(_, price_options)
-#         mean()
-#         _ / (1 - δ)
-#     end
-# end
-
-# function Q_0(p_vect::Vector{T}, δ::T) where {T<:Real} 
-#     Q_0_i.(p_vect, (p_vect,), δ)
-# end
-
-# TODO: Investigate and fix this???
-# ν(m, n, k, β) = (m-1)^n / (m^((k*n) * (n + 1)) * (1 - exp(-β * (n+1))))
-# ν(15, 2, 1, 2e-5)

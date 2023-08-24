@@ -117,7 +117,6 @@ df = @chain df___ begin
             :convergence_profit_demand_high_vect[:signal_is_strong_vect][1],
     )
 
-    # TODO: Uncomment for later versions...
     @transform(
         :convergence_profit_weak_signal_player =
             (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
@@ -423,7 +422,6 @@ f221 = draw(
 )
 save("plots/dddc/plot_221.svg", f221)
 
-# TODO: version of plt22, but where profit is normalized against demand scenario!
 plt23 = @chain df_summary begin
     @subset(:signal_is_strong == "Bool[0, 0]")
     @transform(
@@ -726,8 +724,6 @@ end
 f3 = draw(plt3, axis = (xticks = 0.5:0.1:1,))
 save("plots/dddc/plot_3.svg", f3)
 
-
-# TODO: Make this profit for low signal agent
 plt4 = @chain df_summary begin
     data(_) *
     mapping(
@@ -740,7 +736,6 @@ end
 f4 = draw(plt4)
 save("plots/dddc/plot_4.svg", f4)
 
-# TODO: Make this profit for high signal agent
 plt5 = @chain df_summary begin
     data(_) *
     mapping(
@@ -798,5 +793,3 @@ f6 = draw(
     legend = (position = :bottom, titleposition = :left, framevisible = true, padding = 5),
 )
 save("plots/dddc/plot_6.svg", f6)
-
-# TODO: Look into different levels of low signal quality, whether the 'drop-off' happens subtly or abruptly
