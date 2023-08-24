@@ -54,7 +54,8 @@ fig_0 = draw(
 save("plots/aiapc/fig_0.svg", fig_0)
 
 plt1 = @chain df_summary begin
-    data(_) * mapping(:β, :α, :Δ_π_bar) * visual(Heatmap)
+    @transform(:Δ_π_bar = round(:Δ_π_bar * 60; digits=0) / 60)
+    data(_) * mapping(:β, :α, :Δ_π_bar => "Average Profit Gain") * visual(Heatmap)
 end
 
 fig_1 = draw(plt1)
@@ -65,7 +66,7 @@ plt2 = @chain df_summary begin
     mapping(
         :β,
         :α,
-        log(:iterations_until_convergence) => "Log Iterations until convergence",
+        :iterations_until_convergence => "Iterations until convergence",
     ) *
     visual(Heatmap)
 end
