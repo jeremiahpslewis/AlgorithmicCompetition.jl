@@ -105,5 +105,5 @@ end
 
     exp_diagostic[1:8, :]
     @test all(exp_diagostic[!, :profit_status] .== "ok")
-    @test all(exp_diagostic[!, :convergence_status])
+    @test all(exp_diagostic[!, :convergence_status] .== "ok")
 end
