@@ -606,7 +606,7 @@ plt26 = @chain df_summary begin
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        :percent_unexplored_states_value => "Percent Unexplored States",
+        :percent_unexplored_states_value => "Frequency Unexplored States",
         color = :percent_unexplored_states_type => nonnumeric => "Signal Strength",
         layout = :weak_signal_quality_level_str => nonnumeric => "Weak Signal Strength",
     ) *
@@ -693,7 +693,7 @@ plt_28 = @chain df_weak_weak_outcomes begin
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        :pct_compensating_profit_gain => "Percent of Weak-Weak Outcomes with Compensating Profit Gain",
+        :pct_compensating_profit_gain => "Frequency of Weak-Weak Outcomes with Compensating Profit Gain",
         color = :weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
     ) *
     visual(Lines)
