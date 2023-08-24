@@ -54,7 +54,7 @@ fig_0 = draw(
 save("plots/aiapc/fig_0.svg", fig_0)
 
 plt1 = @chain df_summary begin
-    @transform(:Δ_π_bar = round(:Δ_π_bar * 60; digits=0) / 60)
+    @transform(:Δ_π_bar = round(:Δ_π_bar * 60; digits=0) / 60) # Create bins
     data(_) * mapping(:β, :α, :Δ_π_bar => "Average Profit Gain") * visual(Heatmap)
 end
 
