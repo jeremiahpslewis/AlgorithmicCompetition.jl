@@ -31,9 +31,3 @@ end
 
 aiapc_results = AlgorithmicCompetition.run_aiapc()
 ```
-
-## TODO List
-
-- Figure out broken test
-- Run AIAPC and reproduce data viz
-- Drop ReinforcementLearning.jl, use only RLCore & RLBase; refactor RLZoo code, initially within AlgComp.jl package
