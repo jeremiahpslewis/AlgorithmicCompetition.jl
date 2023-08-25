@@ -17,7 +17,11 @@ folder_name = "aiapc_v0.0.2_data"
 df_ = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
 df = vcat(df_...)
 
-n_simulations_aiapc = @chain df @groupby(:α, :β) @combine(:n_simulations = length(:π_bar)) _[1, :n_simulations]
+n_simulations_aiapc =
+    @chain df @groupby(:α, :β) @combine(:n_simulations = length(:π_bar)) _[
+        1,
+        :n_simulations,
+    ]
 
 mkpath("plots/aiapc")
 
@@ -57,7 +61,7 @@ fig_0 = draw(
 save("plots/aiapc/fig_0.svg", fig_0)
 
 plt1 = @chain df_summary begin
-    @transform(:Δ_π_bar = round(:Δ_π_bar * 60; digits=0) / 60) # Create bins
+    @transform(:Δ_π_bar = round(:Δ_π_bar * 60; digits = 0) / 60) # Create bins
     data(_) * mapping(:β, :α, :Δ_π_bar => "Average Profit Gain") * visual(Heatmap)
 end
 
@@ -66,11 +70,7 @@ save("plots/aiapc/fig_1.svg", fig_1)
 
 plt2 = @chain df_summary begin
     data(_) *
-    mapping(
-        :β,
-        :α,
-        :iterations_until_convergence => "Iterations until convergence",
-    ) *
+    mapping(:β, :α, :iterations_until_convergence => "Iterations until convergence") *
     visual(Heatmap)
 end
 

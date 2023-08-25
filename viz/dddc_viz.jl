@@ -22,7 +22,11 @@ mkpath("plots/dddc")
 df_ = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
 df_ = vcat(df_...)
 
-n_simulations_dddc = @chain df_ @subset((:weak_signal_quality_level == 1) & (:frequency_high_demand == 1) & (:signal_is_strong == "Bool[0, 0]")) nrow()
+n_simulations_dddc = @chain df_ @subset(
+    (:weak_signal_quality_level == 1) &
+    (:frequency_high_demand == 1) &
+    (:signal_is_strong == "Bool[0, 0]")
+) nrow()
 @test (132 * n_simulations_dddc) == nrow(df_)
 
 df__ = @chain df_ begin
@@ -700,12 +704,9 @@ plt_28 = @chain df_weak_weak_outcomes begin
     visual(Lines)
 
 end
-f28 = draw(plt_28,
-    axis = (
-        xticks = 0.5:0.1:1,
-        yticks = 0:0.1:1,
-        limits = (0.5, 1.02, 0.0, 1.0),
-    ),
+f28 = draw(
+    plt_28,
+    axis = (xticks = 0.5:0.1:1, yticks = 0:0.1:1, limits = (0.5, 1.02, 0.0, 1.0)),
 )
 save("plots/dddc/plot_28.svg", f28)
 
