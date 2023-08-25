@@ -31,3 +31,5 @@ end
 
 aiapc_results = AlgorithmicCompetition.run_aiapc()
 ```
+
+For citations of works this project is based on, see `citations.bib`.
