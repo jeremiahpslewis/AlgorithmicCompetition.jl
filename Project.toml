@@ -30,7 +30,7 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
 ReinforcementLearningBase = "0.12"
-ReinforcementLearningCore = "0.10"
+ReinforcementLearningCore = "0.13"
 ReinforcementLearningEnvironments = "0.8"
 AlgebraOfGraphics = "0.6"
 CSV = "0.10"
