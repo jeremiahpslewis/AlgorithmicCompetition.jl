@@ -29,8 +29,6 @@ jobs:
         arch:
           - x64
     steps:
-      - run: | # TODO: temporary patch for ":" issue in windows paths for csv files, better fix is to eliminate ":" from timestamps
-          git config --global core.protectNTFS false
       - uses: actions/checkout@v3
       - uses: julia-actions/setup-julia@v1
         with:
