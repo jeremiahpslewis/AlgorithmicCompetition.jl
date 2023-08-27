@@ -17,7 +17,7 @@ using CSV
 using ParallelDataTransfer
 using Distributed
 
-n_procs_ = 2 # update n processors
+n_procs_ = 2 # update number of parallel processes
 
 _procs = addprocs(
     n_procs_,
