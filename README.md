@@ -2,6 +2,8 @@
 
 [![DOI](https://zenodo.org/badge/570286360.svg)](https://zenodo.org/badge/latestdoi/570286360)
 
+[![CI](https://github.com/jeremiahpslewis/AlgorithmicCompetition.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/jeremiahpslewis/AlgorithmicCompetition.jl/actions/workflows/CI.yml)
+
 Reinforcement learning models of algorithmic competition
 
 ## How to Run
