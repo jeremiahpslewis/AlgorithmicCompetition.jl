@@ -64,7 +64,7 @@ end
 
 
 @testset "AIAPC Conversion Check" begin
-    n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
+    n_procs_ = 2 # up to 8 performance cores on m1 (7 workers + 1 main)
 
     _procs = addprocs(
         n_procs_,
