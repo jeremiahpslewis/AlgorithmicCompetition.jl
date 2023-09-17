@@ -4,6 +4,8 @@
 
 [![CI](https://github.com/jeremiahpslewis/AlgorithmicCompetition.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/jeremiahpslewis/AlgorithmicCompetition.jl/actions/workflows/CI.yml)
 
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/7837/badge)](https://www.bestpractices.dev/projects/7837)
+
 Tools for structuring and scaling research into algorithmic competition.
 
 Components:
