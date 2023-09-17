@@ -6,6 +6,8 @@
 
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/7837/badge)](https://www.bestpractices.dev/projects/7837)
 
+[![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
+
 Tools for structuring and scaling research into algorithmic competition.
 
 Components:
