@@ -24,24 +24,24 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
     convergence_threshold::Int              # Convergence threshold
 
     n_players::Int                          # Number of players
-    price_options::Vector{Float64}      # Price options
-    price_index::Vector{Int8}           # Price indices
+    price_options::Vector{Float64}          # Price options
+    price_index::Vector{Int8}               # Price indices
 
     competition_params_dict::Dict{Symbol,CompetitionParameters} # Competition parameters, true = high, false = low
-    memory::DDDCMemory       # Memory struct (previous prices, signals, demand state)
+    memory::DDDCMemory                      # Memory struct (previous prices, signals, demand state)
     is_high_demand_signals::Vector{Bool}    # [true, false] if demand signal is high for player one and low for player two for a given episode
     is_high_demand_episode::Vector{Bool}    # [true] if demand is high for a given episode
     state_space::Base.OneTo{Int16}          # State space
-    state_space_lookup::Array{Int16,4}       # State space lookup table
+    state_space_lookup::Array{Int16,4}      # State space lookup table
 
     n_prices::Int                           # Number of price options
     n_state_space::Int64                    # Number of states
 
-    convergence_vect::Vector{Bool}     # Convergence status for each player
-    is_done::Vector{Bool}                # Episode is complete
+    convergence_vect::Vector{Bool}          # Convergence status for each player
+    is_done::Vector{Bool}                   # Episode is complete
 
-    p_Bert_nash_equilibrium::Dict{Symbol,Float64}        # Nash equilibrium prices for low and high demand (Betrand price)
-    p_monop_opt::Dict{Symbol,Float64}                    # Monopoly optimal prices for low and high demand
+    p_Bert_nash_equilibrium::Dict{Symbol,Float64} # Nash equilibrium prices for low and high demand (Betrand price)
+    p_monop_opt::Dict{Symbol,Float64}       # Monopoly optimal prices for low and high demand
 
     action_space::Tuple                     # Action space
     profit_array::Array{Float64,4}          # Profit given price pair as coordinates

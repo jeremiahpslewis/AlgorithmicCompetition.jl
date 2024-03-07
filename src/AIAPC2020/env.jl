@@ -14,35 +14,35 @@ const demand_to_index = (; :high => 1, :low => 2)
     Calvano, E., Calzolari, G., Denicolò, V., & Pastorello, S. (2020). Artificial Intelligence, Algorithmic Pricing, and Collusion. American Economic Review, 110(10), 3267–3297. https://doi.org/10.1257/aer.20190623
 """
 struct AIAPCEnv <: AbstractEnv
-    α::Float64                              # Learning parameter
-    β::Float64                              # Exploration parameter
-    δ::Float64                              # Discount factor
-    max_iter::Int                           # Maximum number of iterations
-    convergence_threshold::Int              # Convergence threshold
+    α::Float64                               # Learning parameter
+    β::Float64                               # Exploration parameter
+    δ::Float64                               # Discount factor
+    max_iter::Int                            # Maximum number of iterations
+    convergence_threshold::Int               # Convergence threshold
 
-    n_players::Int                          # Number of players
-    price_options::Vector{Float64}      # Price options
-    price_index::Vector{Int8}           # Price indices
+    n_players::Int                           # Number of players
+    price_options::Vector{Float64}           # Price options
+    price_index::Vector{Int8}                # Price indices
 
     competition_params_dict::Dict{Symbol,CompetitionParameters} # Competition parameters, true = high, false = low
     demand_mode::Symbol                      # Demand mode, :high or :low
-    memory::Vector{CartesianIndex{2}}       # Memory vector (previous prices)
-    state_space::Base.OneTo{Int16}          # State space
+    memory::Vector{CartesianIndex{2}}        # Memory vector (previous prices)
+    state_space::Base.OneTo{Int16}           # State space
     state_space_lookup::Array{Int16,2}       # State space lookup table
 
-    n_prices::Int                           # Number of price options
-    n_state_space::Int64                    # Number of states
+    n_prices::Int                            # Number of price options
+    n_state_space::Int64                     # Number of states
 
-    convergence_vect::Vector{Bool}     # Convergence status for each player
-    is_done::Vector{Bool}                # Episode is complete
+    convergence_vect::Vector{Bool}           # Convergence status for each player
+    is_done::Vector{Bool}                    # Episode is complete
 
-    p_Bert_nash_equilibrium::Float64        # Nash equilibrium price (Betrand price)
-    p_monop_opt::Float64                    # Monopoly optimal price
+    p_Bert_nash_equilibrium::Float64         # Nash equilibrium price (Betrand price)
+    p_monop_opt::Float64                     # Monopoly optimal price
 
-    action_space::Tuple                     # Action space
-    profit_array::Array{Float64,3}          # Profit given price pair as coordinates
+    action_space::Tuple                      # Action space
+    profit_array::Array{Float64,3}           # Profit given price pair as coordinates
 
-    reward::Vector{Float64}                 # Reward vector
+    reward::Vector{Float64}                  # Reward vector
 
     function AIAPCEnv(p::AIAPCHyperParameters)
         price_options = Vector{Float64}(p.price_options)
