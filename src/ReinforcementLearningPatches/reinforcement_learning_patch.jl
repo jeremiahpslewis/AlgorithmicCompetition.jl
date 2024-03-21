@@ -29,23 +29,6 @@ import Base.push!
 import Base.getindex
 using DataStructures: CircularBuffer
 
-# Patch for Agent -> QBasedPolicy
-function RLBase.optimise!(agent::Agent, stage::PostActStage)
-    optimise!(agent.policy, agent.trajectory)
-end
-
-function RLBase.optimise!(policy::QBasedPolicy, trajectory::Trajectory)
-    for batch in trajectory.container
-        optimise!(policy.learner, batch)
-    end
-end
-
-RLBase.optimise!(agent::MultiAgentPolicy, stage::PreActStage) = nothing
-RLBase.optimise!(agent::MultiAgentPolicy, stage::PostEpisodeStage) = nothing
-RLBase.optimise!(agent::MultiAgentPolicy, stage::PreEpisodeStage) = nothing
-
-const SART = (:state, :action, :reward, :terminal)
-
 # Handle CartesianIndex actions
 function Base.push!(
     multiagent::MultiAgentPolicy,
