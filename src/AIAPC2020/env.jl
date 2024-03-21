@@ -1,5 +1,4 @@
-using ReinforcementLearningCore
-using ReinforcementLearningBase
+using ReinforcementLearning
 
 const player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
 const demand_lookup = (; :high => 1, :low => 2)
@@ -22,13 +21,13 @@ struct AIAPCEnv <: AbstractEnv
 
     n_players::Int                           # Number of players
     price_options::Vector{Float64}           # Price options
-    price_index::Vector{Int8}                # Price indices
+    price_index::Vector{Int64}                # Price indices
 
     competition_params_dict::Dict{Symbol,CompetitionParameters} # Competition parameters, true = high, false = low
     demand_mode::Symbol                      # Demand mode, :high or :low
     memory::Vector{CartesianIndex{2}}        # Memory vector (previous prices)
-    state_space::Base.OneTo{Int16}           # State space
-    state_space_lookup::Array{Int16,2}       # State space lookup table
+    state_space::Base.OneTo{Int64}           # State space
+    state_space_lookup::Array{Int64,2}       # State space lookup table
 
     n_prices::Int                            # Number of price options
     n_state_space::Int64                     # Number of states
@@ -47,10 +46,10 @@ struct AIAPCEnv <: AbstractEnv
     function AIAPCEnv(p::AIAPCHyperParameters)
         price_options = Vector{Float64}(p.price_options)
         n_prices = length(p.price_options)
-        price_index = Vector{Int8}(Int8.(1:n_prices))
+        price_index = Vector{Int64}(Int64.(1:n_prices))
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
-        state_space = Base.OneTo(Int16(n_state_space))
+        state_space = Base.OneTo(Int64(n_state_space))
         action_space = construct_AIAPC_action_space(price_index)
         profit_array = construct_AIAPC_profit_array(
             price_options,
@@ -90,7 +89,7 @@ struct AIAPCEnv <: AbstractEnv
 end
 
 """
-    RLBase.act!(env::AIAPCEnv, price_tuple::Tuple{Int8,Int8})
+    RLBase.act!(env::AIAPCEnv, price_tuple::Tuple{Int64,Int64})
 
 Act in the environment by setting the memory to the given price tuple and setting `is_done` to `true`.
 """
@@ -109,7 +108,7 @@ RLBase.action_space(env::AIAPCEnv, ::SimultaneousPlayer) = env.action_space
 
 RLBase.legal_action_space(env::AIAPCEnv, p) = is_terminated(env) ? () : action_space(env, p)
 
-const legal_action_space_mask_object_AIAPC = [Int8.(1:15)...]
+const legal_action_space_mask_object_AIAPC = [Int64.(1:15)...]
 
 RLBase.legal_action_space_mask(env::AIAPCEnv, player::Symbol) =
     legal_action_space_mask_object_AIAPC

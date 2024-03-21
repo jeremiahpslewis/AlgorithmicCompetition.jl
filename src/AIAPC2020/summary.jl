@@ -1,5 +1,5 @@
 using Chain
-using ReinforcementLearningCore, ReinforcementLearningBase
+using ReinforcementLearning
 using DataFrames
 
 """
@@ -90,12 +90,12 @@ end
 Get the optimal action (best response) for each player, given the current policy and the last observed state.
 """
 function get_optimal_action(env::AIAPCEnv, policy::MultiAgentPolicy, last_observed_state)
-    optimal_action_set = Int8[]
+    optimal_action_set = Int64[]
     for player_ in [Symbol(1), Symbol(2)]
         opt_act = argmax(
-            policy[player_].policy.learner.approximator.table[:, last_observed_state],
+            policy[player_].policy.learner.approximator.model[:, last_observed_state],
         )
-        push!(optimal_action_set, Int8(opt_act))
+        push!(optimal_action_set, Int64(opt_act))
     end
     return CartesianIndex(optimal_action_set...)
 end

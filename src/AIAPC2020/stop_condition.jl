@@ -1,5 +1,5 @@
-using ReinforcementLearningCore
-import ReinforcementLearningCore: RLCore
+using ReinforcementLearning
+import ReinforcementLearning: RLCore
 
 struct StopWhenConverged <: AbstractStopCondition end
 
@@ -8,7 +8,7 @@ struct StopWhenConverged <: AbstractStopCondition end
 
 Returns true if the environment has converged for all players.
 """
-function RLCore.check_stop(s::StopWhenConverged, agent, env)
+function RLCore.check!(s::StopWhenConverged, agent, env)
     # false until converged, then true
     return all(env.convergence_vect)
 end
@@ -20,7 +20,7 @@ Returns a stop condition that stops when the environment has converged for all p
 """
 function AIAPCStop(env::E; stop_on_convergence = true) where {E<:AbstractEnv}
     stop_conditions = []
-    push!(stop_conditions, StopAfterEpisode(env.max_iter, is_show_progress = false))
+    push!(stop_conditions, StopAfterNEpisodes(env.max_iter, is_show_progress = false))
     if stop_on_convergence
         stop_converged = StopWhenConverged()
         push!(stop_conditions, stop_converged)

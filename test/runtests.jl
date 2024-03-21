@@ -3,7 +3,7 @@ using JuMP
 using Chain
 using DataFrames
 using DataFrameMacros
-using ReinforcementLearningCore:
+using ReinforcementLearning:
     RLCore,
     PostActStage,
     PreActStage,
@@ -16,10 +16,9 @@ using ReinforcementLearningCore:
     EpsilonGreedyExplorer,
     RandomPolicy,
     MultiAgentPolicy,
-    optimise!
-using ReinforcementLearningBase:
-    RLBase, test_interfaces!, test_runnable!, AbstractPolicy, act!, plan!
-import ReinforcementLearningCore: RLCore
+    optimise!,
+    RLBase, AbstractPolicy, act!, plan!
+import ReinforcementLearning: RLCore
 using Statistics
 using AlgorithmicCompetition:
     AIAPCEnv,
@@ -56,7 +55,6 @@ using AlgorithmicCompetition:
     profit_gain,
     Q_i_0,
     Q,
-    Q!,
     reward,
     run_and_extract,
     run,

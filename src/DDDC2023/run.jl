@@ -24,7 +24,7 @@ function Base.run(hyperparameters::DDDCHyperParameters; stop_on_convergence = tr
         experiment.env,
         experiment.stop_condition,
         experiment.hook,
-        ResetAtTerminal(),
+        ResetIfEnvTerminated(),
     )
     return experiment
 end

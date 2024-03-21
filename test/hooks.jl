@@ -1,11 +1,9 @@
-using AlgorithmicCompetition: TotalRewardPerEpisodeLastN
-using ReinforcementLearningEnvironments
-using ReinforcementLearningBase
-using ReinforcementLearningCore
+using ReinforcementLearningFarm: TotalRewardPerLastNEpisodes
+using ReinforcementLearning
 
-@testset "TotalRewardPerEpisodeLastN" begin
+@testset "TotalRewardPerLastNEpisodes" begin
     @testset "Single Agent" begin
-        hook = TotalRewardPerEpisodeLastN(max_steps = 10)
+        hook = TotalRewardPerLastNEpisodes(max_episodes = 10)
         env = TicTacToeEnv()
         agent = RandomPolicy()
 
@@ -18,7 +16,7 @@ using ReinforcementLearningCore
     end
 
     @testset "MultiAgent" begin
-        hook = TotalRewardPerEpisodeLastN(max_steps = 10)
+        hook = TotalRewardPerLastNEpisodes(max_episodes = 10)
         env = TicTacToeEnv()
         agent = RandomPolicy()
 
@@ -50,10 +48,10 @@ end
     exper = Experiment(env; debug = true)
     state(env, Symbol(1))
     policies = AIAPCPolicy(env, mode = "zero")
-    push!(exper.hook[Symbol(1)][1], Int16(2), Int8(3), false)
+    push!(exper.hook[Symbol(1)][1], Int64(2), Int64(3), false)
     @test exper.hook[Symbol(1)][1].best_response_vector[2] == 3
 
-    policies[Symbol(1)].policy.learner.approximator.table[11, :] .= 10
+    policies[Symbol(1)].policy.learner.approximator.model[11, :] .= 10
     push!(
         exper.hook[Symbol(1)][1],
         PostActStage(),

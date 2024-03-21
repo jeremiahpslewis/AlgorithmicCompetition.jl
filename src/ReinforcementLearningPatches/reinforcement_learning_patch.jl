@@ -21,11 +21,9 @@
 # > SOFTWARE.
 # >
 
-using ReinforcementLearningCore
+using ReinforcementLearning
 
-using ReinforcementLearningBase
-import ReinforcementLearningBase: RLBase
-using ReinforcementLearningEnvironments
+import ReinforcementLearning: RLBase
 using Random
 import Base.push!
 import Base.getindex
@@ -56,7 +54,7 @@ end
 function get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}, step) where {F<:AbstractFloat}
     exp(s.β_neg * step[1])
 
-    # This yields a different result (same result, but at 2x step count) than in the paper for 100k steps, but the same convergece duration at α and β midpoints 850k (pg. 13)
+    # This yields a different result (same result, but at 2x step count) than in the paper for 100k steps, but the same convergence duration at α and β midpoints 850k (pg. 13)
 end
 
 get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}) where {F<:AbstractFloat} = get_ϵ(s, s.step)
@@ -77,48 +75,6 @@ RLBase.optimise!(agent::MultiAgentPolicy, stage::PostEpisodeStage) = nothing
 RLBase.optimise!(agent::MultiAgentPolicy, stage::PreEpisodeStage) = nothing
 
 const SART = (:state, :action, :reward, :terminal)
-
-struct TotalRewardPerEpisodeLastN{F} <: AbstractHook where {F<:AbstractFloat}
-    rewards::CircularBuffer{F}
-    is_display_on_exit::Bool
-
-    function TotalRewardPerEpisodeLastN(; max_steps = 100)
-        new{Float64}(CircularBuffer{Float64}(max_steps))
-    end
-end
-
-Base.getindex(h::TotalRewardPerEpisodeLastN{F}, inds...) where {F<:AbstractFloat} =
-    getindex(h.rewards, inds...)
-
-Base.push!(
-    h::TotalRewardPerEpisodeLastN{F},
-    ::PostActStage,
-    agent::P,
-    env::E,
-    player::Symbol,
-) where {P<:AbstractPolicy,E<:AbstractEnv,F<:AbstractFloat} =
-    h.rewards[end] += reward(env, player)
-
-function Base.push!(
-    hook::TotalRewardPerEpisodeLastN{F},
-    ::PreEpisodeStage,
-    agent,
-    env,
-) where {F<:AbstractFloat}
-    Base.push!(hook.rewards, 0.0)
-    return
-end
-
-function Base.push!(
-    hook::TotalRewardPerEpisodeLastN{F},
-    stage::Union{PreEpisodeStage,PostEpisodeStage,PostExperimentStage},
-    agent,
-    env,
-    player::Symbol,
-) where {F<:AbstractFloat}
-    Base.push!(hook, stage, agent, env)
-    return
-end
 
 function RLBase.plan!(
     s::AIAPCEpsilonGreedyExplorer{<:Any,F},

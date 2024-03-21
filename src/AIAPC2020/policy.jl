@@ -1,4 +1,4 @@
-using ReinforcementLearningCore
+using ReinforcementLearning
 using Flux
 
 """
@@ -38,15 +38,15 @@ function AIAPCPolicy(env::AIAPCEnv; mode = "baseline")
         NamedTuple(
             p => Agent(
                 QBasedPolicy(;
-                    learner = TDLearner(;
+                    learner = TDLearner(
                         # TabularQApproximator with specified init matrix
-                        approximator = TabularApproximator(
+                        TabularApproximator(
                             InitMatrix(env, mode = mode),
-                            Descent(env.α),
                         ),
                         # For param info: https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/f97747923c6d7bbc5576f81664ed7b05a2ab8f1e/src/ReinforcementLearningZoo/src/algorithms/tabular/td_learner.jl#L15
-                        method = :SARS,
+                        :SARS;
                         γ = env.δ,
+                        α = env.α,
                         n = 0,
                     ),
                     explorer = AIAPCEpsilonGreedyExplorer(env.β * 1e-5),
@@ -55,7 +55,7 @@ function AIAPCPolicy(env::AIAPCEnv; mode = "baseline")
                     CircularArraySARTSTraces(;
                         capacity = 1,
                         state = Int64 => (),
-                        action = Int8 => (),
+                        action = Int64 => (),
                         reward = Float64 => (),
                         terminal = Bool => (),
                     ),

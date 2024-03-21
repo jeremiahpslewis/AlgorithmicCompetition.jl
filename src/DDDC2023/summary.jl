@@ -1,5 +1,5 @@
 using Chain
-using ReinforcementLearningCore, ReinforcementLearningBase
+using ReinforcementLearning
 using DataFrames
 using Flux: mse
 using DataFrameMacros

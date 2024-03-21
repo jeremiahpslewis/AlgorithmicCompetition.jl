@@ -2,8 +2,7 @@ export TDLearner
 
 using LinearAlgebra: dot
 using Distributions: pdf
-using ReinforcementLearningBase
-using ReinforcementLearningCore
+using ReinforcementLearning
 using ReinforcementLearningTrajectories: Trajectory
 
 
@@ -33,13 +32,14 @@ RLCore.forward(
 function _optimise!(
     n::I1,
     γ::F,
-    app::TabularApproximator{2,Ar,O},
+    app::TabularApproximator{Ar},
     s::I2,
     s_next::I2,
     a::I3,
     r::F,
-) where {I1<:Number,I2<:Number,I3<:Number,Ar<:AbstractArray,F<:AbstractFloat,O}
+) where {I1<:Number,I2<:Number,I3<:Number,Ar<:AbstractArray}
     α = app.optimizer.eta
+    # TODO: replace this with a custom constant optimiser
     Q!(app, s, s_next, a, α, r, γ)
 end
 

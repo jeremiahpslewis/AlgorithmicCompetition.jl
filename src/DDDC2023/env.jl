@@ -1,5 +1,4 @@
-using ReinforcementLearningCore
-using ReinforcementLearningBase
+using ReinforcementLearning
 
 const player_to_index = (; Symbol(1) => 1, Symbol(2) => 2)
 const demand_to_index = (; :high => 1, :low => 2)
@@ -25,14 +24,14 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
 
     n_players::Int                          # Number of players
     price_options::Vector{Float64}          # Price options
-    price_index::Vector{Int8}               # Price indices
+    price_index::Vector{Int64}               # Price indices
 
     competition_params_dict::Dict{Symbol,CompetitionParameters} # Competition parameters, true = high, false = low
     memory::DDDCMemory                      # Memory struct (previous prices, signals, demand state)
     is_high_demand_signals::Vector{Bool}    # [true, false] if demand signal is high for player one and low for player two for a given episode
     is_high_demand_episode::Vector{Bool}    # [true] if demand is high for a given episode
-    state_space::Base.OneTo{Int16}          # State space
-    state_space_lookup::Array{Int16,4}      # State space lookup table
+    state_space::Base.OneTo{Int64}          # State space
+    state_space_lookup::Array{Int64,4}      # State space lookup table
 
     n_prices::Int                           # Number of price options
     n_state_space::Int64                    # Number of states
@@ -53,11 +52,11 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
     function DDDCEnv(p::DDDCHyperParameters)
         price_options = Vector{Float64}(p.price_options)
         n_prices = length(p.price_options)
-        price_index = Vector{Int8}(Int8.(1:n_prices))
+        price_index = Vector{Int64}(Int64.(1:n_prices))
         n_players = p.n_players
         n_state_space = 4 * n_prices^(p.memory_length * n_players) # 2^2 = 4 possible demand states (ground truth and signal)
 
-        state_space = Base.OneTo(Int16(n_state_space))
+        state_space = Base.OneTo(Int64(n_state_space))
         action_space = construct_DDDC_action_space(price_index)
         profit_array =
             construct_DDDC_profit_array(price_options, p.competition_params_dict, n_players)
@@ -104,7 +103,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
 end
 
 """
-    RLBase.act!(env::DDDCEnv, price_tuple::Tuple{Int8,Int8})
+    RLBase.act!(env::DDDCEnv, price_tuple::Tuple{Int64,Int64})
 
 Act in the environment by setting the memory to the given price tuple and setting `is_done` to `true`.
 """
@@ -135,7 +134,7 @@ RLBase.action_space(env::DDDCEnv, ::SimultaneousPlayer) = env.action_space
 
 RLBase.legal_action_space(env::DDDCEnv, p) = is_terminated(env) ? () : action_space(env, p)
 
-const legal_action_space_mask_object_DDDC = [Int8.(1:15)...]
+const legal_action_space_mask_object_DDDC = [Int64.(1:15)...]
 
 RLBase.legal_action_space_mask(env::DDDCEnv, player::Symbol) =
     legal_action_space_mask_object_DDDC

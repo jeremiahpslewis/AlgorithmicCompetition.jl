@@ -1,3 +1,5 @@
+using CircularArrayBuffers: capacity
+
 @testset "Prepackaged Environment Tests" begin
     α = Float64(0.125)
     β = Float64(1)
@@ -101,7 +103,7 @@ end
             Int(1e7),
             competition_solution_dict,
         ) |> AIAPCEnv
-    env.memory[1] = CartesianIndex(Int8(1), Int8(1))
+    env.memory[1] = CartesianIndex(Int64(1), Int64(1))
     exper = Experiment(env; debug = true)
 
     # Find the Nash equilibrium profit
@@ -112,7 +114,7 @@ end
 
     π_nash = π(p_Bert_nash_equilibrium, p_Bert_nash_equilibrium, params)[1]
     @test π_nash > π_min_price
-    for i = 1:exper.hook[Symbol(1)].hooks[2].rewards.capacity
+    for i = 1:capacity(exper.hook[Symbol(1)].hooks[2].rewards)
         push!(exper.hook[Symbol(1)].hooks[2].rewards, π_nash)
         push!(exper.hook[Symbol(2)].hooks[2].rewards, 0)
     end
@@ -127,7 +129,7 @@ end
         π(maximum(exper.env.price_options), maximum(exper.env.price_options), params)[1]
     @test π_max_price < π_monop
 
-    for i = 1:exper.hook[Symbol(1)].hooks[2].rewards.capacity
+    for i = 1:capacity(exper.hook[Symbol(1)].hooks[2].rewards)
         push!(exper.hook[Symbol(1)].hooks[2].rewards, π_monop)
         push!(exper.hook[Symbol(2)].hooks[2].rewards, 0)
     end
@@ -164,9 +166,9 @@ end
 
     env = AIAPCEnv(hyperparameters)
     @test current_player(env) == RLBase.SimultaneousPlayer()
-    @test action_space(env, Symbol(1)) == Int8.(1:15)
+    @test action_space(env, Symbol(1)) == Int64.(1:15)
     @test reward(env) != 0 # reward reflects outcomes of last play (which happens at player = 1, e.g. before any actions chosen)
-    act!(env, CartesianIndex(Int8(5), Int8(5)))
+    act!(env, CartesianIndex(Int64(5), Int64(5)))
     @test reward(env) != [0, 0] # reward is zero as at least one player has already played (technically sequental plays)
 end
 
@@ -466,12 +468,12 @@ end
     )
 
     c_out = run(hyperparameters; stop_on_convergence = true)
-    @test minimum(c_out.policy[Symbol(1)].policy.learner.approximator.table) < 6
-    @test maximum(c_out.policy[Symbol(1)].policy.learner.approximator.table) > 5.5
+    @test minimum(c_out.policy[Symbol(1)].policy.learner.approximator.model) < 6
+    @test maximum(c_out.policy[Symbol(1)].policy.learner.approximator.model) > 5.5
 
     # ensure that the policy is updated by the learner
-    @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table; dims = 2) != 0
-    state_sum = sum(c_out.policy[Symbol(1)].policy.learner.approximator.table; dims = 1)
+    @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.model; dims = 2) != 0
+    state_sum = sum(c_out.policy[Symbol(1)].policy.learner.approximator.model; dims = 1)
     @test !all(y -> y == state_sum[1], state_sum)
     @test length(reward(c_out.env)) == 2
     @test length(reward(c_out.env, 1)) == 1
@@ -585,8 +587,8 @@ end
     c_out = run(hyperparameters; stop_on_convergence = false, debug = true)
 
     # ensure that the policy is updated by the learner
-    @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table .!= 0) != 0
-    @test sum(c_out.policy[Symbol(2)].policy.learner.approximator.table .!= 0) != 0
+    @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.model .!= 0) != 0
+    @test sum(c_out.policy[Symbol(2)].policy.learner.approximator.model .!= 0) != 0
     @test c_out.env.is_done[1]
     @test c_out.hook[Symbol(1)][1].iterations_until_convergence == max_iter
     @test c_out.hook[Symbol(2)][1].iterations_until_convergence == max_iter
@@ -595,8 +597,8 @@ end
     @test c_out.policy[Symbol(1)].trajectory.container[:reward][1] .!= 0
     @test c_out.policy[Symbol(2)].trajectory.container[:reward][1] .!= 0
 
-    @test c_out.policy[Symbol(1)].policy.learner.approximator.table !=
-          c_out.policy[Symbol(2)].policy.learner.approximator.table
+    @test c_out.policy[Symbol(1)].policy.learner.approximator.model !=
+          c_out.policy[Symbol(2)].policy.learner.approximator.model
     @test c_out.hook[Symbol(1)][1].best_response_vector !=
           c_out.hook[Symbol(2)][1].best_response_vector
 
@@ -679,9 +681,9 @@ end
     @test 0.98 < get_ϵ(c_out.policy[Symbol(1)].policy.explorer) < 1
     @test 0.98 < get_ϵ(c_out.policy[Symbol(2)].policy.explorer) < 1
 
-    @test RLCore.check_stop(c_out.stop_condition, 1, c_out.env) == true
-    @test RLCore.check_stop(c_out.stop_condition.stop_conditions[1], 1, c_out.env) == false
-    @test RLCore.check_stop(c_out.stop_condition.stop_conditions[2], 1, c_out.env) == true
+    @test RLCore.check!(c_out.stop_condition, 1, c_out.env) == true
+    @test RLCore.check!(c_out.stop_condition.stop_conditions[1], 1, c_out.env) == false
+    @test RLCore.check!(c_out.stop_condition.stop_conditions[2], 1, c_out.env) == true
 
     @test c_out.hook[Symbol(1)][1].convergence_duration >= 5
     @test c_out.hook[Symbol(2)][1].convergence_duration >= 5

@@ -27,11 +27,11 @@
     )
     env = AIAPCEnv(hyperparameters)
 
-    app = TabularApproximator(InitMatrix(env; mode = "zero"), Descent(0.1))
+    app = TabularApproximator(InitMatrix(env; mode = "zero"))
 
-    @test Q(app, 1, 1) == 0
-    @test Q(app, 1) == zeros(n_prices)
-    @test 0.0625 == Q!(app, 1, 1, 1, 0.125, 0.5, 0.95)
+    @test RLCore.Q(app, 1, 1) == 0
+    @test RLCore.Q(app, 1) == zeros(n_prices)
+    @test 0.0625 == RLCore.bellman_update!(app, 1, 1, 1, 0.5, δ, α)
 end
 
 @testset "Q_i_0 AIAPC" begin
