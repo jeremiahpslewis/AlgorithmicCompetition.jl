@@ -108,7 +108,7 @@ RLBase.action_space(env::AIAPCEnv, ::SimultaneousPlayer) = env.action_space
 
 RLBase.legal_action_space(env::AIAPCEnv, p) = is_terminated(env) ? () : action_space(env, p)
 
-const legal_action_space_mask_object_AIAPC = [Int64.(1:15)...]
+const legal_action_space_mask_object_AIAPC = fill(true, 15)
 
 RLBase.legal_action_space_mask(env::AIAPCEnv, player::Symbol) =
     legal_action_space_mask_object_AIAPC
