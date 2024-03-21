@@ -662,6 +662,7 @@ end
     max_iter = Int(1e7)
     price_index = 1:n_prices
 
+    policy = RandomPolicy()
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
@@ -681,9 +682,9 @@ end
     @test 0.98 < RLFarm.get_ϵ(c_out.policy[Symbol(1)].policy.explorer) < 1
     @test 0.98 < RLFarm.get_ϵ(c_out.policy[Symbol(2)].policy.explorer) < 1
 
-    @test RLCore.check!(c_out.stop_condition, 1, c_out.env) == true
-    @test RLCore.check!(c_out.stop_condition.stop_conditions[1], 1, c_out.env) == false
-    @test RLCore.check!(c_out.stop_condition.stop_conditions[2], 1, c_out.env) == true
+    @test RLCore.check!(c_out.stop_condition, policy, c_out.env) == true
+    @test RLCore.check!(c_out.stop_condition.stop_conditions[1], policy, c_out.env) == false
+    @test RLCore.check!(c_out.stop_condition.stop_conditions[2], policy, c_out.env) == true
 
     @test c_out.hook[Symbol(1)][1].convergence_duration >= 5
     @test c_out.hook[Symbol(2)][1].convergence_duration >= 5
