@@ -1,18 +1,18 @@
-struct DDDCRewardPerEpisodeLastN{F} <: AbstractHook where {F<:AbstractFloat}
+struct DDDCTotalRewardPerLastNEpisodes{F} <: AbstractHook where {F<:AbstractFloat}
     rewards::CircularBuffer{F}
     demand_state_high_vect::CircularBuffer{Bool}
     is_display_on_exit::Bool
 
-    function DDDCRewardPerEpisodeLastN(; max_steps = 100)
+    function DDDCTotalRewardPerLastNEpisodes(; max_steps = 100)
         new{Float64}(CircularBuffer{Float64}(max_steps), CircularBuffer{Bool}(max_steps))
     end
 end
 
-Base.getindex(h::DDDCRewardPerEpisodeLastN{F}, inds...) where {F<:AbstractFloat} =
+Base.getindex(h::DDDCTotalRewardPerLastNEpisodes{F}, inds...) where {F<:AbstractFloat} =
     getindex(h.rewards, inds...)
 
 function Base.push!(
-    h::DDDCRewardPerEpisodeLastN{F},
+    h::DDDCTotalRewardPerLastNEpisodes{F},
     ::PostActStage,
     agent::P,
     env::E,
@@ -23,7 +23,7 @@ function Base.push!(
 end
 
 function Base.push!(
-    hook::DDDCRewardPerEpisodeLastN{F},
+    hook::DDDCTotalRewardPerLastNEpisodes{F},
     stage::Union{PreEpisodeStage,PostEpisodeStage,PostExperimentStage},
     agent,
     env,
@@ -49,7 +49,7 @@ function DDDCHook(env::AbstractEnv)
         NamedTuple(
             p => ComposedHook(
                 ConvergenceCheck(env.n_state_space, env.convergence_threshold),
-                DDDCRewardPerEpisodeLastN(; max_steps = env.convergence_threshold + 100),
+                DDDCTotalRewardPerLastNEpisodes(; max_steps = env.convergence_threshold + 100),
             ) for p in players(env)
         ),
     )
