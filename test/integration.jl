@@ -648,8 +648,8 @@ end
         convergence_threshold = 10,
     )
     c_out = run(hyperparameters; stop_on_convergence = false)
-    @test get_ϵ(c_out.policy[Symbol(1)].policy.explorer) < 1e-4
-    @test get_ϵ(c_out.policy[Symbol(2)].policy.explorer) < 1e-4
+    @test RLFarm.get_ϵ(c_out.policy[Symbol(1)].policy.explorer) < 1e-4
+    @test RLFarm.get_ϵ(c_out.policy[Symbol(2)].policy.explorer) < 1e-4
 end
 
 @testset "Convergence stop works" begin
@@ -678,8 +678,8 @@ end
         convergence_threshold = 5,
     )
     c_out = run(hyperparameters; stop_on_convergence = true)
-    @test 0.98 < get_ϵ(c_out.policy[Symbol(1)].policy.explorer) < 1
-    @test 0.98 < get_ϵ(c_out.policy[Symbol(2)].policy.explorer) < 1
+    @test 0.98 < RLFarm.get_ϵ(c_out.policy[Symbol(1)].policy.explorer) < 1
+    @test 0.98 < RLFarm.get_ϵ(c_out.policy[Symbol(2)].policy.explorer) < 1
 
     @test RLCore.check!(c_out.stop_condition, 1, c_out.env) == true
     @test RLCore.check!(c_out.stop_condition.stop_conditions[1], 1, c_out.env) == false

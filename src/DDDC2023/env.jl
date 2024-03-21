@@ -195,16 +195,3 @@ RLBase.RewardStyle(::DDDCEnv) = STEP_REWARD
 RLBase.UtilityStyle(::DDDCEnv) = GENERAL_SUM
 RLBase.ChanceStyle(::DDDCEnv) = DETERMINISTIC
 
-function RLBase.plan!(
-    explorer::Ex,
-    learner::L,
-    env::DDDCEnv,
-    player::Symbol,
-) where {Ex<:AbstractExplorer,L<:AbstractLearner}
-    legal_action_space_ = RLBase.legal_action_space_mask(env, player)
-    return RLBase.plan!(
-        explorer,
-        RLCore.forward(learner, state(env, player)),
-        legal_action_space_,
-    )
-end

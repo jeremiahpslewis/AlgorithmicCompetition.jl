@@ -179,17 +179,3 @@ RLBase.StateStyle(::AIAPCEnv) = Observation{Int64}()
 RLBase.RewardStyle(::AIAPCEnv) = STEP_REWARD
 RLBase.UtilityStyle(::AIAPCEnv) = GENERAL_SUM
 RLBase.ChanceStyle(::AIAPCEnv) = DETERMINISTIC
-
-function RLBase.plan!(
-    explorer::Ex,
-    learner::L,
-    env::AIAPCEnv,
-    player::Symbol,
-) where {Ex<:AbstractExplorer,L<:AbstractLearner}
-    legal_action_space_ = RLBase.legal_action_space_mask(env, player)
-    return RLBase.plan!(
-        explorer,
-        RLCore.forward(learner, state(env, player)),
-        legal_action_space_,
-    )
-end

@@ -1,4 +1,5 @@
 using ReinforcementLearning
+using ReinforcementLearningFarm: EpsilonSpeedyExplorer
 
 """
     Q_i_0(env::DDDCEnv)
@@ -53,7 +54,7 @@ function DDDCPolicy(env::DDDCEnv; mode = "baseline")
                         α = env.α,
                         n = 0,
                     ),
-                    explorer = AIAPCEpsilonGreedyExplorer(env.β * 1e-5),
+                    explorer = EpsilonSpeedyExplorer(env.β * 1e-5),
                 ),
                 Trajectory(
                     CircularArraySARTSTraces(;

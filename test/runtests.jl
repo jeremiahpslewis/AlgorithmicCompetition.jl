@@ -22,7 +22,6 @@ import ReinforcementLearning: RLCore
 using Statistics
 using AlgorithmicCompetition:
     AIAPCEnv,
-    AIAPCEpsilonGreedyExplorer,
     AIAPCHyperParameters,
     AIAPCPolicy,
     AIAPCSummary,
@@ -47,7 +46,6 @@ using AlgorithmicCompetition:
     extract_quantity_vars,
     get_demand_level,
     get_demand_signals,
-    get_ϵ,
     initialize_price_memory,
     InitMatrix,
     p_BR,
