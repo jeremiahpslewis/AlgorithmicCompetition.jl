@@ -64,14 +64,16 @@ using AlgorithmicCompetition:
     π
 using Distributed
 
-include("alpha_beta.jl")
-include("stochastic_demand_stochastic_information.jl")
-include("competitive_equilibrium.jl")
-include("hooks.jl")
-include("explorer.jl")
+@testset "AlgorithmicCompetition.jl" begin
+    include("alpha_beta.jl")
+    include("stochastic_demand_stochastic_information.jl")
+    include("competitive_equilibrium.jl")
+    include("hooks.jl")
+    include("explorer.jl")
 
-include("tabular_approximator.jl")
-include("q_learning.jl")
-include("policy.jl")
-include("integration.jl")
-include("aiapc_conversion_check.jl")
+    include("tabular_approximator.jl")
+    include("q_learning.jl")
+    include("policy.jl")
+    include("integration.jl")
+    include("aiapc_conversion_check.jl")
+end
