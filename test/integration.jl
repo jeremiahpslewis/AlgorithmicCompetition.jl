@@ -413,12 +413,10 @@ end
     e_sum = economic_summary(e_out)
     @test e_out.hook[Symbol(1)][2].demand_state_high_vect[end] ==
           (e_out.env.memory.demand_state == :high)
-    @test mean(
-        e_out.hook[Symbol(1)][2].rewards[e_out.hook[Symbol(1)][2].demand_state_high_vect],
-    ) ≈ e_sum.convergence_profit_demand_high[1] atol = 1e-2
-    @test mean(
-        e_out.hook[Symbol(1)][2].rewards[.!e_out.hook[Symbol(1)][2].demand_state_high_vect],
-    ) ≈ e_sum.convergence_profit_demand_low[1] atol = 1e-2
+    demand_state_high_vect = [e_out.hook[Symbol(1)][2].demand_state_high_vect...]
+    rewards = [e_out.hook[Symbol(1)][2].rewards...]
+    @test mean(rewards[demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_high[1] atol = 1e-2
+    @test mean(rewards[.!demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_low[1] atol = 1e-2
     @test mean(e_out.env.profit_array[:, :, :, 1]) >
           mean(e_out.env.profit_array[:, :, :, 2])
     @test 0.45 < e_sum.percent_demand_high < 0.55
