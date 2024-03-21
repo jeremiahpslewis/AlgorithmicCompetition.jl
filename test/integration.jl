@@ -24,10 +24,10 @@ using CircularArrayBuffers: capacity
         competition_solution_dict;
         convergence_threshold = 1,
     )
-
+    
+    RLBase.test_interfaces!(AIAPCEnv(hyperparameters))
     # Until state handling is fixed for multi-agent simultaneous environments, we can't test this
-    # @test test_interfaces!(AIAPCEnv(hyperparameters))
-    # @test test_runnable!(AIAPCEnv(hyperparameters))
+    # RLBase.test_runnable!(AIAPCEnv(hyperparameters))
 end
 
 @testset "Profit gain DDDC" begin
@@ -67,6 +67,11 @@ end
 
 
     env = DDDCEnv(hyperparams)
+
+    # TODO: Until state handling is fixed for multi-agent simultaneous environments, we can't test this
+    # RLBase.test_interfaces!(env)
+    # RLBase.test_runnable!(AIAPCEnv(hyperparameters))
+
     for demand in [:high, :low]
         @test profit_gain(
             π(
@@ -120,6 +125,7 @@ end
     end
 
     ec_summary_ = economic_summary(exper)
+    # TODO: Convergence profit needs to be tested with a properly configured tabular approximator...
     # @test round(profit_gain(ec_summary_.convergence_profit[1], env); digits = 2) == 0
     # @test round(profit_gain(ec_summary_.convergence_profit[2], env); digits = 2) == 1.07
 
