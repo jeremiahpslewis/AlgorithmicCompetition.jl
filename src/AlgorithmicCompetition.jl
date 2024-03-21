@@ -2,6 +2,7 @@ module AlgorithmicCompetition
 
 import Base: @invokelatest
 
+include("common.jl")
 include("ReinforcementLearningPatches/ReinforcementLearningPatches.jl")
 include("competitive_equilibrium_solver.jl")
 include("AIAPC2020/AIAPC2020.jl")
