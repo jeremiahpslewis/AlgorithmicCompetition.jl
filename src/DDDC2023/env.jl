@@ -134,7 +134,7 @@ RLBase.action_space(env::DDDCEnv, ::SimultaneousPlayer) = env.action_space
 
 RLBase.legal_action_space(env::DDDCEnv, p) = is_terminated(env) ? () : action_space(env, p)
 
-const legal_action_space_mask_object_DDDC = [Int64.(1:15)...]
+const legal_action_space_mask_object_DDDC = fill(true, 15)
 
 RLBase.legal_action_space_mask(env::DDDCEnv, player::Symbol) =
     legal_action_space_mask_object_DDDC
