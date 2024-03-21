@@ -1,5 +1,4 @@
 using ReinforcementLearning
-using Flux
 
 """
     Q_i_0(env::AIAPCEnv)

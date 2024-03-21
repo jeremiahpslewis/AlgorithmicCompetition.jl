@@ -1,5 +1,4 @@
 using Test
-using Flux
 using AlgorithmicCompetition:
     TabularApproximator, TabularVApproximator, TabularQApproximator, TDLearner, QBasedPolicy
 import ReinforcementLearning: RLBase
