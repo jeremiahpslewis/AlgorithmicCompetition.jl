@@ -1,5 +1,5 @@
 using ReinforcementLearningFarm: EpsilonSpeedyExplorer
-using ReinforcementaLearningFarm
+using ReinforcementLearningFarm
 
 @testset "EpsilonGreedy" begin
     explorer = EpsilonGreedyExplorer(
