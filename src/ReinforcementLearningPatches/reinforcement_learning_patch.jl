@@ -29,36 +29,6 @@ import Base.push!
 import Base.getindex
 using DataStructures: CircularBuffer
 
-# Epsilon Greedy Explorer for AIAPC Zoo
-# Note: get_ϵ function in RLCore takes: 600.045 ns (6 allocations: 192 bytes)
-# This one has: 59.003 ns (1 allocation: 16 bytes)
-# Well worth looking into optimizations for RLCore
-# TODO evaluate performance cost of checking all values for max, perhaps only do this in the beginning?
-
-struct AIAPCEpsilonGreedyExplorer{R,F<:AbstractFloat} <: AbstractExplorer
-    β::F
-    β_neg::F
-    step::Vector{Int}
-    rng::R
-end
-
-function AIAPCEpsilonGreedyExplorer(β::F) where {F<:AbstractFloat}
-    AIAPCEpsilonGreedyExplorer{typeof(Random.GLOBAL_RNG),F}(
-        β,
-        β * -1,
-        Int[1],
-        Random.GLOBAL_RNG,
-    )
-end
-
-function get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}, step) where {F<:AbstractFloat}
-    exp(s.β_neg * step[1])
-
-    # This yields a different result (same result, but at 2x step count) than in the paper for 100k steps, but the same convergence duration at α and β midpoints 850k (pg. 13)
-end
-
-get_ϵ(s::AIAPCEpsilonGreedyExplorer{<:Any,F}) where {F<:AbstractFloat} = get_ϵ(s, s.step)
-
 # Patch for Agent -> QBasedPolicy
 function RLBase.optimise!(agent::Agent, stage::PostActStage)
     optimise!(agent.policy, agent.trajectory)
