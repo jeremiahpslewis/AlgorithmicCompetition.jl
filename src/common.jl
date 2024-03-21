@@ -1,4 +1,5 @@
 import Base.push!
+using ReinforcementLearning
 
 # Handle CartesianIndex actions
 function Base.push!(
