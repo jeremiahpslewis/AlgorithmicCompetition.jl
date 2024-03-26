@@ -1,8 +1,6 @@
 using ReinforcementLearning
 
-const player_lookup = (; Player(1) => 1, Player(2) => 2)
-const demand_lookup = (; :high => 1, :low => 2)
-const player_to_index = (; Player(1) => 1, Player(2) => 2)
+const player_to_index = Dict(Player(1) => 1, Player(2) => 2)
 const demand_to_index = (; :high => 1, :low => 2)
 
 """
@@ -138,7 +136,7 @@ end
 
 Return the reward for the current state for player `p` as a symbol. If the episode is done, return the profit, else return `0`.
 """
-RLBase.reward(env::AIAPCEnv, p::Symbol) = reward(env, player_lookup[p])
+RLBase.reward(env::AIAPCEnv, p::Symbol) = reward(env, player_to_index[p])
 
 RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
 
