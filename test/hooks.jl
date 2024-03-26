@@ -1,11 +1,9 @@
-using AlgorithmicCompetition: TotalRewardPerEpisodeLastN
-using ReinforcementLearningEnvironments
-using ReinforcementLearningBase
-using ReinforcementLearningCore
+using ReinforcementLearningFarm: TotalRewardPerLastNEpisodes
+using ReinforcementLearning
 
-@testset "TotalRewardPerEpisodeLastN" begin
+@testset "TotalRewardPerLastNEpisodes" begin
     @testset "Single Agent" begin
-        hook = TotalRewardPerEpisodeLastN(max_steps = 10)
+        hook = TotalRewardPerLastNEpisodes(max_episodes = 10)
         env = TicTacToeEnv()
         agent = RandomPolicy()
 
@@ -18,15 +16,15 @@ using ReinforcementLearningCore
     end
 
     @testset "MultiAgent" begin
-        hook = TotalRewardPerEpisodeLastN(max_steps = 10)
+        hook = TotalRewardPerLastNEpisodes(max_episodes = 10)
         env = TicTacToeEnv()
         agent = RandomPolicy()
 
         for i = 1:15
-            push!(hook, PreEpisodeStage(), agent, env, :Cross)
-            push!(hook, PostActStage(), agent, env, :Cross)
+            push!(hook, PreEpisodeStage(), agent, env, Player(:Cross))
+            push!(hook, PostActStage(), agent, env, Player(:Cross))
             @test length(hook.rewards) == min(i, 10)
-            @test hook.rewards[min(i, 10)] == reward(env, :Cross)
+            @test hook.rewards[min(i, 10)] == reward(env, Player(:Cross))
         end
     end
 end
@@ -48,20 +46,20 @@ end
             competition_solution_dict,
         ) |> AIAPCEnv
     exper = Experiment(env; debug = true)
-    state(env, Symbol(1))
+    state(env, Player(1))
     policies = AIAPCPolicy(env, mode = "zero")
-    push!(exper.hook[Symbol(1)][1], Int16(2), Int8(3), false)
-    @test exper.hook[Symbol(1)][1].best_response_vector[2] == 3
+    push!(exper.hook[Player(1)][1], Int64(2), Int64(3), false)
+    @test exper.hook[Player(1)][1].best_response_vector[2] == 3
 
-    policies[Symbol(1)].policy.learner.approximator.table[11, :] .= 10
+    policies[Player(1)].policy.learner.approximator.model[11, :] .= 10
     push!(
-        exper.hook[Symbol(1)][1],
+        exper.hook[Player(1)][1],
         PostActStage(),
-        policies[Symbol(1)],
+        policies[Player(1)],
         exper.env,
-        Symbol(1),
+        Player(1),
     )
-    @test exper.hook[Symbol(1)][1].best_response_vector[state(env, Symbol(1))] == 11
+    @test exper.hook[Player(1)][1].best_response_vector[state(env, Player(1))] == 11
 end
 
 @testset "ConvergenceCheck" begin
@@ -83,15 +81,15 @@ end
     policies = env |> AIAPCPolicy
 
     convergence_hook = ConvergenceCheck(env.n_state_space, 1)
-    push!(convergence_hook, PostActStage(), policies[Symbol(1)], env, Symbol(1))
+    push!(convergence_hook, PostActStage(), policies[Player(1)], env, Player(1))
     @test convergence_hook.convergence_duration == 0
     @test convergence_hook.iterations_until_convergence == 1
-    @test convergence_hook.best_response_vector[state(env, Symbol(1))] != 0
+    @test convergence_hook.best_response_vector[state(env, Player(1))] != 0
     @test convergence_hook.is_converged != true
 
     convergence_hook_1 = ConvergenceCheck(env.n_state_space, 1)
     convergence_hook_1.best_response_vector = Vector{Int}(fill(8, 225))
-    push!(convergence_hook_1, PostActStage(), policies[Symbol(1)], env, Symbol(1))
+    push!(convergence_hook_1, PostActStage(), policies[Player(1)], env, Player(1))
 
     @test convergence_hook.iterations_until_convergence == 1
     @test convergence_hook.convergence_duration ∈ [0, 1]

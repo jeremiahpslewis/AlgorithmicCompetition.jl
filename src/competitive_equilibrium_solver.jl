@@ -2,7 +2,7 @@
 using JuMP
 using Chain
 using Ipopt
-using Flux
+using Flux: softmax
 using Statistics
 
 struct CompetitionParameters

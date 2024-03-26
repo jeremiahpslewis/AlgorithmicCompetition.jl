@@ -1,9 +1,7 @@
-using ReinforcementLearningCore
-using ReinforcementLearningEnvironments
+using ReinforcementLearning
 using Distributed
 import Base
-import ReinforcementLearningBase: RLBase
-import ReinforcementLearningCore: RLCore
+import ReinforcementLearning: RLCore, RLBase
 
 # Patch to improve type stability and try to speed things up (avoid generator)
 function RLBase.plan!(multiagent::MultiAgentPolicy, env::AIAPCEnv)
@@ -23,7 +21,7 @@ function Experiment(env::AIAPCEnv; stop_on_convergence = true, debug = false)
     )
 end
 
-function Base.run(experiments::Vector{ReinforcementLearningCore.Experiment})
+function Base.run(experiments::Vector{RLCore.Experiment})
     sendto(workers(), experiments = experiments)
     status = pmap(1:length(experiments)) do i
         experiment = experiment[i]
@@ -32,7 +30,7 @@ function Base.run(experiments::Vector{ReinforcementLearningCore.Experiment})
             experiment.env,
             experiment.stop_condition,
             experiment.hook,
-            ResetAtTerminal(),
+            ResetIfEnvTerminated(),
         )
         experiments[i]
     end
@@ -50,7 +48,7 @@ function Base.run(
         experiment.env,
         experiment.stop_condition,
         experiment.hook,
-        ResetAtTerminal(),
+        ResetIfEnvTerminated(),
     )
     return experiment
 end

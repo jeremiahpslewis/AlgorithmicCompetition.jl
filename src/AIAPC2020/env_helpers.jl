@@ -5,7 +5,7 @@ Construct a lookup table from action space to the state space.
 """
 function construct_AIAPC_state_space_lookup(action_space, n_prices)
     @assert length(action_space) == n_prices^2
-    state_space_lookup = reshape(Int16.(1:length(action_space)), n_prices, n_prices)
+    state_space_lookup = reshape(1:length(action_space), n_prices, n_prices)
     return state_space_lookup
 end
 

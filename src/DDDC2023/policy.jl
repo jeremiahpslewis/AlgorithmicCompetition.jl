@@ -1,5 +1,5 @@
-using ReinforcementLearningCore
-using Flux
+using ReinforcementLearning
+using ReinforcementLearningFarm: EpsilonSpeedyExplorer
 
 """
     Q_i_0(env::DDDCEnv)
@@ -40,27 +40,27 @@ Create a policy for the DDDC environment, with symmetric agents, using a tabular
 """
 function DDDCPolicy(env::DDDCEnv; mode = "baseline")
     dddc_policy = MultiAgentPolicy(
-        NamedTuple(
+        PlayerTuple(
             p => Agent(
                 QBasedPolicy(;
-                    learner = TDLearner(;
+                    learner = TDLearner(
                         # TabularQApproximator with specified init matrix
-                        approximator = TabularApproximator(
+                        TabularApproximator(
                             InitMatrix(env, mode = mode),
-                            Descent(env.α),
                         ),
                         # For param info: https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/f97747923c6d7bbc5576f81664ed7b05a2ab8f1e/src/ReinforcementLearningZoo/src/algorithms/tabular/td_learner.jl#L15
-                        method = :SARS,
+                        :SARS;
                         γ = env.δ,
+                        α = env.α,
                         n = 0,
                     ),
-                    explorer = AIAPCEpsilonGreedyExplorer(env.β * 1e-5),
+                    explorer = EpsilonSpeedyExplorer(env.β * 1e-5),
                 ),
                 Trajectory(
                     CircularArraySARTSTraces(;
                         capacity = 1,
                         state = Int64 => (),
-                        action = Int8 => (),
+                        action = Int64 => (),
                         reward = Float64 => (),
                         terminal = Bool => (),
                     ),

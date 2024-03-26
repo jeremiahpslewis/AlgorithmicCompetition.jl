@@ -3,7 +3,7 @@ using JuMP
 using Chain
 using DataFrames
 using DataFrameMacros
-using ReinforcementLearningCore:
+using ReinforcementLearning:
     RLCore,
     PostActStage,
     PreActStage,
@@ -16,14 +16,12 @@ using ReinforcementLearningCore:
     EpsilonGreedyExplorer,
     RandomPolicy,
     MultiAgentPolicy,
-    optimise!
-using ReinforcementLearningBase:
-    RLBase, test_interfaces!, test_runnable!, AbstractPolicy, act!, plan!
-import ReinforcementLearningCore: RLCore
+    optimise!,
+    RLBase, AbstractPolicy, act!, plan!
+import ReinforcementLearning: RLCore
 using Statistics
 using AlgorithmicCompetition:
     AIAPCEnv,
-    AIAPCEpsilonGreedyExplorer,
     AIAPCHyperParameters,
     AIAPCPolicy,
     AIAPCSummary,
@@ -48,7 +46,6 @@ using AlgorithmicCompetition:
     extract_quantity_vars,
     get_demand_level,
     get_demand_signals,
-    get_ϵ,
     initialize_price_memory,
     InitMatrix,
     p_BR,
@@ -56,7 +53,6 @@ using AlgorithmicCompetition:
     profit_gain,
     Q_i_0,
     Q,
-    Q!,
     reward,
     run_and_extract,
     run,
@@ -66,14 +62,16 @@ using AlgorithmicCompetition:
     π
 using Distributed
 
-include("alpha_beta.jl")
-include("stochastic_demand_stochastic_information.jl")
-include("competitive_equilibrium.jl")
-include("hooks.jl")
-include("explorer.jl")
+@testset "AlgorithmicCompetition.jl" begin
+    include("alpha_beta.jl")
+    include("stochastic_demand_stochastic_information.jl")
+    include("competitive_equilibrium.jl")
+    include("hooks.jl")
+    include("explorer.jl")
 
-include("tabular_approximator.jl")
-include("q_learning.jl")
-include("policy.jl")
-include("integration.jl")
-include("aiapc_conversion_check.jl")
+    include("tabular_approximator.jl")
+    include("q_learning.jl")
+    include("policy.jl")
+    include("integration.jl")
+    include("aiapc_conversion_check.jl")
+end

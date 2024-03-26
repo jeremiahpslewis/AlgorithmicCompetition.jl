@@ -1,3 +1,5 @@
+using CircularArrayBuffers: capacity
+
 @testset "Prepackaged Environment Tests" begin
     α = Float64(0.125)
     β = Float64(1)
@@ -22,10 +24,10 @@
         competition_solution_dict;
         convergence_threshold = 1,
     )
-
+    
+    RLBase.test_interfaces!(AIAPCEnv(hyperparameters))
     # Until state handling is fixed for multi-agent simultaneous environments, we can't test this
-    # @test test_interfaces!(AIAPCEnv(hyperparameters))
-    # @test test_runnable!(AIAPCEnv(hyperparameters))
+    # RLBase.test_runnable!(AIAPCEnv(hyperparameters))
 end
 
 @testset "Profit gain DDDC" begin
@@ -65,6 +67,11 @@ end
 
 
     env = DDDCEnv(hyperparams)
+
+    # TODO: Until state handling is fixed for multi-agent simultaneous environments, we can't test this
+    # RLBase.test_interfaces!(env)
+    # RLBase.test_runnable!(AIAPCEnv(hyperparameters))
+
     for demand in [:high, :low]
         @test profit_gain(
             π(
@@ -101,7 +108,7 @@ end
             Int(1e7),
             competition_solution_dict,
         ) |> AIAPCEnv
-    env.memory[1] = CartesianIndex(Int8(1), Int8(1))
+    env.memory[1] = CartesianIndex(Int64(1), Int64(1))
     exper = Experiment(env; debug = true)
 
     # Find the Nash equilibrium profit
@@ -112,12 +119,13 @@ end
 
     π_nash = π(p_Bert_nash_equilibrium, p_Bert_nash_equilibrium, params)[1]
     @test π_nash > π_min_price
-    for i = 1:exper.hook[Symbol(1)].hooks[2].rewards.capacity
-        push!(exper.hook[Symbol(1)].hooks[2].rewards, π_nash)
-        push!(exper.hook[Symbol(2)].hooks[2].rewards, 0)
+    for i = 1:capacity(exper.hook[Player(1)].hooks[2].rewards)
+        push!(exper.hook[Player(1)].hooks[2].rewards, π_nash)
+        push!(exper.hook[Player(2)].hooks[2].rewards, 0)
     end
 
     ec_summary_ = economic_summary(exper)
+    # TODO: Convergence profit needs to be tested with a properly configured tabular approximator...
     # @test round(profit_gain(ec_summary_.convergence_profit[1], env); digits = 2) == 0
     # @test round(profit_gain(ec_summary_.convergence_profit[2], env); digits = 2) == 1.07
 
@@ -127,9 +135,9 @@ end
         π(maximum(exper.env.price_options), maximum(exper.env.price_options), params)[1]
     @test π_max_price < π_monop
 
-    for i = 1:exper.hook[Symbol(1)].hooks[2].rewards.capacity
-        push!(exper.hook[Symbol(1)].hooks[2].rewards, π_monop)
-        push!(exper.hook[Symbol(2)].hooks[2].rewards, 0)
+    for i = 1:capacity(exper.hook[Player(1)].hooks[2].rewards)
+        push!(exper.hook[Player(1)].hooks[2].rewards, π_monop)
+        push!(exper.hook[Player(2)].hooks[2].rewards, 0)
     end
 
     ec_summary_ = economic_summary(exper)
@@ -164,9 +172,9 @@ end
 
     env = AIAPCEnv(hyperparameters)
     @test current_player(env) == RLBase.SimultaneousPlayer()
-    @test action_space(env, Symbol(1)) == Int8.(1:15)
+    @test action_space(env, Player(1)) == Int64.(1:15)
     @test reward(env) != 0 # reward reflects outcomes of last play (which happens at player = 1, e.g. before any actions chosen)
-    act!(env, CartesianIndex(Int8(5), Int8(5)))
+    act!(env, CartesianIndex(Int64(5), Int64(5)))
     @test reward(env) != [0, 0] # reward is zero as at least one player has already played (technically sequental plays)
 end
 
@@ -262,14 +270,14 @@ end
 
     e_out = run(hyperparams; stop_on_convergence = true)
     e_sum = economic_summary(e_out)
-    @test e_out.hook[Symbol(1)][2].demand_state_high_vect[end] ==
+    @test e_out.hook[Player(1)][2].demand_state_high_vect[end] ==
           (e_out.env.memory.demand_state == :high)
-    @test mean(
-        e_out.hook[Symbol(1)][2].rewards[e_out.hook[Symbol(1)][2].demand_state_high_vect],
-    ) ≈ e_sum.convergence_profit_demand_high[1] atol = 1e-2
-    @test mean(
-        e_out.hook[Symbol(1)][2].rewards[.!e_out.hook[Symbol(1)][2].demand_state_high_vect],
-    ) ≈ e_sum.convergence_profit_demand_low[1] atol = 1e-2
+
+    player_ = Player(1)
+    demand_state_high_vect = [e_out.hook[player_][2].demand_state_high_vect...]
+    rewards = [e_out.hook[player_][2].rewards...]
+    @test mean(rewards[demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_high[1] atol = 1e-2
+    @test mean(rewards[.!demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_low[1] atol = 1e-2
     @test mean(e_out.env.profit_array[:, :, :, 1]) >
           mean(e_out.env.profit_array[:, :, :, 2])
     @test 0.85 < e_sum.percent_demand_high < 0.95
@@ -333,19 +341,13 @@ end
     e_sum = economic_summary(e_out)
 
     for player_ in [1, 2]
-        @test e_out.hook[Symbol(player_)][2].demand_state_high_vect[end] ==
+        @test e_out.hook[Player(player_)][2].demand_state_high_vect[end] ==
               (e_out.env.memory.demand_state == :high)
-        @test mean(
-            e_out.hook[Symbol(player_)][2].rewards[e_out.hook[Symbol(
-                player_,
-            )][2].demand_state_high_vect],
-        ) ≈ e_sum.convergence_profit_demand_high[player_] atol = 1e-2
-        @test mean(
-            e_out.hook[Symbol(player_)][2].rewards[.!e_out.hook[Symbol(
-                player_,
-            )][2].demand_state_high_vect],
-        ) ≈ e_sum.convergence_profit_demand_low[player_] atol = 1e-2
-        @test mean(e_out.hook[Symbol(player_)][1].best_response_vector .== 0) < 0.05
+        demand_state_high_vect = [e_out.hook[Player(player_)][2].demand_state_high_vect...]
+        rewards = [e_out.hook[Player(player_)][2].rewards...]
+        @test mean(rewards[demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_high[player_] atol = 1e-2
+        @test mean(rewards[.!demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_low[player_] atol = 1e-2
+        @test mean(e_out.hook[Player(player_)][1].best_response_vector .== 0) < 0.05
     end
 
     @test mean(e_out.env.profit_array[:, :, :, 1]) >
@@ -409,14 +411,12 @@ end
 
     e_out = run(hyperparams; stop_on_convergence = true)
     e_sum = economic_summary(e_out)
-    @test e_out.hook[Symbol(1)][2].demand_state_high_vect[end] ==
+    @test e_out.hook[Player(1)][2].demand_state_high_vect[end] ==
           (e_out.env.memory.demand_state == :high)
-    @test mean(
-        e_out.hook[Symbol(1)][2].rewards[e_out.hook[Symbol(1)][2].demand_state_high_vect],
-    ) ≈ e_sum.convergence_profit_demand_high[1] atol = 1e-2
-    @test mean(
-        e_out.hook[Symbol(1)][2].rewards[.!e_out.hook[Symbol(1)][2].demand_state_high_vect],
-    ) ≈ e_sum.convergence_profit_demand_low[1] atol = 1e-2
+    demand_state_high_vect = [e_out.hook[Player(1)][2].demand_state_high_vect...]
+    rewards = [e_out.hook[Player(1)][2].rewards...]
+    @test mean(rewards[demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_high[1] atol = 1e-2
+    @test mean(rewards[.!demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_low[1] atol = 1e-2
     @test mean(e_out.env.profit_array[:, :, :, 1]) >
           mean(e_out.env.profit_array[:, :, :, 2])
     @test 0.45 < e_sum.percent_demand_high < 0.55
@@ -466,12 +466,12 @@ end
     )
 
     c_out = run(hyperparameters; stop_on_convergence = true)
-    @test minimum(c_out.policy[Symbol(1)].policy.learner.approximator.table) < 6
-    @test maximum(c_out.policy[Symbol(1)].policy.learner.approximator.table) > 5.5
+    @test minimum(c_out.policy[Player(1)].policy.learner.approximator.model) < 6
+    @test maximum(c_out.policy[Player(1)].policy.learner.approximator.model) > 5.5
 
     # ensure that the policy is updated by the learner
-    @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table; dims = 2) != 0
-    state_sum = sum(c_out.policy[Symbol(1)].policy.learner.approximator.table; dims = 1)
+    @test sum(c_out.policy[Player(1)].policy.learner.approximator.model; dims = 2) != 0
+    state_sum = sum(c_out.policy[Player(1)].policy.learner.approximator.model; dims = 1)
     @test !all(y -> y == state_sum[1], state_sum)
     @test length(reward(c_out.env)) == 2
     @test length(reward(c_out.env, 1)) == 1
@@ -480,9 +480,9 @@ end
     @test reward(c_out.env) == (0, 0)
     @test reward(c_out.env, 1) != 0
 
-    @test sum(c_out.hook[Symbol(1)][1].best_response_vector == 0) == 0
-    @test c_out.hook[Symbol(1)][1].best_response_vector !=
-          c_out.hook[Symbol(2)][1].best_response_vector
+    @test sum(c_out.hook[Player(1)][1].best_response_vector == 0) == 0
+    @test c_out.hook[Player(1)][1].best_response_vector !=
+          c_out.hook[Player(2)][1].best_response_vector
 end
 
 @testset "Run a set of AIAPC experiments." begin
@@ -518,7 +518,7 @@ end
         sum(experiments[1].convergence_profit .> 1) +
         sum(experiments[1].convergence_profit .< 0)
     ) == 0
-    # @test_broken experiments[1].convergence_profit[1] != experiments[1].convergence_profit[2]
+    @test experiments[1].convergence_profit[1] != experiments[1].convergence_profit[2]
     @test all(experiments[1].is_converged)
 end
 
@@ -585,28 +585,28 @@ end
     c_out = run(hyperparameters; stop_on_convergence = false, debug = true)
 
     # ensure that the policy is updated by the learner
-    @test sum(c_out.policy[Symbol(1)].policy.learner.approximator.table .!= 0) != 0
-    @test sum(c_out.policy[Symbol(2)].policy.learner.approximator.table .!= 0) != 0
+    @test sum(c_out.policy[Player(1)].policy.learner.approximator.model .!= 0) != 0
+    @test sum(c_out.policy[Player(2)].policy.learner.approximator.model .!= 0) != 0
     @test c_out.env.is_done[1]
-    @test c_out.hook[Symbol(1)][1].iterations_until_convergence == max_iter
-    @test c_out.hook[Symbol(2)][1].iterations_until_convergence == max_iter
+    @test c_out.hook[Player(1)][1].iterations_until_convergence == max_iter
+    @test c_out.hook[Player(2)][1].iterations_until_convergence == max_iter
 
 
-    @test c_out.policy[Symbol(1)].trajectory.container[:reward][1] .!= 0
-    @test c_out.policy[Symbol(2)].trajectory.container[:reward][1] .!= 0
+    @test c_out.policy[Player(1)].trajectory.container[:reward][1] .!= 0
+    @test c_out.policy[Player(2)].trajectory.container[:reward][1] .!= 0
 
-    @test c_out.policy[Symbol(1)].policy.learner.approximator.table !=
-          c_out.policy[Symbol(2)].policy.learner.approximator.table
-    @test c_out.hook[Symbol(1)][1].best_response_vector !=
-          c_out.hook[Symbol(2)][1].best_response_vector
+    @test c_out.policy[Player(1)].policy.learner.approximator.model !=
+          c_out.policy[Player(2)].policy.learner.approximator.model
+    @test c_out.hook[Player(1)][1].best_response_vector !=
+          c_out.hook[Player(2)][1].best_response_vector
 
 
     @test mean(
-        c_out.hook[Symbol(1)][2].rewards[(end-2):end] .!=
-        c_out.hook[Symbol(2)][2].rewards[(end-2):end],
+        c_out.hook[Player(1)][2].rewards[(end-2):end] .!=
+        c_out.hook[Player(2)][2].rewards[(end-2):end],
     ) >= 0.3
 
-    for i in [Symbol(1), Symbol(2)]
+    for i in [Player(1), Player(2)]
         @test c_out.hook[i][1].convergence_duration >= 0
         @test c_out.hook[i][1].is_converged
         @test c_out.hook[i][1].convergence_threshold == 1
@@ -646,8 +646,8 @@ end
         convergence_threshold = 10,
     )
     c_out = run(hyperparameters; stop_on_convergence = false)
-    @test get_ϵ(c_out.policy[Symbol(1)].policy.explorer) < 1e-4
-    @test get_ϵ(c_out.policy[Symbol(2)].policy.explorer) < 1e-4
+    @test RLFarm.get_ϵ(c_out.policy[Player(1)].policy.explorer) < 1e-4
+    @test RLFarm.get_ϵ(c_out.policy[Player(2)].policy.explorer) < 1e-4
 end
 
 @testset "Convergence stop works" begin
@@ -660,6 +660,7 @@ end
     max_iter = Int(1e7)
     price_index = 1:n_prices
 
+    policy = RandomPolicy()
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
@@ -676,17 +677,17 @@ end
         convergence_threshold = 5,
     )
     c_out = run(hyperparameters; stop_on_convergence = true)
-    @test 0.98 < get_ϵ(c_out.policy[Symbol(1)].policy.explorer) < 1
-    @test 0.98 < get_ϵ(c_out.policy[Symbol(2)].policy.explorer) < 1
+    @test 0.98 < RLFarm.get_ϵ(c_out.policy[Player(1)].policy.explorer) < 1
+    @test 0.98 < RLFarm.get_ϵ(c_out.policy[Player(2)].policy.explorer) < 1
 
-    @test RLCore.check_stop(c_out.stop_condition, 1, c_out.env) == true
-    @test RLCore.check_stop(c_out.stop_condition.stop_conditions[1], 1, c_out.env) == false
-    @test RLCore.check_stop(c_out.stop_condition.stop_conditions[2], 1, c_out.env) == true
+    @test RLCore.check!(c_out.stop_condition, policy, c_out.env) == true
+    @test RLCore.check!(c_out.stop_condition.stop_conditions[1], policy, c_out.env) == false
+    @test RLCore.check!(c_out.stop_condition.stop_conditions[2], policy, c_out.env) == true
 
-    @test c_out.hook[Symbol(1)][1].convergence_duration >= 5
-    @test c_out.hook[Symbol(2)][1].convergence_duration >= 5
-    @test (c_out.hook[Symbol(2)][1].convergence_duration == 5) ||
-          (c_out.hook[Symbol(1)][1].convergence_duration == 5)
+    @test c_out.hook[Player(1)][1].convergence_duration >= 5
+    @test c_out.hook[Player(2)][1].convergence_duration >= 5
+    @test (c_out.hook[Player(2)][1].convergence_duration == 5) ||
+          (c_out.hook[Player(1)][1].convergence_duration == 5)
 end
 
 @testset "run DDDC multiprocessing code" begin
