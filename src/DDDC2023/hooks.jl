@@ -1,9 +1,8 @@
 using CircularArrayBuffers
 
-struct DDDCTotalRewardPerLastNEpisodes{F} <: AbstractHook where {F<:AbstractFloat}
-    rewards::CircularVectorBuffer{F}
+struct DDDCTotalRewardPerLastNEpisodes{B} <: AbstractHook where {B<:CircularArrayBuffer}
+    rewards::B
     demand_state_high_vect::CircularVectorBuffer{Bool}
-    is_display_on_exit::Bool
 
     function DDDCTotalRewardPerLastNEpisodes(; max_steps = 100)
         new{Float64}(CircularVectorBuffer{Float64}(max_steps), CircularVectorBuffer{Bool}(max_steps))
@@ -27,10 +26,10 @@ end
 function Base.push!(
     hook::DDDCTotalRewardPerLastNEpisodes{F},
     stage::Union{PreEpisodeStage,PostEpisodeStage,PostExperimentStage},
-    agent,
-    env,
+    agent::P,
+    env::E,
     player::Player,
-) where {F<:AbstractFloat}
+) where {P<:AbstractPolicy,E<:AbstractEnv,F<:AbstractFloat}
     push!(hook, stage, agent, env)
     return
 end
