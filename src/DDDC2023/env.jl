@@ -1,6 +1,6 @@
 using ReinforcementLearning
 
-const player_to_index = (; Symbol(1) => 1, Symbol(2) => 2)
+const player_to_index = (; Player(1) => 1, Player(2) => 2)
 const demand_to_index = (; :high => 1, :low => 2)
 
 mutable struct DDDCMemory
@@ -184,7 +184,7 @@ function RLBase.reset!(env::DDDCEnv)
     env.is_done[1] = false
 end
 
-RLBase.players(::DDDCEnv) = (Symbol(1), Symbol(2))
+RLBase.players(::DDDCEnv) = (Player(1), Player(2))
 RLBase.current_player(::DDDCEnv) = SIMULTANEOUS_PLAYER
 RLBase.NumAgentStyle(::DDDCEnv) = MultiAgent(2)
 RLBase.DynamicStyle(::DDDCEnv) = SIMULTANEOUS

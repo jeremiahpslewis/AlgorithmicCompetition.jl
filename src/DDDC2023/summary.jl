@@ -78,17 +78,17 @@ end
 function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::AbstractHook)
     convergence_threshold = env.convergence_threshold
     iterations_until_convergence = Int64[
-        hook[player][1].iterations_until_convergence for player in [Symbol(1), Symbol(2)]
+        hook[player][1].iterations_until_convergence for player in [Player(1), Player(2)]
     ]
 
-    percent_demand_high = mean(hook[Symbol(1)][2].demand_state_high_vect)
+    percent_demand_high = mean(hook[Player(1)][2].demand_state_high_vect)
 
     is_converged = Bool[]
     percent_unexplored_states = Float64[]
     convergence_profit = get_convergence_profit_from_hook(hook)
 
 
-    for player_ in (Symbol(1), Symbol(2))
+    for player_ in (Player(1), Player(2))
         push!(is_converged, hook[player_][1].is_converged)
         push!(percent_unexplored_states, mean(hook[player_][1].best_response_vector .== 0))
     end
@@ -120,16 +120,16 @@ end
 Returns the average profit of the agent, after convergence, over the convergence state or states (in the case of a cycle). Also returns the average profit for the high and low demand states.
 """
 function get_convergence_profit_from_hook(hook::AbstractHook)
-    demand_high = hook[Symbol(1)][2].demand_state_high_vect
+    demand_high = hook[Player(1)][2].demand_state_high_vect
     return Dict(
-        :all => [mean(hook[p][2].rewards[101:end]) for p in [Symbol(1), Symbol(2)]],
+        :all => [mean(hook[p][2].rewards[101:end]) for p in [Player(1), Player(2)]],
         :high => [
             mean(hook[p][2].rewards[101:end][demand_high[101:end]]) for
-            p in [Symbol(1), Symbol(2)]
+            p in [Player(1), Player(2)]
         ],
         :low => [
             mean(hook[p][2].rewards[101:end][.!demand_high[101:end]]) for
-            p in [Symbol(1), Symbol(2)]
+            p in [Player(1), Player(2)]
         ],
     )
 end
@@ -221,7 +221,7 @@ function extract_price_vs_demand_signal_counterfactuals(env::DDDCEnv, hook::Abst
             env.state_space_lookup,
             env.price_options,
             env.n_prices,
-        ) for player_ in [Symbol(1), Symbol(2)]
+        ) for player_ in [Player(1), Player(2)]
     ]
     return price_vs_demand_signal_counterfactuals
 end

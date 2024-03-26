@@ -53,33 +53,33 @@ end
 
     policy = AIAPCPolicy(env)
 
-    @test maximum(policy[Symbol(1)].policy.learner.approximator.model) ≈ 6.278004857861001
-    @test minimum(policy[Symbol(1)].policy.learner.approximator.model) ≈ 4.111178690372623
+    @test maximum(policy[Player(1)].policy.learner.approximator.model) ≈ 6.278004857861001
+    @test minimum(policy[Player(1)].policy.learner.approximator.model) ≈ 4.111178690372623
 
-    approx_table = copy(policy.agents[Symbol(1)].policy.learner.approximator.model)
+    approx_table = copy(policy.agents[Player(1)].policy.learner.approximator.model)
     # First three rounds
 
     # t=1
     push!(policy, PreEpisodeStage(), env)
     push!(policy, PreActStage(), env)
-    @test length(policy.agents[Symbol(1)].trajectory.container) == 0
+    @test length(policy.agents[Player(1)].trajectory.container) == 0
     optimise!(policy, PreActStage())
-    approx_table_t_1 = copy(policy.agents[Symbol(1)].policy.learner.approximator.model)
+    approx_table_t_1 = copy(policy.agents[Player(1)].policy.learner.approximator.model)
     @test approx_table_t_1 == approx_table # test that optimise! in t=1 is a noop
     actions = RLBase.plan!(policy, env)
     act!(env, actions)
-    @test length(policy.agents[Symbol(1)].trajectory.container) == 0 # test that trajectory has not been filled
+    @test length(policy.agents[Player(1)].trajectory.container) == 0 # test that trajectory has not been filled
     push!(policy, PostActStage(), env, actions)
-    @test length(policy.agents[Symbol(1)].trajectory.container) == 1
+    @test length(policy.agents[Player(1)].trajectory.container) == 1
     optimise!(policy, PostActStage())
     push!(policy, PostEpisodeStage(), env)
 
     # t=2
     push!(policy, PreEpisodeStage(), env)
     push!(policy, PreActStage(), env)
-    @test length(policy.agents[Symbol(1)].trajectory.container) == 1
+    @test length(policy.agents[Player(1)].trajectory.container) == 1
     optimise!(policy, PreActStage())
-    approx_table_t_2 = copy(policy.agents[Symbol(1)].policy.learner.approximator.model)
+    approx_table_t_2 = copy(policy.agents[Player(1)].policy.learner.approximator.model)
     @test approx_table_t_2 != approx_table_t_1 # test that optimise! in t=2 is not a noop   
     action = RLBase.plan!(policy, env)
     act!(env, action)
@@ -90,9 +90,9 @@ end
     # t=3
     push!(policy, PreEpisodeStage(), env)
     push!(policy, PreActStage(), env)
-    @test length(policy.agents[Symbol(1)].trajectory.container) == 1
+    @test length(policy.agents[Player(1)].trajectory.container) == 1
     optimise!(policy, PreActStage())
-    approx_table_t_3 = copy(policy.agents[Symbol(1)].policy.learner.approximator.model)
+    approx_table_t_3 = copy(policy.agents[Player(1)].policy.learner.approximator.model)
     @test approx_table_t_2 != approx_table_t_3 # test that optimise! in t=2 is not a noop
     action = RLBase.plan!(policy, env)
     act!(env, action)

@@ -35,7 +35,7 @@ Create a policy for the AIAPC environment, with symmetric agents, using a tabula
 """
 function AIAPCPolicy(env::AIAPCEnv; mode = "baseline")
     aiapc_policy = MultiAgentPolicy(
-        NamedTuple(
+        PlayerTuple(
             p => Agent(
                 QBasedPolicy(;
                     learner = TDLearner(

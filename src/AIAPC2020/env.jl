@@ -1,8 +1,8 @@
 using ReinforcementLearning
 
-const player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
+const player_lookup = (; Player(1) => 1, Player(2) => 2)
 const demand_lookup = (; :high => 1, :low => 2)
-const player_to_index = (; Symbol(1) => 1, Symbol(2) => 2)
+const player_to_index = (; Player(1) => 1, Player(2) => 2)
 const demand_to_index = (; :high => 1, :low => 2)
 
 """
@@ -168,7 +168,7 @@ function RLBase.reset!(env::AIAPCEnv)
     env.is_done[1] = false
 end
 
-const players_ = (Symbol(1), Symbol(2))
+const players_ = (Player(1), Player(2))
 RLBase.players(::AIAPCEnv) = players_
 RLBase.current_player(::AIAPCEnv) = SIMULTANEOUS_PLAYER
 RLBase.NumAgentStyle(::AIAPCEnv) = MultiAgent(2)
