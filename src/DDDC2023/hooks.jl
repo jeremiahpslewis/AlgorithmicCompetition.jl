@@ -5,7 +5,7 @@ struct DDDCTotalRewardPerLastNEpisodes{B} <: AbstractHook where {B<:CircularArra
     demand_state_high_vect::CircularVectorBuffer{Bool}
 
     function DDDCTotalRewardPerLastNEpisodes(; max_steps = 100)
-        new{Float64}(CircularVectorBuffer{Float64}(max_steps), CircularVectorBuffer{Bool}(max_steps))
+        new{CircularVectorBuffer{Float64}}(CircularVectorBuffer{Float64}(max_steps), CircularVectorBuffer{Bool}(max_steps))
     end
 end
 
