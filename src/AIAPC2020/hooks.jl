@@ -137,7 +137,7 @@ end
 
 function AIAPCPerformanceHook(env::AbstractEnv)
     MultiAgentHook(
-        NamedTuple(
+        PlayerTuple(
             p => ComposedHook(
                 ConvergenceCheck(env.n_state_space, env.convergence_threshold),
             ) for p in players(env)
@@ -147,7 +147,7 @@ end
 
 function AIAPCDebugHook(env::AbstractEnv)
     MultiAgentHook(
-        NamedTuple(
+        PlayerTuple(
             p => ComposedHook(
                 # TotalRewardPerEpisode(; is_display_on_exit = false),
                 ConvergenceCheck(env.n_state_space, env.convergence_threshold),

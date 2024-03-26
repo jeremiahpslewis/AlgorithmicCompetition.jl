@@ -40,7 +40,7 @@ Create a policy for the DDDC environment, with symmetric agents, using a tabular
 """
 function DDDCPolicy(env::DDDCEnv; mode = "baseline")
     dddc_policy = MultiAgentPolicy(
-        NamedTuple(
+        PlayerTuple(
             p => Agent(
                 QBasedPolicy(;
                     learner = TDLearner(

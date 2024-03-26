@@ -48,7 +48,7 @@ end
 
 function DDDCHook(env::AbstractEnv)
     MultiAgentHook(
-        NamedTuple(
+        PlayerTuple(
             p => ComposedHook(
                 ConvergenceCheck(env.n_state_space, env.convergence_threshold),
                 DDDCTotalRewardPerLastNEpisodes(; max_steps = env.convergence_threshold + 100),
