@@ -18,7 +18,7 @@ function Base.push!(
     ::PostActStage,
     agent::P,
     env::E,
-    player::Symbol,
+    player::Player,
 ) where {P<:AbstractPolicy,E<:AbstractEnv,F<:AbstractFloat}
     push!(h.rewards, reward(env, player))
     push!(h.demand_state_high_vect, env.memory.demand_state == :high)
@@ -29,7 +29,7 @@ function Base.push!(
     stage::Union{PreEpisodeStage,PostEpisodeStage,PostExperimentStage},
     agent,
     env,
-    player::Symbol,
+    player::Player,
 ) where {F<:AbstractFloat}
     push!(hook, stage, agent, env)
     return

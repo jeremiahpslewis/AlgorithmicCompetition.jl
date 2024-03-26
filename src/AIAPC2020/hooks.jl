@@ -87,7 +87,7 @@ function Base.push!(
     ::PostActStage,
     agent::Agent{P,T},
     env::E,
-    player::Symbol,
+    player::Player,
 ) where {P<:AbstractPolicy,T<:Trajectory,E<:AbstractEnv}
     Base.push!(h, PostActStage(), agent.policy, env, player)
 end
@@ -97,7 +97,7 @@ function Base.push!(
     ::PostActStage,
     policy::QBasedPolicy{L,Exp},
     env::E,
-    player::Symbol,
+    player::Player,
 ) where {L<:AbstractLearner,Exp<:AbstractExplorer,E<:AbstractEnv}
     Base.push!(h, PostActStage(), policy.learner, env, player)
 end
@@ -107,7 +107,7 @@ function Base.push!(
     ::PostActStage,
     learner::L,
     env::E,
-    player::Symbol,
+    player::Player,
 ) where {L<:AbstractLearner,E<:AbstractEnv}
     Base.push!(h, PostActStage(), learner.approximator, env, player)
 end
@@ -117,7 +117,7 @@ function Base.push!(
     ::PostActStage,
     approximator::TabularApproximator{A},
     env::E,
-    player::Symbol,
+    player::Player,
 ) where {A,E<:AbstractEnv}
     Base.push!(h, PostActStage(), approximator.model, env, player)
 end
@@ -127,7 +127,7 @@ function Base.push!(
     ::PostActStage,
     table::Matrix{F},
     env::E,
-    player::Symbol,
+    player::Player,
 ) where {F<:AbstractFloat,E<:AbstractEnv}
     state_ = RLBase.state(env, player)
     player_index = player_to_index[player]

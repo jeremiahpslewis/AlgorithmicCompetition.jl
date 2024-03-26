@@ -1,8 +1,5 @@
 using ReinforcementLearning
 
-const player_to_index = Dict(Player(1) => 1, Player(2) => 2)
-const demand_to_index = (; :high => 1, :low => 2)
-
 """
     AIAPCEnv(p::AIAPCHyperParameters)
 
@@ -100,7 +97,7 @@ function RLBase.act!(env::AIAPCEnv, price_tuple::CartesianIndex{2})
     env.is_done[1] = true
 end
 
-RLBase.action_space(env::AIAPCEnv, ::Symbol) = env.price_index # Choice of price
+RLBase.action_space(env::AIAPCEnv, ::Player) = env.price_index # Choice of price
 
 RLBase.action_space(env::AIAPCEnv, ::SimultaneousPlayer) = env.action_space
 
@@ -108,7 +105,7 @@ RLBase.legal_action_space(env::AIAPCEnv, p) = is_terminated(env) ? () : action_s
 
 const legal_action_space_mask_object_AIAPC = fill(true, 15)
 
-RLBase.legal_action_space_mask(env::AIAPCEnv, player::Symbol) =
+RLBase.legal_action_space_mask(env::AIAPCEnv, player::Player) =
     legal_action_space_mask_object_AIAPC
 
 RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
@@ -132,11 +129,11 @@ function RLBase.reward(env::AIAPCEnv, p::Int)
 end
 
 """
-    RLBase.reward(env::AIAPCEnv, p::Int)
+    RLBase.reward(env::AIAPCEnv, player::Player)
 
-Return the reward for the current state for player `p` as a symbol. If the episode is done, return the profit, else return `0`.
+Return the reward for the current state for `player`. If the episode is done, return the profit, else return `0`.
 """
-RLBase.reward(env::AIAPCEnv, p::Symbol) = reward(env, player_to_index[p])
+RLBase.reward(env::AIAPCEnv, p::Player) = reward(env, player_to_index[p])
 
 RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
 
@@ -144,11 +141,11 @@ RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
 RLBase.state(env::AIAPCEnv) = nothing
 
 """
-    RLBase.state(env::AIAPCEnv, player::Symbol)
+    RLBase.state(env::AIAPCEnv, player::Player)
 
 Return the current state as an integer, mapped from the environment memory.
 """
-function RLBase.state(env::AIAPCEnv, p::Symbol)
+function RLBase.state(env::AIAPCEnv, player::Player)
     memory_index = env.memory[1]
 
     env.state_space_lookup[memory_index]

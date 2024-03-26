@@ -341,13 +341,13 @@ end
     e_sum = economic_summary(e_out)
 
     for player_ in [1, 2]
-        @test e_out.hook[Symbol(player_)][2].demand_state_high_vect[end] ==
+        @test e_out.hook[Player(player_)][2].demand_state_high_vect[end] ==
               (e_out.env.memory.demand_state == :high)
-        demand_state_high_vect = [e_out.hook[Symbol(player_)][2].demand_state_high_vect...]
-        rewards = [e_out.hook[Symbol(player_)][2].rewards...]
+        demand_state_high_vect = [e_out.hook[Player(player_)][2].demand_state_high_vect...]
+        rewards = [e_out.hook[Player(player_)][2].rewards...]
         @test mean(rewards[demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_high[player_] atol = 1e-2
         @test mean(rewards[.!demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_low[player_] atol = 1e-2
-        @test mean(e_out.hook[Symbol(player_)][1].best_response_vector .== 0) < 0.05
+        @test mean(e_out.hook[Player(player_)][1].best_response_vector .== 0) < 0.05
     end
 
     @test mean(e_out.env.profit_array[:, :, :, 1]) >

@@ -1,8 +1,5 @@
 using ReinforcementLearning
 
-const player_to_index = Dict(Player(1) => 1, Player(2) => 2)
-const demand_to_index = (; :high => 1, :low => 2)
-
 mutable struct DDDCMemory
     prices::CartesianIndex{2}
     signals::Vector{Bool}
@@ -128,7 +125,7 @@ function RLBase.act!(env::DDDCEnv, price_tuple::CartesianIndex{2})
     env.is_done[1] = true
 end
 
-RLBase.action_space(env::DDDCEnv, ::Symbol) = env.price_index # Choice of price
+RLBase.action_space(env::DDDCEnv, ::Player) = env.price_index # Choice of price
 
 RLBase.action_space(env::DDDCEnv, ::SimultaneousPlayer) = env.action_space
 
@@ -136,14 +133,14 @@ RLBase.legal_action_space(env::DDDCEnv, p) = is_terminated(env) ? () : action_sp
 
 const legal_action_space_mask_object_DDDC = fill(true, 15)
 
-RLBase.legal_action_space_mask(env::DDDCEnv, player::Symbol) =
+RLBase.legal_action_space_mask(env::DDDCEnv, player::Player) =
     legal_action_space_mask_object_DDDC
 
 RLBase.action_space(env::DDDCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
 
 
-RLBase.reward(env::DDDCEnv, p::Symbol) =
-    env.is_done[1] ? env.memory.reward[player_to_index[p]] : zero(Float64)
+RLBase.reward(env::DDDCEnv, player::Player) =
+    env.is_done[1] ? env.memory.reward[player_to_index[player]] : zero(Float64)
 
 RLBase.state_space(env::DDDCEnv, ::Observation, p) = env.state_space
 
@@ -151,14 +148,14 @@ RLBase.state_space(env::DDDCEnv, ::Observation, p) = env.state_space
 RLBase.state(env::DDDCEnv) = nothing
 
 """
-    RLBase.state(env::DDDCEnv, player::Symbol)
+    RLBase.state(env::DDDCEnv, player::Player)
 
 Return the current state as an integer, mapped from the environment memory.
 """
-function RLBase.state(env::DDDCEnv, p::Symbol)
+function RLBase.state(env::DDDCEnv, player::Player)
     memory_index = env.memory.prices
     # State is defined by memory, as in AIAPC, plus demand signal given to a player
-    index_ = player_to_index[p]
+    index_ = player_to_index[player]
 
     _is_high_demand_signal = env.is_high_demand_signals[index_]
     _demand_signal = _is_high_demand_signal ? :high : :low
