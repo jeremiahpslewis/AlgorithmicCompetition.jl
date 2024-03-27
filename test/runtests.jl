@@ -1,8 +1,8 @@
-using Test
 using JuMP
 using Chain
 using DataFrames
 using DataFrameMacros
+using Test
 using ReinforcementLearning:
     RLCore,
     PostActStage,
@@ -40,6 +40,8 @@ using AlgorithmicCompetition:
     DataDemandDigitalParams,
     DDDCEnv,
     DDDCHyperParameters,
+    DDDCTotalRewardPerLastNEpisodes,
+    DDDCPolicy,
     economic_summary,
     Experiment,
     extract_profit_vars,

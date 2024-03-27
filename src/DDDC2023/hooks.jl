@@ -9,27 +9,24 @@ struct DDDCTotalRewardPerLastNEpisodes{B} <: AbstractHook where {B<:CircularArra
     end
 end
 
-Base.getindex(h::DDDCTotalRewardPerLastNEpisodes{F}, inds...) where {F<:AbstractFloat} =
-    getindex(h.rewards, inds...)
-
 function Base.push!(
-    h::DDDCTotalRewardPerLastNEpisodes{F},
+    h::DDDCTotalRewardPerLastNEpisodes{B},
     ::PostActStage,
     agent::P,
     env::E,
     player::Player,
-) where {P<:AbstractPolicy,E<:AbstractEnv,F<:AbstractFloat}
+) where {P<:AbstractPolicy,E<:AbstractEnv,B}
     push!(h.rewards, reward(env, player))
     push!(h.demand_state_high_vect, env.memory.demand_state == :high)
 end
 
 function Base.push!(
-    hook::DDDCTotalRewardPerLastNEpisodes{F},
+    hook::DDDCTotalRewardPerLastNEpisodes{B},
     stage::Union{PreEpisodeStage,PostEpisodeStage,PostExperimentStage},
     agent::P,
     env::E,
     player::Player,
-) where {P<:AbstractPolicy,E<:AbstractEnv,F<:AbstractFloat}
+) where {P<:AbstractPolicy,E<:AbstractEnv,B}
     push!(hook, stage, agent, env)
     return
 end
@@ -40,7 +37,7 @@ function Base.push!(
     policy::MultiAgentPolicy,
     env::DDDCEnv,
 )
-    @simd for p in (Player(1), Player(2))
+    for p in (Player(1), Player(2))
         push!(hook[p], stage, policy[p], env, p)
     end
 end
