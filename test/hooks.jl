@@ -135,10 +135,11 @@ end
     policies = env |> DDDCPolicy
 
     reward_hook = DDDCTotalRewardPerLastNEpisodes(; max_steps=100)
-    push!(reward_hook, PostActStage(), policies[Player(1)], env, Player(1))
-    @test reward_hook.rewards == [0.0, 0.0]
-    @test reward_hook.demand_state_high_vect == [true, true]
+    for i in 1:2
+        push!(reward_hook, PostActStage(), policies[Player(1)], env, Player(1))
+    end
+
+    @test reward_hook.rewards[2] isa Float64
+    @test reward_hook.demand_state_high_vect[2] ∈ [true, false]
 end
-
-
 

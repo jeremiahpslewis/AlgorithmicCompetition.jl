@@ -1,32 +1,40 @@
 using CircularArrayBuffers
 
-struct DDDCTotalRewardPerLastNEpisodes{B} <: AbstractHook where {B<:CircularArrayBuffer}
-    rewards::B
+struct DDDCTotalRewardPerLastNEpisodes <: AbstractHook
+    rewards::CircularVectorBuffer{Float64}
     demand_state_high_vect::CircularVectorBuffer{Bool}
 
     function DDDCTotalRewardPerLastNEpisodes(; max_steps = 100)
-        new{CircularVectorBuffer{Float64}}(CircularVectorBuffer{Float64}(max_steps), CircularVectorBuffer{Bool}(max_steps))
+        new(CircularVectorBuffer{Float64}(max_steps), CircularVectorBuffer{Bool}(max_steps))
     end
 end
 
+function Base.push!(h::DDDCTotalRewardPerLastNEpisodes,
+    env::E,
+    memory::DDDCMemory,
+    player::Player
+) where {E<:AbstractEnv}
+    push!(h.rewards, reward(env, player))
+    push!(h.demand_state_high_vect, memory.demand_state == :high)
+end
+
 function Base.push!(
-    h::DDDCTotalRewardPerLastNEpisodes{B},
+    h::DDDCTotalRewardPerLastNEpisodes,
     ::PostActStage,
     agent::P,
     env::E,
     player::Player,
-) where {P<:AbstractPolicy,E<:AbstractEnv,B}
-    push!(h.rewards, reward(env, player))
-    push!(h.demand_state_high_vect, env.memory.demand_state == :high)
+) where {P<:AbstractPolicy,E<:AbstractEnv}
+    push!(h, env, env.memory, player)
 end
 
 function Base.push!(
-    hook::DDDCTotalRewardPerLastNEpisodes{B},
+    hook::DDDCTotalRewardPerLastNEpisodes,
     stage::Union{PreEpisodeStage,PostEpisodeStage,PostExperimentStage},
     agent::P,
     env::E,
     player::Player,
-) where {P<:AbstractPolicy,E<:AbstractEnv,B}
+) where {P<:AbstractPolicy,E<:AbstractEnv}
     push!(hook, stage, agent, env)
     return
 end
@@ -37,7 +45,7 @@ function Base.push!(
     policy::MultiAgentPolicy,
     env::DDDCEnv,
 )
-    for p in (Player(1), Player(2))
+    @simd for p in (Player(1), Player(2))
         push!(hook[p], stage, policy[p], env, p)
     end
 end
