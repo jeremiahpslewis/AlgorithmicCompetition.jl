@@ -65,15 +65,22 @@ using AlgorithmicCompetition:
 using Distributed
 
 @testset "AlgorithmicCompetition.jl" begin
-    include("alpha_beta.jl")
-    include("stochastic_demand_stochastic_information.jl")
-    include("competitive_equilibrium.jl")
-    include("hooks.jl")
-    include("explorer.jl")
-
-    include("tabular_approximator.jl")
-    include("q_learning.jl")
-    include("policy.jl")
-    include("integration.jl")
-    include("aiapc_conversion_check.jl")
+    @testset "Paramter tests" begin
+        include("alpha_beta.jl")
+        include("stochastic_demand_stochastic_information.jl")
+        include("competitive_equilibrium.jl")
+    end
+    @testset "RL.jl structs" begin
+        include("hooks.jl")
+        include("explorer.jl")
+        include("tabular_approximator.jl")
+        include("q_learning.jl")
+        include("policy.jl")
+    end
+    @testset verbose = true "Integration tests" begin
+        include("integration.jl")
+    end
+    @testset "Output tests" begin
+        include("aiapc_conversion_check.jl")
+    end
 end
