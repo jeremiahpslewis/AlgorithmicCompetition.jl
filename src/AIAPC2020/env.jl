@@ -1,10 +1,4 @@
-using ReinforcementLearningCore
-using ReinforcementLearningBase
-
-const player_lookup = (; Symbol(1) => 1, Symbol(2) => 2)
-const demand_lookup = (; :high => 1, :low => 2)
-const player_to_index = (; Symbol(1) => 1, Symbol(2) => 2)
-const demand_to_index = (; :high => 1, :low => 2)
+using ReinforcementLearning
 
 """
     AIAPCEnv(p::AIAPCHyperParameters)
@@ -22,13 +16,13 @@ struct AIAPCEnv <: AbstractEnv
 
     n_players::Int                           # Number of players
     price_options::Vector{Float64}           # Price options
-    price_index::Vector{Int8}                # Price indices
+    price_index::Vector{Int64}                # Price indices
 
     competition_params_dict::Dict{Symbol,CompetitionParameters} # Competition parameters, true = high, false = low
     demand_mode::Symbol                      # Demand mode, :high or :low
     memory::Vector{CartesianIndex{2}}        # Memory vector (previous prices)
-    state_space::Base.OneTo{Int16}           # State space
-    state_space_lookup::Array{Int16,2}       # State space lookup table
+    state_space::Base.OneTo{Int64}           # State space
+    state_space_lookup::Array{Int64,2}       # State space lookup table
 
     n_prices::Int                            # Number of price options
     n_state_space::Int64                     # Number of states
@@ -47,10 +41,10 @@ struct AIAPCEnv <: AbstractEnv
     function AIAPCEnv(p::AIAPCHyperParameters)
         price_options = Vector{Float64}(p.price_options)
         n_prices = length(p.price_options)
-        price_index = Vector{Int8}(Int8.(1:n_prices))
+        price_index = Vector{Int64}(Int64.(1:n_prices))
         n_players = p.n_players
         n_state_space = n_prices^(p.memory_length * n_players)
-        state_space = Base.OneTo(Int16(n_state_space))
+        state_space = Base.OneTo(Int64(n_state_space))
         action_space = construct_AIAPC_action_space(price_index)
         profit_array = construct_AIAPC_profit_array(
             price_options,
@@ -90,7 +84,7 @@ struct AIAPCEnv <: AbstractEnv
 end
 
 """
-    RLBase.act!(env::AIAPCEnv, price_tuple::Tuple{Int8,Int8})
+    RLBase.act!(env::AIAPCEnv, price_tuple::Tuple{Int64,Int64})
 
 Act in the environment by setting the memory to the given price tuple and setting `is_done` to `true`.
 """
@@ -103,15 +97,15 @@ function RLBase.act!(env::AIAPCEnv, price_tuple::CartesianIndex{2})
     env.is_done[1] = true
 end
 
-RLBase.action_space(env::AIAPCEnv, ::Symbol) = env.price_index # Choice of price
+RLBase.action_space(env::AIAPCEnv, ::Player) = env.price_index # Choice of price
 
 RLBase.action_space(env::AIAPCEnv, ::SimultaneousPlayer) = env.action_space
 
 RLBase.legal_action_space(env::AIAPCEnv, p) = is_terminated(env) ? () : action_space(env, p)
 
-const legal_action_space_mask_object_AIAPC = [Int8.(1:15)...]
+const legal_action_space_mask_object_AIAPC = fill(true, 15)
 
-RLBase.legal_action_space_mask(env::AIAPCEnv, player::Symbol) =
+RLBase.legal_action_space_mask(env::AIAPCEnv, player::Player) =
     legal_action_space_mask_object_AIAPC
 
 RLBase.action_space(env::AIAPCEnv) = action_space(env, SIMULTANEOUS_PLAYER)
@@ -135,11 +129,11 @@ function RLBase.reward(env::AIAPCEnv, p::Int)
 end
 
 """
-    RLBase.reward(env::AIAPCEnv, p::Int)
+    RLBase.reward(env::AIAPCEnv, player::Player)
 
-Return the reward for the current state for player `p` as a symbol. If the episode is done, return the profit, else return `0`.
+Return the reward for the current state for `player`. If the episode is done, return the profit, else return `0`.
 """
-RLBase.reward(env::AIAPCEnv, p::Symbol) = reward(env, player_lookup[p])
+RLBase.reward(env::AIAPCEnv, p::Player) = reward(env, player_to_index[p])
 
 RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
 
@@ -147,11 +141,11 @@ RLBase.state_space(env::AIAPCEnv, ::Observation, p) = env.state_space
 RLBase.state(env::AIAPCEnv) = nothing
 
 """
-    RLBase.state(env::AIAPCEnv, player::Symbol)
+    RLBase.state(env::AIAPCEnv, player::Player)
 
 Return the current state as an integer, mapped from the environment memory.
 """
-function RLBase.state(env::AIAPCEnv, p::Symbol)
+function RLBase.state(env::AIAPCEnv, player::Player)
     memory_index = env.memory[1]
 
     env.state_space_lookup[memory_index]
@@ -169,7 +163,7 @@ function RLBase.reset!(env::AIAPCEnv)
     env.is_done[1] = false
 end
 
-const players_ = (Symbol(1), Symbol(2))
+const players_ = (Player(1), Player(2))
 RLBase.players(::AIAPCEnv) = players_
 RLBase.current_player(::AIAPCEnv) = SIMULTANEOUS_PLAYER
 RLBase.NumAgentStyle(::AIAPCEnv) = MultiAgent(2)
@@ -180,17 +174,3 @@ RLBase.StateStyle(::AIAPCEnv) = Observation{Int64}()
 RLBase.RewardStyle(::AIAPCEnv) = STEP_REWARD
 RLBase.UtilityStyle(::AIAPCEnv) = GENERAL_SUM
 RLBase.ChanceStyle(::AIAPCEnv) = DETERMINISTIC
-
-function RLBase.plan!(
-    explorer::Ex,
-    learner::L,
-    env::AIAPCEnv,
-    player::Symbol,
-) where {Ex<:AbstractExplorer,L<:AbstractLearner}
-    legal_action_space_ = RLBase.legal_action_space_mask(env, player)
-    return RLBase.plan!(
-        explorer,
-        RLCore.forward(learner, state(env, player)),
-        legal_action_space_,
-    )
-end

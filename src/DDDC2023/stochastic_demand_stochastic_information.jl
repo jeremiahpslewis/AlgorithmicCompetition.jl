@@ -9,8 +9,6 @@
 # env.strong_signal_quality_level = 0.3 # high signal quality -> additive deviation from coin flip zero information signal
 # env.weak_signal_quality_level = 0.1 # low signal quality -> base deviation from coin flip zero information signal
 
-using Flux
-
 @kwdef struct DataDemandDigitalParams
     weak_signal_quality_level::Float64 = 0.5 # probability of true signal (0.5 is lowest possible vale)
     strong_signal_quality_level::Float64 = 1.0 # probability of true signal (0.5 is lowest possible vale)

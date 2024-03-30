@@ -1,34 +1,40 @@
-struct DDDCRewardPerEpisodeLastN{F} <: AbstractHook where {F<:AbstractFloat}
-    rewards::CircularBuffer{F}
-    demand_state_high_vect::CircularBuffer{Bool}
-    is_display_on_exit::Bool
+using CircularArrayBuffers
 
-    function DDDCRewardPerEpisodeLastN(; max_steps = 100)
-        new{Float64}(CircularBuffer{Float64}(max_steps), CircularBuffer{Bool}(max_steps))
+struct DDDCTotalRewardPerLastNEpisodes <: AbstractHook
+    rewards::CircularVectorBuffer{Float64}
+    demand_state_high_vect::CircularVectorBuffer{Bool}
+
+    function DDDCTotalRewardPerLastNEpisodes(; max_steps = 100)
+        new(CircularVectorBuffer{Float64}(max_steps), CircularVectorBuffer{Bool}(max_steps))
     end
 end
 
-Base.getindex(h::DDDCRewardPerEpisodeLastN{F}, inds...) where {F<:AbstractFloat} =
-    getindex(h.rewards, inds...)
-
-function Base.push!(
-    h::DDDCRewardPerEpisodeLastN{F},
-    ::PostActStage,
-    agent::P,
+function Base.push!(h::DDDCTotalRewardPerLastNEpisodes,
     env::E,
-    player::Symbol,
-) where {P<:AbstractPolicy,E<:AbstractEnv,F<:AbstractFloat}
+    memory::DDDCMemory,
+    player::Player
+) where {E<:AbstractEnv}
     push!(h.rewards, reward(env, player))
-    push!(h.demand_state_high_vect, env.memory.demand_state == :high)
+    push!(h.demand_state_high_vect, memory.demand_state == :high)
 end
 
 function Base.push!(
-    hook::DDDCRewardPerEpisodeLastN{F},
+    h::DDDCTotalRewardPerLastNEpisodes,
+    ::PostActStage,
+    agent::P,
+    env::E,
+    player::Player,
+) where {P<:AbstractPolicy,E<:AbstractEnv}
+    push!(h, env, env.memory, player)
+end
+
+function Base.push!(
+    hook::DDDCTotalRewardPerLastNEpisodes,
     stage::Union{PreEpisodeStage,PostEpisodeStage,PostExperimentStage},
-    agent,
-    env,
-    player::Symbol,
-) where {F<:AbstractFloat}
+    agent::P,
+    env::E,
+    player::Player,
+) where {P<:AbstractPolicy,E<:AbstractEnv}
     push!(hook, stage, agent, env)
     return
 end
@@ -39,17 +45,17 @@ function Base.push!(
     policy::MultiAgentPolicy,
     env::DDDCEnv,
 )
-    @simd for p in (Symbol(1), Symbol(2))
+    @simd for p in (Player(1), Player(2))
         push!(hook[p], stage, policy[p], env, p)
     end
 end
 
 function DDDCHook(env::AbstractEnv)
     MultiAgentHook(
-        NamedTuple(
+        PlayerTuple(
             p => ComposedHook(
                 ConvergenceCheck(env.n_state_space, env.convergence_threshold),
-                DDDCRewardPerEpisodeLastN(; max_steps = env.convergence_threshold + 100),
+                DDDCTotalRewardPerLastNEpisodes(; max_steps = env.convergence_threshold + 100),
             ) for p in players(env)
         ),
     )

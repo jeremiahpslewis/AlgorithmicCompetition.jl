@@ -1,4 +1,5 @@
-using ReinforcementLearningCore, ReinforcementLearningBase
+using ReinforcementLearning
+using ReinforcementLearningFarm: TotalRewardPerLastNEpisodes
 import Base.push!
 
 
@@ -10,19 +11,19 @@ Hook to check convergence, as defined by the best response for each state being 
 mutable struct ConvergenceCheck <: AbstractHook
     convergence_duration::Int64
     iterations_until_convergence::Int64
-    best_response_vector::Vector{Int8}
+    best_response_vector::Vector{Int64}
     is_converged::Bool
     convergence_threshold::Int64
 
     function ConvergenceCheck(n_states::Int64, convergence_threshold::Int64)
-        new(0, 0, Vector{Int8}(zeros(Int8, n_states)), false, convergence_threshold)
+        new(0, 0, Vector{Int64}(zeros(Int64, n_states)), false, convergence_threshold)
     end
 end
 
 function Base.push!(
     h::ConvergenceCheck,
     state_::S,
-    best_action::Int8,
+    best_action::Int64,
     iter_converged::Bool,
 ) where {S<:Integer}
     # Increment duration whenever argmax action is stable (convergence criteria)
@@ -63,7 +64,7 @@ function _best_action_lookup(state_, table)
         end
     end
 
-    return Int8(best_action)
+    return Int64(best_action)
 end
 
 function Base.push!(
@@ -86,7 +87,7 @@ function Base.push!(
     ::PostActStage,
     agent::Agent{P,T},
     env::E,
-    player::Symbol,
+    player::Player,
 ) where {P<:AbstractPolicy,T<:Trajectory,E<:AbstractEnv}
     Base.push!(h, PostActStage(), agent.policy, env, player)
 end
@@ -96,7 +97,7 @@ function Base.push!(
     ::PostActStage,
     policy::QBasedPolicy{L,Exp},
     env::E,
-    player::Symbol,
+    player::Player,
 ) where {L<:AbstractLearner,Exp<:AbstractExplorer,E<:AbstractEnv}
     Base.push!(h, PostActStage(), policy.learner, env, player)
 end
@@ -106,7 +107,7 @@ function Base.push!(
     ::PostActStage,
     learner::L,
     env::E,
-    player::Symbol,
+    player::Player,
 ) where {L<:AbstractLearner,E<:AbstractEnv}
     Base.push!(h, PostActStage(), learner.approximator, env, player)
 end
@@ -114,11 +115,11 @@ end
 function Base.push!(
     h::ConvergenceCheck,
     ::PostActStage,
-    approximator::TabularApproximator{S,A},
+    approximator::TabularApproximator{A},
     env::E,
-    player::Symbol,
-) where {S,A,E<:AbstractEnv}
-    Base.push!(h, PostActStage(), approximator.table, env, player)
+    player::Player,
+) where {A,E<:AbstractEnv}
+    Base.push!(h, PostActStage(), approximator.model, env, player)
 end
 
 function Base.push!(
@@ -126,7 +127,7 @@ function Base.push!(
     ::PostActStage,
     table::Matrix{F},
     env::E,
-    player::Symbol,
+    player::Player,
 ) where {F<:AbstractFloat,E<:AbstractEnv}
     state_ = RLBase.state(env, player)
     player_index = player_to_index[player]
@@ -136,7 +137,7 @@ end
 
 function AIAPCPerformanceHook(env::AbstractEnv)
     MultiAgentHook(
-        NamedTuple(
+        PlayerTuple(
             p => ComposedHook(
                 ConvergenceCheck(env.n_state_space, env.convergence_threshold),
             ) for p in players(env)
@@ -146,11 +147,11 @@ end
 
 function AIAPCDebugHook(env::AbstractEnv)
     MultiAgentHook(
-        NamedTuple(
+        PlayerTuple(
             p => ComposedHook(
                 # TotalRewardPerEpisode(; is_display_on_exit = false),
                 ConvergenceCheck(env.n_state_space, env.convergence_threshold),
-                TotalRewardPerEpisodeLastN(; max_steps = env.convergence_threshold + 100),
+                TotalRewardPerLastNEpisodes(; max_episodes = env.convergence_threshold + 100),
                 # TODO: MultiAgent version of TotalRewardPerEpisode / better player handling for hooks
             ) for p in players(env)
         ),
@@ -163,7 +164,7 @@ function Base.push!(
     policy::MultiAgentPolicy,
     env::AIAPCEnv,
 )
-    @simd for p in (Symbol(1), Symbol(2))
+    @simd for p in (Player(1), Player(2))
         Base.push!(hook[p], stage, policy[p], env, p)
     end
 end
