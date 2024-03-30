@@ -10,31 +10,32 @@ struct DDDCTotalRewardPerLastNEpisodes <: AbstractHook
 end
 
 function Base.push!(h::DDDCTotalRewardPerLastNEpisodes,
-    env::E,
-    memory::DDDCMemory,
-    player::Player
-) where {E<:AbstractEnv}
-    push!(h.rewards, reward(env, player))
+    reward::Float64,
+    memory::DDDCMemory
+)
+    push!(h.rewards, reward)
     push!(h.demand_state_high_vect, memory.demand_state == :high)
+    return
 end
 
 function Base.push!(
     h::DDDCTotalRewardPerLastNEpisodes,
     ::PostActStage,
     agent::P,
-    env::E,
+    env::DDDCEnv,
     player::Player,
-) where {P<:AbstractPolicy,E<:AbstractEnv}
-    push!(h, env, env.memory, player)
+) where {P<:AbstractPolicy}
+    push!(h, reward(env, player), env.memory)
+    return
 end
 
 function Base.push!(
     hook::DDDCTotalRewardPerLastNEpisodes,
     stage::Union{PreEpisodeStage,PostEpisodeStage,PostExperimentStage},
     agent::P,
-    env::E,
+    env::DDDCEnv,
     player::Player,
-) where {P<:AbstractPolicy,E<:AbstractEnv}
+) where {P<:AbstractPolicy}
     push!(hook, stage, agent, env)
     return
 end
