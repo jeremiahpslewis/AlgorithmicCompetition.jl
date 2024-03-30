@@ -182,7 +182,7 @@ end
     n_procs_ = 1
 
     _procs = addprocs(
-        n_procs_,
+        Sys.CPU_THREADS,
         topology = :master_worker,
         exeflags = ["--threads=1", "--project=$(Base.active_project())"],
     )
@@ -691,10 +691,8 @@ end
 end
 
 @testset "run DDDC multiprocessing code" begin
-    n_procs_ = 1
-
     _procs = addprocs(
-        n_procs_,
+        Sys.CPU_THREADS,
         topology = :master_worker,
         exeflags = ["--threads=1", "--project=$(Base.active_project())"],
     )
