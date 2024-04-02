@@ -64,10 +64,8 @@ end
 
 
 @testset "AIAPC Conversion Check" begin
-    n_procs_ = 2 # up to 8 performance cores on m1 (7 workers + 1 main)
-
     _procs = addprocs(
-        n_procs_,
+        Sys.CPU_THREADS,
         topology = :master_worker,
         exeflags = ["--threads=1", "--project=$(Base.active_project())"],
     )
