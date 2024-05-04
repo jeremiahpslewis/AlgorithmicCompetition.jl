@@ -9,10 +9,7 @@ struct DDDCTotalRewardPerLastNEpisodes <: AbstractHook
     end
 end
 
-function Base.push!(h::DDDCTotalRewardPerLastNEpisodes,
-    reward::Float64,
-    memory::DDDCMemory
-)
+function Base.push!(h::DDDCTotalRewardPerLastNEpisodes, reward::Float64, memory::DDDCMemory)
     push!(h.rewards, reward)
     push!(h.demand_state_high_vect, memory.demand_state == :high)
     return
@@ -56,7 +53,9 @@ function DDDCHook(env::AbstractEnv)
         PlayerTuple(
             p => ComposedHook(
                 ConvergenceCheck(env.n_state_space, env.convergence_threshold),
-                DDDCTotalRewardPerLastNEpisodes(; max_steps = env.convergence_threshold + 100),
+                DDDCTotalRewardPerLastNEpisodes(;
+                    max_steps = env.convergence_threshold + 100,
+                ),
             ) for p in players(env)
         ),
     )
