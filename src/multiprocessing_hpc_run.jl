@@ -36,7 +36,7 @@ end
 )
 
 
-file_name = "simulation_results_aiapc_$(version)_$(start_timestamp_str).csv"
+file_name = "$(ENV["HOME"])/simulation_results_aiapc_$(version)_$(start_timestamp_str).csv"
 CSV.write(file_name, exp_df)
 
 rmprocs(workers())
