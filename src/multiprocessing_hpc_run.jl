@@ -4,10 +4,10 @@ using AlgorithmicCompetition
 using Dates
 using CSV
 
-n_parameter_iterations = 10
-n_parameter_combinations = 1000
+n_parameter_iterations = 1000
+n_parameter_combinations = 10000
 batch_size = 500
-duration = 1.5 # in hours, e.g. 8 hours per run
+duration = 10 # in hours, e.g. 8 hours per run
 duration_minutes = Int(floor(duration * 60))
 n_sims_per_hour = 5 * 60 # 5 simulations per minute
 speed_discount = 0.9 # 10% buffer for speed discount
@@ -30,8 +30,8 @@ end
     batch_size=batch_size,
     version=version,
     start_timestamp=start_timestamp,
-    max_iter=Int(1e3),
-    convergence_threshold=Int(1e2),
+    # max_iter=Int(1e3),
+    # convergence_threshold=Int(1e2),
     n_parameter_iterations=n_parameter_iterations,
 )
 
