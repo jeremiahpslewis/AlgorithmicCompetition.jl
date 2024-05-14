@@ -14,10 +14,11 @@ using StatsBase
 Run DDDC, given a configuration for a set of experiments.
 """
 function run_dddc(;
-    n_parameter_iterations = 1,
-    max_iter = Int(1e9),
-    convergence_threshold = Int(1e5),
-    n_grid_increments = 100,
+    n_parameter_iterations=1,
+    max_iter=Int(1e9),
+    convergence_threshold=Int(1e5),
+    n_grid_increments=100,
+    batch_size=1,
 )
     frequency_high_demand_range = Float64.(range(0.5, 1, n_grid_increments + 1))
     weak_signal_quality_level_range = Float64.(range(0.5, 1.0, 6))
@@ -38,10 +39,10 @@ function run_dddc(;
 
     data_demand_digital_param_set = [
         DataDemandDigitalParams(
-            weak_signal_quality_level = weak_signal_quality_level,
-            strong_signal_quality_level = 1.0,
-            signal_is_strong = shuffle(signal_quality_players),
-            frequency_high_demand = frequency_high_demand,
+            weak_signal_quality_level=weak_signal_quality_level,
+            strong_signal_quality_level=1.0,
+            signal_is_strong=shuffle(signal_quality_players),
+            frequency_high_demand=frequency_high_demand,
         ) for frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for
         weak_signal_quality_level in weak_signal_quality_level_range
@@ -55,7 +56,7 @@ function run_dddc(;
             max_iter,
             competition_solution_dict,
             data_demand_digital_params;
-            convergence_threshold = convergence_threshold,
+            convergence_threshold=convergence_threshold,
         ) for data_demand_digital_params in data_demand_digital_param_set
     ]
 
@@ -65,7 +66,7 @@ function run_dddc(;
     println(
         "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times",
     )
-    exp_list = @showprogress pmap(run_and_extract, hyperparameter_vect; on_error = identity)
+    exp_list = @showprogress pmap(run_and_extract, hyperparameter_vect; on_error=identity, batch_size=batch_size)
     append!(exp_list_, exp_list)
 
     return exp_list_
