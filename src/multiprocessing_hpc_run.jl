@@ -4,19 +4,20 @@ using AlgorithmicCompetition
 using Dates
 using CSV
 
-n_parameter_iterations = 100
+n_parameter_iterations = 10
+n_parameter_combinations = 1000
 batch_size = 500
-duration = # in minutes, appproximately 6 simulations per minute are possible
-n_cores = Int(ceil(batch_size / 3)) 
-
-Int(floor(1e4*n_parameter_iterations / n_cores))
-
+duration = 1.5 # in hours, e.g. 8 hours per run
+duration_minutes = Int(floor(duration * 60))
+n_sims_per_hour = 5 * 60 # 5 simulations per minute
+speed_discount = 0.9 # 10% buffer for speed discount
+n_cores = n_parameter_iterations * n_parameter_combinations / duration / n_sims_per_hour * speed_discount |> ceil |> Int
 
 version = "v0.0.2"
 start_timestamp = now()
 start_timestamp_str = Dates.format(start_timestamp, "yyyy-mm-dd HHMMSS")
 
-addprocs(SlurmManager(n_cores), partition="normal", t="00:$duration:00", cpus_per_task="1", mem_per_cpu="1G")
+addprocs(SlurmManager(n_cores), partition="normal", t="00:$duration_minutes:00", cpus_per_task="1", mem_per_cpu="1G")
 # q="express"
 
 @everywhere begin
