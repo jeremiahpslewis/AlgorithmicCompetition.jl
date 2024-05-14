@@ -34,12 +34,14 @@ end
 
 """
     run_aiapc(
-        n_parameter_iterations = 1,
-        max_iter = Int(1e9),
-        convergence_threshold = Int(1e5),
-        max_alpha = 0.25,
-        max_beta = 2,
-        sample_fraction = 1,
+        n_parameter_iterations=1,
+        max_iter=Int(1e9),
+        convergence_threshold=Int(1e5),
+        α_range=Float64.(range(0.0025, 0.25, 100)),
+        β_range=Float64.(range(0.02, 2, 100)),
+        version="v0.0.0",
+        start_timestamp=now(),
+        batch_size=1,
     )
 
 Run AIAPC, given a configuration for a set of experiments.
