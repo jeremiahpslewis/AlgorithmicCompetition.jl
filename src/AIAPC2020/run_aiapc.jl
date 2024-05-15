@@ -80,7 +80,7 @@ function run_aiapc(;
     )
 
     start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd HHMMSS")
-    file_name = "simulation_results_aiapc_$(version)_$(start_timestamp).csv"
+    file_name = "simulation_results_aiapc_$(version)_$(start_timestamp)_backup.csv"
 
     # Shuffle hyperparameter_vect, extend according to number of repetitions
     hyperparameter_vect = shuffle(repeat(hyperparameter_vect, n_parameter_iterations))
