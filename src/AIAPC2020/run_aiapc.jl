@@ -79,7 +79,7 @@ function run_aiapc(;
         "About to run $(length(hyperparameter_vect)) parameter settings, each $n_parameter_iterations times",
     )
 
-    start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd HHMMSS")
+    start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd_HHMMSS")
     file_name = "simulation_results_aiapc_$(version)_$(start_timestamp)_backup.csv"
 
     # Shuffle hyperparameter_vect, extend according to number of repetitions
