@@ -92,9 +92,7 @@ function run_aiapc(;
     append!(exp_list_, exp_list)
 
     exp_df = AlgorithmicCompetition.extract_sim_results(exp_list)
-
-    file_name = "$(ENV["HOME"])/$file_name"
-    CSV.write(file_name, exp_df)
+    CSV.write("$(ENV["HOME"])/$file_name", exp_df)
 
     return exp_df
 end
