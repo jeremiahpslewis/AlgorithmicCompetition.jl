@@ -85,9 +85,7 @@ function run_aiapc(;
     # Shuffle hyperparameter_vect, extend according to number of repetitions
     hyperparameter_vect = shuffle(repeat(hyperparameter_vect, n_parameter_iterations))
     exp_list_ = AIAPCSummary[]
-    println(
-        "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times",
-    )
+
     exp_list = @showprogress pmap(run_and_extract, hyperparameter_vect; on_error=identity, batch_size=batch_size)
     append!(exp_list_, exp_list)
 
