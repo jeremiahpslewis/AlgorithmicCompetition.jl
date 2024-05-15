@@ -4,7 +4,7 @@ using AlgorithmicCompetition
 using Dates
 using CSV
 
-n_parameter_iterations = 1000
+n_parameter_iterations = 100
 n_parameter_combinations = 10000
 batch_size = 500
 duration = 10 # in hours, e.g. 8 hours per run
@@ -17,7 +17,7 @@ version = "v0.0.2"
 start_timestamp = now()
 start_timestamp_str = Dates.format(start_timestamp, "yyyy-mm-dd HHMMSS")
 
-addprocs(SlurmManager(n_cores), partition="normal", t="00:$duration_minutes:00", cpus_per_task="1", mem_per_cpu="1G")
+addprocs(SlurmManager(n_cores), partition="normal", t="00:$duration_minutes:00", cpus_per_task="1", mem_per_cpu="2G")
 # q="express"
 
 @everywhere begin
@@ -30,8 +30,6 @@ end
     batch_size=batch_size,
     version=version,
     start_timestamp=start_timestamp,
-    # max_iter=Int(1e3),
-    # convergence_threshold=Int(1e2),
     n_parameter_iterations=n_parameter_iterations,
 )
 
