@@ -80,24 +80,21 @@ function run_aiapc(;
     )
 
     start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd HHMMSS")
-    folder_name = "aiapc_$(version)_$(start_timestamp)"
-    mkpath(folder_name)
+    file_name = "simulation_results_aiapc_$(version)_$(start_timestamp).csv"
 
-    for i = 1:n_parameter_iterations
-        println("Parameter iteration $i of $n_parameter_iterations")
-        file_name = "$(folder_name)/simulation_results_aiapc_$(i).csv"
+    # Shuffle hyperparameter_vect, extend according to number of repetitions
+    hyperparameter_vect = shuffle(repeat(hyperparameter_vect, n_parameter_iterations))
+    exp_list_ = AIAPCSummary[]
+    println(
+        "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times",
+    )
+    exp_list = @showprogress pmap(run_and_extract, hyperparameter_vect; on_error=identity, batch_size=batch_size)
+    append!(exp_list_, exp_list)
 
+    exp_df = AlgorithmicCompetition.extract_sim_results(exp_list)
 
-        exp_list_ = AIAPCSummary[]
-        exp_list =
-            @showprogress pmap(run_and_extract, hyperparameter_vect; on_error=identity, batch_size=batch_size)
-
-        df = AlgorithmicCompetition.extract_sim_results(exp_list)
-        CSV.write(file_name, df)
-    end
-
-    exp_df = DataFrame.(CSV.File.(readdir(folder_name, join=true)))
-    exp_df = vcat(exp_df...)
+    file_name = "$(ENV["HOME"])/$file_name"
+    CSV.write(file_name, exp_df)
 
     return exp_df
 end
