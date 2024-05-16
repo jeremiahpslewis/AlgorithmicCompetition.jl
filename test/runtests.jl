@@ -17,7 +17,10 @@ using ReinforcementLearning:
     RandomPolicy,
     MultiAgentPolicy,
     optimise!,
-    RLBase, AbstractPolicy, act!, plan!
+    RLBase,
+    AbstractPolicy,
+    act!,
+    plan!
 import ReinforcementLearning: RLCore
 using Statistics
 using AlgorithmicCompetition:

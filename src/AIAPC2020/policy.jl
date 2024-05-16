@@ -40,9 +40,7 @@ function AIAPCPolicy(env::AIAPCEnv; mode = "baseline")
                 QBasedPolicy(;
                     learner = TDLearner(
                         # TabularQApproximator with specified init matrix
-                        TabularApproximator(
-                            InitMatrix(env, mode = mode),
-                        ),
+                        TabularApproximator(InitMatrix(env, mode = mode)),
                         # For param info: https://github.com/JuliaReinforcementLearning/ReinforcementLearning.jl/blob/f97747923c6d7bbc5576f81664ed7b05a2ab8f1e/src/ReinforcementLearningZoo/src/algorithms/tabular/td_learner.jl#L15
                         :SARS;
                         γ = env.δ,

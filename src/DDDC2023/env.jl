@@ -191,4 +191,3 @@ RLBase.StateStyle(::DDDCEnv) = Observation{Int64}()
 RLBase.RewardStyle(::DDDCEnv) = STEP_REWARD
 RLBase.UtilityStyle(::DDDCEnv) = GENERAL_SUM
 RLBase.ChanceStyle(::DDDCEnv) = DETERMINISTIC
-
