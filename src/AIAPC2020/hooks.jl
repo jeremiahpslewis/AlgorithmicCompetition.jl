@@ -151,7 +151,9 @@ function AIAPCDebugHook(env::AbstractEnv)
             p => ComposedHook(
                 # TotalRewardPerEpisode(; is_display_on_exit = false),
                 ConvergenceCheck(env.n_state_space, env.convergence_threshold),
-                TotalRewardPerLastNEpisodes(; max_episodes = env.convergence_threshold + 100),
+                TotalRewardPerLastNEpisodes(;
+                    max_episodes = env.convergence_threshold + 100,
+                ),
                 # TODO: MultiAgent version of TotalRewardPerEpisode / better player handling for hooks
             ) for p in players(env)
         ),
