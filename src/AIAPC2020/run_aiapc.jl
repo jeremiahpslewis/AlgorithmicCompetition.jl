@@ -77,7 +77,9 @@ function run_aiapc(;
     )
 
     if !ismissing(parameter_index)
-        hyperparameter_vect = [hyperparameter_vect[parameter_index]]
+        param_index_start = (1 + (parameter_index - 1) * 10)
+        param_index_end = param_index_start + 9
+        hyperparameter_vect = hyperparameter_vect[param_index_start:param_index_end]
     else
         parameter_index = ""
     end
