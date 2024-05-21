@@ -7,7 +7,7 @@ using Dates
 
 version = 0.6
 start_timestamp = now()
-start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd HHMMSS")
+start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd__HH_MM_SS")
 
 if Sys.isapple()
     n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)

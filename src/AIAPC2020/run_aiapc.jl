@@ -77,20 +77,24 @@ function run_aiapc(;
     )
 
     if !ismissing(parameter_index)
-        hyperparameter_vect = [hyperparameter_vect[parameter_index]]
+        param_index_start = (1 + (parameter_index - 1) * 10)
+        param_index_end = param_index_start + 9
+        hyperparameter_vect = hyperparameter_vect[param_index_start:param_index_end]
+    else
+        parameter_index = ""
     end
 
     println(
         "About to run $(length(hyperparameter_vect)) parameter settings, each $n_parameter_iterations times",
     )
 
-    start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd HHMMSS")
-    folder_name = "aiapc_$(version)_$(start_timestamp)"
+    start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd__HH_MM_SS")
+    folder_name = "data/aiapc_$(version)_$(start_timestamp)"
     mkpath(folder_name)
 
     for i = 1:n_parameter_iterations
         println("Parameter iteration $i of $n_parameter_iterations")
-        file_name = "$(folder_name)/simulation_results_aiapc_$(i).csv"
+        file_name = "$(folder_name)/simulation_results_aiapc_$(i)_parameter_index_$(parameter_index).csv"
 
 
         exp_list_ = AIAPCSummary[]

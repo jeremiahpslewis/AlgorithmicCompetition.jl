@@ -13,7 +13,7 @@ using CSV
 using DataFrames
 using Statistics
 
-folder_name = "aiapc_v0.0.2_data"
+folder_name = "data/aiapc_v0.0.2_data"
 df_ = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
 df = vcat(df_...)
 

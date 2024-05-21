@@ -19,7 +19,7 @@ n_cores =
 
 version = "v0.0.2"
 start_timestamp = now()
-start_timestamp_str = Dates.format(start_timestamp, "yyyy-mm-dd HHMMSS")
+start_timestamp_str = Dates.format(start_timestamp, "yyyy-mm-dd__HH_MM_SS")
 
 addprocs(
     SlurmManager(n_cores),
