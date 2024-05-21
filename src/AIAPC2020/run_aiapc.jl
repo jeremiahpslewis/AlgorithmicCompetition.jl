@@ -86,7 +86,7 @@ function run_aiapc(;
         "About to run $(length(hyperparameter_vect)) parameter settings, each $n_parameter_iterations times",
     )
 
-    start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd HHMMSS")
+    start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd__HH_MM_SS")
     folder_name = "aiapc_$(version)_$(start_timestamp)"
     mkpath(folder_name)
 
