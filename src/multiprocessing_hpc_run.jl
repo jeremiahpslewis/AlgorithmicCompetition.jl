@@ -7,7 +7,7 @@ using CSV
 n_parameter_iterations = 1000
 n_parameter_combinations = 10000
 batch_size = 500
-duration = 10 # in hours, e.g. 8 hours per run
+duration = 0.5 # in hours, e.g. 8 hours per run
 duration_minutes = Int(floor(duration * 60))
 n_sims_per_hour = 5 * 60 # 5 simulations per minute
 speed_discount = 0.9 # 10% buffer for speed discount
@@ -27,8 +27,9 @@ addprocs(
     t = "00:$duration_minutes:00",
     cpus_per_task = "1",
     mem_per_cpu = "1G",
+    # q="express",
 )
-# q="express"
+
 
 @everywhere begin
     using Pkg

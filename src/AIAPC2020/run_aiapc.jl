@@ -55,6 +55,7 @@ function run_aiapc(;
     version = "v0.0.0",
     start_timestamp = now(),
     batch_size = 1,
+    parameter_index = missing,
 )
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
@@ -74,6 +75,10 @@ function run_aiapc(;
         convergence_threshold,
         1,
     )
+
+    if !ismissing(parameter_index)
+        hyperparameter_vect = [hyperparameter_vect[parameter_index]]
+    end
 
     println(
         "About to run $(length(hyperparameter_vect)) parameter settings, each $n_parameter_iterations times",
@@ -103,5 +108,6 @@ function run_aiapc(;
     exp_df = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
     exp_df = vcat(exp_df...)
 
+    CSV.write("$(folder_name)_parameter_index_$(parameter_index)_.csv", exp_df)
     return exp_df
 end
