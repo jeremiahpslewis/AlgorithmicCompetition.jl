@@ -5,7 +5,7 @@
 #SBATCH --array=1-1000 # after % is the number of simultaneous jobs
 #SBATCH --mem-per-cpu=1G
 #SBATCH --cpus-per-task=1
-#SBATCH --time=04:30:00 # For full run this is 4.5 hours
+#SBATCH --time=30:00:00 # For full run this is 4.5 hours
 #SBATCH -p normal
 #SBATCH --mail-user=irddcc1@mail.uni-paderborn.de   # Where to send mail	
 
