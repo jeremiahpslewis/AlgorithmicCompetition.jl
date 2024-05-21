@@ -78,6 +78,8 @@ function run_aiapc(;
 
     if !ismissing(parameter_index)
         hyperparameter_vect = [hyperparameter_vect[parameter_index]]
+    else
+        parameter_index = ""
     end
 
     println(
@@ -90,7 +92,7 @@ function run_aiapc(;
 
     for i = 1:n_parameter_iterations
         println("Parameter iteration $i of $n_parameter_iterations")
-        file_name = "$(folder_name)/simulation_results_aiapc_$(i).csv"
+        file_name = "$(folder_name)/simulation_results_aiapc_$(i)_parameter_index_$(parameter_index).csv"
 
 
         exp_list_ = AIAPCSummary[]
