@@ -87,7 +87,7 @@ function run_aiapc(;
     )
 
     start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd__HH_MM_SS")
-    folder_name = "aiapc_$(version)_$(start_timestamp)"
+    folder_name = "data/aiapc_$(version)_$(start_timestamp)"
     mkpath(folder_name)
 
     for i = 1:n_parameter_iterations
