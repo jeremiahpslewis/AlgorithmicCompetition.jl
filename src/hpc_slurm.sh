@@ -9,6 +9,6 @@
 #SBATCH -p normal
 #SBATCH --mail-user=irddcc1@mail.uni-paderborn.de   # Where to send mail	
 
-export N_ITERATIONS=1000 # Number of iterations per parameter set; for full run, this is 1000
+export N_ITERATIONS=100 # Number of iterations per parameter set; for full run, this is 1000
 export VERSION="2024-05-21"
 julia src/slurm_batch.jl
