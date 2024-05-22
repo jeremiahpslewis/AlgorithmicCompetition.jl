@@ -62,6 +62,9 @@ function run_aiapc(;
     if debug
         α_range = α_range[1:10:end]
         β_range = β_range[1:10:end]
+        if SLURM_ARRAY_TASK_ID > 10
+            return
+        end
     end
 
     competition_params_dict = Dict(
