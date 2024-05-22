@@ -9,4 +9,5 @@ AlgorithmicCompetition.run_aiapc(
         SLURM_ARRAY_JOB_ID = parse(Int, ENV["SLURM_ARRAY_JOB_ID"]),
         SLURM_ARRAY_TASK_ID = parse(Int, ENV["SLURM_ARRAY_TASK_ID"]),
     ),
+    debug = (parse(Int, ENV["DEBUG"]) == 1),
 )

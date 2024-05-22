@@ -56,7 +56,14 @@ function run_aiapc(;
     start_timestamp = now(),
     batch_size = 1,
     slurm_metadata = (SLURM_ARRAY_JOB_ID = 0, SLURM_ARRAY_TASK_ID = 0),
+    debug = false,
 )
+
+    if debug
+        α_range = α_range[1:10:end]
+        β_range = β_range[1:10:end]
+    end
+
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
         :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
