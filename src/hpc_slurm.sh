@@ -2,7 +2,7 @@
 #SBATCH --job-name=array_job
 #SBATCH --output=array_job_%A_%a.out
 #SBATCH --error=array_job_%A_%a.err
-#SBATCH --array=1:10 # 1-1000 # after % is the number of simultaneous jobs
+#SBATCH --array=1:10 # 1-1000 # Number of iterations over all parameter sets
 #SBATCH --mem-per-cpu=1500M
 #SBATCH --cpus-per-task=1
 #SBATCH --time=20:00:00 # For full run true value should be <13 hours
