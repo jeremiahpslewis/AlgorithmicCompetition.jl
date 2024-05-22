@@ -10,4 +10,6 @@ git clone https://github.com/jeremiahpslewis/AlgorithmicCompetition.jl.git
 
 cd AlgorithmicCompetition.jl
 
+julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate()'
+
 sbatch src/hpc_slurm.sh

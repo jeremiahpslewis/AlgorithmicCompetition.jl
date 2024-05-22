@@ -102,7 +102,7 @@ function run_aiapc(;
 
     for i = 1:n_parameter_iterations
         println("Parameter iteration $i of $n_parameter_iterations")
-        file_name = joinpath(folder_name, savename(parameter_iteration = i, suffix = "csv"))
+        file_name = joinpath(folder_name, savename((parameter_iteration = i, suffix = "csv")))
         exp_list_ = AIAPCSummary[]
         exp_list = @showprogress pmap(
             run_and_extract,
