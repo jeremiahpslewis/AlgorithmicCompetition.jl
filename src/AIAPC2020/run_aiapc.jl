@@ -90,13 +90,13 @@ function run_aiapc(;
     start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd__HH_MM_SS")
     folder_name = joinpath(
         "data",
-        savename(
+        savename((
             model = "aiapc",
             version = version,
             start_timestamp = start_timestamp,
             SLURM_ARRAY_JOB_ID = slurm_metadata.SLURM_ARRAY_JOB_ID,
             SLURM_ARRAY_TASK_ID = slurm_metadata.SLURM_ARRAY_TASK_ID,
-        ),
+        )),
     )
     mkpath(folder_name)
 
