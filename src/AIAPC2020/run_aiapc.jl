@@ -55,7 +55,7 @@ function run_aiapc(;
     version = "v0.0.0",
     start_timestamp = now(),
     batch_size = 1,
-    parameter_index = missing,
+    slurm_metadata = (SLURM_ARRAY_JOB_ID = 0, SLURM_ARRAY_TASK_ID = 0),
 )
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
@@ -76,27 +76,26 @@ function run_aiapc(;
         1,
     )
 
-    if !ismissing(parameter_index)
-        param_index_start = (1 + (parameter_index - 1) * 10)
-        param_index_end = param_index_start + 9
-        hyperparameter_vect = hyperparameter_vect[param_index_start:param_index_end]
-    else
-        parameter_index = ""
-    end
-
     println(
         "About to run $(length(hyperparameter_vect)) parameter settings, each $n_parameter_iterations times",
     )
 
     start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd__HH_MM_SS")
-    folder_name = "data/aiapc_$(version)_$(start_timestamp)"
+    folder_name = joinpath(
+        "data",
+        savename(
+            model = "aiapc",
+            version = version,
+            start_timestamp = start_timestamp,
+            SLURM_ARRAY_JOB_ID = slurm_metadata.SLURM_ARRAY_JOB_ID,
+            SLURM_ARRAY_TASK_ID = slurm_metadata.SLURM_ARRAY_TASK_ID,
+        ),
+    )
     mkpath(folder_name)
 
     for i = 1:n_parameter_iterations
         println("Parameter iteration $i of $n_parameter_iterations")
-        file_name = "$(folder_name)/simulation_results_aiapc_$(i)_parameter_index_$(parameter_index).csv"
-
-
+        file_name = joinpath(folder_name, savename(parameter_iteration = i, suffix = "csv"))
         exp_list_ = AIAPCSummary[]
         exp_list = @showprogress pmap(
             run_and_extract,
@@ -112,6 +111,7 @@ function run_aiapc(;
     exp_df = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
     exp_df = vcat(exp_df...)
 
-    CSV.write("$(folder_name)_parameter_index_$(parameter_index)_.csv", exp_df)
+    mkpath("data/")
+    # CSV.write(joinpath("")"$(folder_name)_parameter_index_$(parameter_index)_.csv", exp_df)
     return exp_df
 end

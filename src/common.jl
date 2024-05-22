@@ -1,5 +1,6 @@
 import Base.push!
 using ReinforcementLearning
+using DrWatson
 
 const player_to_index = Dict(Player(1) => 1, Player(2) => 2)
 const demand_to_index = (; :high => 1, :low => 2)
