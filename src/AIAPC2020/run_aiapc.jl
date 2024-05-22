@@ -111,7 +111,7 @@ function run_aiapc(;
     exp_df = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
     exp_df = vcat(exp_df...)
 
-    mkpath("data/")
-    # CSV.write(joinpath("")"$(folder_name)_parameter_index_$(parameter_index)_.csv", exp_df)
+    CSV.write(folder_name * ".csv", exp_df)
+    rm(folder_name, recursive=true) # Remove folder after merging and writing to CSV
     return exp_df
 end
