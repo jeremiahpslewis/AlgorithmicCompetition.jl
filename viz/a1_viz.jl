@@ -1,3 +1,4 @@
+using DrWatson
 using CairoMakie
 using Chain
 using DataFrameMacros
@@ -13,9 +14,17 @@ using CSV
 using DataFrames
 using Statistics
 
-folder_name = "data/aiapc_v0.0.2_data"
-df_ = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
+
+job_id = "7799305"
+csv_files = filter!(x -> occursin(Regex("data/SLURM_ARRAY_JOB_ID=$(job_id).*.csv"), x), readdir("data", join = true))
+
+df_ = DataFrame.(CSV.File.(csv_files))
+
+for i in 1:length(df_)
+    df_[i][!, "metadata"] .= csv_files[i]
+end
 df = vcat(df_...)
+# df[!, "metadata_dict"] = parse_savename.(df[!, "metadata"])
 
 n_simulations_aiapc =
     @chain df @groupby(:α, :β) @combine(:n_simulations = length(:π_bar)) _[
