@@ -102,6 +102,7 @@ function run_aiapc(;
             debug = debug,
         )),
     )
+
     mkpath(folder_name)
 
     for i = 1:n_parameter_iterations
@@ -115,7 +116,7 @@ function run_aiapc(;
             batch_size = batch_size,
         )
 
-        df = AlgorithmicCompetition.extract_sim_results(exp_list)
+        df = extract_sim_results(exp_list)
         CSV.write(file_name, df)
     end
 
