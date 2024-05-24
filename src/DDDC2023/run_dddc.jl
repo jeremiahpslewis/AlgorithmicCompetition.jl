@@ -23,11 +23,19 @@ function run_dddc(;
     slurm_metadata = (SLURM_ARRAY_JOB_ID = 0, SLURM_ARRAY_TASK_ID = 0),
     debug = false,
 )
+    signal_quality_vect = [[true, false], [false, false]]
+
     frequency_high_demand_range = Float64.(range(0.5, 1, n_grid_increments + 1))
     weak_signal_quality_level_range = Float64.(range(0.5, 1.0, n_grid_increments + 1))
-    # Capture 'extreme' values
-    weak_signal_quality_level_range = [weak_signal_quality_level_range...]
-    signal_quality_vect = [[true, false], [false, false]]
+
+    if debug
+        frequency_high_demand_range = frequency_high_demand_range[1:10:end]
+        weak_signal_quality_level_range = weak_signal_quality_level_range[1:10:end]
+        if SLURM_ARRAY_TASK_ID > 10
+            return
+        end
+    end
+
     competition_params_dict = Dict(
         :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
         :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)), # Parameter values aligned with Calvano 2020 Stochastic Demand case
@@ -35,7 +43,7 @@ function run_dddc(;
 
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
-
+        
     α = Float64(0.15)
     β = Float64(4e-1)
     δ = 0.95

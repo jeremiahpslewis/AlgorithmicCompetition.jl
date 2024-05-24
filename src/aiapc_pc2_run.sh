@@ -14,7 +14,7 @@ cd AlgorithmicCompetition.jl || exit
 julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate()'
 
 mkdir -p log # Log directory for slurm task output
-sbatch src/hpc_slurm.sh
+sbatch src/aiapc_slurm_sbatch.sh
 
 
 ## Viz Analysis Script
