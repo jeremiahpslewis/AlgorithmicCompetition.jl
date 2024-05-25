@@ -5,7 +5,7 @@
 #SBATCH --array=1-1000 # 1-1000 # Number of iterations over all parameter sets
 #SBATCH --mem-per-cpu=1000M
 #SBATCH --cpus-per-task=1
-#SBATCH --time=01:00:00 # For full run true value should be <12 hours
+#SBATCH --time=01:12:00 # For full run true value should be <12 hours
 #SBATCH -p normal
 #SBATCH --mail-user=irddcc1@mail.uni-paderborn.de   # Where to send mail	
 
