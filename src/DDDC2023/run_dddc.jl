@@ -97,5 +97,5 @@ function run_dddc(;
     mkpath(folder_name)
     df = extract_sim_results(exp_list)
     CSV.write(folder_name * ".csv", df)
-    return exp_list_
+    return exp_list
 end
