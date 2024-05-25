@@ -32,9 +32,6 @@ function run_dddc(;
     if debug
         frequency_high_demand_range = frequency_high_demand_range[1:10:end]
         weak_signal_quality_level_range = weak_signal_quality_level_range[1:10:end]
-        if SLURM_ARRAY_TASK_ID > 10
-            return
-        end
     end
 
     competition_params_dict = Dict(
