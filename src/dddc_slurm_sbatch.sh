@@ -11,6 +11,6 @@
 
 # Number of iterations per parameter set; for parallelized full run, 1 iteration over 10k parameters
 export N_ITERATIONS=1 
-export DEBUG=1
+export DEBUG=0
 export VERSION="2024-05-22-debug"
 julia --project=. src/dddc_slurm_batch.jl
