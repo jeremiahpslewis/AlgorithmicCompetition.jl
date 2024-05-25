@@ -17,11 +17,11 @@ SLURM_ARRAY_JOB_ID = parse(Int, ENV["SLURM_ARRAY_JOB_ID"])
 n_parameter_iterations = parse(Int, ENV["N_ITERATIONS"])
 
 if debug && Sys.isapple()
-    n_parameter_iterations = 1
+    n_grid_increments = 1
 elseif debug
-    n_parameter_iterations = 10
+    n_grid_increments = 10
 else
-    n_parameter_iterations = 100
+    n_grid_increments = 100
 end
 
 if debug && SLURM_ARRAY_TASK_ID > 10
@@ -30,8 +30,8 @@ else
     AlgorithmicCompetition.run_dddc(
         version = ENV["VERSION"],
         start_timestamp = now(),
-        n_parameter_iterations = n_parameter_iterations,
-        # n_grid_increments = 1,
+        n_parameter_iterations = 1,
+        n_grid_increments = n_grid_increments,
         batch_metadata = (
             SLURM_ARRAY_JOB_ID = SLURM_ARRAY_JOB_ID,
             SLURM_ARRAY_TASK_ID = SLURM_ARRAY_TASK_ID,
