@@ -13,4 +13,4 @@
 export N_ITERATIONS=1 
 export DEBUG=1
 export VERSION="2024-05-22-debug"
-julia --project=. src/slurm_batch.jl
+julia --project=. src/dddc_slurm_batch.jl
