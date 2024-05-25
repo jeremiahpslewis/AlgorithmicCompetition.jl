@@ -81,7 +81,7 @@ function run_dddc(;
         on_error = identity,
         batch_size = batch_size,
     )
-    append!(exp_list_, exp_list_)
+    append!(exp_list_, exp_list)
 
     folder_name = joinpath(
         "data",
@@ -94,7 +94,7 @@ function run_dddc(;
             debug = debug,
         )),
     )
-
+    mkpath(folder_name)
     df = extract_sim_results(exp_list)
     CSV.write(folder_name * ".csv", df)
     return exp_list_
