@@ -21,7 +21,7 @@ function run_dddc(;
     version = "v0.0.0",
     start_timestamp = now(),
     batch_size = 1,
-    slurm_metadata = (SLURM_ARRAY_JOB_ID = 0, SLURM_ARRAY_TASK_ID = 0),
+    batch_metadata = (SLURM_ARRAY_JOB_ID = 0, SLURM_ARRAY_TASK_ID = 0),
     debug = false,
 )
     signal_quality_vect = [[true, false], [false, false]]
@@ -89,8 +89,8 @@ function run_dddc(;
             model = "dddc",
             version = version,
             start_timestamp = start_timestamp,
-            SLURM_ARRAY_JOB_ID = slurm_metadata.SLURM_ARRAY_JOB_ID,
-            SLURM_ARRAY_TASK_ID = slurm_metadata.SLURM_ARRAY_TASK_ID,
+            SLURM_ARRAY_JOB_ID = batch_metadata.SLURM_ARRAY_JOB_ID,
+            SLURM_ARRAY_TASK_ID = batch_metadata.SLURM_ARRAY_TASK_ID,
             debug = debug,
         )),
     )

@@ -14,7 +14,7 @@ else
         version = ENV["VERSION"],
         start_timestamp = now(),
         n_parameter_iterations = n_parameter_iterations,
-        slurm_metadata = (
+        batch_metadata = (
             SLURM_ARRAY_JOB_ID = SLURM_ARRAY_JOB_ID,
             SLURM_ARRAY_TASK_ID = SLURM_ARRAY_TASK_ID,
         ),
