@@ -18,4 +18,4 @@ sbatch src/aiapc_slurm_sbatch.sh
 
 
 ## Viz Analysis Script
-julia --project=.
+# julia --project=.
