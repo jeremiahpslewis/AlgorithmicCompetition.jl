@@ -1,7 +1,7 @@
 name = "AlgorithmicCompetition"
 uuid = "435e633d-9c15-4973-be77-d092c40524e8"
 authors = ["Jeremiah Lewis <hello@jeremiahlewis.me>"]
-version = "0.1.6"
+version = "0.1.5"
 
 [deps]
 AlgebraOfGraphics = "cbdf2221-f076-402e-a563-3d30da359d67"
