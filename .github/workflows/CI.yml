@@ -7,6 +7,8 @@ on:
     branches: [main]
     tags: ["*"]
   pull_request:
+  issue_comment:
+    types: [created]
 concurrency:
   # Skip intermediate builds: always.
   # Cancel intermediate builds: only if it is a pull request build.
