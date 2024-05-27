@@ -18,6 +18,5 @@ julia -e 'using Pkg; Pkg.activate("."); Pkg.update(); Pkg.instantiate()'
 mkdir -p log # Log directory for slurm task output
 sbatch src/dddc_slurm_sbatch.sh
 
-
 ## Viz Analysis Script
 # julia --project=.
