@@ -107,7 +107,8 @@ function run_aiapc(;
 
     for i = 1:n_parameter_iterations
         println("Parameter iteration $i of $n_parameter_iterations")
-        file_name = joinpath(folder_name, savename((parameter_iteration = i, suffix = "csv")))
+        file_name =
+            joinpath(folder_name, savename((parameter_iteration = i, suffix = "csv")))
         exp_list_ = AIAPCSummary[]
         exp_list = @showprogress pmap(
             run_and_extract,
@@ -124,6 +125,6 @@ function run_aiapc(;
     exp_df = vcat(exp_df...)
 
     CSV.write(folder_name * ".csv", exp_df)
-    rm(folder_name, recursive=true) # Remove folder after merging and writing to CSV
+    rm(folder_name, recursive = true) # Remove folder after merging and writing to CSV
     return exp_df
 end

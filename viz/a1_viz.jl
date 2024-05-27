@@ -16,11 +16,14 @@ using Statistics
 
 
 job_id = "7799305"
-csv_files = filter!(x -> occursin(Regex("data/SLURM_ARRAY_JOB_ID=$(job_id).*.csv"), x), readdir("data", join = true))
+csv_files = filter!(
+    x -> occursin(Regex("data/SLURM_ARRAY_JOB_ID=$(job_id).*.csv"), x),
+    readdir("data", join = true),
+)
 
 df_ = DataFrame.(CSV.File.(csv_files))
 
-for i in 1:length(df_)
+for i = 1:length(df_)
     df_[i][!, "metadata"] .= csv_files[i]
 end
 df = vcat(df_...)

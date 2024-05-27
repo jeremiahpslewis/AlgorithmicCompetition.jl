@@ -17,7 +17,7 @@ function run_dddc(;
     n_parameter_iterations = 1,
     max_iter = Int(1e9),
     convergence_threshold = Int(1e5),
-    n_grid_increments = 100,    
+    n_grid_increments = 100,
     version = "v0.0.0",
     start_timestamp = now(),
     batch_size = 1,
@@ -41,7 +41,7 @@ function run_dddc(;
 
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
-        
+
     α = Float64(0.15)
     β = Float64(4e-1)
     δ = 0.95
