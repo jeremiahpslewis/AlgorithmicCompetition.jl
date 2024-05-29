@@ -9,6 +9,11 @@ using StatsBase
         max_iter = Int(1e9),
         convergence_threshold = Int(1e5),
         n_grid_increments = 100,
+        version = "v0.0.0",
+        start_timestamp = now(),
+        batch_size = 1,
+        batch_metadata = (SLURM_ARRAY_JOB_ID = 0, SLURM_ARRAY_TASK_ID = 0),
+        debug = false,
     )
 
 Run DDDC, given a configuration for a set of experiments.

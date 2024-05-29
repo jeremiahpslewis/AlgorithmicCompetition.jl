@@ -1,5 +1,6 @@
 using AlgorithmicCompetition
 using Dates
+using Distributed
 
 if Sys.isapple()
     # For debugging on MacOS
@@ -8,6 +9,7 @@ if Sys.isapple()
     ENV["SLURM_ARRAY_JOB_ID"] = 1
     ENV["N_ITERATIONS"] = 1
     ENV["VERSION"] = "v1"
+    ENV["N_CORES"] = 6
 end
 
 
@@ -15,6 +17,7 @@ debug = parse(Int, ENV["DEBUG"]) == 1
 SLURM_ARRAY_TASK_ID = parse(Int, ENV["SLURM_ARRAY_TASK_ID"])
 SLURM_ARRAY_JOB_ID = parse(Int, ENV["SLURM_ARRAY_JOB_ID"])
 n_parameter_iterations = parse(Int, ENV["N_ITERATIONS"])
+n_cores = parse(Int, ENV["N_CORES"])
 
 if debug && Sys.isapple()
     n_grid_increments = 1
@@ -22,6 +25,20 @@ elseif debug
     n_grid_increments = 10
 else
     n_grid_increments = 100
+end
+
+if n_cores > 1
+    _procs = addprocs(
+        n_cores,
+        topology = :master_worker,
+        exeflags = ["--threads=1", "--project=$(Base.active_project())"],
+    )
+
+    @everywhere begin
+        using Pkg
+        Pkg.instantiate()
+        using AlgorithmicCompetition: run_and_extract
+    end
 end
 
 if debug && SLURM_ARRAY_TASK_ID > 10
@@ -32,6 +49,7 @@ else
         start_timestamp = now(),
         n_parameter_iterations = 1,
         n_grid_increments = n_grid_increments,
+        batch_size = 20,
         batch_metadata = (
             SLURM_ARRAY_JOB_ID = SLURM_ARRAY_JOB_ID,
             SLURM_ARRAY_TASK_ID = SLURM_ARRAY_TASK_ID,
