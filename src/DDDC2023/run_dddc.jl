@@ -104,6 +104,6 @@ function run_dddc(;
     )
     mkpath(folder_name)
     df = extract_sim_results(exp_list)
-    save(folder_name * ".jld2", df)
+    jldsave(folder_name * ".jld2", df)
     return exp_list
 end
