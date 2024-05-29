@@ -2,6 +2,7 @@ import ProgressMeter: @showprogress
 using Distributed
 using Random
 using StatsBase
+using Parquet2
 
 """
     run_dddc(
@@ -93,14 +94,16 @@ function run_dddc(;
         savename((
             model = "dddc",
             version = version,
-            start_timestamp = start_timestamp,
             SLURM_ARRAY_JOB_ID = batch_metadata.SLURM_ARRAY_JOB_ID,
-            SLURM_ARRAY_TASK_ID = batch_metadata.SLURM_ARRAY_TASK_ID,
             debug = debug,
+        )),        
+        savename((
+            start_timestamp = start_timestamp,
+            SLURM_ARRAY_TASK_ID = batch_metadata.SLURM_ARRAY_TASK_ID,
         )),
     )
     mkpath(folder_name)
     df = extract_sim_results(exp_list)
-    CSV.write(folder_name * ".csv", df)
+    Parquet2.writefile(folder_name * ".parquet", df)
     return exp_list
 end

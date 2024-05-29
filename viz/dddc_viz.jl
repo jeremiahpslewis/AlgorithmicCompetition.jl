@@ -17,19 +17,37 @@ using AlgorithmicCompetition:
     DDDCHyperParameters,
     draw_price_diagnostic
 
-folder_name = "data/dddc_v0.0.6_data"
-mkpath("plots/dddc")
-df_ = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
+csv_files = filter!(
+   x -> occursin(Regex("data/.*(8207308|8070443).*debug=false.*model=dddc.*.csv"), x),
+    readdir("data", join = true),
+)
+
+df_ = DataFrame.(CSV.File.(csv_files))
+
+for i = 1:length(df_)
+    df_[i][!, "metadata"] .= csv_files[i]
+end
 df_ = vcat(df_...)
+
+mkpath("data_final")
+csv_file_name = "data_final/dddc_v0.0.7_data.csv"
+CSV.write(csv_file_name, df_)
+
+mkpath("plots/dddc")
+df_ = DataFrame(CSV.File(csv_file_name))
 
 n_simulations_dddc = @chain df_ @subset(
     (:weak_signal_quality_level == 1) &
     (:frequency_high_demand == 1) &
     (:signal_is_strong == "Bool[0, 0]")
 ) nrow()
-@test (132 * n_simulations_dddc) == nrow(df_)
 
-df__ = @chain df_ begin
+@test (101 * 101 * 2 * n_simulations_dddc) == nrow(df_)
+
+ds = Parquet2.Dataset("test.parquet")
+df = DataFrame(ds; copycols=false)
+
+df__ = @chain df_[1:10, :] begin
     @transform(
         :price_response_to_demand_signal_mse =
             eval(Meta.parse(:price_response_to_demand_signal_mse)),
