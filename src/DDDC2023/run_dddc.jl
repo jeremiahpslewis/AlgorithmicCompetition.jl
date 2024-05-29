@@ -2,7 +2,7 @@ import ProgressMeter: @showprogress
 using Distributed
 using Random
 using StatsBase
-using Parquet2
+using JLD2
 
 """
     run_dddc(
@@ -104,6 +104,6 @@ function run_dddc(;
     )
     mkpath(folder_name)
     df = extract_sim_results(exp_list)
-    Parquet2.writefile(folder_name * ".parquet", df)
+    save(folder_name * ".jld2", df)
     return exp_list
 end
