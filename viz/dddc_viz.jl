@@ -18,7 +18,7 @@ using AlgorithmicCompetition:
     draw_price_diagnostic
 
 jld_folders = filter!(
-   x -> occursin("SLURM_ARRAY_JOB_ID=8215836", x),
+   x -> occursin("SLURM_ARRAY_JOB_ID=8222238", x),
     readdir("data", join = true),
 )
 jld_files = vcat([filter(y -> occursin(".jld2", y), readdir(x, join=true)) for x in jld_folders]...)
