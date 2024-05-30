@@ -204,7 +204,7 @@ plt1 = @chain df begin
     visual(Scatter)
 end
 f1 = draw(plt1)
-# save("plots/dddc/plot_1.svg", f1)
+save("plots/dddc/plot_1.svg", f1)
 
 df_summary = @chain df begin
     @transform!(@subset(:signal_is_strong == [0, 1]), :signal_is_strong = [1, 0],)
