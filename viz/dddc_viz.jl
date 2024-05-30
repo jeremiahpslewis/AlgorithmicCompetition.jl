@@ -2,7 +2,7 @@ using CairoMakie
 using Chain
 using DataFrameMacros
 using AlgebraOfGraphics
-using CSV
+using JLD2
 using DataFrames
 using Statistics
 using Test
@@ -17,50 +17,43 @@ using AlgorithmicCompetition:
     DDDCHyperParameters,
     draw_price_diagnostic
 
-csv_files = filter!(
-   x -> occursin(Regex("data/.*(8207308|8070443).*debug=false.*model=dddc.*.csv"), x),
+jld_folders = filter!(
+   x -> occursin("SLURM_ARRAY_JOB_ID=8215836", x),
     readdir("data", join = true),
 )
+jld_files = vcat([filter(y -> occursin(".jld2", y), readdir(x, join=true)) for x in jld_folders]...)
 
-df_ = DataFrame.(CSV.File.(csv_files))
+jlds_ = jldopen.(jld_files, "r")
 
-for i = 1:length(df_)
-    df_[i][!, "metadata"] .= csv_files[i]
+df_ = DataFrame[]
+for i = 1:length(jlds_)
+    push!(df_, jlds_[i]["df"])
+    df_[i][!, "metadata"] .= jld_files[i]
 end
+
 df_ = vcat(df_...)
 
 mkpath("data_final")
-csv_file_name = "data_final/dddc_v0.0.7_data.csv"
-CSV.write(csv_file_name, df_)
+jld2_file_name = "data_final/dddc_v0.0.7_data.jld2"
+jldsave(jld2_file_name; df=df_)
 
 mkpath("plots/dddc")
-df_ = DataFrame(CSV.File(csv_file_name))
+df_ = jldopen(jld2_file_name, "r")["df"]
 
 n_simulations_dddc = @chain df_ @subset(
     (:weak_signal_quality_level == 1) &
     (:frequency_high_demand == 1) &
-    (:signal_is_strong == "Bool[0, 0]")
+    (:signal_is_strong == [0, 0])
 ) nrow()
 
 @test (101 * 101 * 2 * n_simulations_dddc) == nrow(df_)
 
-ds = Parquet2.Dataset("test.parquet")
-df = DataFrame(ds; copycols=false)
-
-df__ = @chain df_[1:10, :] begin
+df__ = @chain df_ begin
     @transform(
-        :price_response_to_demand_signal_mse =
-            eval(Meta.parse(:price_response_to_demand_signal_mse)),
-        :convergence_profit_demand_high_vect =
-            eval(Meta.parse(:convergence_profit_demand_high)),
-        :convergence_profit_demand_low_vect =
-            eval(Meta.parse(:convergence_profit_demand_low)),
-        :profit_vect = eval(Meta.parse(:profit_vect)),
-        :profit_gain = eval(Meta.parse(:profit_gain)),
-        :profit_gain_demand_high = eval(Meta.parse(:profit_gain_demand_high)),
-        :profit_gain_demand_low = eval(Meta.parse(:profit_gain_demand_low)),
-        :signal_is_strong_vect = eval(Meta.parse(:signal_is_strong)),
-        :percent_unexplored_states_vect = eval(Meta.parse(:percent_unexplored_states)),
+        :convergence_profit_demand_high_vect = :convergence_profit_demand_high,
+        :convergence_profit_demand_low_vect = :convergence_profit_demand_low,
+        :signal_is_strong_vect = :signal_is_strong,
+        :percent_unexplored_states_vect = :percent_unexplored_states,
     )
     @transform!(
         @subset((:frequency_high_demand == 1) & (:weak_signal_quality_level == 1)),
@@ -74,45 +67,45 @@ df___ = @chain df__ begin
     @transform(:percent_unexplored_states = mean(:percent_unexplored_states_vect))
     @transform(
         :percent_unexplored_states_weak_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
             :percent_unexplored_states_vect[:signal_is_weak_vect][1],
     )
     @transform(
         :percent_unexplored_states_strong_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
             :percent_unexplored_states_vect[:signal_is_strong_vect][1],
     )
     @transform(
         :profit_gain_demand_low_weak_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
+            (:signal_is_strong ∈ ([0, 0], [1, 1])) |
             (:frequency_high_demand == 1) ? missing :
             :profit_gain_demand_low[:signal_is_weak_vect][1],
     )
     @transform(
         :profit_gain_demand_low_strong_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
+            (:signal_is_strong ∈ ([0, 0], [1, 1])) |
             (:frequency_high_demand == 1) ? missing :
             :profit_gain_demand_low[:signal_is_strong_vect][1],
     )
     @transform(
         :profit_gain_demand_high_weak_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
             :profit_gain_demand_high[:signal_is_weak_vect][1],
     )
     @transform(
         :profit_gain_demand_high_strong_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
             :profit_gain_demand_high[:signal_is_strong_vect][1],
     )
 
     @transform(
         :profit_gain_weak_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
             :profit_gain[:signal_is_weak_vect][1],
     )
     @transform(
         :profit_gain_strong_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
             :profit_gain[:signal_is_strong_vect][1],
     )
 end
@@ -121,35 +114,35 @@ df = @chain df___ begin
     @transform(:signal_is_weak_vect = :signal_is_strong_vect .!= 1)
     @transform(
         :convergence_profit_demand_low_weak_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
+            (:signal_is_strong ∈ ([0, 0], [1, 1])) |
             (:frequency_high_demand == 1) ? missing :
             :convergence_profit_demand_low_vect[:signal_is_weak_vect][1],
     )
     @transform(
         :convergence_profit_demand_low_strong_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) |
+            (:signal_is_strong ∈ ([0, 0], [1, 1])) |
             (:frequency_high_demand == 1) ? missing :
             :convergence_profit_demand_low_vect[:signal_is_strong_vect][1],
     )
     @transform(
         :convergence_profit_demand_high_weak_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
             :convergence_profit_demand_high_vect[:signal_is_weak_vect][1],
     )
     @transform(
         :convergence_profit_demand_high_strong_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
             :convergence_profit_demand_high_vect[:signal_is_strong_vect][1],
     )
 
     @transform(
         :convergence_profit_weak_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
             :profit_vect[:signal_is_weak_vect][1],
     )
     @transform(
         :convergence_profit_strong_signal_player =
-            (:signal_is_strong ∈ ("Bool[0, 0]", "Bool[1, 1]")) ? missing :
+            (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
             :profit_vect[:signal_is_strong_vect][1],
     )
 end
@@ -158,7 +151,7 @@ end
 @test mean(mean.(df[!, :signal_is_weak_vect] .+ df[!, :signal_is_strong_vect])) == 1
 
 @chain df begin
-    @subset(:signal_is_strong ∉ ("Bool[0, 0]", "Bool[1, 1]"))
+    @subset(:signal_is_strong ∉ ([0, 0], [1, 1]))
     @transform(
         :profit_gain_sum_1 =
             (:profit_gain_weak_signal_player + :profit_gain_strong_signal_player),
@@ -170,7 +163,7 @@ end
 end
 
 @chain df begin
-    @subset(:signal_is_strong ∉ ("Bool[0, 0]", "Bool[1, 1]"))
+    @subset(:signal_is_strong ∉ ([0, 0], [1, 1]))
     @transform(
         :profit_gain_sum_1 = (
             :profit_gain_demand_high_weak_signal_player +
@@ -185,7 +178,7 @@ end
 
 @chain df begin
     @subset(
-        (:signal_is_strong ∉ ("Bool[0, 0]", "Bool[1, 1]")) & (:frequency_high_demand != 1)
+        (:signal_is_strong ∉ ([0, 0], [1, 1])) & (:frequency_high_demand != 1)
     )
     @transform(
         :profit_gain_sum_1 = (
@@ -214,7 +207,7 @@ f1 = draw(plt1)
 # save("plots/dddc/plot_1.svg", f1)
 
 df_summary = @chain df begin
-    @transform!(@subset(:signal_is_strong == "Bool[0, 1]"), :signal_is_strong = "Bool[1, 0]",)
+    @transform!(@subset(:signal_is_strong == [0, 1]), :signal_is_strong = [1, 0],)
     @transform(
         :price_response_to_demand_signal_mse_mean =
             @passmissing minimum(:price_response_to_demand_signal_mse)
@@ -338,7 +331,7 @@ plt2 = @chain df_summary begin
         variable_name = :profit_variable_name,
         value_name = :profit_value,
     )
-    @subset(:signal_is_strong == "Bool[0, 0]")
+    @subset(:signal_is_strong == [0, 0])
     @sort(:frequency_high_demand)
     data(_) *
     mapping(
@@ -356,7 +349,7 @@ f2 = draw(
 save("plots/dddc/plot_2.svg", f2)
 
 plt20 = @chain df_summary begin
-    @subset(:signal_is_strong == "Bool[0, 0]")
+    @subset(:signal_is_strong == [0, 0])
     @sort(:frequency_high_demand)
     data(_) *
     mapping(
@@ -374,7 +367,7 @@ save("plots/dddc/plot_20.svg", f20)
 
 plt21 = @chain df_summary begin
     @subset(
-        (:signal_is_strong == "Bool[0, 0]") &
+        (:signal_is_strong == [0, 0]) &
         !ismissing(:price_response_to_demand_signal_mse)
     )
     @sort(:frequency_high_demand)
@@ -399,7 +392,7 @@ plt22 = @chain df_summary begin
         variable_name = :demand_level,
         value_name = :profit,
     )
-    @subset(:signal_is_strong == "Bool[0, 0]")
+    @subset(:signal_is_strong == [0, 0])
     @transform(:demand_level = replace(:demand_level, "convergence_profit_demand_" => ""))
     @sort(:frequency_high_demand)
     data(_) *
@@ -419,7 +412,7 @@ f22 = draw(
 save("plots/dddc/plot_22.svg", f22)
 
 plt221 = @chain df_summary begin
-    @subset(:signal_is_strong == "Bool[0, 0]")
+    @subset(:signal_is_strong == [0, 0])
     stack(
         [:profit_gain_min, :profit_gain_max],
         variable_name = :min_max,
@@ -448,7 +441,7 @@ f221 = draw(
 save("plots/dddc/plot_221.svg", f221)
 
 plt23 = @chain df_summary begin
-    @subset(:signal_is_strong == "Bool[0, 0]")
+    @subset(:signal_is_strong == [0, 0])
     @transform(
         :profit_gain_demand_all_min = :profit_gain_min,
         :profit_gain_demand_all_max = :profit_gain_max,
@@ -515,7 +508,7 @@ plt24 = @chain df_summary begin
         variable_name = :profit_gain_type,
         value_name = :profit_gain,
     )
-    @subset((:signal_is_strong == "Bool[1, 0]"))
+    @subset((:signal_is_strong == [1, 0]))
     @sort(:frequency_high_demand)
     @transform(
         :demand_level =
@@ -573,7 +566,7 @@ plt25 = @chain df_summary begin
         variable_name = :convergence_profit_type,
         value_name = :convergence_profit,
     )
-    @subset((:signal_is_strong == "Bool[1, 0]") & (:frequency_high_demand != 1))
+    @subset((:signal_is_strong == [1, 0]) & (:frequency_high_demand != 1))
     @sort(:frequency_high_demand)
     @transform(
         :convergence_profit_type =
@@ -614,7 +607,7 @@ plt26 = @chain df_summary begin
         variable_name = :percent_unexplored_states_type,
         value_name = :percent_unexplored_states_value,
     )
-    @subset((:signal_is_strong == "Bool[1, 0]"))
+    @subset((:signal_is_strong == [1, 0]))
     @sort(:frequency_high_demand)
     @transform(
         :percent_unexplored_states_type = replace(
@@ -662,7 +655,7 @@ plt27 = @chain df_summary begin
         variable_name = :profit_gain_type,
         value_name = :profit_gain,
     )
-    @subset((:signal_is_strong == "Bool[1, 0]") & (:frequency_high_demand != 1))
+    @subset((:signal_is_strong == [1, 0]) & (:frequency_high_demand != 1))
     @sort(:frequency_high_demand)
     @transform(
         :demand_level =
@@ -701,7 +694,7 @@ f27 = draw(
 save("plots/dddc/plot_27.svg", f27)
 
 df_weak_weak_outcomes = @chain df begin
-    @subset((:signal_is_strong == "Bool[0, 0]") & (:frequency_high_demand < 1.0))
+    @subset((:signal_is_strong == [0, 0]) & (:frequency_high_demand < 1.0))
     @transform(
         :compensating_profit_gain =
             (:profit_gain_demand_high[1] > :profit_gain_demand_high[2]) !=
@@ -732,7 +725,7 @@ plt3 = @chain df_summary begin
     @sort(:frequency_high_demand)
     @transform(
         :signal_is_strong =
-            :signal_is_strong == "Bool[0, 0]" ? "Weak-Weak" : "Strong-Weak"
+            :signal_is_strong == [0, 0] ? "Weak-Weak" : "Strong-Weak"
     )
     data(_) *
     mapping(
