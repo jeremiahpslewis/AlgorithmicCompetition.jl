@@ -363,6 +363,23 @@ f20 = draw(
 )
 save("plots/dddc/plot_20.svg", f20)
 
+plt201 = @chain df_summary begin
+    @subset(:signal_is_strong == [0, 0])
+    data(_) *
+    mapping(
+        :frequency_high_demand => "High Demand Frequency",
+        :weak_signal_quality_level => "Weak Signal Strength",
+        :profit_mean => "Average Profit"
+    ) *
+    visual(Heatmap)
+end
+f201 = draw(
+    plt201,
+    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+)
+save("plots/dddc/plot_201.svg", f201)
+
+
 plt21 = @chain df_summary begin
     @subset(
         (:signal_is_strong == [0, 0]) &
@@ -383,6 +400,27 @@ f21 = draw(
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
 )
 save("plots/dddc/plot_21.svg", f21)
+
+
+plt211 = @chain df_summary begin
+    @subset(
+        (:signal_is_strong == [0, 0]) &
+        !ismissing(:price_response_to_demand_signal_mse)
+    )
+
+    data(_) *
+    mapping(
+        :frequency_high_demand => "High Demand Frequency",
+        :weak_signal_quality_level => "Weak Signal Strength",
+        :price_response_to_demand_signal_mse => "Mean Squared Error Price Difference by Demand Signal",
+    ) *
+    visual(Heatmap)
+end
+f211 = draw(
+    plt211,
+    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+)
+save("plots/dddc/plot_211.svg", f211)
 
 plt22 = @chain df_summary begin
     stack(
@@ -408,6 +446,30 @@ f22 = draw(
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
 )
 save("plots/dddc/plot_22.svg", f22)
+
+plt222 = @chain df_summary begin
+    stack(
+        [:convergence_profit_demand_high, :convergence_profit_demand_low],
+        variable_name = :demand_level,
+        value_name = :profit,
+    )
+    @subset(:signal_is_strong == [0, 0])
+    @transform(:demand_level = replace(:demand_level, "convergence_profit_demand_" => ""))
+    data(_) *
+    mapping(
+        :frequency_high_demand => "High Demand Frequency",
+        :weak_signal_quality_level => "Weak Signal Strength",
+        :profit => "Average Profit",
+        color = :demand_level => nonnumeric => "Demand Level",
+        layout = :demand_level => nonnumeric => "Demand Level",
+    ) *
+    visual(Heatmap)
+end
+f222 = draw(
+    plt222,
+    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+)
+save("plots/dddc/plot_222.svg", f222)
 
 plt221 = @chain df_summary begin
     @subset(:signal_is_strong == [0, 0])
@@ -437,6 +499,32 @@ f221 = draw(
     axis = (xlabel = "High Demand Frequency", ylabel = "Profit Gain"),
 )
 save("plots/dddc/plot_221.svg", f221)
+
+plt223 = @chain df_summary begin
+    @subset(:signal_is_strong == [0, 0])
+    stack(
+        [:profit_gain_min, :profit_gain_max],
+        variable_name = :min_max,
+        value_name = :profit_gain,
+    )
+    @transform(
+        :min_max = (:min_max == "profit_gain_min" ? "Per-Trial Min" : "Per-Trial Max")
+    )
+    data(_) *
+    mapping(
+        :frequency_high_demand => "High Demand Frequency",
+        :weak_signal_quality_level => "Weak Signal Strength",
+        :profit_gain => "Profit Gain",
+        color = :min_max => nonnumeric => "",
+        layout = :min_max => nonnumeric => "",
+    ) *
+    visual(Heatmap)
+end
+f223 = draw(
+    plt223,
+    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+)
+save("plots/dddc/plot_223.svg", f223)
 
 plt23 = @chain df_summary begin
     @subset(:signal_is_strong == [0, 0])
@@ -494,6 +582,55 @@ f23 = draw(
     ),
 )
 save("plots/dddc/plot_23.svg", f23)
+
+plt231 = @chain df_summary begin
+    @subset(:signal_is_strong == [0, 0])
+    @transform(
+        :profit_gain_demand_all_min = :profit_gain_min,
+        :profit_gain_demand_all_max = :profit_gain_max,
+    )
+    stack(
+        [
+            :profit_gain_demand_high_min,
+            :profit_gain_demand_high_max,
+            :profit_gain_demand_low_min,
+            :profit_gain_demand_low_max,
+            :profit_gain_demand_all_min,
+            :profit_gain_demand_all_max,
+        ],
+        variable_name = :profit_gain_type,
+        value_name = :profit_gain,
+    )
+    @transform(
+        :demand_level =
+            replace(:profit_gain_type, r"profit_gain_demand_([a-z]+)_.*" => s"\1")
+    )
+    @transform(
+        :statistic =
+            replace(:profit_gain_type, r"profit_gain_demand_[a-z]+_([a-z_]+)" => s"\1")
+    )
+    data(_) *
+    mapping(
+        :frequency_high_demand => "High Demand Frequency",
+        :weak_signal_quality_level => "Weak Signal Strength",
+        :profit_gain => "Profit Gain",
+        row = :demand_level => nonnumeric => "Demand Level",
+        column = :statistic => "Metric",
+    ) *
+    visual(Heatmap)
+end
+
+f231 = draw(
+    plt231,
+    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+    axis = (
+        xticks = 0.5:0.1:1,
+        yticks = 0.5:0.1:1,
+        aspect = 1,
+        limits = (0.5, 1.0, 0.5, 1.0),
+    ),
+)
+save("plots/dddc/plot_223.svg", f231)
 
 plt24 = @chain df_summary begin
     stack(
