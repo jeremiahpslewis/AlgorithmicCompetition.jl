@@ -13,4 +13,5 @@
 export N_ITERATIONS=1 
 export DEBUG=1
 export VERSION="2024-05-22-debug"
+export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/v1/.julia
 julia --project=. src/aiapc_slurm_batch.jl

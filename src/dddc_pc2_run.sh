@@ -1,5 +1,4 @@
 #!/bin/bash
-tmux new -s aiapc
 
 module load lang       # loading the gateway module
 module load JuliaHPC   # loading the latest JuliaHPC
@@ -16,7 +15,9 @@ git pull
 julia -e 'using Pkg; Pkg.activate("."); Pkg.update(); Pkg.instantiate()'
 
 mkdir -p log # Log directory for slurm task output
-sbatch src/dddc_slurm_sbatch.sh
 
-## Viz Analysis Script
-# julia --project=.
+if [[ "$TASK" == "DDDC" ]]; then
+    sbatch src/dddc_slurm_sbatch.sh
+elif [[ "$TASK" == "AIAPC" ]]; then
+    sbatch src/aiapc_slurm_sbatch.sh
+fi
