@@ -130,7 +130,7 @@ function get_convergence_profit_from_hook(hook::AbstractHook)
         :low => replace([
             mean(hook[p][2].rewards[101:end][.!demand_high[101:end]]) for
             p in [Player(1), Player(2)]
-        ], Nan => missing),
+        ], NaN => missing),
     )
 end
 
