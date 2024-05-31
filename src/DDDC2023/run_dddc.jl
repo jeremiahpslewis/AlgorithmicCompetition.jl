@@ -3,6 +3,7 @@ using Distributed
 using Random
 using StatsBase
 using JLD2
+using Parquet2
 
 """
     run_dddc(
