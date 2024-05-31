@@ -106,6 +106,7 @@ function run_dddc(;
     mkpath(folder_name)
     df = extract_sim_results(exp_list)
     jldsave(folder_name * ".jld2"; df)
+    jldsave(folder_name * ".parquet"; df)
     df = expand_and_extract_dddc(df)
     df_summary = construct_df_summary_dddc(df)
     Parquet2.writefile(folder_name * "df_summary.parquet", df_summary)
