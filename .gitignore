@@ -30,3 +30,5 @@ settings.json
 *.svg
 !viz/**/*.csv
 data_final/
+*.parquet
+*.jld2
