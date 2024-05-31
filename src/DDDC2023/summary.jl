@@ -291,7 +291,104 @@ function profit_gain(π_hat, env::DDDCEnv)
     )
 end
 
-function construct_df_summary(df::DataFrame)
+function expand_and_extract_dddc(df::DataFrame)
+    df__ = @chain df begin
+        @transform!(
+            @subset((:frequency_high_demand == 1) & (:weak_signal_quality_level == 1)),
+            :price_response_to_demand_signal_mse = missing
+        )
+    end
+    
+    df___ = @chain df__ begin
+        @transform(:signal_is_weak = :signal_is_strong .!= 1)
+        @transform(:profit_mean = mean(:profit_vect))
+        @transform(:mean_percent_unexplored_states = mean(:percent_unexplored_states))
+        @transform(
+            :percent_unexplored_states_weak_signal_player =
+                (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
+                :percent_unexplored_states[:signal_is_weak][1],
+        )
+        @transform(
+            :percent_unexplored_states_strong_signal_player =
+                (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
+                :percent_unexplored_states[:signal_is_strong][1],
+        )
+        @transform(
+            :profit_gain_demand_low_weak_signal_player =
+                (:signal_is_strong ∈ ([0, 0], [1, 1])) |
+                (:frequency_high_demand == 1) ? missing :
+                :profit_gain_demand_low[:signal_is_weak][1],
+        )
+        @transform(
+            :profit_gain_demand_low_strong_signal_player =
+                (:signal_is_strong ∈ ([0, 0], [1, 1])) |
+                (:frequency_high_demand == 1) ? missing :
+                :profit_gain_demand_low[:signal_is_strong][1],
+        )
+        @transform(
+            :profit_gain_demand_high_weak_signal_player =
+                (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
+                :profit_gain_demand_high[:signal_is_weak][1],
+        )
+        @transform(
+            :profit_gain_demand_high_strong_signal_player =
+                (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
+                :profit_gain_demand_high[:signal_is_strong][1],
+        )
+    
+        @transform(
+            :profit_gain_weak_signal_player =
+                (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
+                :profit_gain[:signal_is_weak][1],
+        )
+        @transform(
+            :profit_gain_strong_signal_player =
+                (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
+                :profit_gain[:signal_is_strong][1],
+        )
+    end
+    
+    df = @chain df___ begin
+        @transform(:signal_is_weak = :signal_is_strong .!= 1)
+        @transform(
+            :convergence_profit_demand_low_weak_signal_player =
+                (:signal_is_strong ∈ ([0, 0], [1, 1])) |
+                (:frequency_high_demand == 1) ? missing :
+                :convergence_profit_demand_low[:signal_is_weak][1],
+        )
+        @transform(
+            :convergence_profit_demand_low_strong_signal_player =
+                (:signal_is_strong ∈ ([0, 0], [1, 1])) |
+                (:frequency_high_demand == 1) ? missing :
+                :convergence_profit_demand_low[:signal_is_strong][1],
+        )
+        @transform(
+            :convergence_profit_demand_high_weak_signal_player =
+                (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
+                :convergence_profit_demand_high[:signal_is_weak][1],
+        )
+        @transform(
+            :convergence_profit_demand_high_strong_signal_player =
+                (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
+                :convergence_profit_demand_high[:signal_is_strong][1],
+        )
+    
+        @transform(
+            :convergence_profit_weak_signal_player =
+                (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
+                :profit_vect[:signal_is_weak][1],
+        )
+        @transform(
+            :convergence_profit_strong_signal_player =
+                (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
+                :profit_vect[:signal_is_strong][1],
+        )
+    end
+
+    return df
+end
+
+function construct_df_summary_dddc(df::DataFrame)
     df_summary = @chain df begin
         @transform!(@subset(:signal_is_strong == [0, 1]), :signal_is_strong = [1, 0],)
         @transform(
