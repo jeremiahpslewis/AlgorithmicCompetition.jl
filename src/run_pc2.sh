@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# In order to run this script, do the following:
+# TASK=DDDC bash src/run_pc2.sh 
+# or
+# TASK=AIAPC bash src/run_pc2.sh 
+
 module load lang       # loading the gateway module
 module load JuliaHPC   # loading the latest JuliaHPC
 
