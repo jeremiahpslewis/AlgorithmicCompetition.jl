@@ -290,3 +290,77 @@ function profit_gain(π_hat, env::DDDCEnv)
         :weighted => profit_gain_weighted,
     )
 end
+
+function construct_df_summary(df::DataFrame)
+    df_summary = @chain df begin
+        @transform!(@subset(:signal_is_strong == [0, 1]), :signal_is_strong = [1, 0],)
+        @transform(
+            :price_response_to_demand_signal_mse_mean =
+                @passmissing minimum(:price_response_to_demand_signal_mse)
+        )
+        @transform(
+            :weak_signal_quality_level_str =
+                string("Weak Signal Strength: ", :weak_signal_quality_level)
+        )
+        @transform(
+            :profit_gain_max = maximum(:profit_gain),
+            :profit_gain_demand_high_max = maximum(:profit_gain_demand_high),
+            :profit_gain_demand_low_max = maximum(:profit_gain_demand_low),
+            :profit_gain_min = minimum(:profit_gain),
+            :profit_gain_demand_high_min = minimum(:profit_gain_demand_high),
+            :profit_gain_demand_low_min = minimum(:profit_gain_demand_low),
+            :convergence_profit_demand_high = mean(:convergence_profit_demand_high),
+            :convergence_profit_demand_low = mean(:convergence_profit_demand_low),
+        )
+        @groupby(
+            :signal_is_strong,
+            :weak_signal_quality_level,
+            :weak_signal_quality_level_str,
+            :frequency_high_demand,
+        )
+        @combine(
+            :profit_mean = mean(:profit_mean),
+            mean(:iterations_until_convergence),
+            mean(:profit_min),
+            mean(:profit_max),
+            :profit_gain_min = mean(:profit_gain_min),
+            :profit_gain_max = mean(:profit_gain_max),
+            :profit_gain_demand_high_weak_signal_player =
+                mean(:profit_gain_demand_high_weak_signal_player),
+            :profit_gain_demand_low_weak_signal_player =
+                mean(:profit_gain_demand_low_weak_signal_player),
+            :profit_gain_demand_high_strong_signal_player =
+                mean(:profit_gain_demand_high_strong_signal_player),
+            :profit_gain_demand_low_strong_signal_player =
+                mean(:profit_gain_demand_low_strong_signal_player),
+            :mean_percent_unexplored_states = mean(:mean_percent_unexplored_states),
+            :percent_unexplored_states_weak_signal_player =
+                mean(:percent_unexplored_states_weak_signal_player),
+            :percent_unexplored_states_strong_signal_player =
+                mean(:percent_unexplored_states_strong_signal_player),
+            :profit_gain_weak_signal_player = mean(:profit_gain_weak_signal_player),
+            :profit_gain_strong_signal_player = mean(:profit_gain_strong_signal_player),
+            :profit_gain_demand_high_min = mean(:profit_gain_demand_high_min),
+            :profit_gain_demand_low_min = mean(:profit_gain_demand_low_min),
+            :profit_gain_demand_high_max = mean(:profit_gain_demand_high_max),
+            :profit_gain_demand_low_max = mean(:profit_gain_demand_low_max),
+            :convergence_profit_demand_high_weak_signal_player =
+                mean(:convergence_profit_demand_high_weak_signal_player),
+            :convergence_profit_demand_low_weak_signal_player =
+                mean(:convergence_profit_demand_low_weak_signal_player),
+            :convergence_profit_demand_high_strong_signal_player =
+                mean(:convergence_profit_demand_high_strong_signal_player),
+            :convergence_profit_demand_low_strong_signal_player =
+                mean(:convergence_profit_demand_low_strong_signal_player),
+            :convergence_profit_weak_signal_player =
+                mean(:convergence_profit_weak_signal_player),
+            :convergence_profit_strong_signal_player =
+                mean(:convergence_profit_strong_signal_player),
+            :price_response_to_demand_signal_mse =
+                (@passmissing mean(:price_response_to_demand_signal_mse_mean)),
+            :convergence_profit_demand_high = mean(:convergence_profit_demand_high),
+            :convergence_profit_demand_low = mean(:convergence_profit_demand_low),
+        )
+    end
+    return df
+end
