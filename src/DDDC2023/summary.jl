@@ -18,8 +18,8 @@ struct DDDCSummary
     convergence_profit_demand_high::Vector{Float64}
     convergence_profit_demand_low::Vector{Float64}
     profit_gain::Vector{Float64}
-    profit_gain_demand_high::Vector{Float64}
-    profit_gain_demand_low::Vector{Float64}
+    profit_gain_demand_high::Vector{Union{Missing, Float64}}
+    profit_gain_demand_low::Vector{Union{Missing, Float64}}
     iterations_until_convergence::Vector{Int64}
     price_response_to_demand_signal_mse::Vector{Float64}
     percent_demand_high::Float64
