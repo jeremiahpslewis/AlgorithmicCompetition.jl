@@ -14,5 +14,5 @@ export N_ITERATIONS=1
 export DEBUG=1
 export VERSION="2024-05-30-dddc-trial"
 export N_CORES=50
-export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/v1/.julia
+export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/v2/.julia
 julia --project=. src/dddc_slurm_batch.jl
