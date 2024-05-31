@@ -49,12 +49,6 @@ n_simulations_dddc = @chain df_ @subset(
 @test (101 * 101 * 2 * n_simulations_dddc) == nrow(df_)
 
 df__ = @chain df_ begin
-    @transform(
-        :convergence_profit_demand_high_vect = :convergence_profit_demand_high,
-        :convergence_profit_demand_low_vect = :convergence_profit_demand_low,
-        :signal_is_strong_vect = :signal_is_strong,
-        :percent_unexplored_states_vect = :percent_unexplored_states,
-    )
     @transform!(
         @subset((:frequency_high_demand == 1) & (:weak_signal_quality_level == 1)),
         :price_response_to_demand_signal_mse = missing
@@ -62,93 +56,93 @@ df__ = @chain df_ begin
 end
 
 df___ = @chain df__ begin
-    @transform(:signal_is_weak_vect = :signal_is_strong_vect .!= 1)
+    @transform(:signal_is_weak = :signal_is_strong .!= 1)
     @transform(:profit_mean = mean(:profit_vect))
-    @transform(:percent_unexplored_states = mean(:percent_unexplored_states_vect))
+    @transform(:mean_percent_unexplored_states = mean(:percent_unexplored_states))
     @transform(
         :percent_unexplored_states_weak_signal_player =
             (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
-            :percent_unexplored_states_vect[:signal_is_weak_vect][1],
+            :percent_unexplored_states[:signal_is_weak][1],
     )
     @transform(
         :percent_unexplored_states_strong_signal_player =
             (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
-            :percent_unexplored_states_vect[:signal_is_strong_vect][1],
+            :percent_unexplored_states[:signal_is_strong][1],
     )
     @transform(
         :profit_gain_demand_low_weak_signal_player =
             (:signal_is_strong ∈ ([0, 0], [1, 1])) |
             (:frequency_high_demand == 1) ? missing :
-            :profit_gain_demand_low[:signal_is_weak_vect][1],
+            :profit_gain_demand_low[:signal_is_weak][1],
     )
     @transform(
         :profit_gain_demand_low_strong_signal_player =
             (:signal_is_strong ∈ ([0, 0], [1, 1])) |
             (:frequency_high_demand == 1) ? missing :
-            :profit_gain_demand_low[:signal_is_strong_vect][1],
+            :profit_gain_demand_low[:signal_is_strong][1],
     )
     @transform(
         :profit_gain_demand_high_weak_signal_player =
             (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
-            :profit_gain_demand_high[:signal_is_weak_vect][1],
+            :profit_gain_demand_high[:signal_is_weak][1],
     )
     @transform(
         :profit_gain_demand_high_strong_signal_player =
             (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
-            :profit_gain_demand_high[:signal_is_strong_vect][1],
+            :profit_gain_demand_high[:signal_is_strong][1],
     )
 
     @transform(
         :profit_gain_weak_signal_player =
             (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
-            :profit_gain[:signal_is_weak_vect][1],
+            :profit_gain[:signal_is_weak][1],
     )
     @transform(
         :profit_gain_strong_signal_player =
             (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
-            :profit_gain[:signal_is_strong_vect][1],
+            :profit_gain[:signal_is_strong][1],
     )
 end
 
 df = @chain df___ begin
-    @transform(:signal_is_weak_vect = :signal_is_strong_vect .!= 1)
+    @transform(:signal_is_weak = :signal_is_strong .!= 1)
     @transform(
         :convergence_profit_demand_low_weak_signal_player =
             (:signal_is_strong ∈ ([0, 0], [1, 1])) |
             (:frequency_high_demand == 1) ? missing :
-            :convergence_profit_demand_low_vect[:signal_is_weak_vect][1],
+            :convergence_profit_demand_low[:signal_is_weak][1],
     )
     @transform(
         :convergence_profit_demand_low_strong_signal_player =
             (:signal_is_strong ∈ ([0, 0], [1, 1])) |
             (:frequency_high_demand == 1) ? missing :
-            :convergence_profit_demand_low_vect[:signal_is_strong_vect][1],
+            :convergence_profit_demand_low[:signal_is_strong][1],
     )
     @transform(
         :convergence_profit_demand_high_weak_signal_player =
             (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
-            :convergence_profit_demand_high_vect[:signal_is_weak_vect][1],
+            :convergence_profit_demand_high[:signal_is_weak][1],
     )
     @transform(
         :convergence_profit_demand_high_strong_signal_player =
             (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
-            :convergence_profit_demand_high_vect[:signal_is_strong_vect][1],
+            :convergence_profit_demand_high[:signal_is_strong][1],
     )
 
     @transform(
         :convergence_profit_weak_signal_player =
             (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
-            :profit_vect[:signal_is_weak_vect][1],
+            :profit_vect[:signal_is_weak][1],
     )
     @transform(
         :convergence_profit_strong_signal_player =
             (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
-            :profit_vect[:signal_is_strong_vect][1],
+            :profit_vect[:signal_is_strong][1],
     )
 end
 
 # Basic correctness assurance tests...
-@test mean(mean.(df[!, :signal_is_weak_vect] .+ df[!, :signal_is_strong_vect])) == 1
+@test mean(mean.(df[!, :signal_is_weak] .+ df[!, :signal_is_strong])) == 1
 
 @chain df begin
     @subset(:signal_is_strong ∉ ([0, 0], [1, 1]))
@@ -223,8 +217,8 @@ df_summary = @chain df begin
         :profit_gain_min = minimum(:profit_gain),
         :profit_gain_demand_high_min = minimum(:profit_gain_demand_high),
         :profit_gain_demand_low_min = minimum(:profit_gain_demand_low),
-        :convergence_profit_demand_high = mean(:convergence_profit_demand_high_vect),
-        :convergence_profit_demand_low = mean(:convergence_profit_demand_low_vect),
+        :convergence_profit_demand_high = mean(:convergence_profit_demand_high),
+        :convergence_profit_demand_low = mean(:convergence_profit_demand_low),
     )
     @groupby(
         :signal_is_strong,
@@ -247,7 +241,7 @@ df_summary = @chain df begin
             mean(:profit_gain_demand_high_strong_signal_player),
         :profit_gain_demand_low_strong_signal_player =
             mean(:profit_gain_demand_low_strong_signal_player),
-        :percent_unexplored_states = mean(:percent_unexplored_states),
+        :mean_percent_unexplored_states = mean(:mean_percent_unexplored_states),
         :percent_unexplored_states_weak_signal_player =
             mean(:percent_unexplored_states_weak_signal_player),
         :percent_unexplored_states_strong_signal_player =
