@@ -16,6 +16,7 @@ using AlgorithmicCompetition:
     DataDemandDigitalParams,
     DDDCHyperParameters,
     draw_price_diagnostic
+using Parquet2
 
 jld_folders = filter!(
    x -> occursin("SLURM_ARRAY_JOB_ID=8222238", x),
@@ -272,6 +273,9 @@ df_summary = @chain df begin
 end
 
 @assert nrow(df_summary) == 20402
+
+
+Parquet2.writefile("data_final/dddc_v0.0.7_data_summary.parquet", df_summary)
 
 # Question is how existence of low state destabilizes the high state / overall collusion and to what extent...
 # Question becomes 'given signal, estimated demand state prob, which opponent do I believe I am competing against?' the low demand believing opponent or the high demand one...
