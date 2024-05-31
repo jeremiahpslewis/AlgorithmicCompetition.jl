@@ -400,7 +400,7 @@ end
         weak_signal_quality_level = 1,
         strong_signal_quality_level = 1,
         signal_is_strong = [true, true],
-        frequency_high_demand = 0.5,
+        frequency_high_demand = 1,
     )
 
     hyperparams = DDDCHyperParameters(
@@ -709,12 +709,14 @@ end
         using AlgorithmicCompetition
     end
 
-    AlgorithmicCompetition.run_dddc(
-        n_parameter_iterations = 1,
-        max_iter = Int(2e5),
-        convergence_threshold = Int(1e5),
-        n_grid_increments = 3,
-    )
-
+    for debug in [true, false]
+        AlgorithmicCompetition.run_dddc(
+            n_parameter_iterations = 1,
+            max_iter = Int(2e5),
+            convergence_threshold = Int(1e5),
+            n_grid_increments = 3,
+            debug = debug,
+        )
+    end
     rmprocs(_procs)
 end
