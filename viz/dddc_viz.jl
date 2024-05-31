@@ -187,19 +187,19 @@ end
     @test _[1, :profit_gain_check_sum] == 0
 end
 
-plt1 = @chain df begin
-    @transform(:signal_is_strong = string(:signal_is_strong))
-    data(_) *
-    mapping(
-        :frequency_high_demand => "High Demand Frequency",
-        :profit_mean => "Average Profit",
-        color = :signal_is_strong => nonnumeric,
-        row = :signal_is_strong,
-    ) *
-    visual(Scatter)
-end
-f1 = draw(plt1)
-save("plots/dddc/plot_1.svg", f1)
+# plt1 = @chain df begin
+#     @transform(:signal_is_strong = string(:signal_is_strong))
+#     data(_) *
+#     mapping(
+#         :frequency_high_demand => "High Demand Frequency",
+#         :profit_mean => "Average Profit",
+#         color = :signal_is_strong => nonnumeric,
+#         row = :signal_is_strong,
+#     ) *
+#     visual(Scatter)
+# end
+# f1 = draw(plt1)
+# save("plots/dddc/plot_1.svg", f1)
 
 df_summary = @chain df begin
     @transform!(@subset(:signal_is_strong == [0, 1]), :signal_is_strong = [1, 0],)
@@ -329,7 +329,7 @@ plt2 = @chain df_summary begin
         variable_name = :profit_variable_name,
         value_name = :profit_value,
     )
-    @subset(:signal_is_strong == [0, 0])
+    @subset((:signal_is_strong == [0, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     @sort(:frequency_high_demand)
     data(_) *
     mapping(
@@ -338,7 +338,7 @@ plt2 = @chain df_summary begin
         color = :profit_variable_name => nonnumeric,
         layout = :weak_signal_quality_level_str => nonnumeric,
     ) *
-    (visual(Scatter) + visual(Lines))
+    (visual(Lines))
 end
 f2 = draw(
     plt2,
@@ -347,7 +347,7 @@ f2 = draw(
 save("plots/dddc/plot_2.svg", f2)
 
 plt20 = @chain df_summary begin
-    @subset(:signal_is_strong == [0, 0])
+    @subset((:signal_is_strong == [0, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     @sort(:frequency_high_demand)
     data(_) *
     mapping(
@@ -355,7 +355,7 @@ plt20 = @chain df_summary begin
         :profit_mean => "Average Profit",
         color = :weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
     ) *
-    (visual(Scatter) + visual(Lines))
+    visual(Lines)
 end
 f20 = draw(
     plt20,
@@ -383,7 +383,8 @@ save("plots/dddc/plot_201.svg", f201)
 plt21 = @chain df_summary begin
     @subset(
         (:signal_is_strong == [0, 0]) &
-        !ismissing(:price_response_to_demand_signal_mse)
+        !ismissing(:price_response_to_demand_signal_mse) &
+        (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1))
     )
     @sort(:frequency_high_demand)
     data(_) *
@@ -392,7 +393,7 @@ plt21 = @chain df_summary begin
         :price_response_to_demand_signal_mse => "Mean Squared Error Price Difference by Demand Signal",
         color = :weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
     ) *
-    (visual(Scatter) + visual(Lines))
+    visual(Lines)
 end
 # NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f21 = draw(
@@ -428,7 +429,7 @@ plt22 = @chain df_summary begin
         variable_name = :demand_level,
         value_name = :profit,
     )
-    @subset(:signal_is_strong == [0, 0])
+    @subset((:signal_is_strong == [0, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     @transform(:demand_level = replace(:demand_level, "convergence_profit_demand_" => ""))
     @sort(:frequency_high_demand)
     data(_) *
@@ -438,7 +439,7 @@ plt22 = @chain df_summary begin
         color = :demand_level => nonnumeric => "Demand Level",
         layout = :weak_signal_quality_level_str => nonnumeric,
     ) *
-    (visual(Scatter) + visual(Lines))
+    visual(Lines)
 end
 # NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f22 = draw(
@@ -460,7 +461,6 @@ plt222 = @chain df_summary begin
         :frequency_high_demand => "High Demand Frequency",
         :weak_signal_quality_level => "Weak Signal Strength",
         :profit => "Average Profit",
-        color = :demand_level => nonnumeric => "Demand Level",
         layout = :demand_level => nonnumeric => "Demand Level",
     ) *
     visual(Heatmap)
@@ -472,7 +472,7 @@ f222 = draw(
 save("plots/dddc/plot_222.svg", f222)
 
 plt221 = @chain df_summary begin
-    @subset(:signal_is_strong == [0, 0])
+    @subset((:signal_is_strong == [0, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     stack(
         [:profit_gain_min, :profit_gain_max],
         variable_name = :min_max,
@@ -490,7 +490,7 @@ plt221 = @chain df_summary begin
         # columns = :weak_signal_quality_level => nonnumeric,
         layout = :weak_signal_quality_level_str => nonnumeric,
     ) *
-    (visual(Scatter) + visual(Lines))
+    visual(Lines)
 end
 # NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f221 = draw(
@@ -515,7 +515,6 @@ plt223 = @chain df_summary begin
         :frequency_high_demand => "High Demand Frequency",
         :weak_signal_quality_level => "Weak Signal Strength",
         :profit_gain => "Profit Gain",
-        color = :min_max => nonnumeric => "",
         layout = :min_max => nonnumeric => "",
     ) *
     visual(Heatmap)
@@ -527,7 +526,7 @@ f223 = draw(
 save("plots/dddc/plot_223.svg", f223)
 
 plt23 = @chain df_summary begin
-    @subset(:signal_is_strong == [0, 0])
+    @subset((:signal_is_strong == [0, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     @transform(
         :profit_gain_demand_all_min = :profit_gain_min,
         :profit_gain_demand_all_max = :profit_gain_max,
@@ -556,7 +555,7 @@ plt23 = @chain df_summary begin
         :statistic,
         :profit_gain,
         :demand_level,
-        :weak_signal_quality_level_str,
+        :weak_signal_quality_level,
         :frequency_high_demand
     )
     @sort(:frequency_high_demand)
@@ -564,11 +563,11 @@ plt23 = @chain df_summary begin
     mapping(
         :frequency_high_demand => "High Demand Frequency",
         :profit_gain => "Profit Gain",
-        marker = :statistic => nonnumeric => "Metric",
+        row = :statistic => nonnumeric => "Metric",
         color = :demand_level => nonnumeric => "Demand Level",
-        layout = :weak_signal_quality_level_str => nonnumeric,
+        col = :weak_signal_quality_level => nonnumeric,
     ) *
-    (visual(Lines) + visual(Scatter))
+    (visual(Lines))
 end
 # NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f23 = draw(
@@ -615,7 +614,7 @@ plt231 = @chain df_summary begin
         :weak_signal_quality_level => "Weak Signal Strength",
         :profit_gain => "Profit Gain",
         row = :demand_level => nonnumeric => "Demand Level",
-        column = :statistic => "Metric",
+        col = :statistic => "Metric",
     ) *
     visual(Heatmap)
 end
@@ -643,7 +642,7 @@ plt24 = @chain df_summary begin
         variable_name = :profit_gain_type,
         value_name = :profit_gain,
     )
-    @subset((:signal_is_strong == [1, 0]))
+    @subset((:signal_is_strong == [1, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     @sort(:frequency_high_demand)
     @transform(
         :demand_level =
@@ -660,12 +659,13 @@ plt24 = @chain df_summary begin
     mapping(
         :frequency_high_demand => "High Demand Frequency",
         :profit_gain,
-        marker = :demand_level => nonnumeric => "Demand Level",
-        layout = :weak_signal_quality_level_str => nonnumeric,
+        row = :demand_level => nonnumeric => "Demand Level",
+        col = :weak_signal_quality_level => nonnumeric,
         color = :signal_type => "Signal Strength",
     ) *
-    (visual(Scatter) + visual(Lines))
+    (visual(Lines))
 end
+
 # NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f24 = draw(
     plt24,
@@ -701,7 +701,7 @@ plt25 = @chain df_summary begin
         variable_name = :convergence_profit_type,
         value_name = :convergence_profit,
     )
-    @subset((:signal_is_strong == [1, 0]) & (:frequency_high_demand != 1))
+    @subset((:signal_is_strong == [1, 0]) & (:frequency_high_demand != 1) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     @sort(:frequency_high_demand)
     @transform(
         :convergence_profit_type =
@@ -713,9 +713,9 @@ plt25 = @chain df_summary begin
         :frequency_high_demand => "High Demand Frequency",
         :convergence_profit => "Average Profit",
         color = :convergence_profit_type => nonnumeric => "Demand Level",
-        layout = :weak_signal_quality_level_str => nonnumeric,
+        layout = :weak_signal_quality_level => nonnumeric,
     ) *
-    (visual(Scatter) + visual(Lines))
+    (visual(Lines))
 end
 # NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f25 = draw(
@@ -742,7 +742,7 @@ plt26 = @chain df_summary begin
         variable_name = :percent_unexplored_states_type,
         value_name = :percent_unexplored_states_value,
     )
-    @subset((:signal_is_strong == [1, 0]))
+    @subset((:signal_is_strong == [1, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     @sort(:frequency_high_demand)
     @transform(
         :percent_unexplored_states_type = replace(
@@ -759,9 +759,9 @@ plt26 = @chain df_summary begin
         :frequency_high_demand => "High Demand Frequency",
         :percent_unexplored_states_value => "Frequency Unexplored States",
         color = :percent_unexplored_states_type => nonnumeric => "Signal Strength",
-        layout = :weak_signal_quality_level_str => nonnumeric => "Weak Signal Strength",
+        layout = :weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
     ) *
-    (visual(Scatter) + visual(Lines))
+    (visual(Lines))
 end
 # NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f26 = draw(
@@ -790,7 +790,7 @@ plt27 = @chain df_summary begin
         variable_name = :profit_gain_type,
         value_name = :profit_gain,
     )
-    @subset((:signal_is_strong == [1, 0]) & (:frequency_high_demand != 1))
+    @subset((:signal_is_strong == [1, 0]) & (:frequency_high_demand != 1) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     @sort(:frequency_high_demand)
     @transform(
         :demand_level =
@@ -829,7 +829,7 @@ f27 = draw(
 save("plots/dddc/plot_27.svg", f27)
 
 df_weak_weak_outcomes = @chain df begin
-    @subset((:signal_is_strong == [0, 0]) & (:frequency_high_demand < 1.0))
+    @subset((:signal_is_strong == [0, 0]) & (:frequency_high_demand < 1.0) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     @transform(
         :compensating_profit_gain =
             (:profit_gain_demand_high[1] > :profit_gain_demand_high[2]) !=
@@ -862,6 +862,7 @@ plt3 = @chain df_summary begin
         :signal_is_strong =
             :signal_is_strong == [0, 0] ? "Weak-Weak" : "Strong-Weak"
     )
+    @subset(:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1))
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
@@ -869,34 +870,35 @@ plt3 = @chain df_summary begin
         color = :weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
         layout = :signal_is_strong => nonnumeric,
     ) *
-    (visual(Scatter) + visual(Lines))
+    visual(Lines)
 end
 f3 = draw(plt3, axis = (xticks = 0.5:0.1:1,))
 save("plots/dddc/plot_3.svg", f3)
 
-plt4 = @chain df_summary begin
-    data(_) *
-    mapping(
-        :frequency_high_demand => "High Demand Frequency",
-        :profit_min_mean => "Minimum Player Profit per Trial",
-        color = :signal_is_strong => nonnumeric,
-    ) *
-    (visual(Scatter) + linear())
-end
-f4 = draw(plt4)
-save("plots/dddc/plot_4.svg", f4)
+# plt4 = @chain df_summary begin
+#     @subset(:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1))
+#     data(_) *
+#     mapping(
+#         :frequency_high_demand => "High Demand Frequency",
+#         :profit_min_mean => "Minimum Player Profit per Trial",
+#         color = :signal_is_strong => nonnumeric,
+#     ) *
+#     (visual(Lines))
+# end
+# f4 = draw(plt4)
+# save("plots/dddc/plot_4.svg", f4)
 
-plt5 = @chain df_summary begin
-    data(_) *
-    mapping(
-        :frequency_high_demand => "High Demand Frequency",
-        :profit_max_mean => "Maximum Player Profit per Trial",
-        color = :signal_is_strong => nonnumeric,
-    ) *
-    (visual(Scatter) + linear())
-end
-f5 = draw(plt5)
-save("plots/dddc/plot_5.svg", f5)
+# plt5 = @chain df_summary begin
+#     data(_) *
+#     mapping(
+#         :frequency_high_demand => "High Demand Frequency",
+#         :profit_max_mean => "Maximum Player Profit per Trial",
+#         color = :signal_is_strong => nonnumeric,
+#     ) *
+#     (visual(Scatter) + linear())
+# end
+# f5 = draw(plt5)
+# save("plots/dddc/plot_5.svg", f5)
 
 α = Float64(0.125)
 β = Float64(4e-1)
@@ -932,14 +934,14 @@ hyperparams = DDDCHyperParameters(
     convergence_threshold = Int(1e5),
 )
 
-plt = draw_price_diagnostic(hyperparams)
-f6 = draw(
-    plt,
-    axis = (
-        title = "Profit Levels across Price Options",
-        subtitle = "(Solid line is profit for symmetric prices, shaded region shows range based on price options)",
-        xlabel = "Competitor's Price Choice",
-    ),
-    legend = (position = :bottom, titleposition = :left, framevisible = true, padding = 5),
-)
-save("plots/dddc/plot_6.svg", f6)
+# plt = draw_price_diagnostic(hyperparams)
+# f6 = draw(
+#     plt,
+#     axis = (
+#         title = "Profit Levels across Price Options",
+#         subtitle = "(Solid line is profit for symmetric prices, shaded region shows range based on price options)",
+#         xlabel = "Competitor's Price Choice",
+#     ),
+#     legend = (position = :bottom, titleposition = :left, framevisible = true, padding = 5),
+# )
+# save("plots/dddc/plot_6.svg", f6)
