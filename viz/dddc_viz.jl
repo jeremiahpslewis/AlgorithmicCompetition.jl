@@ -2,9 +2,9 @@ using CairoMakie
 using Chain
 using DataFrameMacros
 using AlgebraOfGraphics
-using DataFrames
 using Statistics
 using Test
+using DataFrames
 
 using AlgorithmicCompetition:
     post_prob_high_low_given_signal,
@@ -17,28 +17,30 @@ using AlgorithmicCompetition:
     draw_price_diagnostic
 using Parquet2
 
-jld_folders = filter!(
-   x -> occursin("SLURM_ARRAY_JOB_ID=8222238", x),
+parquet_folders = filter!(
+   x -> occursin("SLURM_ARRAY_JOB_ID=8399593", x),
     readdir("data", join = true),
 )
-jld_files = vcat([filter(y -> occursin(".jld2", y), readdir(x, join=true)) for x in jld_folders]...)
+parquet_files = vcat([filter(y -> occursin(".parquet", y), readdir(x, join=true)) for x in parquet_folders]...)
 
-jlds_ = jldopen.(jld_files, "r")
+is_summary_file = occursin.(("df_summary",), parquet_files)
+df_raw_ = parquet_files[is_summary_file]
+df_summary_ = parquet_files[.!is_summary_file]
 
-df_ = DataFrame[]
-for i = 1:length(jlds_)
-    push!(df_, jlds_[i]["df"])
-    df_[i][!, "metadata"] .= jld_files[i]
+parquets_ = DataFrame.(Parquet2.readfile.(df_summary_))
+
+for i = 1:length(parquets_)
+    parquets_[i][!, "metadata"] .= df_summary_[i]
 end
 
-df_ = vcat(df_...)
+df_ = vcat(parquets_...)
 
 mkpath("data_final")
 parquet_file_name = "data_final/dddc_v0.0.7_data.parquet"
 Parquet2.writefile(parquet_file_name, df_)
 
 mkpath("plots/dddc")
-df_ = jldopen(jld2_file_name, "r")["df"]
+df_ = DataFrame(Parquet2.readfile(parquet_file_name))
 
 n_simulations_dddc = @chain df_ @subset(
     (:weak_signal_quality_level == 1) &
