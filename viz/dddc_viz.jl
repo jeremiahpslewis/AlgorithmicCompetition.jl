@@ -2,7 +2,6 @@ using CairoMakie
 using Chain
 using DataFrameMacros
 using AlgebraOfGraphics
-using JLD2
 using DataFrames
 using Statistics
 using Test
