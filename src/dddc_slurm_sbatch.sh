@@ -3,7 +3,7 @@
 #SBATCH --output=log/%A_%a.out
 #SBATCH --error=log/%A_%a.err
 #SBATCH --array=1-4 # 1-1000 # Number of iterations over all parameter sets
-#SBATCH --mem-per-cpu=1000M
+#SBATCH --mem-per-cpu=1500M
 #SBATCH --cpus-per-task=50
 #SBATCH --time=3:30:00 # For full run true value should be <45 hours, e.g. 1-12
 #SBATCH -p normal
