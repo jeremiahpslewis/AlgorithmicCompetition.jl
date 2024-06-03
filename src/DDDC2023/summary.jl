@@ -274,6 +274,8 @@ function extract_price_vs_demand_signal_counterfactuals(
     return price_mse, price_counterfactual_df
 end
 
+profit_gain_metric(π_hat, π_N, π_M) = (π_hat - π_N) / (π_M - π_N)
+
 """
     profit_gain(π_hat, env::AIAPCEnv)
 
@@ -281,8 +283,9 @@ Returns the profit gain of the agent based on the current policy.
 """
 function profit_gain(π_hat, env::DDDCEnv)
     π_N, π_M = extract_profit_vars(env)
+    # Hack to handle edge case for low demand metrics when only high demand is used in simulation.
     profit_gain_ =
-        Dict(i => (mean_or_missing(π_hat) - π_N[i]) / (π_M[i] - π_N[i]) for i in [:high, :low])
+        Dict(i => ismissing(π_hat[1]) ? profit_gain_metric(π_hat, π_N[i], π_M[i]) : missing for i in [:high, :low])
     π_N_weighted =
         π_N[:high] * env.data_demand_digital_params.frequency_high_demand +
         π_N[:low] * (1 - env.data_demand_digital_params.frequency_high_demand)
@@ -290,7 +293,7 @@ function profit_gain(π_hat, env::DDDCEnv)
         π_M[:high] * env.data_demand_digital_params.frequency_high_demand +
         π_M[:low] * (1 - env.data_demand_digital_params.frequency_high_demand)
 
-    profit_gain_weighted = (mean_or_missing(π_hat) - π_N_weighted) / (π_M_weighted - π_N_weighted)
+    profit_gain_weighted = (π_hat - π_N_weighted) / (π_M_weighted - π_N_weighted)
     return Dict(
         :high => profit_gain_[:high],
         :low => profit_gain_[:low],
