@@ -255,7 +255,7 @@ end
         weak_signal_quality_level = 1,
         strong_signal_quality_level = 1,
         signal_is_strong = [false, false],
-        frequency_high_demand = 1.0,
+        frequency_high_demand = 0.9,
     )
 
     hyperparams = DDDCHyperParameters(
