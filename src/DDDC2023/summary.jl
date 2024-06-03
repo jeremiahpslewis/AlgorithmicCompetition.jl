@@ -21,7 +21,7 @@ struct DDDCSummary
     profit_gain_demand_high::Vector{Union{Float64,Missing}}
     profit_gain_demand_low::Vector{Union{Float64,Missing}}
     iterations_until_convergence::Vector{Int64}
-    price_response_to_demand_signal_mse::Vector{Float64}
+    price_response_to_demand_signal_mse::Vector{Union{Float64,Missing}}
     percent_demand_high::Float64
     percent_unexplored_states::Vector{Float64}
 end
@@ -271,7 +271,7 @@ function extract_price_vs_demand_signal_counterfactuals(
         )
         _[1, :price_mse]
     end
-    price_mse = price_mse == NaN ? missing : price_mse
+    price_mse = isnan(price_mse) ? missing : price_mse
     return price_mse, price_counterfactual_df
 end
 
