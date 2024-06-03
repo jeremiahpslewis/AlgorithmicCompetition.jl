@@ -11,7 +11,7 @@
 
 # Number of iterations per parameter set; for parallelized full run, 1 iteration over 10k parameters
 export N_ITERATIONS=1
-export DEBUG=1
+export DEBUG=0
 export VERSION="2024-05-30-dddc-trial"
 export N_CORES=50
 export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/v2/.julia
