@@ -470,5 +470,5 @@ function construct_df_summary_dddc(df::DataFrame)
             :convergence_profit_demand_low = mean(:convergence_profit_demand_low),
         )
     end
-    return df
+    return df_summary
 end

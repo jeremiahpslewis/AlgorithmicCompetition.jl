@@ -12,20 +12,22 @@ using AlgorithmicCompetition:
     draw_price_diagnostic,
     CompetitionParameters,
     CompetitionSolution,
+    construct_df_summary_dddc,
     DataDemandDigitalParams,
     DDDCHyperParameters,
-    draw_price_diagnostic
+    draw_price_diagnostic,
+    expand_and_extract_dddc
 using Parquet2
 
 parquet_folders = filter!(
-   x -> occursin("SLURM_ARRAY_JOB_ID=8399593", x),
+   x -> occursin("SLURM_ARRAY_JOB_ID=8406094", x),
     readdir("data", join = true),
 )
 parquet_files = vcat([filter(y -> occursin(".parquet", y), readdir(x, join=true)) for x in parquet_folders]...)
 
 is_summary_file = occursin.(("df_summary",), parquet_files)
-df_raw_ = parquet_files[is_summary_file]
-df_summary_ = parquet_files[.!is_summary_file]
+df_summary_ = parquet_files[is_summary_file]
+df_raw_ = parquet_files[.!is_summary_file]
 
 parquets_ = DataFrame.(Parquet2.readfile.(df_summary_))
 
@@ -33,69 +35,69 @@ for i = 1:length(parquets_)
     parquets_[i][!, "metadata"] .= df_summary_[i]
 end
 
-df_ = vcat(parquets_...)
+df_summary = vcat(parquets_...)
 
-mkpath("data_final")
-parquet_file_name = "data_final/dddc_v0.0.7_data.parquet"
-Parquet2.writefile(parquet_file_name, df_)
+# mkpath("data_final")
+# parquet_file_name = "data_final/dddc_v0.0.8_data.parquet"
+# Parquet2.writefile(parquet_file_name, df_)
 
-mkpath("plots/dddc")
-df_ = DataFrame(Parquet2.readfile(parquet_file_name))
+# mkpath("plots/dddc")
+# df_ = DataFrame(Parquet2.readfile(parquet_file_name))
 
-n_simulations_dddc = @chain df_ @subset(
-    (:weak_signal_quality_level == 1) &
-    (:frequency_high_demand == 1) &
-    (:signal_is_strong == [0, 0])
-) nrow()
+# n_simulations_dddc = @chain df_ @subset(
+#     (:weak_signal_quality_level == 1) &
+#     (:frequency_high_demand == 1) &
+#     (:signal_is_strong == [0, 0])
+# ) nrow()
 
-@test (101 * 101 * 2 * n_simulations_dddc) == nrow(df_)
+# @test (101 * 101 * 2 * n_simulations_dddc) == nrow(df_)
 
-df = expand_and_extract_dddc(df)
+# df = expand_and_extract_dddc(df_)
 
 # Basic correctness assurance tests...
-@test mean(mean.(df[!, :signal_is_weak] .+ df[!, :signal_is_strong])) == 1
+# @test mean(mean.(df[!, :signal_is_weak] .+ df[!, :signal_is_strong])) == 1
 
-@chain df begin
-    @subset(:signal_is_strong ∉ ([0, 0], [1, 1]))
-    @transform(
-        :profit_gain_sum_1 =
-            (:profit_gain_weak_signal_player + :profit_gain_strong_signal_player),
-        :profit_gain_sum_2 = sum(:profit_gain),
-    )
-    @transform(:profit_gain_check = :profit_gain_sum_1 != :profit_gain_sum_2)
-    @combine(sum(:profit_gain_check))
-    @test _[1, :profit_gain_check_sum] == 0
-end
+# @chain df begin
+#     @subset(:signal_is_strong ∉ ([0, 0], [1, 1]))
+#     @transform(
+#         :profit_gain_sum_1 =
+#             (:profit_gain_weak_signal_player + :profit_gain_strong_signal_player),
+#         :profit_gain_sum_2 = sum(:profit_gain),
+#     )
+#     @transform(:profit_gain_check = :profit_gain_sum_1 != :profit_gain_sum_2)
+#     @combine(sum(:profit_gain_check))
+#     @test _[1, :profit_gain_check_sum] == 0
+# end
 
-@chain df begin
-    @subset(:signal_is_strong ∉ ([0, 0], [1, 1]))
-    @transform(
-        :profit_gain_sum_1 = (
-            :profit_gain_demand_high_weak_signal_player +
-            :profit_gain_demand_high_strong_signal_player
-        ),
-        :profit_gain_sum_2 = sum(:profit_gain_demand_high),
-    )
-    @transform(:profit_gain_check = :profit_gain_sum_1 != :profit_gain_sum_2)
-    @combine(sum(:profit_gain_check))
-    @test _[1, :profit_gain_check_sum] == 0
-end
+# @chain df begin
+#     @subset(:signal_is_strong ∉ ([0, 0], [1, 1]))
+#     @transform(
+#         :profit_gain_sum_1 = (
+#             :profit_gain_demand_high_weak_signal_player +
+#             :profit_gain_demand_high_strong_signal_player
+#         ),
+#         :profit_gain_sum_2 = sum(:profit_gain_demand_high),
+#     )
+#     @transform(:profit_gain_check = :profit_gain_sum_1 != :profit_gain_sum_2)
+#     @combine(sum(:profit_gain_check))
+#     @test _[1, :profit_gain_check_sum] == 0
+# end
 
-@chain df begin
-    @subset(
-        (:signal_is_strong ∉ ([0, 0], [1, 1])) & (:frequency_high_demand != 1)
-    )
-    @transform(
-        :profit_gain_sum_1 = (
-            :profit_gain_demand_low_weak_signal_player +
-            :profit_gain_demand_low_strong_signal_player
-        ),
-        :profit_gain_sum_2 = sum(:profit_gain_demand_low),
-    )
-    @transform(:profit_gain_check = :profit_gain_sum_1 != :profit_gain_sum_2)
-    @combine(sum(:profit_gain_check))
-    @test _[1, :profit_gain_check_sum] == 0
-end
+# @chain df begin
+#     @subset(
+#         (:signal_is_strong ∉ ([0, 0], [1, 1])) & (:frequency_high_demand != 1)
+#     )
+#     @transform(
+#         :profit_gain_sum_1 = (
+#             :profit_gain_demand_low_weak_signal_player +
+#             :profit_gain_demand_low_strong_signal_player
+#         ),
+#         :profit_gain_sum_2 = sum(:profit_gain_demand_low),
+#     )
+#     @transform(:profit_gain_check = :profit_gain_sum_1 != :profit_gain_sum_2)
+#     @combine(sum(:profit_gain_check))
+#     @test _[1, :profit_gain_check_sum] == 0
+# end
 
 # plt1 = @chain df begin
 #     @transform(:signal_is_strong = string(:signal_is_strong))
@@ -111,79 +113,9 @@ end
 # f1 = draw(plt1)
 # save("plots/dddc/plot_1.svg", f1)
 
-df_summary = @chain df begin
-    @transform!(@subset(:signal_is_strong == [0, 1]), :signal_is_strong = [1, 0],)
-    @transform(
-        :price_response_to_demand_signal_mse_mean =
-            @passmissing minimum(:price_response_to_demand_signal_mse)
-    )
-    @transform(
-        :weak_signal_quality_level_str =
-            string("Weak Signal Strength: ", :weak_signal_quality_level)
-    )
-    @transform(
-        :profit_gain_max = maximum(:profit_gain),
-        :profit_gain_demand_high_max = maximum(:profit_gain_demand_high),
-        :profit_gain_demand_low_max = maximum(:profit_gain_demand_low),
-        :profit_gain_min = minimum(:profit_gain),
-        :profit_gain_demand_high_min = minimum(:profit_gain_demand_high),
-        :profit_gain_demand_low_min = minimum(:profit_gain_demand_low),
-        :convergence_profit_demand_high = mean(:convergence_profit_demand_high),
-        :convergence_profit_demand_low = mean(:convergence_profit_demand_low),
-    )
-    @groupby(
-        :signal_is_strong,
-        :weak_signal_quality_level,
-        :weak_signal_quality_level_str,
-        :frequency_high_demand,
-    )
-    @combine(
-        :profit_mean = mean(:profit_mean),
-        mean(:iterations_until_convergence),
-        mean(:profit_min),
-        mean(:profit_max),
-        :profit_gain_min = mean(:profit_gain_min),
-        :profit_gain_max = mean(:profit_gain_max),
-        :profit_gain_demand_high_weak_signal_player =
-            mean(:profit_gain_demand_high_weak_signal_player),
-        :profit_gain_demand_low_weak_signal_player =
-            mean(:profit_gain_demand_low_weak_signal_player),
-        :profit_gain_demand_high_strong_signal_player =
-            mean(:profit_gain_demand_high_strong_signal_player),
-        :profit_gain_demand_low_strong_signal_player =
-            mean(:profit_gain_demand_low_strong_signal_player),
-        :mean_percent_unexplored_states = mean(:mean_percent_unexplored_states),
-        :percent_unexplored_states_weak_signal_player =
-            mean(:percent_unexplored_states_weak_signal_player),
-        :percent_unexplored_states_strong_signal_player =
-            mean(:percent_unexplored_states_strong_signal_player),
-        :profit_gain_weak_signal_player = mean(:profit_gain_weak_signal_player),
-        :profit_gain_strong_signal_player = mean(:profit_gain_strong_signal_player),
-        :profit_gain_demand_high_min = mean(:profit_gain_demand_high_min),
-        :profit_gain_demand_low_min = mean(:profit_gain_demand_low_min),
-        :profit_gain_demand_high_max = mean(:profit_gain_demand_high_max),
-        :profit_gain_demand_low_max = mean(:profit_gain_demand_low_max),
-        :convergence_profit_demand_high_weak_signal_player =
-            mean(:convergence_profit_demand_high_weak_signal_player),
-        :convergence_profit_demand_low_weak_signal_player =
-            mean(:convergence_profit_demand_low_weak_signal_player),
-        :convergence_profit_demand_high_strong_signal_player =
-            mean(:convergence_profit_demand_high_strong_signal_player),
-        :convergence_profit_demand_low_strong_signal_player =
-            mean(:convergence_profit_demand_low_strong_signal_player),
-        :convergence_profit_weak_signal_player =
-            mean(:convergence_profit_weak_signal_player),
-        :convergence_profit_strong_signal_player =
-            mean(:convergence_profit_strong_signal_player),
-        :price_response_to_demand_signal_mse =
-            (@passmissing mean(:price_response_to_demand_signal_mse_mean)),
-        :convergence_profit_demand_high = mean(:convergence_profit_demand_high),
-        :convergence_profit_demand_low = mean(:convergence_profit_demand_low),
-    )
-end
-
+# df_summary = construct_df_summary_dddc(df_)
 @assert nrow(df_summary) == 20402
-
+# TODO: Rereduce summary data across all runs!
 
 Parquet2.writefile("data_final/dddc_v0.0.7_data_summary.parquet", df_summary)
 
