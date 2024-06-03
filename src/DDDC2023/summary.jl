@@ -271,6 +271,7 @@ function extract_price_vs_demand_signal_counterfactuals(
         )
         _[1, :price_mse]
     end
+    price_mse = price_mse == NaN ? missing : price_mse
     return price_mse, price_counterfactual_df
 end
 
@@ -285,7 +286,7 @@ function profit_gain(π_hat, env::DDDCEnv)
     π_N, π_M = extract_profit_vars(env)
     # Hack to handle edge case for low demand metrics when only high demand is used in simulation.
     profit_gain_ =
-        Dict(i => ismissing(π_hat[1]) ? profit_gain_metric(π_hat, π_N[i], π_M[i]) : missing for i in [:high, :low])
+        Dict(i => profit_gain_metric(π_hat, π_N[i], π_M[i]) for i in [:high, :low])
     π_N_weighted =
         π_N[:high] * env.data_demand_digital_params.frequency_high_demand +
         π_N[:low] * (1 - env.data_demand_digital_params.frequency_high_demand)

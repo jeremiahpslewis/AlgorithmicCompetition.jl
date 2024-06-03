@@ -9,7 +9,7 @@ Returns the profit gain of the agent based on the current policy.
 """
 function profit_gain(π_hat, env)
     π_N, π_M = extract_profit_vars(env)
-    (mean(skipmissing(π_hat)) - π_N) / (π_M - π_N)
+    (mean(π_hat) - π_N) / (π_M - π_N)
 end
 
 """
