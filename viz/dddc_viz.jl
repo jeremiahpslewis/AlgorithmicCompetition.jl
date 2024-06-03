@@ -34,8 +34,8 @@ end
 df_ = vcat(df_...)
 
 mkpath("data_final")
-jld2_file_name = "data_final/dddc_v0.0.7_data.jld2"
-jldsave(jld2_file_name; df=df_)
+parquet_file_name = "data_final/dddc_v0.0.7_data.parquet"
+Parquet2.writefile(parquet_file_name, df_)
 
 mkpath("plots/dddc")
 df_ = jldopen(jld2_file_name, "r")["df"]
