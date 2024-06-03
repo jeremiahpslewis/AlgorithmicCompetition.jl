@@ -114,13 +114,33 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
     )
 end
 
-mean_or_missing(x) = isempty(x) | all(ismissing.(x)) ? missing : mean(skipmissing(x))
-
 """
     get_convergence_profit_from_env(env::DDDCEnv, policy::MultiAgentPolicy)
 
 Returns the average profit of the agent, after convergence, over the convergence state or states (in the case of a cycle). Also returns the average profit for the high and low demand states.
 """
+function get_convergence_profit_from_hook(hook::AbstractHook)
+    # Row entry form
+    convergence_profit = [get_convergence_profit_from_hook(hook[player][2]) for player in [Player(1), Player(2)]]
+
+    # Consolidate into Dict / col form
+    return Dict(stat => [p[stat] for p in convergence_profit] for stat in [:all, :high, :low])
+end
+
+function get_convergence_profit_from_hook(hook::DDDCTotalRewardPerLastNEpisodes)
+    df = DataFrame(hook)[101:end, :]
+    df_by_demand = @chain df begin
+        @groupby(:demand_state_high_vect)
+        @combine(:reward = mean(:rewards))
+    end
+
+    unwrap(x) = length(x) == 1 ? x[1] : missing
+    mean_low_demand = @chain df_by_demand @subset(:demand_state_high_vect == false) _[!, :reward] unwrap
+    mean_high_demand = @chain df_by_demand @subset(:demand_state_high_vect == true) _[!, :reward] unwrap
+    mean_overall = mean(df[!, :rewards])
+    Dict(:all => mean_overall, :high => mean_high_demand, :low => mean_low_demand)
+end
+
 function get_convergence_profit_from_hook(hook::AbstractHook)
     demand_high = hook[Player(1)][2].demand_state_high_vect
     return Dict(
@@ -191,26 +211,26 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
         [ex.percent_unexplored_states for ex in exp_list if !(ex isa Exception)]
 
     df = DataFrame(
-        α = α_result,
-        β = β_result,
-        profit_vect = profit_vect,
-        profit_min = profit_min,
-        profit_max = profit_max,
-        profit_gain = profit_gain,
-        profit_gain_demand_high = profit_gain_demand_high,
-        profit_gain_demand_low = profit_gain_demand_low,
-        convergence_profit = convergence_profit,
-        convergence_profit_demand_high = convergence_profit_demand_high,
-        convergence_profit_demand_low = convergence_profit_demand_low,
-        iterations_until_convergence = iterations_until_convergence,
-        is_converged = is_converged,
-        weak_signal_quality_level = weak_signal_quality_level,
-        strong_signal_quality_level = strong_signal_quality_level,
-        signal_is_strong = signal_is_strong,
-        frequency_high_demand = frequency_high_demand,
-        price_response_to_demand_signal_mse = price_response_to_demand_signal_mse,
-        percent_demand_high = percent_demand_high,
-        percent_unexplored_states = percent_unexplored_states,
+        α=α_result,
+        β=β_result,
+        profit_vect=profit_vect,
+        profit_min=profit_min,
+        profit_max=profit_max,
+        profit_gain=profit_gain,
+        profit_gain_demand_high=profit_gain_demand_high,
+        profit_gain_demand_low=profit_gain_demand_low,
+        convergence_profit=convergence_profit,
+        convergence_profit_demand_high=convergence_profit_demand_high,
+        convergence_profit_demand_low=convergence_profit_demand_low,
+        iterations_until_convergence=iterations_until_convergence,
+        is_converged=is_converged,
+        weak_signal_quality_level=weak_signal_quality_level,
+        strong_signal_quality_level=strong_signal_quality_level,
+        signal_is_strong=signal_is_strong,
+        frequency_high_demand=frequency_high_demand,
+        price_response_to_demand_signal_mse=price_response_to_demand_signal_mse,
+        percent_demand_high=percent_demand_high,
+        percent_unexplored_states=percent_unexplored_states,
     )
     return df
 end
@@ -300,7 +320,7 @@ function expand_and_extract_dddc(df::DataFrame)
             :price_response_to_demand_signal_mse = missing
         )
     end
-    
+
     df___ = @chain df__ begin
         @transform(:signal_is_weak = :signal_is_strong .!= 1)
         @transform(:profit_mean = mean(:profit_vect))
@@ -337,7 +357,7 @@ function expand_and_extract_dddc(df::DataFrame)
                 (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
                 :profit_gain_demand_high[:signal_is_strong][1],
         )
-    
+
         @transform(
             :profit_gain_weak_signal_player =
                 (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
@@ -349,7 +369,7 @@ function expand_and_extract_dddc(df::DataFrame)
                 :profit_gain[:signal_is_strong][1],
         )
     end
-    
+
     df = @chain df___ begin
         @transform(:signal_is_weak = :signal_is_strong .!= 1)
         @transform(
@@ -374,7 +394,7 @@ function expand_and_extract_dddc(df::DataFrame)
                 (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
                 :convergence_profit_demand_high[:signal_is_strong][1],
         )
-    
+
         @transform(
             :convergence_profit_weak_signal_player =
                 (:signal_is_strong ∈ ([0, 0], [1, 1])) ? missing :
