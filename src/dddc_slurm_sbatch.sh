@@ -4,7 +4,7 @@
 #SBATCH --error=log/%A_%a.err
 #SBATCH --array=1-100 # 1-1000 # Number of iterations over all parameter sets
 #SBATCH --mem-per-cpu=1600M
-#SBATCH --cpus-per-task=100
+#SBATCH --cpus-per-task=50
 #SBATCH --time=1:30:00 # For full run true value should be <2 hours
 #SBATCH -p normal
 #SBATCH --mail-user=irddcc1@mail.uni-paderborn.de   # Where to send mail	
