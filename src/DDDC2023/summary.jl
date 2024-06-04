@@ -312,9 +312,9 @@ function reduce_dddc(df_summary::DataFrame)
         )
         @combine(
             :profit_mean = mean(:profit_mean),
-            mean(:iterations_until_convergence),
-            mean(:profit_min),
-            mean(:profit_max),
+            :iterations_until_convergence = mean(:iterations_until_convergence),
+            :profit_min = mean(:profit_min),
+            :profit_max = mean(:profit_max),
             :profit_gain_min = mean(:profit_gain_min),
             :profit_gain_max = mean(:profit_gain_max),
             :profit_gain_demand_high_weak_signal_player =
@@ -349,7 +349,7 @@ function reduce_dddc(df_summary::DataFrame)
             :convergence_profit_strong_signal_player =
                 mean(:convergence_profit_strong_signal_player),
             :price_response_to_demand_signal_mse =
-                (@passmissing mean(:price_response_to_demand_signal_mse_mean)),
+                (@passmissing mean(:price_response_to_demand_signal_mse)),
             :convergence_profit_demand_high = mean(:convergence_profit_demand_high),
             :convergence_profit_demand_low = mean(:convergence_profit_demand_low),
         )
@@ -458,8 +458,8 @@ function construct_df_summary_dddc(df::DataFrame)
     df_summary = @chain df begin
         @transform!(@subset(:signal_is_strong == [0, 1]), :signal_is_strong = [1, 0],)
         @transform(
-            :price_response_to_demand_signal_mse_mean =
-                @passmissing minimum(:price_response_to_demand_signal_mse)
+            :price_response_to_demand_signal_mse =
+                @passmissing mean(:price_response_to_demand_signal_mse)
         )
         @transform(
             :profit_gain_max = maximum(:profit_gain),

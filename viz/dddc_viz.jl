@@ -168,7 +168,7 @@ save("plots/dddc/plot_11.svg", f11)
 
 plt2 = @chain df_summary begin
     stack(
-        [:profit_min_mean, :profit_max_mean],
+        [:profit_min, :profit_max],
         variable_name = :profit_variable_name,
         value_name = :profit_value,
     )
@@ -721,7 +721,7 @@ plt3 = @chain df_summary begin
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        :iterations_until_convergence_mean => "Iterations Until Convergence",
+        :iterations_until_convergence => "Iterations Until Convergence",
         color = :weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
         layout = :signal_is_strong => nonnumeric,
     ) *
@@ -735,7 +735,7 @@ save("plots/dddc/plot_3.svg", f3)
 #     data(_) *
 #     mapping(
 #         :frequency_high_demand => "High Demand Frequency",
-#         :profit_min_mean => "Minimum Player Profit per Trial",
+#         :profit_min => "Minimum Player Profit per Trial",
 #         color = :signal_is_strong => nonnumeric,
 #     ) *
 #     (visual(Lines))
