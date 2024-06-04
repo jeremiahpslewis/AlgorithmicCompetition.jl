@@ -18,7 +18,7 @@ using AlgorithmicCompetition:
     draw_price_diagnostic,
     expand_and_extract_dddc,
     reduce_dddc
-using Parquet2
+using Arrow
 
 parquet_folders = filter!(
    x -> occursin("SLURM_ARRAY_JOB_ID=8409092", x),
@@ -30,21 +30,21 @@ is_summary_file = occursin.(("df_summary",), parquet_files)
 df_summary_ = parquet_files[is_summary_file]
 df_raw_ = parquet_files[.!is_summary_file]
 
-parquets_ = DataFrame.(Parquet2.readfile.(df_summary_))
+parquets_ = DataFrame.(Arrow.read.(df_summary_))
 
 # remove this for future runs...
 for i = 1:length(df_raw_)
-    parquet_temp = DataFrame(Parquet2.readfile(df_raw_[i]))
+    parquet_temp = DataFrame(Arrow.read(df_raw_[i]))
     parquet_temp = expand_and_extract_dddc(parquet_temp)
     parquet_temp = construct_df_summary_dddc(parquet_temp)
-    Parquet2.writefile("summary_$i.parquet", parquet_temp)
+    Arrow.write("summary_$i.parquet", parquet_temp)
 end
 
 parquet_files = filter!(
    x -> occursin("summary", x),
     readdir(join = true),
 )
-parquets_ = DataFrame.(Parquet2.readfile.(df_summary_))
+parquets_ = DataFrame.(Arrow.read.(df_summary_))
 #
 
 for i = 1:length(parquets_)
@@ -55,10 +55,10 @@ df_summary = vcat(parquets_...)
 df_summary = reduce_dddc(df_summary)
 # mkpath("data_final")
 # parquet_file_name = "data_final/dddc_v0.0.8_data.parquet"
-# Parquet2.writefile(parquet_file_name, df_)
+# Arrow.write(parquet_file_name, df_)
 
 # mkpath("plots/dddc")
-# df_ = DataFrame(Parquet2.readfile(parquet_file_name))
+# df_ = DataFrame(Arrow.read(parquet_file_name))
 
 # n_simulations_dddc = @chain df_ @subset(
 #     (:weak_signal_quality_level == 1) &
@@ -133,7 +133,7 @@ df_summary = reduce_dddc(df_summary)
 @assert nrow(df_summary) == 20402
 # TODO: Rereduce summary data across all runs!
 
-Parquet2.writefile("data_final/dddc_v0.0.8_data_summary.parquet", df_summary)
+Arrow.write("data_final/dddc_v0.0.8_data_summary.parquet", df_summary)
 
 # Question is how existence of low state destabilizes the high state / overall collusion and to what extent...
 # Question becomes 'given signal, estimated demand state prob, which opponent do I believe I am competing against?' the low demand believing opponent or the high demand one...

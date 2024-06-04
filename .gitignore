@@ -31,4 +31,5 @@ settings.json
 !viz/**/*.csv
 data_final/
 *.parquet
+*.arrow
 *.jld2

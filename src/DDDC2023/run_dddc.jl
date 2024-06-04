@@ -2,7 +2,7 @@ import ProgressMeter: @showprogress
 using Distributed
 using Random
 using StatsBase
-using Parquet2
+using Arrow
 
 """
     run_dddc(
@@ -104,9 +104,9 @@ function run_dddc(;
     )
     mkpath(folder_name)
     df = extract_sim_results(exp_list)
-    Parquet2.writefile(folder_name * ".parquet", df)
+    Arrow.write(folder_name * ".arrow", df)
     df = expand_and_extract_dddc(df)
     df_summary = construct_df_summary_dddc(df)
-    Parquet2.writefile(folder_name * "df_summary.parquet", df_summary)
+    Arrow.write(folder_name * "df_summary.arrow", df_summary)
     return exp_list
 end
