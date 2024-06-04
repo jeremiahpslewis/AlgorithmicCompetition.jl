@@ -21,7 +21,7 @@ using AlgorithmicCompetition:
 using Arrow
 
 arrow_folders = filter!(
-   x -> occursin("SLURM_ARRAY_JOB_ID=(8419083|8422841)", x),
+   x -> occursin(r"SLURM_ARRAY_JOB_ID=(8419083|8422841|8447799)", x),
     readdir("data", join = true),
 )
 arrow_files = vcat([filter(y -> occursin(".arrow", y), readdir(x, join=true)) for x in arrow_folders]...)
@@ -38,6 +38,7 @@ end
 
 df_summary = vcat(arrows_...)
 df_summary = reduce_dddc(df_summary)
+
 # mkpath("data_final")
 # arrow_file_name = "data_final/dddc_v0.0.8_data.arrow"
 # Arrow.write(arrow_file_name, df_)
@@ -166,4 +167,3 @@ f11 = @chain df_post_prob begin
 end
 save("plots/dddc/plot_11.svg", f11)
 
-4

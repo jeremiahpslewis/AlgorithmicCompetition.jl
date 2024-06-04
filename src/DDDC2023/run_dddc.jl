@@ -107,6 +107,6 @@ function run_dddc(;
     Arrow.write(folder_name * ".arrow", df)
     df = expand_and_extract_dddc(df)
     df_summary = construct_df_summary_dddc(df)
-    Arrow.write(folder_name * "df_summary.arrow", df_summary)
+    Arrow.write(folder_name * "_df_summary.arrow", df_summary)
     return exp_list
 end
