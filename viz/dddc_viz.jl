@@ -118,12 +118,14 @@ df_summary = reduce_dddc(df_summary)
 # df_summary = construct_df_summary_dddc(df_)
 @assert nrow(df_summary) == 20402
 # TODO: Rereduce summary data across all runs!
-
-Arrow.write("data_final/dddc_v0.0.8_data_summary.arrow", df_summary)
+df_summary_arrow_cache_path = "data_final/dddc_v0.0.8_data_summary.arrow"
+Arrow.write(df_summary_arrow_cache_path, df_summary)
 
 # Question is how existence of low state destabilizes the high state / overall collusion and to what extent...
 # Question becomes 'given signal, estimated demand state prob, which opponent do I believe I am competing against?' the low demand believing opponent or the high demand one...
 # in the case where own and opponents' signals are public, the high-high signal state yields the following probability curve over high state base frequency:
+
+df_summary = DataFrame(Arrow.Table(df_summary_arrow_cache_path))
 
 df_post_prob = DataFrame(
     vcat([
@@ -308,7 +310,7 @@ plt222 = @chain df_summary begin
         value_name = :profit,
     )
     @subset(:signal_is_strong == [0, 0])
-    @transform(:demand_level = replace(:demand_level, "convergence_profit_demand_" => ""))
+    @transform(:demand_level = replace(:demand_level, "convergence_profit_demand_" => "Demand: "))
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
@@ -415,6 +417,7 @@ plt23 = @chain df_summary begin
         :weak_signal_quality_level,
         :frequency_high_demand
     )
+    @subset(!ismissing(:profit_gain))
     @sort(:frequency_high_demand)
     data(_) *
     mapping(
@@ -431,10 +434,10 @@ f23 = draw(
     plt23,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
     axis = (
-        xticks = 0.5:0.1:1,
-        yticks = 0:0.1:1.2,
-        aspect = 1,
-        limits = (0.5, 1.05, 0.2, 1.2),
+        xticks = 0.5:0.2:1,
+        yticks = 0:0.2:1.2,
+        aspect = 0.5,
+        limits = (0.5, 1.0, 0.0, 1.0),
     ),
 )
 save("plots/dddc/plot_23.svg", f23)
@@ -539,10 +542,10 @@ f24 = draw(
         # subtitle = "(Solid line is profit for symmetric prices, shaded region shows range based on price options)",
         xlabel = "High Demand Frequency",
         ylabel = "Profit Gain",
-        xticks = 0.5:0.1:1,
+        xticks = 0.5:0.2:1,
         yticks = 0:0.2:1,
-        aspect = 1,
-        limits = (0.5, 1.05, 0.0, 1.0),
+        aspect = 0.5,
+        limits = (0.5, 1.01, 0.0, 1.0),
     ),
 )
 save("plots/dddc/plot_24.svg", f24)
@@ -632,7 +635,7 @@ f26 = draw(
         labelsize = 10,
         nbanks = 2,
     ),
-    axis = (yticks = 0:0.1:1, xticks = 0:0.1:1, limits = (0.5, 1.02, 0.0, 0.85)),
+    axis = (yticks = 0:0.25:1, xticks = 0:0.1:1, limits = (0.5, 1.01, 0.0, 0.85)),
 )
 save("plots/dddc/plot_26.svg", f26)
 
@@ -669,7 +672,7 @@ plt27 = @chain df_summary begin
         row = :demand_level => nonnumeric => "Demand Level",
         col = :signal_type => nonnumeric => "Signal Strength",
     ) *
-    (visual(Scatter) + visual(Lines))
+    (visual(Lines))
 end
 # NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
 f27 = draw(
@@ -685,15 +688,8 @@ f27 = draw(
 )
 save("plots/dddc/plot_27.svg", f27)
 
-df_weak_weak_outcomes = @chain df begin
+df_weak_weak_outcomes = @chain df_summary begin
     @subset((:signal_is_strong == [0, 0]) & (:frequency_high_demand < 1.0) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
-    @transform(
-        :compensating_profit_gain =
-            (:profit_gain_demand_high[1] > :profit_gain_demand_high[2]) !=
-            (:profit_gain_demand_low[1] > :profit_gain_demand_low[2])
-    )
-    @groupby(:weak_signal_quality_level, :frequency_high_demand)
-    @combine(:pct_compensating_profit_gain = mean(:compensating_profit_gain),)
     @sort(:frequency_high_demand)
 end
 
