@@ -21,24 +21,16 @@ using AlgorithmicCompetition:
 using Arrow
 
 parquet_folders = filter!(
-   x -> occursin("SLURM_ARRAY_JOB_ID=8409092", x),
+   x -> occursin("SLURM_ARRAY_JOB_ID=8418938", x),
     readdir("data", join = true),
 )
-parquet_files = vcat([filter(y -> occursin(".parquet", y), readdir(x, join=true)) for x in parquet_folders]...)
+parquet_files = vcat([filter(y -> occursin(".arrow", y), readdir(x, join=true)) for x in parquet_folders]...)
 
 is_summary_file = occursin.(("df_summary",), parquet_files)
 df_summary_ = parquet_files[is_summary_file]
 df_raw_ = parquet_files[.!is_summary_file]
 
-parquets_ = DataFrame.(Arrow.read.(df_summary_))
-
-# remove this for future runs...
-for i = 1:length(df_raw_)
-    parquet_temp = DataFrame(Arrow.read(df_raw_[i]))
-    parquet_temp = expand_and_extract_dddc(parquet_temp)
-    parquet_temp = construct_df_summary_dddc(parquet_temp)
-    Arrow.write("summary_$i.parquet", parquet_temp)
-end
+parquets_ = DataFrame.(Arrow.Table.(df_summary_))
 
 parquet_files = filter!(
    x -> occursin("summary", x),

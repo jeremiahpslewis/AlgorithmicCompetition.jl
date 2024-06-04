@@ -458,7 +458,7 @@ end
 function construct_df_summary_dddc(df::DataFrame)
     df_summary = @chain df begin
         # For summary statistics of the entire dataset, [0, 1] signal is equivalent to [1, 0] signal
-        @transform!(@subset(:signal_is_strong == [0, 1]), :signal_is_strong = [1, 0],)
+        @transform!(@subset(:signal_is_strong == [0, 1]), :signal_is_strong = Bool[1, 0],)
         @transform(
             :price_response_to_demand_signal_mse =
                 @passmissing mean(:price_response_to_demand_signal_mse)
