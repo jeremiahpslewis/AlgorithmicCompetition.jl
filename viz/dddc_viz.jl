@@ -20,37 +20,30 @@ using AlgorithmicCompetition:
     reduce_dddc
 using Arrow
 
-parquet_folders = filter!(
+arrow_folders = filter!(
    x -> occursin("SLURM_ARRAY_JOB_ID=8418938", x),
     readdir("data", join = true),
 )
-parquet_files = vcat([filter(y -> occursin(".arrow", y), readdir(x, join=true)) for x in parquet_folders]...)
+arrow_files = vcat([filter(y -> occursin(".arrow", y), readdir(x, join=true)) for x in arrow_folders]...)
 
-is_summary_file = occursin.(("df_summary",), parquet_files)
-df_summary_ = parquet_files[is_summary_file]
-df_raw_ = parquet_files[.!is_summary_file]
+is_summary_file = occursin.(("df_summary",), arrow_files)
+df_summary_ = arrow_files[is_summary_file]
+df_raw_ = arrow_files[.!is_summary_file]
 
-parquets_ = DataFrame.(Arrow.Table.(df_summary_))
+arrows_ = DataFrame.(Arrow.Table.(df_summary_))
 
-parquet_files = filter!(
-   x -> occursin("summary", x),
-    readdir(join = true),
-)
-parquets_ = DataFrame.(Arrow.read.(df_summary_))
-#
-
-for i = 1:length(parquets_)
-    parquets_[i][!, "metadata"] .= df_summary_[i]
+for i = 1:length(arrows_)
+    arrows_[i][!, "metadata"] .= df_summary_[i]
 end
 # construct_df_summary_dddc
-df_summary = vcat(parquets_...)
+df_summary = vcat(arrows_...)
 df_summary = reduce_dddc(df_summary)
 # mkpath("data_final")
-# parquet_file_name = "data_final/dddc_v0.0.8_data.parquet"
-# Arrow.write(parquet_file_name, df_)
+# arrow_file_name = "data_final/dddc_v0.0.8_data.arrow"
+# Arrow.write(arrow_file_name, df_)
 
 # mkpath("plots/dddc")
-# df_ = DataFrame(Arrow.read(parquet_file_name))
+# df_ = DataFrame(Arrow.read(arrow_file_name))
 
 # n_simulations_dddc = @chain df_ @subset(
 #     (:weak_signal_quality_level == 1) &
@@ -125,7 +118,7 @@ df_summary = reduce_dddc(df_summary)
 @assert nrow(df_summary) == 20402
 # TODO: Rereduce summary data across all runs!
 
-Arrow.write("data_final/dddc_v0.0.8_data_summary.parquet", df_summary)
+Arrow.write("data_final/dddc_v0.0.8_data_summary.arrow", df_summary)
 
 # Question is how existence of low state destabilizes the high state / overall collusion and to what extent...
 # Question becomes 'given signal, estimated demand state prob, which opponent do I believe I am competing against?' the low demand believing opponent or the high demand one...
