@@ -366,6 +366,7 @@ function expand_and_extract_dddc(df::DataFrame)
     end
 
     df___ = @chain df__ begin
+        @transform(:signal_is_strong = :signal_is_strong .== 1)
         @transform(:signal_is_weak = :signal_is_strong .!= 1)
         @transform(:profit_mean = mean(:profit_vect))
         @transform(:mean_percent_unexplored_states = mean(:percent_unexplored_states))
