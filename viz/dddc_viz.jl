@@ -39,6 +39,12 @@ for i = 1:length(df_raw_)
     parquet_temp = construct_df_summary_dddc(parquet_temp)
     Parquet2.writefile("summary_$i.parquet", parquet_temp)
 end
+
+parquet_files = filter!(
+   x -> occursin("summary", x),
+    readdir(join = true),
+)
+parquets_ = DataFrame.(Parquet2.readfile.(df_summary_))
 #
 
 for i = 1:length(parquets_)
