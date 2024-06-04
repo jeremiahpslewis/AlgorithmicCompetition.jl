@@ -16,11 +16,12 @@ using AlgorithmicCompetition:
     DataDemandDigitalParams,
     DDDCHyperParameters,
     draw_price_diagnostic,
-    expand_and_extract_dddc
+    expand_and_extract_dddc,
+    reduce_dddc
 using Parquet2
 
 parquet_folders = filter!(
-   x -> occursin("SLURM_ARRAY_JOB_ID=8406094", x),
+   x -> occursin("SLURM_ARRAY_JOB_ID=8409092", x),
     readdir("data", join = true),
 )
 parquet_files = vcat([filter(y -> occursin(".parquet", y), readdir(x, join=true)) for x in parquet_folders]...)
@@ -36,7 +37,7 @@ for i = 1:length(parquets_)
 end
 
 df_summary = vcat(parquets_...)
-
+df_summary = reduce_dddc(df_summary)
 # mkpath("data_final")
 # parquet_file_name = "data_final/dddc_v0.0.8_data.parquet"
 # Parquet2.writefile(parquet_file_name, df_)
@@ -173,6 +174,10 @@ plt2 = @chain df_summary begin
     )
     @subset((:signal_is_strong == [0, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     @sort(:frequency_high_demand)
+    @transform(
+        :weak_signal_quality_level_str =
+            string("Weak Signal Strength: ", :weak_signal_quality_level)
+    )
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
@@ -274,6 +279,10 @@ plt22 = @chain df_summary begin
     @subset((:signal_is_strong == [0, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     @transform(:demand_level = replace(:demand_level, "convergence_profit_demand_" => ""))
     @sort(:frequency_high_demand)
+    @transform(
+        :weak_signal_quality_level_str =
+            string("Weak Signal Strength: ", :weak_signal_quality_level)
+    )
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
@@ -324,6 +333,10 @@ plt221 = @chain df_summary begin
         :min_max = (:min_max == "profit_gain_min" ? "Per-Trial Min" : "Per-Trial Max")
     )
     @sort(:frequency_high_demand)
+    @transform(
+        :weak_signal_quality_level_str =
+            string("Weak Signal Strength: ", :weak_signal_quality_level)
+    )
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
