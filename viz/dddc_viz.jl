@@ -21,7 +21,7 @@ using AlgorithmicCompetition:
 using Arrow
 
 arrow_folders = filter!(
-   x -> occursin("SLURM_ARRAY_JOB_ID=8419083", x),
+   x -> occursin("SLURM_ARRAY_JOB_ID=(8419083|8422841)", x),
     readdir("data", join = true),
 )
 arrow_files = vcat([filter(y -> occursin(".arrow", y), readdir(x, join=true)) for x in arrow_folders]...)
