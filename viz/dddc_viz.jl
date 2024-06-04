@@ -20,15 +20,31 @@ using AlgorithmicCompetition:
     reduce_dddc
 using Arrow
 
+df_summary_arrow_cache_path = "data_final/dddc_v0.0.9_data_summary.arrow"
+
 arrow_folders = filter!(
    x -> occursin(r"SLURM_ARRAY_JOB_ID=(8419083|8422841|8447799)", x),
     readdir("data", join = true),
 )
 arrow_files = vcat([filter(y -> occursin(".arrow", y), readdir(x, join=true)) for x in arrow_folders]...)
 
+# TODO: revert to df_summary once all summary files are tested...
 is_summary_file = occursin.(("df_summary",), arrow_files)
 df_summary_ = arrow_files[is_summary_file]
 df_raw_ = arrow_files[.!is_summary_file]
+
+#= Temp for rebuilding summary files from raw files...
+rm.(df_summary_)
+for i in 1:length(df_raw_)
+    df = DataFrame(Arrow.Table(df_raw_[i]))
+    if nrow(df) > 0
+        df = expand_and_extract_dddc(df)
+        df_summary = construct_df_summary_dddc(df)
+        Arrow.write(replace(df_raw_[i], ".arrow" => "_df_summary_rebuilt.arrow"), df_summary)
+    end
+end
+# End Temp
+=#
 
 arrows_ = DataFrame.(Arrow.Table.(df_summary_))
 
@@ -38,6 +54,7 @@ end
 
 df_summary = vcat(arrows_...)
 df_summary = reduce_dddc(df_summary)
+Arrow.write(df_summary_arrow_cache_path, df_summary)
 
 # mkpath("data_final")
 # arrow_file_name = "data_final/dddc_v0.0.8_data.arrow"
@@ -118,8 +135,6 @@ df_summary = reduce_dddc(df_summary)
 # df_summary = construct_df_summary_dddc(df_)
 @assert nrow(df_summary) == 20402
 # TODO: Rereduce summary data across all runs!
-df_summary_arrow_cache_path = "data_final/dddc_v0.0.8_data_summary.arrow"
-Arrow.write(df_summary_arrow_cache_path, df_summary)
 
 # Question is how existence of low state destabilizes the high state / overall collusion and to what extent...
 # Question becomes 'given signal, estimated demand state prob, which opponent do I believe I am competing against?' the low demand believing opponent or the high demand one...

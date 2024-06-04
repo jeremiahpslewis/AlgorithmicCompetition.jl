@@ -352,7 +352,7 @@ function reduce_dddc(df_summary::DataFrame)
                 (@passmissing mean(:price_response_to_demand_signal_mse)),
             :convergence_profit_demand_high = mean(:convergence_profit_demand_high),
             :convergence_profit_demand_low = mean(:convergence_profit_demand_low),
-            :pct_compensating_profit_gain = mean(:compensating_profit_gain),
+            :pct_compensating_profit_gain = mean(:pct_compensating_profit_gain),
         )
     end
     return df_reduced
@@ -475,7 +475,7 @@ function construct_df_summary_dddc(df::DataFrame)
             :convergence_profit_demand_low = mean(:convergence_profit_demand_low),
         )
         @transform(
-            :compensating_profit_gain =
+            :pct_compensating_profit_gain =
                 (:profit_gain_demand_high[1] > :profit_gain_demand_high[2]) !=
                 (:profit_gain_demand_low[1] > :profit_gain_demand_low[2])
         )    
