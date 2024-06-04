@@ -278,6 +278,7 @@ plt22 = @chain df_summary begin
         value_name = :profit,
     )
     @subset((:signal_is_strong == [0, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
+    @subset(!ismissing(:profit))
     @transform(:demand_level = replace(:demand_level, "convergence_profit_demand_" => ""))
     @sort(:frequency_high_demand)
     @transform(
