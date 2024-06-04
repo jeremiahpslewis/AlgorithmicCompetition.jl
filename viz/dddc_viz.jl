@@ -32,10 +32,19 @@ df_raw_ = parquet_files[.!is_summary_file]
 
 parquets_ = DataFrame.(Parquet2.readfile.(df_summary_))
 
+# remove this for future runs...
+for i = 1:length(df_raw_)
+    parquet_temp = DataFrame(Parquet2.readfile(df_raw_[i]))
+    parquet_temp = expand_and_extract_dddc(parquet_temp)
+    parquet_temp = construct_df_summary_dddc(parquet_temp)
+    Parquet2.writefile("summary_$i.parquet", parquet_temp)
+end
+#
+
 for i = 1:length(parquets_)
     parquets_[i][!, "metadata"] .= df_summary_[i]
 end
-
+# construct_df_summary_dddc
 df_summary = vcat(parquets_...)
 df_summary = reduce_dddc(df_summary)
 # mkpath("data_final")
@@ -118,7 +127,7 @@ df_summary = reduce_dddc(df_summary)
 @assert nrow(df_summary) == 20402
 # TODO: Rereduce summary data across all runs!
 
-Parquet2.writefile("data_final/dddc_v0.0.7_data_summary.parquet", df_summary)
+Parquet2.writefile("data_final/dddc_v0.0.8_data_summary.parquet", df_summary)
 
 # Question is how existence of low state destabilizes the high state / overall collusion and to what extent...
 # Question becomes 'given signal, estimated demand state prob, which opponent do I believe I am competing against?' the low demand believing opponent or the high demand one...
