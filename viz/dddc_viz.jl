@@ -194,7 +194,7 @@ plt2 = @chain df_summary begin
     @sort(:frequency_high_demand)
     @transform(
         :weak_signal_quality_level_str =
-            string("Weak Signal Strength: ", :weak_signal_quality_level)
+            string("Symmetric Signal Strength: ", :weak_signal_quality_level)
     )
     data(_) *
     mapping(
@@ -218,7 +218,7 @@ plt20 = @chain df_summary begin
     mapping(
         :frequency_high_demand => "High Demand Frequency",
         :profit_mean => "Average Profit",
-        color = :weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
+        color = :weak_signal_quality_level => nonnumeric => "Symmetric Signal Strength",
     ) *
     visual(Lines)
 end
@@ -233,7 +233,7 @@ plt201 = @chain df_summary begin
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        :weak_signal_quality_level => "Weak Signal Strength",
+        :weak_signal_quality_level => "Symmetric Signal Strength",
         :profit_mean => "Average Profit"
     ) *
     visual(Heatmap)
@@ -256,7 +256,7 @@ plt21 = @chain df_summary begin
     mapping(
         :frequency_high_demand => "High Demand Frequency",
         :price_response_to_demand_signal_mse => "Mean Squared Error Price Difference by Demand Signal",
-        color = :weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
+        color = :weak_signal_quality_level => nonnumeric => "Symmetric Signal Strength",
     ) *
     visual(Lines)
 end
@@ -277,7 +277,7 @@ plt211 = @chain df_summary begin
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        :weak_signal_quality_level => "Weak Signal Strength",
+        :weak_signal_quality_level => "Symmetric Signal Strength",
         :price_response_to_demand_signal_mse => "Mean Squared Error Price Difference by Demand Signal",
     ) *
     visual(Heatmap)
@@ -300,7 +300,7 @@ plt22 = @chain df_summary begin
     @sort(:frequency_high_demand)
     @transform(
         :weak_signal_quality_level_str =
-            string("Weak Signal Strength: ", :weak_signal_quality_level)
+            string("Symmetric Signal Strength: ", :weak_signal_quality_level)
     )
     data(_) *
     mapping(
@@ -329,7 +329,7 @@ plt222 = @chain df_summary begin
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        :weak_signal_quality_level => "Weak Signal Strength",
+        :weak_signal_quality_level => "Symmetric Signal Strength",
         :profit => "Average Profit",
         layout = :demand_level => nonnumeric => "Demand Level",
     ) *
@@ -354,7 +354,7 @@ plt221 = @chain df_summary begin
     @sort(:frequency_high_demand)
     @transform(
         :weak_signal_quality_level_str =
-            string("Weak Signal Strength: ", :weak_signal_quality_level)
+            string("Symmetric Signal Strength: ", :weak_signal_quality_level)
     )
     data(_) *
     mapping(
@@ -387,7 +387,7 @@ plt223 = @chain df_summary begin
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        :weak_signal_quality_level => "Weak Signal Strength",
+        :weak_signal_quality_level => "Symmetric Signal Strength",
         :profit_gain => "Profit Gain",
         layout = :min_max => nonnumeric => "",
     ) *
@@ -486,7 +486,7 @@ plt231 = @chain df_summary begin
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        :weak_signal_quality_level => "Weak Signal Strength",
+        :weak_signal_quality_level => "Symmetric Signal Strength",
         :profit_gain => "Profit Gain",
         row = :demand_level => nonnumeric => "Demand Level",
         col = :statistic => "Metric",
@@ -713,7 +713,7 @@ plt_28 = @chain df_weak_weak_outcomes begin
     mapping(
         :frequency_high_demand => "High Demand Frequency",
         :pct_compensating_profit_gain => "Frequency of Weak-Weak Outcomes with Compensating Profit Gain",
-        color = :weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
+        color = :weak_signal_quality_level => nonnumeric => "Symmetric Signal Strength",
     ) *
     visual(Lines)
 
@@ -735,7 +735,7 @@ plt3 = @chain df_summary begin
     mapping(
         :frequency_high_demand => "High Demand Frequency",
         :iterations_until_convergence => "Iterations Until Convergence",
-        color = :weak_signal_quality_level => nonnumeric => "Weak Signal Strength",
+        color = :weak_signal_quality_level => nonnumeric => "Symmetric Signal Strength",
         layout = :signal_is_strong => nonnumeric,
     ) *
     visual(Lines)
