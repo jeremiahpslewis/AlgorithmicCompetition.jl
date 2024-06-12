@@ -12,6 +12,6 @@
 # For full version, N_GRID_INCREMENTS=100
 export N_GRID_INCREMENTS=50
 export VERSION="2024-06-12-dddc-strong-weak-grid"
-export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/v2/.julia
+export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/v1/.julia
 export DEBUG=0
 julia --project=. src/dddc_slurm_batch.jl
