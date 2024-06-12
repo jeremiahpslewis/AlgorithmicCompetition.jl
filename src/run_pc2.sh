@@ -7,7 +7,7 @@
 
 module load lang       # loading the gateway module
 # module load JuliaHPC   # loading the latest JuliaHPC
-module load Julia/1.10.4-linux-x86_64 # This should be fine, not using MPI for this project...
+module load JuliaHPC/1.10.4-foss-2022a-CUDA-11.7.0 # This should be fine, not using MPI for this project...
 
 cd /scratch/hpc-prf-irddcc || exit
 export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/v1/.julia
