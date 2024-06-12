@@ -56,7 +56,7 @@ function run_dddc(;
         DataDemandDigitalParams(
             weak_signal_quality_level = weak_signal_quality_level,
             strong_signal_quality_level = strong_signal_quality_level,
-            signal_is_strong = shuffle(signal_quality_players),
+            signal_is_strong = signal_quality_players,
             frequency_high_demand = frequency_high_demand,
         ) for frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for

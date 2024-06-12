@@ -7,24 +7,22 @@ if Sys.isapple()
     ENV["DEBUG"] = 1
     ENV["SLURM_ARRAY_TASK_ID"] = 1
     ENV["SLURM_ARRAY_JOB_ID"] = 1
-    ENV["N_ITERATIONS"] = 1
+    ENV["SLURM_CPUS_PER_TASK"] = 6
     ENV["VERSION"] = "v1"
-    ENV["N_CORES"] = 6
 end
 
 
 debug = parse(Int, ENV["DEBUG"]) == 1
 SLURM_ARRAY_TASK_ID = parse(Int, ENV["SLURM_ARRAY_TASK_ID"])
 SLURM_ARRAY_JOB_ID = parse(Int, ENV["SLURM_ARRAY_JOB_ID"])
-n_parameter_iterations = parse(Int, ENV["N_ITERATIONS"])
-n_cores = parse(Int, ENV["N_CORES"])
+n_cores = parse(Int, ENV["SLURM_CPUS_PER_TASK"])
+n_grid_increments = parse(Int, ENV["N_GRID_INCREMENTS"])
 
+# Overrride in case of debugging
 if debug && Sys.isapple()
     n_grid_increments = 1
 elseif debug
     n_grid_increments = 10
-else
-    n_grid_increments = 100
 end
 
 if n_cores > 1
