@@ -5,6 +5,7 @@ using AlgebraOfGraphics
 using Statistics
 using Test
 using DataFrames
+using ProgressMeter
 
 using AlgorithmicCompetition:
     post_prob_high_low_given_signal,
@@ -35,7 +36,7 @@ df_raw_ = arrow_files[.!is_summary_file]
 
 #= Temp for rebuilding summary files from raw files...
 rm.(df_summary_)
-for i in 1:length(df_raw_)
+@showprogress for i in 1:length(df_raw_)
     df = DataFrame(Arrow.Table(df_raw_[i]))
     if nrow(df) > 0
         df = expand_and_extract_dddc(df)
