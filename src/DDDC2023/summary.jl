@@ -306,7 +306,6 @@ end
 function reduce_dddc(df_summary::DataFrame)
     df_reduced = @chain df_summary begin
         @groupby(
-            :signal_is_strong,
             :weak_signal_quality_level,
             :strong_signal_quality_level,
             :frequency_high_demand,
