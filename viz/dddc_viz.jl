@@ -66,7 +66,7 @@ Arrow.write(df_summary_arrow_cache_path, df_summary)
 # n_simulations_dddc = @chain df_ @subset(
 #     (:weak_signal_quality_level == 1) &
 #     (:frequency_high_demand == 1) &
-#     (:signal_is_strong == [0, 0])
+#     (:high_signal_quality_level == :low_signal_quality_level)
 # ) nrow()
 
 # @test (101 * 101 * 2 * n_simulations_dddc) == nrow(df_)
@@ -140,6 +140,7 @@ Arrow.write(df_summary_arrow_cache_path, df_summary)
 # Question becomes 'given signal, estimated demand state prob, which opponent do I believe I am competing against?' the low demand believing opponent or the high demand one...
 # in the case where own and opponents' signals are public, the high-high signal state yields the following probability curve over high state base frequency:
 
+high_signal_level = 0.9
 df_summary = DataFrame(Arrow.Table(df_summary_arrow_cache_path))
 
 df_post_prob = DataFrame(
@@ -190,7 +191,7 @@ plt2 = @chain df_summary begin
         variable_name = :profit_variable_name,
         value_name = :profit_value,
     )
-    @subset((:signal_is_strong == [0, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
+    @subset((:high_signal_quality_level == :low_signal_quality_level) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     @sort(:frequency_high_demand)
     @transform(
         :weak_signal_quality_level_str =
@@ -212,7 +213,7 @@ f2 = draw(
 save("plots/dddc/plot_2.svg", f2)
 
 plt20 = @chain df_summary begin
-    @subset((:signal_is_strong == [0, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
+    @subset((:high_signal_quality_level == :low_signal_quality_level) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     @sort(:frequency_high_demand)
     data(_) *
     mapping(
@@ -229,7 +230,7 @@ f20 = draw(
 save("plots/dddc/plot_20.svg", f20)
 
 plt201 = @chain df_summary begin
-    @subset(:signal_is_strong == [0, 0])
+    @subset(:high_signal_quality_level == :low_signal_quality_level)
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
@@ -247,7 +248,7 @@ save("plots/dddc/plot_201.svg", f201)
 
 plt21 = @chain df_summary begin
     @subset(
-        (:signal_is_strong == [0, 0]) &
+        (:high_signal_quality_level == :low_signal_quality_level) &
         !ismissing(:price_response_to_demand_signal_mse) &
         (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1))
     )
@@ -270,7 +271,7 @@ save("plots/dddc/plot_21.svg", f21)
 
 plt211 = @chain df_summary begin
     @subset(
-        (:signal_is_strong == [0, 0]) &
+        (:high_signal_quality_level == :low_signal_quality_level) &
         !ismissing(:price_response_to_demand_signal_mse)
     )
 
@@ -294,7 +295,7 @@ plt22 = @chain df_summary begin
         variable_name = :demand_level,
         value_name = :profit,
     )
-    @subset((:signal_is_strong == [0, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
+    @subset((:high_signal_quality_level == :low_signal_quality_level) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     @subset(!ismissing(:profit))
     @transform(:demand_level = replace(:demand_level, "convergence_profit_demand_" => ""))
     @sort(:frequency_high_demand)
@@ -324,7 +325,7 @@ plt222 = @chain df_summary begin
         variable_name = :demand_level,
         value_name = :profit,
     )
-    @subset(:signal_is_strong == [0, 0])
+    @subset(:high_signal_quality_level == :low_signal_quality_level)
     @transform(:demand_level = replace(:demand_level, "convergence_profit_demand_" => "Demand: "))
     data(_) *
     mapping(
@@ -342,7 +343,7 @@ f222 = draw(
 save("plots/dddc/plot_222.svg", f222)
 
 plt221 = @chain df_summary begin
-    @subset((:signal_is_strong == [0, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
+    @subset((:high_signal_quality_level == :low_signal_quality_level) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     stack(
         [:profit_gain_min, :profit_gain_max],
         variable_name = :min_max,
@@ -375,7 +376,7 @@ f221 = draw(
 save("plots/dddc/plot_221.svg", f221)
 
 plt223 = @chain df_summary begin
-    @subset(:signal_is_strong == [0, 0])
+    @subset(:high_signal_quality_level == :low_signal_quality_level)
     stack(
         [:profit_gain_min, :profit_gain_max],
         variable_name = :min_max,
@@ -400,7 +401,7 @@ f223 = draw(
 save("plots/dddc/plot_223.svg", f223)
 
 plt23 = @chain df_summary begin
-    @subset((:signal_is_strong == [0, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
+    @subset((:high_signal_quality_level == :low_signal_quality_level) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     @transform(
         :profit_gain_demand_all_min = :profit_gain_min,
         :profit_gain_demand_all_max = :profit_gain_max,
@@ -458,7 +459,7 @@ f23 = draw(
 save("plots/dddc/plot_23.svg", f23)
 
 plt231 = @chain df_summary begin
-    @subset(:signal_is_strong == [0, 0])
+    @subset(:high_signal_quality_level == :low_signal_quality_level)
     @transform(
         :profit_gain_demand_all_min = :profit_gain_min,
         :profit_gain_demand_all_max = :profit_gain_max,
@@ -517,7 +518,7 @@ plt24 = @chain df_summary begin
         variable_name = :profit_gain_type,
         value_name = :profit_gain,
     )
-    @subset((:signal_is_strong == [1, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
+    @subset((:signal_is_strong == [1, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)) & (:high_signal_quality_level == high_signal_level))
     @sort(:frequency_high_demand)
     @transform(
         :demand_level =
@@ -576,7 +577,7 @@ plt25 = @chain df_summary begin
         variable_name = :convergence_profit_type,
         value_name = :convergence_profit,
     )
-    @subset((:signal_is_strong == [1, 0]) & (:frequency_high_demand != 1) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
+    @subset((:signal_is_strong == [1, 0]) & (:frequency_high_demand != 1) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)) & (:high_signal_quality_level == high_signal_level))
     @sort(:frequency_high_demand)
     @transform(
         :convergence_profit_type =
@@ -617,7 +618,7 @@ plt26 = @chain df_summary begin
         variable_name = :percent_unexplored_states_type,
         value_name = :percent_unexplored_states_value,
     )
-    @subset((:signal_is_strong == [1, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
+    @subset((:signal_is_strong == [1, 0]) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)) & (:high_signal_quality_level == high_signal_level))
     @sort(:frequency_high_demand)
     @transform(
         :percent_unexplored_states_type = replace(
@@ -665,7 +666,7 @@ plt27 = @chain df_summary begin
         variable_name = :profit_gain_type,
         value_name = :profit_gain,
     )
-    @subset((:signal_is_strong == [1, 0]) & (:frequency_high_demand != 1) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
+    @subset((:signal_is_strong == [1, 0]) & (:frequency_high_demand != 1) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)) & (:high_signal_quality_level == high_signal_level))
     @sort(:frequency_high_demand)
     @transform(
         :demand_level =
@@ -704,7 +705,7 @@ f27 = draw(
 save("plots/dddc/plot_27.svg", f27)
 
 df_weak_weak_outcomes = @chain df_summary begin
-    @subset((:signal_is_strong == [0, 0]) & (:frequency_high_demand < 1.0) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
+    @subset((:high_signal_quality_level == :low_signal_quality_level) & (:frequency_high_demand < 1.0) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
     @sort(:frequency_high_demand)
 end
 
@@ -728,9 +729,9 @@ plt3 = @chain df_summary begin
     @sort(:frequency_high_demand)
     @transform(
         :signal_is_strong =
-            :signal_is_strong == [0, 0] ? "Weak-Weak" : "Strong-Weak"
+            :high_signal_quality_level == :low_signal_quality_level ? "Weak-Weak" : "Strong-Weak"
     )
-    @subset(:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1))
+    @subset(:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1) & (:high_signal_quality_level == high_signal_level))
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
@@ -744,7 +745,7 @@ f3 = draw(plt3, axis = (xticks = 0.5:0.1:1,))
 save("plots/dddc/plot_3.svg", f3)
 
 # plt4 = @chain df_summary begin
-#     @subset(:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1))
+#     @subset(:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1) & (:high_signal_quality_level == high_signal_level))
 #     data(_) *
 #     mapping(
 #         :frequency_high_demand => "High Demand Frequency",
