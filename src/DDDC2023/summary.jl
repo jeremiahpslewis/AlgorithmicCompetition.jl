@@ -308,6 +308,7 @@ function reduce_dddc(df_summary::DataFrame)
         @groupby(
             :signal_is_strong,
             :weak_signal_quality_level,
+            :strong_signal_quality_level,
             :frequency_high_demand,
         )
         @combine(
