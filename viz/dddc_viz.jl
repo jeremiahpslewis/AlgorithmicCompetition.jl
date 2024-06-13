@@ -745,23 +745,21 @@ end
 f3 = draw(plt3, axis = (xticks = 0.5:0.1:1,))
 save("plots/dddc/plot_3.svg", f3)
 
-freq_high_demand = 0.75
+freq_high_demand = 0.7
 for freq_high_demand in 0.5:0.1:1
     df_summary_weak_weak = @chain df_summary begin
-        @subset(
-            !ismissing(:profit_gain_strong_signal_player) &
-            (:frequency_high_demand == freq_high_demand)
-        )
+        @subset(:frequency_high_demand == freq_high_demand)
         @subset(:weak_signal_quality_level == :strong_signal_quality_level)
-        @select(:signal_quality_level = :weak_signal_quality_level, :profit_gain_avg = (:profit_gain_weak_signal_player + :profit_gain_strong_signal_player) / 2) # (no symmantic effect, but double the sample size)
+        @select(:signal_quality_level = :weak_signal_quality_level, :profit_gain_avg = (:profit_gain_max + :profit_gain_min) / 2) # (no symmantic effect, but double the sample size)
     end
 
     plt8 = @chain df_summary begin
+        @subset(:strong_signal_quality_level != 1) # TODO: remove this...
+        @transform(:frequency_high_demand = round(:frequency_high_demand, digits=1)) # TODO: remove this
         @subset(
-            !ismissing(:profit_gain_strong_signal_player) &
+            # !ismissing(:profit_gain_strong_signal_player) &
             (:frequency_high_demand == freq_high_demand)
         )
-        @subset(:strong_signal_quality_level != 1) # remove this...
         leftjoin(df_summary_weak_weak, on = :strong_signal_quality_level => :signal_quality_level, renamecols = "" => "_signal_ceil")
         leftjoin(df_summary_weak_weak, on = :weak_signal_quality_level => :signal_quality_level, renamecols = "" => "_signal_floor")
         @transform(
