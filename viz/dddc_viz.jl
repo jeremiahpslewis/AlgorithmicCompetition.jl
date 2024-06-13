@@ -745,7 +745,7 @@ end
 f3 = draw(plt3, axis = (xticks = 0.5:0.1:1,))
 save("plots/dddc/plot_3.svg", f3)
 
-freq_high_demand = 0.7
+freq_high_demand = 0.75
 for freq_high_demand in 0.5:0.1:1
     df_summary_weak_weak = @chain df_summary begin
         @subset(
@@ -797,7 +797,6 @@ for freq_high_demand in 0.5:0.1:1
     f8 = draw(plt8) #, axis = (xticks = 0.5:0.1:1,))
     save("plots/dddc/plot_8__freq_high_demand_$freq_high_demand.svg", f8)
 end
-# TO DO: same as above, but for weak player...
 
 # plt4 = @chain df_summary begin
 #     @subset(:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1) & (:strong_signal_quality_level == strong_signal_level))
