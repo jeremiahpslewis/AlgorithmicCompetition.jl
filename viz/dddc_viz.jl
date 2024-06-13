@@ -746,56 +746,57 @@ f3 = draw(plt3, axis = (xticks = 0.5:0.1:1,))
 save("plots/dddc/plot_3.svg", f3)
 
 freq_high_demand = 0.7
-df_summary_weak_weak = @chain df_summary begin
-    @subset(
-        !ismissing(:profit_gain_strong_signal_player) &
-        (:frequency_high_demand == freq_high_demand)
-    )
-    @subset(:weak_signal_quality_level == :strong_signal_quality_level)
-    @select(:signal_quality_level = :weak_signal_quality_level, :profit_gain_avg = (:profit_gain_weak_signal_player + :profit_gain_strong_signal_player) / 2) # (no symmantic effect, but double the sample size)
-end
+for freq_high_demand in 0.5:0.1:1
+    df_summary_weak_weak = @chain df_summary begin
+        @subset(
+            !ismissing(:profit_gain_strong_signal_player) &
+            (:frequency_high_demand == freq_high_demand)
+        )
+        @subset(:weak_signal_quality_level == :strong_signal_quality_level)
+        @select(:signal_quality_level = :weak_signal_quality_level, :profit_gain_avg = (:profit_gain_weak_signal_player + :profit_gain_strong_signal_player) / 2) # (no symmantic effect, but double the sample size)
+    end
 
-plt8 = @chain df_summary begin
-    @subset(
-        !ismissing(:profit_gain_strong_signal_player) &
-        (:frequency_high_demand == freq_high_demand)
-    )
-    @subset(:strong_signal_quality_level != 1) # remove this...
-    leftjoin(df_summary_weak_weak, on = :strong_signal_quality_level => :signal_quality_level, renamecols = "" => "_signal_ceil")
-    leftjoin(df_summary_weak_weak, on = :weak_signal_quality_level => :signal_quality_level, renamecols = "" => "_signal_floor")
-    @transform(
-        :profit_gain_delta_strong_player_signal_ceil = :profit_gain_strong_signal_player - :profit_gain_avg_signal_ceil,
-        :profit_gain_delta_strong_player_signal_floor = :profit_gain_strong_signal_player - :profit_gain_avg_signal_floor,
-    )
-    @transform(
-        :profit_gain_delta_weak_player_signal_ceil = :profit_gain_weak_signal_player - :profit_gain_avg_signal_ceil,
-        :profit_gain_delta_weak_player_signal_floor = :profit_gain_weak_signal_player - :profit_gain_avg_signal_floor,
-    )
-    stack(
-        [
-            :profit_gain_delta_strong_player_signal_ceil,
-            :profit_gain_delta_strong_player_signal_floor,
-            :profit_gain_delta_weak_player_signal_ceil,
-            :profit_gain_delta_weak_player_signal_floor,
-        ],
-        variable_name = :signal_intervention,
-        value_name = :profit_gain_delta,
-    )
-    @transform(:player = occursin("weak", :signal_intervention) ? "weak", "strong")
-    @transform(:signal_intervention = replace(:signal_intervention, "profit_gain_delta_" => ""))
-    data(_) *
-    mapping(
-        :weak_signal_quality_level,
-        :strong_signal_quality_level,
-        :profit_gain_delta,
-        col = :signal_intervention,
-        row = :player,
-    ) *
-    visual(Heatmap)
+    plt8 = @chain df_summary begin
+        @subset(
+            !ismissing(:profit_gain_strong_signal_player) &
+            (:frequency_high_demand == freq_high_demand)
+        )
+        @subset(:strong_signal_quality_level != 1) # remove this...
+        leftjoin(df_summary_weak_weak, on = :strong_signal_quality_level => :signal_quality_level, renamecols = "" => "_signal_ceil")
+        leftjoin(df_summary_weak_weak, on = :weak_signal_quality_level => :signal_quality_level, renamecols = "" => "_signal_floor")
+        @transform(
+            :profit_gain_delta_strong_player_signal_ceil = :profit_gain_strong_signal_player - :profit_gain_avg_signal_ceil,
+            :profit_gain_delta_strong_player_signal_floor = :profit_gain_strong_signal_player - :profit_gain_avg_signal_floor,
+        )
+        @transform(
+            :profit_gain_delta_weak_player_signal_ceil = :profit_gain_weak_signal_player - :profit_gain_avg_signal_ceil,
+            :profit_gain_delta_weak_player_signal_floor = :profit_gain_weak_signal_player - :profit_gain_avg_signal_floor,
+        )
+        stack(
+            [
+                :profit_gain_delta_strong_player_signal_ceil,
+                :profit_gain_delta_strong_player_signal_floor,
+                :profit_gain_delta_weak_player_signal_ceil,
+                :profit_gain_delta_weak_player_signal_floor,
+            ],
+            variable_name = :signal_intervention,
+            value_name = :profit_gain_delta,
+        )
+        @transform(:player = occursin("weak", :signal_intervention) ? "weak" : "strong")
+        @transform(:signal_intervention = replace(:signal_intervention, r"profit_gain_delta_.*_player_" => ""))
+        data(_) *
+        mapping(
+            :weak_signal_quality_level,
+            :strong_signal_quality_level,
+            :profit_gain_delta,
+            col = :signal_intervention,
+            row = :player,
+        ) *
+        visual(Heatmap)
+    end
+    f8 = draw(plt8) #, axis = (xticks = 0.5:0.1:1,))
+    save("plots/dddc/plot_8__freq_high_demand_$freq_high_demand.svg", f8)
 end
-f8 = draw(plt8) #, axis = (xticks = 0.5:0.1:1,))
-save("plots/dddc/plot_8.svg", f8)
-
 # TO DO: same as above, but for weak player...
 
 # plt4 = @chain df_summary begin
