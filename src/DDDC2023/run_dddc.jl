@@ -33,7 +33,7 @@ function run_dddc(;
     # signal_quality_vect = [[true, false], [false, false]]
     signal_quality_vect = [[true, false]] # With signal_quality_range over both weak and strong, [false, false] case is redundant
 
-    frequency_high_demand_range = Float64.(range(0.5, 1, n_grid_increments + 1))
+    frequency_high_demand_range = Float64.(range(0.5, 1.0, n_grid_increments + 1))
     signal_quality_level_range = Float64.(range(0.5, 1.0, n_grid_increments + 1))
 
     if debug
