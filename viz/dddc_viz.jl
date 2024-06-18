@@ -51,6 +51,9 @@ arrows_ = DataFrame.(Arrow.Table.(df_summary_))
 
 for i = 1:length(arrows_)
     arrows_[i][!, "metadata"] .= df_summary_[i]
+    if "signal_is_strong" in names(arrows_[i])
+        arrows_[i] = select!(arrows_[i], Not(:signal_is_strong))
+    end
 end
 
 df_summary = vcat(arrows_...)
