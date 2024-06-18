@@ -24,7 +24,7 @@ using Arrow
 df_summary_arrow_cache_path = "data_final/dddc_v0.0.9_data_summary.arrow"
 
 arrow_folders = filter!(
-   x -> occursin(r"SLURM_ARRAY_JOB_ID=(8419083|8422841|8447799|8539762|8539372|8549184)", x),
+   x -> occursin(r"SLURM_ARRAY_JOB_ID=(8419083|8422841|8447799|8539762|8539372|8561296|8549184)", x),
     readdir("data", join = true),
 )
 arrow_files = vcat([filter(y -> occursin(".arrow", y), readdir(x, join=true)) for x in arrow_folders]...)
