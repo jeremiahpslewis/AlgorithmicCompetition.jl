@@ -199,13 +199,14 @@ plt2 = @chain df_summary begin
     @sort(:frequency_high_demand)
     @transform(
         :weak_signal_quality_level_str =
-            string("Symmetric Signal Strength: ", :weak_signal_quality_level)
+            string("Signal Strength: ", :weak_signal_quality_level),
+        :profit_variable_name = replace(:profit_variable_name, "_" => " "),
     )
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
         :profit_value => "Average Profit",
-        color = :profit_variable_name => nonnumeric,
+        color = :profit_variable_name => nonnumeric => "",
         layout = :weak_signal_quality_level_str => nonnumeric,
     ) *
     (visual(Lines))
@@ -305,7 +306,7 @@ plt22 = @chain df_summary begin
     @sort(:frequency_high_demand)
     @transform(
         :weak_signal_quality_level_str =
-            string("Symmetric Signal Strength: ", :weak_signal_quality_level)
+            string("Signal Strength: ", :weak_signal_quality_level)
     )
     data(_) *
     mapping(
@@ -522,17 +523,20 @@ plt24 = @chain df_summary begin
         variable_name = :profit_gain_type,
         value_name = :profit_gain,
     )
-    @subset((:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)) & (:strong_signal_quality_level == strong_signal_level))
+    @subset(:strong_signal_quality_level == strong_signal_level)
     @sort(:frequency_high_demand)
     @transform(
         :demand_level =
-            replace(:profit_gain_type, r"profit_gain_demand_([a-z]+)_.*" => s"\1")
-    )
-    @transform(
+            replace(:profit_gain_type, r"profit_gain_demand_([a-z]+)_.*" => s"\1"),
+        :weak_signal_quality_level = round(:weak_signal_quality_level; digits=1),
         :signal_type = replace(
             :profit_gain_type,
             r"profit_gain_demand_[a-z]+_([a-z_]+)_signal_player" => s"\1",
         )
+    )
+    @groupby(:demand_level, :weak_signal_quality_level, :strong_signal_quality_level, :signal_type, :frequency_high_demand)
+    @combine(
+        :profit_gain = mean(:profit_gain),
     )
     @subset((:frequency_high_demand < 1) | (:demand_level == "high"))
     data(_) *
@@ -562,10 +566,10 @@ f24 = draw(
         # subtitle = "(Solid line is profit for symmetric prices, shaded region shows range based on price options)",
         xlabel = "High Demand Frequency",
         ylabel = "Profit Gain",
-        xticks = 0.5:0.2:1,
-        yticks = 0:0.2:1,
-        aspect = 0.5,
-        limits = (0.5, 1.01, 0.0, 1.0),
+        # xticks = 0.5:0.2:1,
+        # yticks = 0:0.2:1,
+        # aspect = 0.5,
+        # limits = (0.5, 1.01, 0.0, 1.0),
     ),
 )
 save("plots/dddc/plot_24.svg", f24)
