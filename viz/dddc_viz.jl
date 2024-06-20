@@ -29,6 +29,7 @@ arrow_folders = filter!(
 )
 arrow_files = vcat([filter(y -> occursin(".arrow", y), readdir(x, join=true)) for x in arrow_folders]...)
 
+# TODO: For decile demand-frequency binned data, round / group to avoid losing data...
 # TODO: revert to df_summary once all summary files are tested...
 is_summary_file = occursin.(("df_summary",), arrow_files)
 df_summary_ = arrow_files[is_summary_file]
@@ -57,7 +58,7 @@ for i = 1:length(arrows_)
 end
 
 df_summary = vcat(arrows_...)
-df_summary = reduce_dddc(df_summary)
+df_summary = reduce_dddc(df_summary, round_parameters=true)
 Arrow.write(df_summary_arrow_cache_path, df_summary)
 
 # mkpath("data_final")
@@ -137,7 +138,7 @@ Arrow.write(df_summary_arrow_cache_path, df_summary)
 # save("plots/dddc/plot_1.svg", f1)
 
 # df_summary = construct_df_summary_dddc(df_)
-@assert nrow(df_summary) == 20402
+# @assert nrow(df_summary) == 20402
 # TODO: Rereduce summary data across all runs!
 
 # Question is how existence of low state destabilizes the high state / overall collusion and to what extent...
@@ -155,7 +156,7 @@ df_post_prob = DataFrame(
             post_prob_high_low_given_signal(pr_high_demand, pr_signal_true)[1],
             post_prob_high_low_given_both_signals(pr_high_demand, pr_signal_true)[1],
             pr_high_demand^2 * pr_signal_true,
-        ) for pr_high_demand = 0.5:0.01:1 for pr_signal_true = 0.5:0.1:1
+        ) for pr_high_demand = 0.0:0.01:1 for pr_signal_true = 0.5:0.1:1
     ]),
 ) # squared to reflect high-high signals, for each opponent, independently
 rename!(
@@ -180,7 +181,7 @@ f11 = @chain df_post_prob begin
     visual(Scatter)
     draw(
         axis = (
-            xticks = 0.5:0.1:1,
+            xticks = 0.0:0.1:1,
             yticks = 0:0.1:1,
             xlabel = "Probability High Demand",
             ylabel = "Probability High Demand and Opponent Signal High Given Own Signal High",
@@ -360,7 +361,7 @@ plt221 = @chain df_summary begin
     @sort(:frequency_high_demand)
     @transform(
         :weak_signal_quality_level_str =
-            string("Symmetric Signal Strength: ", :weak_signal_quality_level)
+            string("Signal Strength: ", :weak_signal_quality_level)
     )
     data(_) *
     mapping(
@@ -401,6 +402,7 @@ plt223 = @chain df_summary begin
 end
 f223 = draw(
     plt223,
+    axis = (xticks = 0.0:0.2:1,),
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
 )
 save("plots/dddc/plot_223.svg", f223)
@@ -455,10 +457,10 @@ f23 = draw(
     plt23,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
     axis = (
-        xticks = 0.5:0.2:1,
+        xticks = 0.0:0.2:1,
         yticks = 0:0.2:1.2,
         aspect = 0.5,
-        limits = (0.5, 1.0, 0.0, 1.0),
+        limits = (0.0, 1.0, 0.0, 1.0),
     ),
 )
 save("plots/dddc/plot_23.svg", f23)
@@ -504,10 +506,10 @@ f231 = draw(
     plt231,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
     axis = (
-        xticks = 0.5:0.1:1,
+        xticks = 0.0:0.1:1,
         yticks = 0.5:0.1:1,
         aspect = 1,
-        limits = (0.5, 1.0, 0.5, 1.0),
+        limits = (0.0, 1.0, 0.5, 1.0),
     ),
 )
 save("plots/dddc/plot_223.svg", f231)
@@ -534,6 +536,7 @@ plt24 = @chain df_summary begin
             r"profit_gain_demand_[a-z]+_([a-z_]+)_signal_player" => s"\1",
         )
     )
+    @subset(!ismissing(:profit_gain)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
     @groupby(:demand_level, :weak_signal_quality_level, :strong_signal_quality_level, :signal_type, :frequency_high_demand)
     @combine(
         :profit_gain = mean(:profit_gain),
@@ -592,6 +595,7 @@ plt25 = @chain df_summary begin
             replace(:convergence_profit_type, "convergence_profit_" => "")
     )
     @transform(:convergence_profit_type = replace(:convergence_profit_type, "_" => " "))
+    @subset(!ismissing(:convergence_profit)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)    
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
@@ -638,6 +642,7 @@ plt26 = @chain df_summary begin
         :percent_unexplored_states_type =
             replace(:percent_unexplored_states_type, "_" => " ")
     )
+    @subset(!ismissing(:percent_unexplored_states_value)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)    
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
@@ -659,7 +664,7 @@ f26 = draw(
         labelsize = 10,
         nbanks = 2,
     ),
-    axis = (yticks = 0:0.25:1, xticks = 0:0.1:1, limits = (0.5, 1.01, 0.0, 0.85)),
+    # axis = (yticks = 0:0.000025:0.0001, xticks = 0:0.1:1, limits = (0.5, 1.01, 0.0, 0.0001)),
 )
 save("plots/dddc/plot_26.svg", f26)
 
@@ -688,6 +693,7 @@ plt27 = @chain df_summary begin
     )
     @transform(:signal_type = uppercasefirst(:signal_type) * " Signal Player")
     @transform(:demand_level = uppercasefirst(:demand_level) * " Demand")
+    @subset(!ismissing(:profit_gain)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
@@ -714,6 +720,7 @@ save("plots/dddc/plot_27.svg", f27)
 
 df_weak_weak_outcomes = @chain df_summary begin
     @subset((:strong_signal_quality_level == :weak_signal_quality_level) & (:frequency_high_demand < 1.0) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
+    @subset(!ismissing(:pct_compensating_profit_gain)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
     @sort(:frequency_high_demand)
 end
 
@@ -729,7 +736,7 @@ plt_28 = @chain df_weak_weak_outcomes begin
 end
 f28 = draw(
     plt_28,
-    axis = (xticks = 0.5:0.1:1, yticks = 0:0.1:1, limits = (0.5, 1.02, 0.0, 1.0)),
+    axis = (xticks = 0.0:0.1:1, yticks = 0:0.1:1, limits = (0.0, 1.02, 0.0, 1.0)),
 )
 save("plots/dddc/plot_28.svg", f28)
 
@@ -739,7 +746,7 @@ plt3 = @chain df_summary begin
         :signal_is_strong =
             :strong_signal_quality_level == :weak_signal_quality_level ? "Weak-Weak" : "Strong-Weak"
     )
-    @subset(:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1) & (:strong_signal_quality_level == strong_signal_level))
+    @subset((:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)) & (:strong_signal_quality_level == strong_signal_level))
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
@@ -749,11 +756,11 @@ plt3 = @chain df_summary begin
     ) *
     visual(Lines)
 end
-f3 = draw(plt3, axis = (xticks = 0.5:0.1:1,))
+f3 = draw(plt3, axis = (xticks = 0.0:0.1:1,))
 save("plots/dddc/plot_3.svg", f3)
 
 freq_high_demand = 0.7
-for freq_high_demand in 0.5:0.1:1
+for freq_high_demand in 0.0:0.1:1
     df_summary_weak_weak = @chain df_summary begin
         @subset(:frequency_high_demand == freq_high_demand)
         @subset(:weak_signal_quality_level == :strong_signal_quality_level)
@@ -762,7 +769,6 @@ for freq_high_demand in 0.5:0.1:1
 
     plt8 = @chain df_summary begin
         @subset(:strong_signal_quality_level != 1) # TODO: remove this...
-        @transform(:frequency_high_demand = round(:frequency_high_demand, digits=1)) # TODO: remove this
         @subset(
             # !ismissing(:profit_gain_strong_signal_player) &
             (:frequency_high_demand == freq_high_demand)
@@ -789,6 +795,7 @@ for freq_high_demand in 0.5:0.1:1
         )
         @transform(:player = occursin("weak", :signal_intervention) ? "weak" : "strong")
         @transform(:signal_intervention = replace(:signal_intervention, r"profit_gain_delta_.*_player_" => ""))
+        @subset(!ismissing(:profit_gain_delta)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
         data(_) *
         mapping(
             :weak_signal_quality_level,

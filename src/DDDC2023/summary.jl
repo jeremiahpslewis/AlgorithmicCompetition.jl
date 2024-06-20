@@ -303,7 +303,14 @@ function profit_gain(π_hat, env::DDDCEnv)
 end
 
 
-function reduce_dddc(df_summary::DataFrame)
+function reduce_dddc(df_summary::DataFrame, round_parameters=false)
+    if round_parameters
+        df_summary = @chain df_summary begin
+            @transform(:weak_signal_quality_level = round.(:weak_signal_quality_level, digits=2))
+            @transform(:strong_signal_quality_level = round.(:strong_signal_quality_level, digits=2))
+            @transform(:frequency_high_demand = round.(:frequency_high_demand, digits=2))
+        end
+    end
     df_reduced = @chain df_summary begin
         @groupby(
             :weak_signal_quality_level,
