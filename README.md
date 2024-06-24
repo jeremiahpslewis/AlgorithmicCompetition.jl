@@ -44,6 +44,14 @@ aiapc_results = AlgorithmicCompetition.run_aiapc()
 
 For citations of works this project is based on, see `citations.bib`.
 
+## How to Run on PC2 Cluster
+
+```bash
+tmux
+TASK=DDDC bash src/run_pc2.sh
+```
+
 ## AI / LLM Usage Statement
 
 This project uses [Github Copilot](https://github.com/features/copilot) and [Chat-GPT 3](https://chat.openai.com) to assist software development and optimize code performance.
+

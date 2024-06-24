@@ -709,12 +709,14 @@ end
         using AlgorithmicCompetition
     end
 
-    AlgorithmicCompetition.run_dddc(
-        n_parameter_iterations = 1,
-        max_iter = Int(2e5),
-        convergence_threshold = Int(1e5),
-        n_grid_increments = 3,
-    )
-
+    for debug in [true, false]
+        AlgorithmicCompetition.run_dddc(
+            n_parameter_iterations = 1,
+            max_iter = Int(2e5),
+            convergence_threshold = Int(1e5),
+            n_grid_increments = 3,
+            debug = debug,
+        )
+    end
     rmprocs(_procs)
 end
