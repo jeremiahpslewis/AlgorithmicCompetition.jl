@@ -764,7 +764,10 @@ for freq_high_demand in 0.0:0.1:1
     df_summary_weak_weak = @chain df_summary begin
         @subset(:frequency_high_demand == freq_high_demand)
         @subset(:weak_signal_quality_level == :strong_signal_quality_level)
-        @select(:signal_quality_level = :weak_signal_quality_level, :profit_gain_avg = (:profit_gain_max + :profit_gain_min) / 2) # (no symmantic effect, but double the sample size)
+        @select(
+            :signal_quality_level = :weak_signal_quality_level,
+            :profit_gain_avg = (:profit_gain_max + :profit_gain_min) / 2
+        ) # (no semantic effect, but double the sample size)
     end
 
     plt8 = @chain df_summary begin
