@@ -457,9 +457,9 @@ f23 = draw(
     plt23,
     legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
     axis = (
-        xticks = 0.0:0.2:1,
+        xticks = 0.0:0.5:1,
+        xlabelsize = 0.1,
         yticks = 0:0.2:1.2,
-        aspect = 0.5,
         limits = (0.0, 1.0, 0.0, 1.0),
     ),
 )
@@ -770,7 +770,7 @@ for freq_high_demand in 0.0:0.1:1
         ) # (no semantic effect, but double the sample size)
     end
 
-    plt8 = @chain df_summary begin
+    plt8_partial = @chain df_summary begin
         @subset(:strong_signal_quality_level != 1) # TODO: remove this...
         @subset(
             # !ismissing(:profit_gain_strong_signal_player) &
@@ -806,11 +806,15 @@ for freq_high_demand in 0.0:0.1:1
             :profit_gain_delta,
             col = :signal_intervention,
             row = :player,
-        ) *
-        visual(Heatmap)
+        )
     end
+    plt8 = plt8_partial * visual(Heatmap)
     f8 = draw(plt8) #, axis = (xticks = 0.5:0.1:1,))
     save("plots/dddc/plot_8__freq_high_demand_$freq_high_demand.svg", f8)
+    
+    plt8_1 = plt8_partial * contours(levels = 8, labels = true)
+    f81 = ø(plt8_1) #, axis = (xticks = 0.5:0.1:1,))
+    save("plots/dddc/plot_81__freq_high_demand_$freq_high_demand.svg", f81)
 end
 
 # plt4 = @chain df_summary begin
