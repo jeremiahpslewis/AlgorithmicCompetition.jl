@@ -24,7 +24,7 @@ using Arrow
 df_summary_arrow_cache_path = "data_final/dddc_v0.0.9_data_summary.arrow"
 
 arrow_folders = filter!(
-   x -> occursin(r"SLURM_ARRAY_JOB_ID=(8419083|8422841|8447799|8539762|8539372|8549184|8561296)", x),
+   x -> occursin(r"2024-07-23-dddc-full-strong-weak-grid", x),
     readdir("data", join = true),
 )
 arrow_files = vcat([filter(y -> occursin(".arrow", y), readdir(x, join=true)) for x in arrow_folders]...)
@@ -58,7 +58,7 @@ for i = 1:length(arrows_)
 end
 
 df_summary = vcat(arrows_...)
-df_summary = reduce_dddc(df_summary, round_parameters=true)
+df_summary = reduce_dddc(df_summary)#, round_parameters=false)
 Arrow.write(df_summary_arrow_cache_path, df_summary)
 
 # mkpath("data_final")
@@ -536,7 +536,7 @@ plt24 = @chain df_summary begin
             r"profit_gain_demand_[a-z]+_([a-z_]+)_signal_player" => s"\1",
         )
     )
-    @subset(!ismissing(:profit_gain)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
+    # @subset(!ismissing(:profit_gain)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
     @groupby(:demand_level, :weak_signal_quality_level, :strong_signal_quality_level, :signal_type, :frequency_high_demand)
     @combine(
         :profit_gain = mean(:profit_gain),
@@ -595,7 +595,7 @@ plt25 = @chain df_summary begin
             replace(:convergence_profit_type, "convergence_profit_" => "")
     )
     @transform(:convergence_profit_type = replace(:convergence_profit_type, "_" => " "))
-    @subset(!ismissing(:convergence_profit)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)    
+    # @subset(!ismissing(:convergence_profit)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)    
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
@@ -763,15 +763,15 @@ freq_high_demand = 0.5
 for freq_high_demand in 0.0:0.1:1
     n_bins_ = 200
     df_summary_rounded = @chain df_summary begin
-        @subset(!ismissing(:profit_gain_min)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)            
-        @subset(!ismissing(:profit_gain_max)) # TODO: Remove this once you figure out why missings are in data (or 
-        @subset(!ismissing(:profit_gain_demand_high_weak_signal_player)) # TODO: Remove this once you figure out why missings are in data (or 
-        @subset(!ismissing(:profit_gain_demand_high_strong_signal_player)) # TODO: Remove this once you figure out why missings are in data (or 
-        @transform(
-            :weak_signal_quality_level = round(:weak_signal_quality_level * n_bins_; digits=0) / n_bins_,
-            :strong_signal_quality_level = round(:strong_signal_quality_level * n_bins_; digits=0) / n_bins_,
-            :frequency_high_demand = round(:frequency_high_demand * 10; digits=0) / 10,
-        ) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
+        # @subset(!ismissing(:profit_gain_min)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)            
+        # @subset(!ismissing(:profit_gain_max)) # TODO: Remove this once you figure out why missings are in data (or 
+        # @subset(!ismissing(:profit_gain_demand_high_weak_signal_player)) # TODO: Remove this once you figure out why missings are in data (or 
+        # @subset(!ismissing(:profit_gain_demand_high_strong_signal_player)) # TODO: Remove this once you figure out why missings are in data (or 
+        # @transform(
+        #     :weak_signal_quality_level = round(:weak_signal_quality_level * n_bins_; digits=0) / n_bins_,
+        #     :strong_signal_quality_level = round(:strong_signal_quality_level * n_bins_; digits=0) / n_bins_,
+        #     :frequency_high_demand = round(:frequency_high_demand * 10; digits=0) / 10,
+        # ) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
         @groupby(:weak_signal_quality_level, :strong_signal_quality_level, :frequency_high_demand)
         @combine(
             :profit_gain_min = mean(:profit_gain_min),
@@ -801,7 +801,7 @@ for freq_high_demand in 0.0:0.1:1
             :profit_gain_delta_strong_player_signal_ceil = :profit_gain_strong_signal_player - :profit_gain_avg_signal_ceil,
             :profit_gain_delta_strong_player_signal_floor = :profit_gain_strong_signal_player - :profit_gain_avg_signal_floor,
         )
-        @subset(!ismissing(:profit_gain_strong_signal_player)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)        
+        # @subset(!ismissing(:profit_gain_strong_signal_player)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)        
         @transform(
             :profit_gain_delta_weak_player_signal_ceil = :profit_gain_weak_signal_player - :profit_gain_avg_signal_ceil,
             :profit_gain_delta_weak_player_signal_floor = :profit_gain_weak_signal_player - :profit_gain_avg_signal_floor,
