@@ -761,7 +761,7 @@ save("plots/dddc/plot_3.svg", f3)
 
 freq_high_demand = 0.7
 for freq_high_demand in 0.0:0.1:1
-    n_bins_ = 120
+    n_bins_ = 200
     df_summary_rounded = @chain df_summary begin
         @subset(!ismissing(:profit_gain_min)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)            
         @subset(!ismissing(:profit_gain_max)) # TODO: Remove this once you figure out why missings are in data (or 
@@ -815,6 +815,17 @@ for freq_high_demand in 0.0:0.1:1
             :strong_player_best_information_string = :strong_player_best_information == 1 ? "h" : :strong_player_best_information == 2 ? "s" : "d",
         )
         @transform(
+            :weak_player_worst_information = argmin([:profit_gain_weak_signal_player, :profit_gain_avg_signal_ceil, :profit_gain_avg_signal_floor]),
+            :strong_player_worst_information = argmin([:profit_gain_strong_signal_player, :profit_gain_avg_signal_ceil, :profit_gain_avg_signal_floor])
+        )
+        @transform(
+            :weak_player_worst_information_string = :weak_player_worst_information == 1 ? "h" : :weak_player_worst_information == 2 ? "s" : "d",
+            :strong_player_worst_information_string = :strong_player_worst_information == 1 ? "h" : :strong_player_worst_information == 2 ? "s" : "d",
+        )
+        @transform(
+            :joint_worst_information = :strong_player_worst_information_string * :weak_player_worst_information_string
+        )
+        @transform(
             :joint_best_information = :strong_player_best_information_string * :weak_player_best_information_string
         )
     end
@@ -860,6 +871,18 @@ for freq_high_demand in 0.0:0.1:1
     end
     f82 = draw(plt82)
     save("plots/dddc/plot_82__freq_high_demand_$freq_high_demand.svg", f82)
+
+    plt83 = @chain df_rework begin
+        data(_) *
+        mapping(
+            :weak_signal_quality_level,
+            :strong_signal_quality_level,
+            :joint_worst_information,
+        ) *
+        visual(Heatmap)
+    end
+    f83 = draw(plt83)
+    save("plots/dddc/plot_83__freq_high_demand_$freq_high_demand.svg", f82)
 end
 
 
