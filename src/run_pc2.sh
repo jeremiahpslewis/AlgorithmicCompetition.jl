@@ -7,7 +7,10 @@
 
 module load lang       # loading the gateway module
 # module load JuliaHPC   # loading the latest JuliaHPC
-module load Julia/1.10.4 # This should be fine, not using MPI for this project...
+# module load Julia/1.10.4 # This should be fine, not using MPI for this project...
+curl -fsSL https://install.julialang.org | sh
+. /pc2/users/i/irddcc1/.bashrc
+
 cd /scratch/hpc-prf-irddcc || exit
 export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
 
@@ -20,7 +23,7 @@ bash <(curl -Ls https://gist.githubusercontent.com/jeremiahpslewis/373e5e4d4d6fa
 
 git pull
 
-julia -e 'using Pkg; Pkg.activate("."); Pkg.update(); Pkg.instantiate()'
+julia +1.11 -e 'using Pkg; Pkg.activate("."); Pkg.update(); Pkg.instantiate()'
 
 mkdir -p log # Log directory for slurm task output
 
