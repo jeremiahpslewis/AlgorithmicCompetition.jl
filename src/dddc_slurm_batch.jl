@@ -2,6 +2,8 @@ using AlgorithmicCompetition
 using Dates
 using Distributed
 
+println("Running DDDC batch.")
+
 if Sys.isapple()
     # For debugging on MacOS
     ENV["DEBUG"] = 1
@@ -43,6 +45,7 @@ end
 if debug && SLURM_ARRAY_TASK_ID > 10
     return
 else
+    println("Julia: Running DDDC batch with n_grid_increments = $n_grid_increments.")
     AlgorithmicCompetition.run_dddc(
         version = ENV["VERSION"],
         start_timestamp = now(),
