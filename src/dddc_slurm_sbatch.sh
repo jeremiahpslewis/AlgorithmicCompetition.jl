@@ -15,4 +15,4 @@ export VERSION="2024-07-23-dddc-full-strong-weak-grid"
 export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
 export DEBUG=0
 echo "Bash: Running DDDC with $N_GRID_INCREMENTS grid increments"
-julia +1.11 --project=. src/dddc_slurm_batch.jl
+julia +1.10 --project=. src/dddc_slurm_batch.jl

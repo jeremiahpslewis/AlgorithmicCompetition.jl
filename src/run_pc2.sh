@@ -23,7 +23,7 @@ bash <(curl -Ls https://gist.githubusercontent.com/jeremiahpslewis/373e5e4d4d6fa
 
 git pull
 
-julia +1.11 -e 'using Pkg; Pkg.activate("."); Pkg.update(); Pkg.instantiate()'
+julia +1.10 -e 'using Pkg; Pkg.activate("."); Pkg.update(); Pkg.instantiate()'
 
 mkdir -p log # Log directory for slurm task output
 
