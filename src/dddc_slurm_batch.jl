@@ -9,6 +9,7 @@ if Sys.isapple()
     ENV["SLURM_ARRAY_JOB_ID"] = 1
     ENV["SLURM_CPUS_PER_TASK"] = 6
     ENV["VERSION"] = "v1"
+    ENV["N_GRID_INCREMENTS"] = 10
 end
 
 
