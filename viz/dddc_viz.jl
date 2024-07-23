@@ -759,7 +759,7 @@ end
 f3 = draw(plt3, axis = (xticks = 0.0:0.1:1,))
 save("plots/dddc/plot_3.svg", f3)
 
-freq_high_demand = 0.7
+freq_high_demand = 0.5
 for freq_high_demand in 0.0:0.1:1
     n_bins_ = 200
     df_summary_rounded = @chain df_summary begin
@@ -768,9 +768,9 @@ for freq_high_demand in 0.0:0.1:1
         @subset(!ismissing(:profit_gain_demand_high_weak_signal_player)) # TODO: Remove this once you figure out why missings are in data (or 
         @subset(!ismissing(:profit_gain_demand_high_strong_signal_player)) # TODO: Remove this once you figure out why missings are in data (or 
         @transform(
-            :weak_signal_quality_level = floor(:weak_signal_quality_level * n_bins_; digits=0) / n_bins_,
-            :strong_signal_quality_level = floor(:strong_signal_quality_level * n_bins_; digits=0) / n_bins_,
-            :frequency_high_demand = floor(:frequency_high_demand * 10; digits=0) / 10,
+            :weak_signal_quality_level = round(:weak_signal_quality_level * n_bins_; digits=0) / n_bins_,
+            :strong_signal_quality_level = round(:strong_signal_quality_level * n_bins_; digits=0) / n_bins_,
+            :frequency_high_demand = round(:frequency_high_demand * 10; digits=0) / 10,
         ) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
         @groupby(:weak_signal_quality_level, :strong_signal_quality_level, :frequency_high_demand)
         @combine(
