@@ -16,6 +16,6 @@ export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
 export DEBUG=0
 echo "Bash: Running DDDC with $N_GRID_INCREMENTS grid increments"
 # julia +1.10 --project=. src/dddc_slurm_batch.jl
-julia +1.10 -e 'using Pkg; Pkg.activate("."); Pkg.update(); Pkg.instantiate()'
+# julia +1.10 -e 'using Pkg; Pkg.activate("."); Pkg.update(); Pkg.instantiate()'
 julia +1.10 -e 'println("Hello, World!")'
 
