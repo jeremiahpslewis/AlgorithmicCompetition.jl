@@ -1,3 +1,4 @@
+println("Loading packages.")
 using AlgorithmicCompetition
 using Dates
 using Distributed
