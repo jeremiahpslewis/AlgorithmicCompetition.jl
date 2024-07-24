@@ -344,7 +344,7 @@ plt222 = @chain df_summary begin
 end
 f222 = draw(
     plt222,
-    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+    # legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
 )
 save("plots/dddc/plot_222.svg", f222)
 
@@ -759,7 +759,7 @@ end
 f3 = draw(plt3, axis = (xticks = 0.0:0.1:1,))
 save("plots/dddc/plot_3.svg", f3)
 
-freq_high_demand = 0.5
+freq_high_demand = 0.9
 for freq_high_demand in 0.0:0.1:1
     n_bins_ = 200
     df_summary_rounded = @chain df_summary begin
@@ -771,14 +771,14 @@ for freq_high_demand in 0.0:0.1:1
         #     :weak_signal_quality_level = round(:weak_signal_quality_level * n_bins_; digits=0) / n_bins_,
         #     :strong_signal_quality_level = round(:strong_signal_quality_level * n_bins_; digits=0) / n_bins_,
         #     :frequency_high_demand = round(:frequency_high_demand * 10; digits=0) / 10,
-        # ) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
-        @groupby(:weak_signal_quality_level, :strong_signal_quality_level, :frequency_high_demand)
-        @combine(
-            :profit_gain_min = mean(:profit_gain_min),
-            :profit_gain_max = mean(:profit_gain_max),
-            :profit_gain_weak_signal_player = mean(:profit_gain_demand_high_weak_signal_player),
-            :profit_gain_strong_signal_player = mean(:profit_gain_demand_high_strong_signal_player),
-        )
+        # # ) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
+        # @groupby(:weak_signal_quality_level, :strong_signal_quality_level, :frequency_high_demand)
+        # @combine(
+        #     :profit_gain_min = mean(:profit_gain_min),
+        #     :profit_gain_max = mean(:profit_gain_max),
+        #     :profit_gain_weak_signal_player = mean(:profit_gain_demand_high_weak_signal_player),
+        #     :profit_gain_strong_signal_player = mean(:profit_gain_demand_high_strong_signal_player),
+        # )
     end
     df_summary_weak_weak = @chain df_summary_rounded begin
         @subset(:frequency_high_demand == freq_high_demand)
@@ -869,7 +869,10 @@ for freq_high_demand in 0.0:0.1:1
         ) *
         visual(Heatmap)
     end
-    f82 = draw(plt82)
+    scale_custom_color = scales(Color = (;
+    categories = ["ss"=> "Share/Share", "dd"=> "Discard/Discard", "hh"=>"Hoard/Hoard", "hs"=> "Hoard/Share", "sh"=> "Share/Hoard", "dh"=>"Discard/Hoard", "hd"=>"Hoard/Discard", "ds"=>"Discard/Share"],
+    ))
+    f82 = draw(plt82, scale_custom_color)
     save("plots/dddc/plot_82__freq_high_demand_$freq_high_demand.svg", f82)
 
     plt83 = @chain df_rework begin
@@ -881,7 +884,7 @@ for freq_high_demand in 0.0:0.1:1
         ) *
         visual(Heatmap)
     end
-    f83 = draw(plt83)
+    f83 = draw(plt83, scale_custom_color)
     save("plots/dddc/plot_83__freq_high_demand_$freq_high_demand.svg", f82)
 end
 
