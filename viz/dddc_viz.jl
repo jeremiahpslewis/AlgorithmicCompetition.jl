@@ -720,7 +720,6 @@ save("plots/dddc/plot_27.svg", f27)
 
 df_weak_weak_outcomes = @chain df_summary begin
     @subset((:strong_signal_quality_level == :weak_signal_quality_level) & (:frequency_high_demand < 1.0) & (:frequency_high_demand > 0.0) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
-    # @subset(!ismissing(:pct_compensating_profit_gain)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
     @sort(:frequency_high_demand)
 end
 
@@ -790,10 +789,10 @@ for freq_high_demand in 0.0:0.1:1
     end
 
     df_rework = @chain df_summary_rounded begin
-        @subset(:strong_signal_quality_level != 1) # TODO: remove this...
+        @subset(:strong_signal_quality_level != 1)
         @subset(
-            # !ismissing(:profit_gain_strong_signal_player) &
-            (:frequency_high_demand == freq_high_demand)
+            (:frequency_high_demand == freq_high_demand) &
+            (:strong_signal_quality_level != :weak_signal_quality_level)
         )
         leftjoin(df_summary_weak_weak, on = :strong_signal_quality_level => :signal_quality_level, renamecols = "" => "_signal_ceil")
         leftjoin(df_summary_weak_weak, on = :weak_signal_quality_level => :signal_quality_level, renamecols = "" => "_signal_floor")
