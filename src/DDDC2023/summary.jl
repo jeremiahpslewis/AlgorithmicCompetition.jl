@@ -303,14 +303,11 @@ function profit_gain(π_hat, env::DDDCEnv)
 end
 
 
-function reduce_dddc(df_summary::DataFrame, round_parameters=false)
-    if round_parameters
-        df_summary = @chain df_summary begin
-            @transform(:weak_signal_quality_level = round.(:weak_signal_quality_level, digits=2))
-            @transform(:strong_signal_quality_level = round.(:strong_signal_quality_level, digits=2))
-            @transform(:frequency_high_demand = round.(:frequency_high_demand, digits=2))
-        end
+function reduce_dddc(df_summary::DataFrame)
+    if !:n_obs ∈ names(df_summary)
+        df_summary[!, :n_obs] = 1
     end
+    
     df_reduced = @chain df_summary begin
         @groupby(
             :weak_signal_quality_level,
@@ -360,6 +357,7 @@ function reduce_dddc(df_summary::DataFrame, round_parameters=false)
             :convergence_profit_demand_high = mean(:convergence_profit_demand_high),
             :convergence_profit_demand_low = mean(:convergence_profit_demand_low),
             :pct_compensating_profit_gain = mean(:pct_compensating_profit_gain),
+            :n_obs = sum(:n_obs),
         )
     end
     return df_reduced

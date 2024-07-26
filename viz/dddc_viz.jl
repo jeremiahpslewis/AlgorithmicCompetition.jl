@@ -21,6 +21,8 @@ using AlgorithmicCompetition:
     reduce_dddc
 using Arrow
 
+
+rebuild_summary_files = false
 df_summary_arrow_cache_path = "data_final/dddc_v0.0.9_data_summary.arrow"
 
 arrow_folders = filter!(
@@ -35,18 +37,17 @@ is_summary_file = occursin.(("df_summary",), arrow_files)
 df_summary_ = arrow_files[is_summary_file]
 df_raw_ = arrow_files[.!is_summary_file]
 
-#= Temp for rebuilding summary files from raw files...
-rm.(df_summary_)
-@showprogress for i in 1:length(df_raw_)
-    df = DataFrame(Arrow.Table(df_raw_[i]))
-    if nrow(df) > 0
-        df = expand_and_extract_dddc(df)
-        df_summary = construct_df_summary_dddc(df)
-        Arrow.write(replace(df_raw_[i], ".arrow" => "_df_summary_rebuilt.arrow"), df_summary)
+if rebuild_summary_files
+    rm.(df_summary_)
+    @showprogress for i in 1:length(df_raw_)
+        df = DataFrame(Arrow.Table(df_raw_[i]))
+        if nrow(df) > 0
+            df = expand_and_extract_dddc(df)
+            df_summary = construct_df_summary_dddc(df)
+            Arrow.write(replace(df_raw_[i], ".arrow" => "_df_summary_rebuilt.arrow"), df_summary)
+        end
     end
 end
-# End Temp
-=#
 
 arrows_ = DataFrame.(Arrow.Table.(df_summary_))
 
@@ -758,6 +759,9 @@ end
 f3 = draw(plt3, axis = (xticks = 0.0:0.1:1,))
 save("plots/dddc/plot_3.svg", f3)
 
+
+
+
 freq_high_demand = 0.9
 for freq_high_demand in 0.0:0.1:1
     n_bins_ = 200
@@ -887,8 +891,33 @@ for freq_high_demand in 0.0:0.1:1
     save("plots/dddc/plot_83__freq_high_demand_$freq_high_demand.svg", f82)
 end
 
-
-
+plt9 = @chain df_summary begin
+    stack([
+        :profit_gain_strong_signal_player,
+        :profit_gain_weak_signal_player,
+    ],
+    variable_name = :signal_player,
+    value_name = :profit_gain_delta
+    )
+    @transform(:signal_player = replace(:signal_player, r"profit_gain_" => ""))
+    @groupby(:frequency_high_demand, :signal_player)
+    @combine(
+        :profit_gain_delta_max = maximum(:profit_gain_delta),
+        :profit_gain_delta_min = minimum(:profit_gain_delta),
+    )
+    @sort(:frequency_high_demand)
+    data(_) *
+    mapping(
+        :frequency_high_demand => "High Demand Frequency",
+        :profit_gain_delta_min => "Profit Gain",
+        :profit_gain_delta_max => "Profit Gain",
+        color=:signal_player => nonnumeric => "Signal Player",
+        col = :signal_player => nonnumeric,
+    ) *
+    visual(Band)
+end
+f9 = draw(plt9)
+save("plots/dddc/plot_9.svg", f9)
 # plt4 = @chain df_summary begin
 #     @subset(:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1) & (:strong_signal_quality_level == strong_signal_level))
 #     data(_) *
