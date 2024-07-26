@@ -719,8 +719,8 @@ f27 = draw(
 save("plots/dddc/plot_27.svg", f27)
 
 df_weak_weak_outcomes = @chain df_summary begin
-    @subset((:strong_signal_quality_level == :weak_signal_quality_level) & (:frequency_high_demand < 1.0) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
-    @subset(!ismissing(:pct_compensating_profit_gain)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
+    @subset((:strong_signal_quality_level == :weak_signal_quality_level) & (:frequency_high_demand < 1.0) & (:frequency_high_demand > 0.0) & (:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1)))
+    # @subset(!ismissing(:pct_compensating_profit_gain)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
     @sort(:frequency_high_demand)
 end
 
@@ -915,39 +915,39 @@ end
 # f5 = draw(plt5)
 # save("plots/dddc/plot_5.svg", f5)
 
-α = Float64(0.125)
-β = Float64(4e-1)
-δ = 0.95
-ξ = 0.1
-δ = 0.95
-n_prices = 15
-max_iter = Int(1e6) # 1e8
-price_index = 1:n_prices
+# α = Float64(0.125)
+# β = Float64(4e-1)
+# δ = 0.95
+# ξ = 0.1
+# δ = 0.95
+# n_prices = 15
+# max_iter = Int(1e6) # 1e8
+# price_index = 1:n_prices
 
-competition_params_dict = Dict(
-    :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
-    :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
-)
+# competition_params_dict = Dict(
+#     :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
+#     :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
+# )
 
-competition_solution_dict =
-    Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+# competition_solution_dict =
+#     Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
-data_demand_digital_params = DataDemandDigitalParams(
-    weak_signal_quality_level = 0.99,
-    strong_signal_quality_level = 0.995,
-    signal_is_strong = [true, false],
-    frequency_high_demand = 0.9,
-)
+# data_demand_digital_params = DataDemandDigitalParams(
+#     weak_signal_quality_level = 0.99,
+#     strong_signal_quality_level = 0.995,
+#     signal_is_strong = [true, false],
+#     frequency_high_demand = 0.9,
+# )
 
-hyperparams = DDDCHyperParameters(
-    α,
-    β,
-    δ,
-    max_iter,
-    competition_solution_dict,
-    data_demand_digital_params;
-    convergence_threshold = Int(1e5),
-)
+# hyperparams = DDDCHyperParameters(
+#     α,
+#     β,
+#     δ,
+#     max_iter,
+#     competition_solution_dict,
+#     data_demand_digital_params;
+#     convergence_threshold = Int(1e5),
+# )
 
 # plt = draw_price_diagnostic(hyperparams)
 # f6 = draw(
