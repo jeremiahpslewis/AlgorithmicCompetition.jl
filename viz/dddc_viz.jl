@@ -759,9 +759,6 @@ end
 f3 = draw(plt3, axis = (xticks = 0.0:0.1:1,))
 save("plots/dddc/plot_3.svg", f3)
 
-
-
-
 freq_high_demand = 0.9
 for freq_high_demand in 0.0:0.1:1
     n_bins_ = 200
@@ -891,7 +888,7 @@ for freq_high_demand in 0.0:0.1:1
     save("plots/dddc/plot_83__freq_high_demand_$freq_high_demand.svg", f82)
 end
 
-plt9 = @chain df_summary begin
+df_information_summary = @chain df_summary begin
     stack([
         :profit_gain_strong_signal_player,
         :profit_gain_weak_signal_player,
@@ -905,7 +902,11 @@ plt9 = @chain df_summary begin
         :profit_gain_delta_max = maximum(:profit_gain_delta),
         :profit_gain_delta_min = minimum(:profit_gain_delta),
     )
+    @transform(:information_value = :profit_gain_delta_max - :profit_gain_delta_min)
     @sort(:frequency_high_demand)
+end
+
+plt9 = @chain df_information_summary begin
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
@@ -916,8 +917,20 @@ plt9 = @chain df_summary begin
     ) *
     visual(Band)
 end
-f9 = draw(plt9)
+f9 = draw(plt9, axis = (xticks = 0.0:0.2:1,))
 save("plots/dddc/plot_9.svg", f9)
+
+plt91 = @chain df_information_summary begin
+    data(_) *
+    mapping(
+        :frequency_high_demand => "High Demand Frequency",
+        :information_value => "Information Value (Profit Gain Range)",
+        color=:signal_player => nonnumeric => "Signal Player",
+        col = :signal_player => nonnumeric,
+    ) *
+    visual(Lines)
+end
+f91 = draw(plt91, axis = (xticks = 0.0:0.2:1,))
 # plt4 = @chain df_summary begin
 #     @subset(:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1) & (:strong_signal_quality_level == strong_signal_level))
 #     data(_) *
