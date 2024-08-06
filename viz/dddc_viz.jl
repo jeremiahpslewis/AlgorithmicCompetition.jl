@@ -596,7 +596,7 @@ plt25 = @chain df_summary begin
             replace(:convergence_profit_type, "convergence_profit_" => "")
     )
     @transform(:convergence_profit_type = replace(:convergence_profit_type, "_" => " "))
-    # @subset(!ismissing(:convergence_profit)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)    
+    # @subset(!ismissing(:convergence_profit)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
@@ -643,7 +643,7 @@ plt26 = @chain df_summary begin
         :percent_unexplored_states_type =
             replace(:percent_unexplored_states_type, "_" => " ")
     )
-    @subset(!ismissing(:percent_unexplored_states_value)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)    
+    @subset(!ismissing(:percent_unexplored_states_value)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
@@ -763,10 +763,10 @@ freq_high_demand = 0.9
 for freq_high_demand in 0.0:0.1:1
     n_bins_ = 200
     df_summary_rounded = @chain df_summary begin
-        # @subset(!ismissing(:profit_gain_min)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)            
-        # @subset(!ismissing(:profit_gain_max)) # TODO: Remove this once you figure out why missings are in data (or 
-        # @subset(!ismissing(:profit_gain_demand_high_weak_signal_player)) # TODO: Remove this once you figure out why missings are in data (or 
-        # @subset(!ismissing(:profit_gain_demand_high_strong_signal_player)) # TODO: Remove this once you figure out why missings are in data (or 
+        # @subset(!ismissing(:profit_gain_min)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
+        # @subset(!ismissing(:profit_gain_max)) # TODO: Remove this once you figure out why missings are in data (or
+        # @subset(!ismissing(:profit_gain_demand_high_weak_signal_player)) # TODO: Remove this once you figure out why missings are in data (or
+        # @subset(!ismissing(:profit_gain_demand_high_strong_signal_player)) # TODO: Remove this once you figure out why missings are in data (or
         # @transform(
         #     :weak_signal_quality_level = round(:weak_signal_quality_level * n_bins_; digits=0) / n_bins_,
         #     :strong_signal_quality_level = round(:strong_signal_quality_level * n_bins_; digits=0) / n_bins_,
@@ -801,7 +801,7 @@ for freq_high_demand in 0.0:0.1:1
             :profit_gain_delta_strong_player_signal_ceil = :profit_gain_strong_signal_player - :profit_gain_avg_signal_ceil,
             :profit_gain_delta_strong_player_signal_floor = :profit_gain_strong_signal_player - :profit_gain_avg_signal_floor,
         )
-        # @subset(!ismissing(:profit_gain_strong_signal_player)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)        
+        # @subset(!ismissing(:profit_gain_strong_signal_player)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
         @transform(
             :profit_gain_delta_weak_player_signal_ceil = :profit_gain_weak_signal_player - :profit_gain_avg_signal_ceil,
             :profit_gain_delta_weak_player_signal_floor = :profit_gain_weak_signal_player - :profit_gain_avg_signal_floor,
@@ -855,7 +855,7 @@ for freq_high_demand in 0.0:0.1:1
     plt8 = plt8_partial * visual(Heatmap)
     f8 = draw(plt8) #, axis = (xticks = 0.5:0.1:1,))
     save("plots/dddc/plot_8__freq_high_demand_$freq_high_demand.svg", f8)
-    
+
     plt8_1 = plt8_partial * contours(levels = 8, labels = true)
     f81 = draw(plt8_1) #, axis = (xticks = 0.5:0.1:1,))
     save("plots/dddc/plot_81__freq_high_demand_$freq_high_demand.svg", f81)
@@ -931,6 +931,72 @@ plt91 = @chain df_information_summary begin
     visual(Lines)
 end
 f91 = draw(plt91, axis = (xticks = 0.0:0.2:1,))
+
+function arg_nth_percentile(x, p::Float64)
+    partialsortperm(x, Int64(round(length(x) * p, digits=0)))
+end
+@test arg_nth_percentile([1.5,2.5,3.5], 0.33) == 1
+
+
+df_profit_max_min_signal_strength = @chain df_summary begin
+    @subset((:strong_signal_quality_level <= 0.9) & (:weak_signal_quality_level <= 0.9))
+    @groupby(:frequency_high_demand)
+    @combine(
+        :weak_player__signal_quality_for_profit_max__strong_player_preferences = :weak_signal_quality_level[argmax(:profit_gain_strong_signal_player)],
+        :weak_player__signal_quality_for_profit_max__weak_player_preferences = :weak_signal_quality_level[argmax(:profit_gain_weak_signal_player)],
+        :strong_player__signal_quality_for_profit_max__strong_player_preferences = :strong_signal_quality_level[argmax(:profit_gain_strong_signal_player)],
+        :strong_player__signal_quality_for_profit_max__weak_player_preferences = :strong_signal_quality_level[argmax(:profit_gain_weak_signal_player)],
+        :weak_player__signal_quality_for_profit_min = :weak_signal_quality_level[argmin((:profit_gain_strong_signal_player + :profit_gain_weak_signal_player)/2)],
+        :strong_player__signal_quality_for_profit_min = :strong_signal_quality_level[argmin((:profit_gain_strong_signal_player + :profit_gain_weak_signal_player)/2)],
+        )
+end
+
+plt_10_1 = @chain df_profit_max_min_signal_strength begin
+    stack(
+        [
+            :weak_player__signal_quality_for_profit_max__strong_player_preferences,
+            :weak_player__signal_quality_for_profit_max__weak_player_preferences,
+            :strong_player__signal_quality_for_profit_max__strong_player_preferences,
+            :strong_player__signal_quality_for_profit_max__weak_player_preferences,
+        ],
+        variable_name=:player_situation,
+        value_name=:signal_quality,
+    )
+    @transform(:player_situation)
+    @transform(:profit_max_for_player = replace(:player_situation, r"^.*__" => ""))
+    @transform(:signal_quality_player = replace(:player_situation, r"__.*$" => ""))
+    data(_) *
+    mapping(
+        :frequency_high_demand,
+        :signal_quality,
+        row = :signal_quality_player,
+        color = :profit_max_for_player
+    )
+end
+f10_1 = draw(plt_10_1, axis = (xticks = 0.0:0.2:1, title="max 0.9 signal strength for either player"))
+
+plt_10_2 = @chain df_profit_max_min_signal_strength begin
+    stack(
+        [
+            :weak_player__signal_quality_for_profit_min,
+            :strong_player__signal_quality_for_profit_min,
+        ],
+        variable_name=:player_situation,
+        value_name=:signal_quality,
+    )
+    @transform(:player_situation)
+    @transform(:profit_min_for_product = replace(:player_situation, r"^.*__" => ""))
+    @transform(:signal_quality_player = replace(:player_situation, r"__.*$" => ""))
+    data(_) *
+    mapping(
+        :frequency_high_demand,
+        :signal_quality,
+        # row = :signal_quality_player,
+        color = :signal_quality_player
+    )
+end
+f10_2 = draw(plt_10_2, axis = (xticks = 0.0:0.2:1, title="max 0.9 signal strength for either player"))
+
 # plt4 = @chain df_summary begin
 #     @subset(:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1) & (:strong_signal_quality_level == strong_signal_level))
 #     data(_) *
