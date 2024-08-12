@@ -43,14 +43,14 @@ end
 
 
 
-df = DataFrame(frequency_high_demand = Float64[], signal_strength = Float64[])
+df_raw = DataFrame(frequency_high_demand = Float64[], signal_strength = Float64[])
 for i in 0:0.005:1
     for j in 0.5:0.2:0.9
-        push!(df, (i, j))
+        push!(df_raw, (i, j))
     end
 end
 
-df = @chain df begin
+df = @chain df_raw begin
     @transform(:prob_high_signal = :signal_strength * :frequency_high_demand + (1 - :signal_strength) * (1 - :frequency_high_demand))
     @transform(:prob_low_signal = :signal_strength * (1 - :frequency_high_demand) + (1 - :signal_strength) * :frequency_high_demand)
     @transform(:post_prob_high_demand__cond_high_signal = :signal_strength * :frequency_high_demand / :prob_high_signal)
@@ -58,8 +58,8 @@ df = @chain df begin
     stack([:post_prob_high_demand__cond_high_signal, :post_prob_high_demand__cond_low_signal], variable_name=:signal, value_name=:probability_high_demand)
     @transform(:probability_low_demand = 1 - :probability_high_demand)
     @transform(:probability_combined = max(:probability_high_demand, :probability_low_demand))
-    @transform(:weighted_probability_combined = :probability_high_demand > :probability_low_demand ? :probability_high_demand * :prob_high_signal : :probability_low_demand * :prob_low_signal)
     @transform(:signal = replace(:signal, "post_prob_high_demand__cond_"=>""))
+    @transform(:weighted_probability_combined = :probability_combined * ifelse(:signal == "high_signal", :prob_high_signal, :prob_low_signal))
     @sort(:frequency_high_demand)
 end
 
@@ -73,9 +73,9 @@ draw(plt_a_1)
 
 plt_a = @chain df begin
     @groupby(:frequency_high_demand, :signal_strength)
-    @combine(:weighted_probability_combined = mean(:weighted_probability_combined))
+    @combine(:weighted_probability_combined = sum(:weighted_probability_combined))
     data(_)
-    mapping(:frequency_high_demand, :weighted_probability_combined, color=:signal_strength => nonnumeric) *
+    mapping(:frequency_high_demand, :weighted_probability_combined, color=:signal_strength => nonnumeric, col=:signal_strength => nonnumeric) *
     visual(Lines)
 end
 draw(plt_a)

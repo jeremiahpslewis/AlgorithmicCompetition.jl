@@ -10,17 +10,16 @@ using ProgressMeter
 using AlgorithmicCompetition:
     post_prob_high_low_given_signal,
     post_prob_high_low_given_both_signals,
-    draw_price_diagnostic,
     CompetitionParameters,
     CompetitionSolution,
     construct_df_summary_dddc,
     DataDemandDigitalParams,
     DDDCHyperParameters,
-    draw_price_diagnostic,
     expand_and_extract_dddc,
     reduce_dddc
 using Arrow
 
+include("viz/price_diagnostics.jl")
 
 rebuild_summary_files = false
 rebuild_overall_summary = false
@@ -993,6 +992,7 @@ titlelayout = GridLayout(f[0, 1], halign = :left, tellwidth = false)
 Label(titlelayout[1, 1], "Profit Maximizing Signal Strengths", halign = :left, fontsize = 20, font = "TeX Gyre Heros Bold Makie")
 rowgap!(titlelayout, 0)
 f
+save("plots/dddc/plot_10_1.svg", f)
 
 plt_10_2 = @chain df_profit_max_min_signal_strength begin
     stack(
@@ -1017,6 +1017,7 @@ plt_10_2 = @chain df_profit_max_min_signal_strength begin
     visual(Lines)
 end
 f10_2 = draw(plt_10_2, axis = (xticks = 0.0:0.2:1, title="Profit Minimizing Signal Strength", subtitle="(Signal strength capped at 0.9)"))
+save("plots/dddc/plot_10_2.svg", f10_2)
 
 # plt4 = @chain df_summary begin
 #     @subset(:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1) & (:strong_signal_quality_level == strong_signal_level))
