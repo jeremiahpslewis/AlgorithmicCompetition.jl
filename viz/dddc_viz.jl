@@ -23,6 +23,7 @@ using Arrow
 
 
 rebuild_summary_files = false
+rebuild_overall_summary = false
 df_summary_arrow_cache_path = "data_final/dddc_v0.0.9_data_summary.arrow"
 
 arrow_folders = filter!(
@@ -49,19 +50,20 @@ if rebuild_summary_files
     end
 end
 
-arrows_ = DataFrame.(Arrow.Table.(df_summary_))
+if rebuild_overall_summary
+    arrows_ = DataFrame.(Arrow.Table.(df_summary_))
 
-for i = 1:length(arrows_)
-    arrows_[i][!, "metadata"] .= df_summary_[i]
-    if "signal_is_strong" in names(arrows_[i])
-        arrows_[i] = select!(arrows_[i], Not(:signal_is_strong))
+    for i = 1:length(arrows_)
+        arrows_[i][!, "metadata"] .= df_summary_[i]
+        if "signal_is_strong" in names(arrows_[i])
+            arrows_[i] = select!(arrows_[i], Not(:signal_is_strong))
+        end
     end
+
+    df_summary = vcat(arrows_...)
+    df_summary = reduce_dddc(df_summary)#, round_parameters=false)
+    Arrow.write(df_summary_arrow_cache_path, df_summary)
 end
-
-df_summary = vcat(arrows_...)
-df_summary = reduce_dddc(df_summary)#, round_parameters=false)
-Arrow.write(df_summary_arrow_cache_path, df_summary)
-
 # mkpath("data_final")
 # arrow_file_name = "data_final/dddc_v0.0.8_data.arrow"
 # Arrow.write(arrow_file_name, df_)
@@ -965,15 +967,32 @@ plt_10_1 = @chain df_profit_max_min_signal_strength begin
     @transform(:player_situation)
     @transform(:profit_max_for_player = replace(:player_situation, r"^.*__" => ""))
     @transform(:signal_quality_player = replace(:player_situation, r"__.*$" => ""))
+    @transform(:signal_quality_player = replace(:signal_quality_player, "_" => " "))
+    @transform(:profit_max_for_player = replace(:profit_max_for_player, "_" => " "))
+    @transform(:profit_max_for_player = replace(:profit_max_for_player, " preferences" => ""))
+    @sort(:frequency_high_demand)
     data(_) *
     mapping(
-        :frequency_high_demand,
-        :signal_quality,
-        row = :signal_quality_player,
-        color = :profit_max_for_player
-    )
+        :frequency_high_demand => "High Demand Frequency",
+        :signal_quality => "Signal Quality",
+        row = :signal_quality_player => titlecase => "",
+        color = :profit_max_for_player => titlecase => "Profit Maximizing for:",
+    ) *
+    visual(Lines)
 end
-f10_1 = draw(plt_10_1, axis = (xticks = 0.0:0.2:1, title="max 0.9 signal strength for either player"))
+
+
+f = Figure(; size=(800, 600))
+# ax = Axis(f[1, 1], title="Some plot")
+subfig = f[1, 1]
+grid = draw!(subfig, plt_10_1, axis = (xticks = 0.0:0.2:1, yticks = 0.0:0.1:1, title=""))
+legend!(f[1, 2], grid)
+titlelayout = GridLayout(f[0, 1], halign = :left, tellwidth = false)
+# Label(titlelayout[1, 1], "Interest rate differentials", halign = :left, fontsize = 30, font = "TeX Gyre Heros Bold Makie")
+# Label(titlelayout[2, 1], "Differences in monetary policy are a key driver of the strong dollar.", halign = :left, fontsize = 20)
+Label(titlelayout[1, 1], "Profit Maximizing Signal Strengths", halign = :left, fontsize = 20, font = "TeX Gyre Heros Bold Makie")
+rowgap!(titlelayout, 0)
+f
 
 plt_10_2 = @chain df_profit_max_min_signal_strength begin
     stack(
@@ -987,15 +1006,17 @@ plt_10_2 = @chain df_profit_max_min_signal_strength begin
     @transform(:player_situation)
     @transform(:profit_min_for_product = replace(:player_situation, r"^.*__" => ""))
     @transform(:signal_quality_player = replace(:player_situation, r"__.*$" => ""))
+    @transform(:signal_quality_player = replace(:signal_quality_player, "_" => " "))
+    @sort(:frequency_high_demand)
     data(_) *
     mapping(
-        :frequency_high_demand,
-        :signal_quality,
-        # row = :signal_quality_player,
-        color = :signal_quality_player
-    )
+        :frequency_high_demand => "High Demand Frequency",
+        :signal_quality => "Signal Quality",
+        color = :signal_quality_player => titlecase => "",
+    ) *
+    visual(Lines)
 end
-f10_2 = draw(plt_10_2, axis = (xticks = 0.0:0.2:1, title="max 0.9 signal strength for either player"))
+f10_2 = draw(plt_10_2, axis = (xticks = 0.0:0.2:1, title="Profit Minimizing Signal Strength", subtitle="(Signal strength capped at 0.9)"))
 
 # plt4 = @chain df_summary begin
 #     @subset(:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1) & (:strong_signal_quality_level == strong_signal_level))
