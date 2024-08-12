@@ -18,11 +18,6 @@ Components:
 
 ```julia
 import AlgorithmicCompetition
-using Chain
-using Statistics
-using DataFrameMacros
-using CSV
-using ParallelDataTransfer
 using Distributed
 
 n_procs_ = 2 # update number of parallel processes

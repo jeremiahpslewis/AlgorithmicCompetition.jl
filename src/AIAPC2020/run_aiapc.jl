@@ -3,7 +3,6 @@ using Distributed
 using Random
 using StatsBase
 using DataFrames
-using CSV
 using Dates
 
 function build_hyperparameter_set(
@@ -108,7 +107,7 @@ function run_aiapc(;
     for i = 1:n_parameter_iterations
         println("Parameter iteration $i of $n_parameter_iterations")
         file_name =
-            joinpath(folder_name, savename((parameter_iteration = i, suffix = "csv")))
+            joinpath(folder_name, savename((parameter_iteration = i, suffix = "arrow")))
         exp_list_ = AIAPCSummary[]
         exp_list = @showprogress pmap(
             run_and_extract,
@@ -118,13 +117,13 @@ function run_aiapc(;
         )
 
         df = extract_sim_results(exp_list)
-        CSV.write(file_name, df)
+        Arrow.write(file_name * ".arrow", df)
     end
 
-    exp_df = DataFrame.(CSV.File.(readdir(folder_name, join = true)))
+    exp_df = DataFrame.(Arrow.Table.(readdir(folder_name, join = true)))
     exp_df = vcat(exp_df...)
 
-    CSV.write(folder_name * ".csv", exp_df)
+    Arrow.write(folder_name * ".arrow", exp_df)
     rm(folder_name, recursive = true) # Remove folder after merging and writing to CSV
     return exp_df
 end

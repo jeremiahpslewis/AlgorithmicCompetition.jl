@@ -2,7 +2,7 @@ using Distributed
 using ClusterManagers
 using AlgorithmicCompetition
 using Dates
-using CSV
+using Arrow
 
 n_parameter_iterations = 1000
 n_parameter_combinations = 10000
@@ -47,7 +47,7 @@ end
 )
 
 
-file_name = "$(ENV["HOME"])/simulation_results_aiapc_$(version)_$(start_timestamp_str).csv"
-CSV.write(file_name, exp_df)
+file_name = "$(ENV["HOME"])/simulation_results_aiapc_$(version)_$(start_timestamp_str).arrow"
+Arrow.write(file_name, exp_df)
 
 rmprocs(workers())

@@ -14,6 +14,8 @@ cd /scratch/hpc-prf-irddcc || exit
 
 cd AlgorithmicCompetition.jl || exit
 
+export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
+
 bash <(curl -Ls https://gist.githubusercontent.com/jeremiahpslewis/373e5e4d4d6faf1bf1a59ef9414019ca/raw/7e9166d3051687e2371b4ab98e6db1ac64432bef/sacct_tail.sh)
 
 git pull

@@ -10,14 +10,13 @@ using AlgorithmicCompetition:
     CompetitionSolution,
     profit_gain,
     draw_price_diagnostic
-using CSV
 using DataFrames
 using Statistics
 
 
 job_id = "7799305"
 csv_files = filter!(
-    x -> occursin(Regex("data/SLURM_ARRAY_JOB_ID=$(job_id).*.csv"), x),
+    x -> occursin(Regex("data/SLURM_ARRAY_JOB_ID=$(job_id).*.arrow"), x),
     readdir("data", join = true),
 )
 
