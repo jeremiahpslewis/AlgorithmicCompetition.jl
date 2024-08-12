@@ -25,7 +25,7 @@ n_grid_increments = parse(Int, ENV["N_GRID_INCREMENTS"])
 
 # Overrride in case of debugging
 if debug && Sys.isapple()
-    n_grid_increments = 1
+    n_grid_increments = 2
 elseif debug
     n_grid_increments = 10
 end
