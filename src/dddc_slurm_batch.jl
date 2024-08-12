@@ -7,12 +7,13 @@ println("Running DDDC batch.")
 
 if Sys.isapple()
     # For debugging on MacOS
-    ENV["DEBUG"] = 1
+    ENV["DEBUG"] = 0
     ENV["SLURM_ARRAY_TASK_ID"] = 1
     ENV["SLURM_ARRAY_JOB_ID"] = 1
     ENV["SLURM_CPUS_PER_TASK"] = 6
     ENV["VERSION"] = "v1"
-    ENV["N_GRID_INCREMENTS"] = 10
+    ENV["N_GRID_INCREMENTS"] = 20
+    ENV["N_PARAMETER_ITERATIONS"] = 5
 end
 
 
@@ -50,7 +51,7 @@ else
     AlgorithmicCompetition.run_dddc(
         version = ENV["VERSION"],
         start_timestamp = now(),
-        n_parameter_iterations = 1,
+        n_parameter_iterations = ENV["N_PARAMETER_ITERATIONS"],
         n_grid_increments = n_grid_increments,
         batch_size = 20,
         batch_metadata = (
