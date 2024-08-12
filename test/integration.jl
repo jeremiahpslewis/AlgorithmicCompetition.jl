@@ -568,7 +568,7 @@ end
     ξ = 0.1
     δ = 0.95
     n_prices = 15
-    max_iter = 100000
+    max_iter = 1000000
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
@@ -584,7 +584,7 @@ end
         δ,
         max_iter,
         competition_solution_dict;
-        convergence_threshold = 2,
+        convergence_threshold = 1,
     )
 
 
