@@ -6,13 +6,13 @@
 # TASK=AIAPC bash src/run_pc2.sh
 
 module load lang       # loading the gateway module
-# module load JuliaHPC   # loading the latest JuliaHPC
+module load JuliaHPC   # loading the latest JuliaHPC
 # module load Julia/1.10.4 # This should be fine, not using MPI for this project...
-curl -fsSL https://install.julialang.org | sh
-. /pc2/users/i/irddcc1/.bashrc
+# curl -fsSL https://install.julialang.org | sh
+# . /pc2/users/i/irddcc1/.bashrc
 
 cd /scratch/hpc-prf-irddcc || exit
-export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
+# export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
 
 [ ! -d 'AlgorithmicCompetition.jl' ] && git clone https://github.com/jeremiahpslewis/AlgorithmicCompetition.jl.git
 
@@ -23,7 +23,7 @@ bash <(curl -Ls https://gist.githubusercontent.com/jeremiahpslewis/373e5e4d4d6fa
 
 git pull
 
-julia +1.10 -e 'using Pkg; Pkg.activate("."); Pkg.update(); Pkg.instantiate(); Pkg.precompile()'
+julia -e 'using Pkg; Pkg.activate("."); Pkg.update(); Pkg.instantiate(); Pkg.precompile()'
 
 mkdir -p log # Log directory for slurm task output
 
