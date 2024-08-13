@@ -7,8 +7,9 @@
 
 
 # NOTE: to self
-# try using home directory for DEPOT and check runtime performance and storage limits: $HOME/.julia
-# try using PackageCompiler.jl (see screenshots) as luster performance (/scratch parallel file system) is poor for lots of small files
+# 1. try using home directory for DEPOT and check runtime performance and storage limits: $HOME/.julia
+# 2. try creating a docker container and running it via singularity: https://upb-pc2.atlassian.net/wiki/spaces/PC2DOK/pages/1900673/Singularity-Introduction#Loading-the-Singularity-Environment
+# 3. try using PackageCompiler.jl (see screenshots) as luster performance (/scratch parallel file system) is poor for lots of small files
 
 module load lang       # loading the gateway module
 module load JuliaHPC   # loading the latest JuliaHPC
