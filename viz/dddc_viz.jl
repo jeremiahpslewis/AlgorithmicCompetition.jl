@@ -905,6 +905,8 @@ df_information_summary = @chain df_summary begin
     )
     @transform(:information_value = :profit_gain_delta_max - :profit_gain_delta_min)
     @sort(:frequency_high_demand)
+    @transform(:signal_player = replace(:signal_player, "_" => " "))
+    @transform(:signal_player = titlecase(:signal_player))
 end
 
 plt9 = @chain df_information_summary begin
@@ -925,13 +927,14 @@ plt91 = @chain df_information_summary begin
     data(_) *
     mapping(
         :frequency_high_demand => "High Demand Frequency",
-        :information_value => "Information Value (Profit Gain Range)",
+        :information_value => "Information Value\n(Max - Min Profit Gain)",
         color=:signal_player => nonnumeric => "Signal Player",
-        col = :signal_player => nonnumeric,
+        # col = :signal_player => nonnumeric,
     ) *
     visual(Lines)
 end
-f91 = draw(plt91, axis = (xticks = 0.0:0.2:1,))
+f91 = draw(plt91, axis = (xticks = 0.0:0.2:1, title = "Value of Information Set by Demand Setting"))
+save("plots/dddc/plot_9_1.svg", f91)
 
 function arg_nth_percentile(x, p::Float64)
     partialsortperm(x, Int64(round(length(x) * p, digits=0)))
