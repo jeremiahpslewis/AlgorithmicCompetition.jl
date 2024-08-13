@@ -920,8 +920,16 @@ plt9 = @chain df_information_summary begin
     ) *
     visual(Band)
 end
-f9 = draw(plt9, axis = (xticks = 0.0:0.2:1,))
-save("plots/dddc/plot_9.svg", f9)
+
+f912 = Figure(; size=(800, 600))
+subfig = f912[1, 1]
+grid = draw!(subfig, plt9, axis = (xticks = 0.0:0.2:1, title=""))
+legend!(f912[1, 2], grid)
+titlelayout = GridLayout(f912[0, 1], halign = :left, tellwidth = false)
+Label(titlelayout[1, 1], "Information Strategy Bandwith", halign = :left, fontsize = 20, font = "TeX Gyre Heros Bold Makie")
+rowgap!(titlelayout, 0)
+f912
+save("plots/dddc/plot_9.svg", f912)
 
 plt91 = @chain df_information_summary begin
     data(_) *
@@ -985,13 +993,10 @@ end
 
 
 f = Figure(; size=(800, 600))
-# ax = Axis(f[1, 1], title="Some plot")
 subfig = f[1, 1]
 grid = draw!(subfig, plt_10_1, axis = (xticks = 0.0:0.2:1, yticks = 0.0:0.1:1, title=""))
 legend!(f[1, 2], grid)
 titlelayout = GridLayout(f[0, 1], halign = :left, tellwidth = false)
-# Label(titlelayout[1, 1], "Interest rate differentials", halign = :left, fontsize = 30, font = "TeX Gyre Heros Bold Makie")
-# Label(titlelayout[2, 1], "Differences in monetary policy are a key driver of the strong dollar.", halign = :left, fontsize = 20)
 Label(titlelayout[1, 1], "Profit Maximizing Signal Strengths", halign = :left, fontsize = 20, font = "TeX Gyre Heros Bold Makie")
 rowgap!(titlelayout, 0)
 f

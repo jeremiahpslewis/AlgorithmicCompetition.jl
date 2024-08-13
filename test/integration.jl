@@ -584,7 +584,7 @@ end
         δ,
         max_iter,
         competition_solution_dict;
-        convergence_threshold = 1,
+        convergence_threshold = 100,
     )
 
 
