@@ -615,7 +615,7 @@ end
     for i in [Player(1), Player(2)]
         @test c_out.hook[i][1].convergence_duration >= 0
         @test c_out.hook[i][1].is_converged
-        @test c_out.hook[i][1].convergence_threshold == 1
+        @test c_out.hook[i][1].convergence_threshold == 100
         @test sum(c_out.hook[i][2].rewards .== 0) == 0
     end
 
