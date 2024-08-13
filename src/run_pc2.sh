@@ -5,6 +5,11 @@
 # or
 # TASK=AIAPC bash src/run_pc2.sh
 
+
+# NOTE: to self
+# try using home directory for DEPOT and check runtime performance and storage limits: $HOME/.julia
+# try using PackageCompiler.jl (see screenshots) as luster performance (/scratch parallel file system) is poor for lots of small files
+
 module load lang       # loading the gateway module
 module load JuliaHPC   # loading the latest JuliaHPC
 
