@@ -926,7 +926,7 @@ subfig = f912[1, 1]
 grid = draw!(subfig, plt9, axis = (xticks = 0.0:0.2:1, title=""))
 legend!(f912[1, 2], grid)
 titlelayout = GridLayout(f912[0, 1], halign = :left, tellwidth = false)
-Label(titlelayout[1, 1], "Information Strategy Bandwith", halign = :left, fontsize = 20, font = "TeX Gyre Heros Bold Makie")
+Label(titlelayout[1, 1], "Profit Possibilities Range", halign = :left, fontsize = 20, font = "TeX Gyre Heros Bold Makie")
 rowgap!(titlelayout, 0)
 f912
 save("plots/dddc/plot_9.svg", f912)
