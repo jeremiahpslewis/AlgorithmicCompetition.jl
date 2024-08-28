@@ -3,7 +3,7 @@
 #SBATCH --output=log/array_job_%A_%a.out
 #SBATCH --error=log/array_job_%A_%a.err
 #SBATCH --array=1-1000 # 1-1000 # Number of iterations over all parameter sets
-#SBATCH --mem-per-cpu=1500M
+#SBATCH --mem-per-cpu=1700M
 #SBATCH --cpus-per-task=1
 #SBATCH --time=15:00:00 # For full run true value should be <12 hours
 #SBATCH -p normal
@@ -13,4 +13,5 @@
 export N_ITERATIONS=1 
 export DEBUG=1
 export VERSION="2024-05-22-debug"
+export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
 julia --project=. src/aiapc_slurm_batch.jl

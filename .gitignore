@@ -29,3 +29,7 @@ settings.json
 *.png
 *.svg
 !viz/**/*.csv
+data_final/
+*.parquet
+*.arrow
+*.jld2

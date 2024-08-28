@@ -512,7 +512,7 @@ end
             δ,
             max_iter,
             competition_solution_dict;
-            convergence_threshold = 10,
+            convergence_threshold = 100,
         ) for α in α_ for β in β_
     ]
 
@@ -568,7 +568,7 @@ end
     ξ = 0.1
     δ = 0.95
     n_prices = 15
-    max_iter = 10000
+    max_iter = 1000000
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
@@ -584,7 +584,7 @@ end
         δ,
         max_iter,
         competition_solution_dict;
-        convergence_threshold = 1,
+        convergence_threshold = 100,
     )
 
 
@@ -615,7 +615,7 @@ end
     for i in [Player(1), Player(2)]
         @test c_out.hook[i][1].convergence_duration >= 0
         @test c_out.hook[i][1].is_converged
-        @test c_out.hook[i][1].convergence_threshold == 1
+        @test c_out.hook[i][1].convergence_threshold == 100
         @test sum(c_out.hook[i][2].rewards .== 0) == 0
     end
 
@@ -709,12 +709,14 @@ end
         using AlgorithmicCompetition
     end
 
-    AlgorithmicCompetition.run_dddc(
-        n_parameter_iterations = 1,
-        max_iter = Int(2e5),
-        convergence_threshold = Int(1e5),
-        n_grid_increments = 3,
-    )
-
+    for debug in [true, false]
+        AlgorithmicCompetition.run_dddc(
+            n_parameter_iterations = 1,
+            max_iter = Int(2e5),
+            convergence_threshold = Int(1e5),
+            n_grid_increments = 3,
+            debug = debug,
+        )
+    end
     rmprocs(_procs)
 end
