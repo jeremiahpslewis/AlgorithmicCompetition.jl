@@ -568,7 +568,7 @@ end
     ξ = 0.1
     δ = 0.95
     n_prices = 15
-    max_iter = Int64(1e5)
+    max_iter = Int64(5e6)
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
@@ -588,7 +588,7 @@ end
     )
 
 
-    c_out = run(hyperparameters; stop_on_convergence = false, debug = true)
+    c_out = run(hyperparameters; stop_on_convergence = true, debug = true)
 
     # ensure that the policy is updated by the learner
     @test sum(c_out.policy[Player(1)].policy.learner.approximator.model .!= 0) != 0
