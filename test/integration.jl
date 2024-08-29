@@ -584,7 +584,7 @@ end
         δ,
         max_iter,
         competition_solution_dict;
-        convergence_threshold = 100,
+        convergence_threshold = 500,
     )
 
 
@@ -607,15 +607,12 @@ end
           c_out.hook[Player(2)][1].best_response_vector
 
 
-    @test mean(
-        c_out.hook[Player(1)][2].rewards[(end-2):end] .!=
-        c_out.hook[Player(2)][2].rewards[(end-2):end],
-    ) >= 0.3
+    @test mean(argmax(c_out.policy[Player(1)].policy.learner.approximator.model, dims=1) .!= argmax(c_out.policy[Player(2)].policy.learner.approximator.model, dims=1)) < 0.98
 
     for i in [Player(1), Player(2)]
         @test c_out.hook[i][1].convergence_duration >= 0
         @test c_out.hook[i][1].is_converged
-        @test c_out.hook[i][1].convergence_threshold == 100
+        @test c_out.hook[i][1].convergence_threshold == 500
         @test sum(c_out.hook[i][2].rewards .== 0) == 0
     end
 

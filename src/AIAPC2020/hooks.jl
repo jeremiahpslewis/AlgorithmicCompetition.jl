@@ -56,7 +56,11 @@ function _best_action_lookup(state_, table)
     best_action = 1
     max_value = table[1, state_]
 
-    for i = 2:size(table, 1)
+    for i = axes(table, 1)
+        if i == 1
+            continue
+        end
+
         value = table[i, state_]
         if value > max_value
             max_value = value

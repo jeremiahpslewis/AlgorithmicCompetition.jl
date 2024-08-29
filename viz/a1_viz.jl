@@ -22,7 +22,7 @@ csv_files = filter!(
 
 df_ = DataFrame.(CSV.File.(csv_files))
 
-for i = 1:length(df_)
+for i = eachindex(df_, 2)
     df_[i][!, "metadata"] .= csv_files[i]
 end
 df = vcat(df_...)
