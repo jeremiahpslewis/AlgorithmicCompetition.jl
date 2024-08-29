@@ -568,7 +568,7 @@ end
     ξ = 0.1
     δ = 0.95
     n_prices = 15
-    max_iter = 1000000
+    max_iter = Int64(1e5)
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
