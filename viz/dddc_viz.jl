@@ -931,6 +931,8 @@ rowgap!(titlelayout, 0)
 f912
 save("plots/dddc/plot_9.svg", f912)
 
+# TODO: Look into using Bayes' Factor instead of frequency high demand for plot...
+
 plt91 = @chain df_information_summary begin
     data(_) *
     mapping(
