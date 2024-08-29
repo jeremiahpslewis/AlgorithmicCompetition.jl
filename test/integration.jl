@@ -709,8 +709,8 @@ end
     for debug in [true, false]
         AlgorithmicCompetition.run_dddc(
             n_parameter_iterations = 1,
-            max_iter = Int(1e4),
-            convergence_threshold = Int(1e3),
+            max_iter = Int(1e5),
+            convergence_threshold = Int(1e2),
             n_grid_increments = 3,
             debug = debug,
         )
