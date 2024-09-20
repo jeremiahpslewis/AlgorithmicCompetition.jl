@@ -39,7 +39,7 @@ df_raw_ = arrow_files[.!is_summary_file]
 
 if rebuild_summary_files
     rm.(df_summary_)
-    @showprogress for i in 1:length(df_raw_)
+    @showprogress for i in eachindex(df_raw_)
         df = DataFrame(Arrow.Table(df_raw_[i]))
         if nrow(df) > 0
             df = expand_and_extract_dddc(df)
@@ -52,7 +52,7 @@ end
 if rebuild_overall_summary
     arrows_ = DataFrame.(Arrow.Table.(df_summary_))
 
-    for i = 1:length(arrows_)
+    for i = eachindex(arrows_)
         arrows_[i][!, "metadata"] .= df_summary_[i]
         if "signal_is_strong" in names(arrows_[i])
             arrows_[i] = select!(arrows_[i], Not(:signal_is_strong))

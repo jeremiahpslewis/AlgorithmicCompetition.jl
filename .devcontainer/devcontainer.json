@@ -1,7 +1,17 @@
 {
-    "extensions": [
-      "julialang.language-julia"
-    ],
-    "runArgs": ["--privileged"],
-    "dockerFile": "Dockerfile"
+	"image": "mcr.microsoft.com/vscode/devcontainers/base:ubuntu-24.04",
+    "features": {
+		"ghcr.io/julialang/devcontainer-features/julia": "1.10"
+    },
+	// Set *default* container specific settings.json values on container create.
+	"settings": {
+		"terminal.integrated.fontFamily": "monospace",
+		"julia.environmentPath": "."
+	},
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"quarto.quarto",
+		"GitHub.copilot",
+	],	
 }

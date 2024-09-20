@@ -1,6 +1,7 @@
 using AlgorithmicCompetition
 using Statistics
-using DataFrames CSV
+using DataFrames
+using CSV
 using Distributed
 using Dates
 
