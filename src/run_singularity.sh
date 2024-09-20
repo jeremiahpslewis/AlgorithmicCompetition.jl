@@ -7,6 +7,12 @@
 
 cd /scratch/hpc-prf-irddcc || exit
 
+[ ! -d 'AlgorithmicCompetition.jl' ] && git clone https://github.com/jeremiahpslewis/AlgorithmicCompetition.jl.git
+
+cd AlgorithmicCompetition.jl || exit
+
+git pull
+
 module load system singularity
 rm algorithmiccompetition.jl_main.sif
 singularity pull docker://ghcr.io/jeremiahpslewis/algorithmiccompetition.jl:main

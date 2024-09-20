@@ -20,4 +20,4 @@ echo "Bash: Running DDDC with $N_GRID_INCREMENTS grid increments"
 module reset
 module load system singularity
 
-singularity run /scratch/hpc-prf-irddcc/algorithmiccompetition.jl_main.sif julia --project=/algcomp /algcomp/src/dddc_slurm_batch.jl
+singularity run algorithmiccompetition.jl_main.sif julia --project=/algcomp /algcomp/src/dddc_slurm_batch.jl
