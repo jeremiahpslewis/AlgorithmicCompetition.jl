@@ -5,7 +5,7 @@ ENV JULIA_PATH=/usr/local/julia
 ENV JULIA_DEPOT_PATH=/depot
 ENV JULIA_PROJECT=/algcomp
 
-COPY . /
+COPY . /algcomp
 
 RUN julia --project=/algcomp -e 'using Pkg; Pkg.instantiate(); Pkg.precompile(); using AlgorithmicCompetition'
 
