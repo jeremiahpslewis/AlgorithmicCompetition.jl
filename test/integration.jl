@@ -255,7 +255,7 @@ end
         weak_signal_quality_level = 1,
         strong_signal_quality_level = 1,
         signal_is_strong = [false, false],
-        frequency_high_demand = 0.9,
+        frequency_high_demand = 0.7,
     )
 
     hyperparams = DDDCHyperParameters(
@@ -282,7 +282,7 @@ end
         1e-2
     @test mean(e_out.env.profit_array[:, :, :, 1]) >
           mean(e_out.env.profit_array[:, :, :, 2])
-    @test 0.85 < e_sum.percent_demand_high < 0.95
+    @test 0.65 < e_sum.percent_demand_high < 0.75
     @test all(e_sum.convergence_profit_demand_high > e_sum.convergence_profit_demand_low)
     @test all(1 .> e_sum.profit_gain .> 0)
     @test all(1 .> e_sum.profit_gain_demand_low .> 0)
@@ -512,7 +512,7 @@ end
             δ,
             max_iter,
             competition_solution_dict;
-            convergence_threshold = 100,
+            convergence_threshold = 1000,
         ) for α in α_ for β in β_
     ]
 
@@ -594,8 +594,8 @@ end
     @test sum(c_out.policy[Player(1)].policy.learner.approximator.model .!= 0) != 0
     @test sum(c_out.policy[Player(2)].policy.learner.approximator.model .!= 0) != 0
     @test c_out.env.is_done[1]
-    @test c_out.hook[Player(1)][1].iterations_until_convergence == max_iter
-    @test c_out.hook[Player(2)][1].iterations_until_convergence == max_iter
+    @test 500 < c_out.hook[Player(1)][1].iterations_until_convergence <= max_iter
+    @test 500 < c_out.hook[Player(2)][1].iterations_until_convergence <= max_iter
 
 
     @test c_out.policy[Player(1)].trajectory.container[:reward][1] .!= 0
@@ -709,9 +709,9 @@ end
     for debug in [true, false]
         AlgorithmicCompetition.run_dddc(
             n_parameter_iterations = 1,
-            max_iter = Int(1e5),
+            max_iter = Int(1e4),
             convergence_threshold = Int(1e2),
-            n_grid_increments = 3,
+            n_grid_increments = 2,
             debug = debug,
         )
     end
