@@ -16,5 +16,8 @@ export VERSION="2024-07-23-dddc-full-strong-weak-grid"
 export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
 export DEBUG=0
 echo "Bash: Running DDDC with $N_GRID_INCREMENTS grid increments"
-julia --project=. src/dddc_slurm_batch.jl
 
+module reset
+module load system singularity
+
+singularity run /scratch/hpc-prf-irddcc/algorithmiccompetition.jl_main.sif julia --project=/algcomp /algcomp/src/dddc_slurm_batch.jl
