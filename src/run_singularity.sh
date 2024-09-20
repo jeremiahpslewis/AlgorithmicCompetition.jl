@@ -14,7 +14,11 @@ cd AlgorithmicCompetition.jl || exit
 git pull
 
 module load system singularity
-rm algorithmiccompetition.jl_main.sif
+
+if [ -f algorithmiccompetition.jl_main.sif ]; then
+    rm algorithmiccompetition.jl_main.sif
+fi
+
 singularity pull docker://ghcr.io/jeremiahpslewis/algorithmiccompetition.jl:main
 
 mkdir -p log # Log directory for slurm task output
