@@ -512,7 +512,7 @@ end
             δ,
             max_iter,
             competition_solution_dict;
-            convergence_threshold = 100,
+            convergence_threshold = 1000,
         ) for α in α_ for β in β_
     ]
 
