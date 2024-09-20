@@ -6,7 +6,7 @@
 #SBATCH --mem-per-cpu=1600M
 #SBATCH --cpus-per-task=128 # 128 core
 #SBATCH --time=20:00:00 # For full run true value should be <13 hours
-#SBATCH -p express
+#SBATCH -p normal
 #SBATCH --mail-user=irddcc1@mail.uni-paderborn.de   # Where to send mail	
 
 # For full version, N_GRID_INCREMENTS=100
@@ -20,9 +20,9 @@ echo "Bash: Running DDDC with $N_GRID_INCREMENTS grid increments"
 module reset
 module load system singularity
 
-export SINGULARITYENV_SLURM_ARRAY_TASK_ID=$SLURM_ARRAY_TASK_ID
-export SINGULARITYENV_SLURM_ARRAY_JOB_ID=$SLURM_ARRAY_JOB_ID
-export SINGULARITYENV_SLURM_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK
+export SINGULARITYENV_SLURM_ARRAY_TASK_ID="$SLURM_ARRAY_TASK_ID"
+export SINGULARITYENV_SLURM_ARRAY_JOB_ID="$SLURM_ARRAY_JOB_ID"
+export SINGULARITYENV_SLURM_CPUS_PER_TASK="$SLURM_CPUS_PER_TASK"
 
 singularity run algorithmiccompetition.jl_main.sif julia --project=/algcomp /algcomp/src/dddc_slurm_batch.jl
 

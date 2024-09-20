@@ -22,6 +22,17 @@ SLURM_ARRAY_TASK_ID = parse(Int, ENV["SLURM_ARRAY_TASK_ID"])
 SLURM_ARRAY_JOB_ID = parse(Int, ENV["SLURM_ARRAY_JOB_ID"])
 n_cores = parse(Int, ENV["SLURM_CPUS_PER_TASK"])
 n_grid_increments = parse(Int, ENV["N_GRID_INCREMENTS"])
+n_parameter_iterations = parse(Int, ENV["N_PARAMETER_ITERATIONS"])
+
+params = Dict(
+    "debug" => debug,
+    "SLURM_ARRAY_TASK_ID" => SLURM_ARRAY_TASK_ID,
+    "SLURM_ARRAY_JOB_ID" => SLURM_ARRAY_JOB_ID,
+    "n_cores" => n_cores,
+    "n_grid_increments" => n_grid_increments,
+    "n_parameter_iterations" => n_parameter_iterations,
+)
+println("Parameters: $params")
 
 # Overrride in case of debugging
 if debug && Sys.isapple()
@@ -51,7 +62,7 @@ else
     AlgorithmicCompetition.run_dddc(
         version = ENV["VERSION"],
         start_timestamp = now(),
-        n_parameter_iterations = ENV["N_PARAMETER_ITERATIONS"],
+        n_parameter_iterations = n_parameter_iterations,
         n_grid_increments = n_grid_increments,
         batch_size = 20,
         batch_metadata = (
