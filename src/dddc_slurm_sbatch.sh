@@ -10,7 +10,7 @@
 #SBATCH --mail-user=irddcc1@mail.uni-paderborn.de   # Where to send mail	
 
 # For full version, N_GRID_INCREMENTS=100
-export N_GRID_INCREMENTS=20
+export N_GRID_INCREMENTS=100 # Number of grid increments
 export N_PARAMETER_ITERATIONS=1 # Number of iterations over all parameter sets per job
 export VERSION="2024-07-23-dddc-full-strong-weak-grid"
 export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
