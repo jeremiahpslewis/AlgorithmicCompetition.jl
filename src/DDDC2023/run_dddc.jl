@@ -62,7 +62,8 @@ function run_dddc(;
         ) for frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for
         weak_signal_quality_level in signal_quality_level_range for
-        strong_signal_quality_level in signal_quality_level_range if weak_signal_quality_level <= strong_signal_quality_level
+        strong_signal_quality_level in signal_quality_level_range if
+        weak_signal_quality_level <= strong_signal_quality_level
     ]
 
     hyperparameter_vect = [
@@ -98,7 +99,7 @@ function run_dddc(;
             version = version,
             SLURM_ARRAY_JOB_ID = batch_metadata.SLURM_ARRAY_JOB_ID,
             debug = debug,
-        )),        
+        )),
         savename((
             start_timestamp = start_timestamp,
             SLURM_ARRAY_TASK_ID = batch_metadata.SLURM_ARRAY_TASK_ID,

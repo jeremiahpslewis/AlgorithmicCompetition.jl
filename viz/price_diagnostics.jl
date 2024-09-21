@@ -3,7 +3,8 @@ using CairoMakie
 using DataFrames
 using Chain
 using DataFrameMacros
-using AlgorithmicCompetition: CompetitionParameters, AIAPCHyperParameters, DDDCHyperParameters
+using AlgorithmicCompetition:
+    CompetitionParameters, AIAPCHyperParameters, DDDCHyperParameters
 
 max_profit_for_price(
     price::Float64,
