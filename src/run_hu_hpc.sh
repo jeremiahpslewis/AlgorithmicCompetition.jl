@@ -15,11 +15,7 @@ cd AlgorithmicCompetition.jl || exit
 
 git pull
 
-if [ -f algorithmiccompetition.jl_main.sif ]; then
-    rm algorithmiccompetition.jl_main.sif
-fi
-
-apptainer pull docker://ghcr.io/jeremiahpslewis/algorithmiccompetition.jl:main
+apptainer pull --force docker://ghcr.io/jeremiahpslewis/algorithmiccompetition.jl:main
 
 mkdir -p log # Log directory for slurm task output
 
