@@ -5,6 +5,10 @@
 # or
 # TASK=AIAPC bash src/run_pc2.sh
 
+module reset
+
+mkdir -p $HOME/data
+
 export APPTAINER_CACHEDIR=/lustre/department/lewisjps/apptainer
 
 cd /lustre/wiwi/lewisjps || exit
