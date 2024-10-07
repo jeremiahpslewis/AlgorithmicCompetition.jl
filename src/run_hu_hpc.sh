@@ -20,7 +20,7 @@ apptainer pull --force docker://ghcr.io/jeremiahpslewis/algorithmiccompetition.j
 mkdir -p log # Log directory for slurm task output
 
 if [[ "$TASK" == "DDDC" ]]; then
-    sbatch src/dddc_slurm_sbatch.sh
+    sbatch src/dddc_slurm_hu_sbatch.sh
 elif [[ "$TASK" == "AIAPC" ]]; then
     sbatch src/aiapc_slurm_sbatch.sh
 fi
