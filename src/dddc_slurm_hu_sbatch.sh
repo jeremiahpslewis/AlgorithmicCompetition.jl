@@ -5,14 +5,14 @@
 #SBATCH --array=1-5 # Number of iterations over all parameter sets
 #SBATCH --mem-per-cpu=1600M
 #SBATCH --cpus-per-task=64 # 128 core
-#SBATCH --time=1:00:00 # For full run true value should be <13 hours
+#SBATCH --time=16:00:00 # For full run true value should be <13 hours
 #SBATCH -p std
 
 # For full version, N_GRID_INCREMENTS=100
-export N_GRID_INCREMENTS=20
+export N_GRID_INCREMENTS=100 # Number of grid increments
 export N_PARAMETER_ITERATIONS=1 # Number of iterations over all parameter sets per job
 export VERSION="2024-10-07-dddc-hu-test"
-export DEBUG=1
+export DEBUG=0
 echo "Bash: Running DDDC with $N_GRID_INCREMENTS grid increments"
 
 export APPTAINERENV_SLURM_ARRAY_TASK_ID="$SLURM_ARRAY_TASK_ID"
