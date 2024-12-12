@@ -7,8 +7,6 @@
 
 module reset
 
-mkdir -p $HOME/data
-
 export APPTAINER_CACHEDIR=/lustre/department/lewisjps/apptainer
 
 cd /lustre/wiwi/lewisjps || exit
