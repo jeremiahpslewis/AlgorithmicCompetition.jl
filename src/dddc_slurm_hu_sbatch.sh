@@ -10,7 +10,7 @@
 
 # For full version, N_GRID_INCREMENTS=100
 export N_GRID_INCREMENTS=20 # Number of grid increments
-export N_PARAMETER_ITERATIONS=2 # Number of iterations over all parameter sets per job
+export N_PARAMETER_ITERATIONS=3 # Number of iterations over all parameter sets per job
 export VERSION="2024-12-05-dddc-hu-test"
 export DEBUG=0
 echo "Bash: Running DDDC with $N_GRID_INCREMENTS grid increments"

@@ -22,11 +22,11 @@ using Arrow
 include("viz/price_diagnostics.jl")
 
 rebuild_summary_files = false
-rebuild_overall_summary = false
+rebuild_overall_summary = true
 df_summary_arrow_cache_path = "data_final/dddc_v0.0.9_data_summary.arrow"
 
 arrow_folders = filter!(
-   x -> occursin(r"2024-07-23-dddc-full-strong-weak-grid", x),
+   x -> occursin(r"dddc_version=2024-12-05-dddc-hu-test", x),
     readdir("data", join = true),
 )
 arrow_files = vcat([filter(y -> occursin(".arrow", y), readdir(x, join=true)) for x in arrow_folders]...)
@@ -61,13 +61,14 @@ if rebuild_overall_summary
 
     df_summary = vcat(arrows_...)
     df_summary = reduce_dddc(df_summary)#, round_parameters=false)
+    mkpath("data_final")
     Arrow.write(df_summary_arrow_cache_path, df_summary)
 end
 # mkpath("data_final")
 # arrow_file_name = "data_final/dddc_v0.0.8_data.arrow"
 # Arrow.write(arrow_file_name, df_)
 
-# mkpath("plots/dddc")
+mkpath("plots/dddc")
 # df_ = DataFrame(Arrow.read(arrow_file_name))
 
 # n_simulations_dddc = @chain df_ @subset(
