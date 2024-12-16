@@ -5,7 +5,11 @@
 # or
 # TASK=AIAPC bash src/run_pc2.sh
 
-cd /scratch/hpc-prf-irddcc || exit
+module reset
+
+export APPTAINER_CACHEDIR=/lustre/department/lewisjps/apptainer
+
+cd /lustre/wiwi/lewisjps || exit
 
 [ ! -d 'AlgorithmicCompetition.jl' ] && git clone https://github.com/jeremiahpslewis/AlgorithmicCompetition.jl.git
 
@@ -13,13 +17,7 @@ cd AlgorithmicCompetition.jl || exit
 
 git pull
 
-module load system singularity
-
-if [ -f algorithmiccompetition.jl_main.sif ]; then
-    rm algorithmiccompetition.jl_main.sif
-fi
-
-singularity pull docker://ghcr.io/jeremiahpslewis/algorithmiccompetition.jl:main
+apptainer pull --force docker://ghcr.io/jeremiahpslewis/algorithmiccompetition.jl:main
 
 mkdir -p log # Log directory for slurm task output
 
