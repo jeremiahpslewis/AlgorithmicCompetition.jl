@@ -70,7 +70,7 @@ function run_dddc(;
     hyperparameter_vect = [
         DDDCHyperParameters(
             α,
-            ν_inverse(15, 2, 1, ν_tilde(ν_, frequency_high_demand, weak_signal_quality_level)) # \beta value
+            ν_inverse(15, 2, 1, ν_tilde(ν_, frequency_high_demand, weak_signal_quality_level)), # \beta value
             δ,
             max_iter,
             competition_solution_dict,
