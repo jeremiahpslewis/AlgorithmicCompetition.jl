@@ -50,9 +50,11 @@ function run_dddc(;
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
     α = Float64(0.15)
-    β = Float64(4e-1)
+    ν_ = 20.0 # From Calvano 2020
+    frequency_high_demand = 0.3
+    weak_signal_quality_level = 0.1
     δ = 0.95
-
+    
     data_demand_digital_param_set = [
         DataDemandDigitalParams(
             weak_signal_quality_level = weak_signal_quality_level,
@@ -68,7 +70,7 @@ function run_dddc(;
     hyperparameter_vect = [
         DDDCHyperParameters(
             α,
-            β,
+            ν_inverse(15, 2, 1, ν_tilde(ν_, frequency_high_demand, weak_signal_quality_level)) # \beta value
             δ,
             max_iter,
             competition_solution_dict,
