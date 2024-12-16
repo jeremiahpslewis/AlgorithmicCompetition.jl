@@ -48,3 +48,8 @@ function ν_tilde(ν_, frequency_high_demand, weak_signal_quality_level)
     signal_distribution_correction = frequency_least_frequent_signal_value(frequency_high_demand, weak_signal_quality_level)^2
     return ν_ / signal_distribution_correction
 end
+
+# @test ν_inverse(15, 2, 1, ν_tilde(ν_, 0.5, 0.5)) ≈ 1.0754475510580863e-6
+
+# @test ν_inverse(15, 2, 1, ν_tilde(ν_, 0.9, 0.1)) ≈ ν_inverse(15, 2, 1, ν_tilde(ν_, 0.1, 0.9))
+
