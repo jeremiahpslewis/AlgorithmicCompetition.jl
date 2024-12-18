@@ -7,6 +7,7 @@
 #SBATCH --cpus-per-task=32 # 128 core
 #SBATCH --time=24:00:00 # For full run true value should be <13 hours
 #SBATCH --partition standard
+#SBATCH --unbuffered
 
 # For full version, N_GRID_INCREMENTS=100
 export N_GRID_INCREMENTS=20 # Number of grid increments
@@ -19,5 +20,5 @@ export APPTAINERENV_SLURM_ARRAY_TASK_ID="$SLURM_ARRAY_TASK_ID"
 export APPTAINERENV_SLURM_ARRAY_JOB_ID="$SLURM_ARRAY_JOB_ID"
 export APPTAINERENV_SLURM_CPUS_PER_TASK="$SLURM_CPUS_PER_TASK"
 
-apptainer run algorithmiccompetition.jl_main.sif julia --project=/algcomp /algcomp/src/dddc_slurm_batch.jl
+stdbuf -oL -eL apptainer run algorithmiccompetition.jl_main.sif julia --project=/algcomp /algcomp/src/dddc_slurm_batch.jl
 
