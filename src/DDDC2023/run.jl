@@ -35,6 +35,6 @@ end
 Runs the experiment and returns the economic summary.
 """
 function run_and_extract(hyperparameters::DDDCHyperParameters; stop_on_convergence = true)
-    println("Running single simulation with hyperparameters: $hyperparameters")
+    @info "Running single simulation with hyperparameters: $hyperparameters"
     economic_summary(run(hyperparameters; stop_on_convergence = stop_on_convergence))
 end

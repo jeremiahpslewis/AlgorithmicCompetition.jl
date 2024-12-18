@@ -1,9 +1,9 @@
-println("Loading packages.")
+@info "Loading AlgComp packages."
 using AlgorithmicCompetition
 using Dates
 using Distributed
 
-println("Running DDDC batch.")
+@info "Running DDDC batch."
 
 if Sys.isapple()
     # For debugging on MacOS
@@ -32,7 +32,7 @@ params = Dict(
     "n_grid_increments" => n_grid_increments,
     "n_parameter_iterations" => n_parameter_iterations,
 )
-println("Parameters: $params")
+@info "Parameters: $params"
 
 # Overrride in case of debugging
 if debug && Sys.isapple()
@@ -58,7 +58,7 @@ end
 if debug && SLURM_ARRAY_TASK_ID > 10
     return
 else
-    println("Julia: Running DDDC batch with n_grid_increments = $n_grid_increments.")
+    @info "Running DDDC batch with n_grid_increments = $n_grid_increments."
     AlgorithmicCompetition.run_dddc(
         version = ENV["VERSION"],
         start_timestamp = now(),

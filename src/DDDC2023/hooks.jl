@@ -64,4 +64,5 @@ end
 # Make the hook table compatible with Tables.jl / accessible as DataFrame
 Tables.istable(::Type{DDDCTotalRewardPerLastNEpisodes}) = true
 Tables.columnaccess(::Type{DDDCTotalRewardPerLastNEpisodes}) = true
-Tables.columns(h::DDDCTotalRewardPerLastNEpisodes) = (; rewards = h.rewards, demand_state_high_vect = h.demand_state_high_vect)
+Tables.columns(h::DDDCTotalRewardPerLastNEpisodes) =
+    (; rewards = h.rewards, demand_state_high_vect = h.demand_state_high_vect)
