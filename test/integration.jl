@@ -607,7 +607,10 @@ end
           c_out.hook[Player(2)][1].best_response_vector
 
 
-    @test mean(argmax(c_out.policy[Player(1)].policy.learner.approximator.model, dims=1) .!= argmax(c_out.policy[Player(2)].policy.learner.approximator.model, dims=1)) < 0.98
+    @test mean(
+        argmax(c_out.policy[Player(1)].policy.learner.approximator.model, dims = 1) .!=
+        argmax(c_out.policy[Player(2)].policy.learner.approximator.model, dims = 1),
+    ) < 0.98
 
     for i in [Player(1), Player(2)]
         @test c_out.hook[i][1].convergence_duration >= 0
