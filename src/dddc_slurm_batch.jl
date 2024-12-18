@@ -1,3 +1,7 @@
+using Logging
+debuglogger = ConsoleLogger(stderr, Logging.Info)
+global_logger(debuglogger)
+
 @info "Loading AlgComp packages."
 using AlgorithmicCompetition
 using Dates
