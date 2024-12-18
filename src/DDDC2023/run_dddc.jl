@@ -82,9 +82,9 @@ function run_dddc(;
     # Shuffle hyperparameter_vect, extend according to number of repetitions
     hyperparameter_vect = shuffle(repeat(hyperparameter_vect, n_parameter_iterations))
     exp_list = DDDCSummary[]
-    println(
-        "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times",
-    )
+
+    @info "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times"
+
     exp_list_ = @showprogress pmap(
         run_and_extract,
         hyperparameter_vect;

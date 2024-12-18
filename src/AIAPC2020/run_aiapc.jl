@@ -85,9 +85,8 @@ function run_aiapc(;
         1,
     )
 
-    println(
-        "About to run $(length(hyperparameter_vect)) parameter settings, each $n_parameter_iterations times",
-    )
+    
+    @info "About to run $(length(hyperparameter_vect)) parameter settings, each $n_parameter_iterations times"
 
     start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd__HH_MM_SS")
     folder_name = joinpath(
@@ -105,7 +104,7 @@ function run_aiapc(;
     mkpath(folder_name)
 
     for i = 1:n_parameter_iterations
-        println("Parameter iteration $i of $n_parameter_iterations")
+        @info "Parameter iteration $i of $n_parameter_iterations"
         file_name =
             joinpath(folder_name, savename((parameter_iteration = i, suffix = "arrow")))
         exp_list_ = AIAPCSummary[]
