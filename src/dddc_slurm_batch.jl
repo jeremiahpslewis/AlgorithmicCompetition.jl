@@ -1,4 +1,5 @@
 using Logging
+using LoggingExtras
 
 debuglogger = FormatLogger(println, stderr)
 global_logger(debuglogger)
