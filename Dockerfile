@@ -1,4 +1,4 @@
-FROM julia:1.11-alpine
+FROM julia:1.10
 
 RUN mkdir /depot
 ENV JULIA_PATH=/usr/local/julia
