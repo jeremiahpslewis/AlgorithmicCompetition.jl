@@ -1,6 +1,6 @@
 using Logging
 
-debuglogger = FormatLogger(println, stdout)
+debuglogger = FormatLogger(println, stderr)
 global_logger(debuglogger)
 
 @info "Loading AlgComp packages."
