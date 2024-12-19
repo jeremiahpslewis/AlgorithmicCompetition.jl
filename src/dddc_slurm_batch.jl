@@ -1,6 +1,6 @@
 using Logging
 
-debuglogger = ConsoleLogger(stderr, Logging.Info)
+debuglogger = FormatLogger(println, stderr)
 global_logger(debuglogger)
 
 @info "Loading AlgComp packages."
