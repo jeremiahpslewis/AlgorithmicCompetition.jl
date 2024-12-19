@@ -1,7 +1,12 @@
 using Logging
 using LoggingExtras
 
-debuglogger = FormatLogger(println, stderr)
+f_logger = FormatLogger(stderr) do io, args
+    println(io, args._module, " | ", "[", args.level, "] ", args.message)
+end
+
+debuglogger = MinLevelLogger(f_logger, Logging.Info)
+
 global_logger(debuglogger)
 
 @info "Loading AlgComp packages."
