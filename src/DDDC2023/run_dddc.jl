@@ -89,11 +89,16 @@ function run_dddc(;
     hyperparameter_vect = shuffle(repeat(hyperparameter_vect, n_parameter_iterations))
     exp_list = DDDCSummary[]
 
+    @info "Run single parameter smoke test."
+    exp_res = run_and_extract(hyperparameter_vect[1])
+    @info "Smoke test successful."
+    push!(exp_list, exp_res)
+
     @info "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times"
 
     exp_list_ = @showprogress pmap(
         run_and_extract,
-        hyperparameter_vect;
+        hyperparameter_vect[2:end];
         on_error = identity,
         batch_size = batch_size,
     )
