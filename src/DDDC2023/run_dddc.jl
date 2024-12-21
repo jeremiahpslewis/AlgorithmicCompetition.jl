@@ -91,7 +91,7 @@ function run_dddc(;
 
     @info "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times"
 
-    exp_list_ = @showprogress @distributed for i in 1:size(hyperparameter_vect)
+    exp_list_ = @showprogress @distributed for i = 1:size(hyperparameter_vect)
         append!(exp_list_, run_and_extract(hyperparameter_vect[i]))
     end
 
