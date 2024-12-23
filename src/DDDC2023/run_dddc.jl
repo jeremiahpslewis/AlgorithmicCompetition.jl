@@ -28,6 +28,7 @@ function run_dddc(;
     batch_size = 1,
     batch_metadata = (SLURM_ARRAY_JOB_ID = 0, SLURM_ARRAY_TASK_ID = 0),
     debug = false,
+    precompile = false,
 )
     # signal_quality_vect = [[true, false], [false, false]]
     signal_quality_vect = [[true, false]] # With signal_quality_range over both weak and strong, [false, false] case is redundant
@@ -113,9 +114,13 @@ function run_dddc(;
     )
     mkpath(folder_name)
     df = extract_sim_results(exp_list)
-    Arrow.write(folder_name * ".arrow", df)
+    if !precompile
+        Arrow.write(folder_name * ".arrow", df)
+    end
     df = expand_and_extract_dddc(df)
     df_summary = construct_df_summary_dddc(df)
-    Arrow.write(folder_name * "_df_summary.arrow", df_summary)
+    if !precompile
+        Arrow.write(folder_name * "_df_summary.arrow", df_summary)
+    end
     return exp_list
 end

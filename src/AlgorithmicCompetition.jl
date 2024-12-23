@@ -16,6 +16,7 @@ include("DDDC2023/DDDC2023.jl")
         convergence_threshold = Int(1e2),
         n_grid_increments = 2,
         debug = false,
+        precompile = true,
     )
 end
 
