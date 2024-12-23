@@ -20,6 +20,11 @@ if params[:debug] && Sys.isapple()
     params[:n_grid_increments] = 2
 elseif params[:debug]
     params[:n_grid_increments] = 10
+    params[:max_iter] = Int(1e6)
+    params[:convergence_threshold] = Int(1e2)
+else
+    params[:max_iter] = Int(1e9)
+    params[:convergence_threshold] = Int(1e5)
 end
 
 if params[:n_cores] > 1
@@ -39,11 +44,11 @@ if params[:n_cores] > 1
 
         params = extract_params_from_environment()
         f_logger = FileLogger("log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
-        
+
         debuglogger = MinLevelLogger(f_logger, Logging.Info)
-        
+
         global_logger(debuglogger)
-        
+
     end
 end
 
@@ -61,6 +66,8 @@ else
             SLURM_ARRAY_JOB_ID = params[:SLURM_ARRAY_JOB_ID],
             SLURM_ARRAY_TASK_ID = params[:SLURM_ARRAY_TASK_ID],
         ),
+        max_iter = params[:max_iter],
+        convergence_threshold = params[:convergence_threshold],
         debug = params[:debug],
     )
 end
