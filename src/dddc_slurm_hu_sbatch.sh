@@ -12,7 +12,7 @@
 export N_GRID_INCREMENTS=20 # Number of grid increments
 export N_PARAMETER_ITERATIONS=1 # Number of iterations over all parameter sets per job
 export VERSION="2024-12-16-dddc-dynamic-epsilon-greedy-beta"
-export DEBUG=0
+export DEBUG=1
 echo "Bash: Running DDDC with $N_GRID_INCREMENTS grid increments"
 
 export APPTAINERENV_SLURM_ARRAY_TASK_ID="$SLURM_ARRAY_TASK_ID"
