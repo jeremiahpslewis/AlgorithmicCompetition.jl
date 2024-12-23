@@ -4,7 +4,7 @@ using AlgorithmicCompetition
 using Dates
 using Distributed
 
-params = extract_params_from_environment()
+params = AlgorithmicCompetition.extract_params_from_environment()
 
 @info "Parameters: $params"
 
