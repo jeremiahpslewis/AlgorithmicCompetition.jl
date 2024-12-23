@@ -1,43 +1,17 @@
-if Sys.isapple()
-    # For debugging on MacOS
-    ENV["DEBUG"] = 0
-    ENV["SLURM_ARRAY_TASK_ID"] = 1
-    ENV["SLURM_ARRAY_JOB_ID"] = 1
-    ENV["SLURM_CPUS_PER_TASK"] = 6
-    ENV["VERSION"] = "v1"
-    ENV["N_GRID_INCREMENTS"] = 20
-    ENV["N_PARAMETER_ITERATIONS"] = 5
-end
-
-debug = parse(Int, ENV["DEBUG"]) == 1
-SLURM_ARRAY_TASK_ID = parse(Int, ENV["SLURM_ARRAY_TASK_ID"])
-SLURM_ARRAY_JOB_ID = parse(Int, ENV["SLURM_ARRAY_JOB_ID"])
-n_cores = parse(Int, ENV["SLURM_CPUS_PER_TASK"])
-n_grid_increments = parse(Int, ENV["N_GRID_INCREMENTS"])
-n_parameter_iterations = parse(Int, ENV["N_PARAMETER_ITERATIONS"])
-
-params = Dict(
-    :debug => debug,
-    :SLURM_ARRAY_TASK_ID => SLURM_ARRAY_TASK_ID,
-    :SLURM_ARRAY_JOB_ID => SLURM_ARRAY_JOB_ID,
-    :n_cores => n_cores,
-    :n_grid_increments => n_grid_increments,
-    :n_parameter_iterations => n_parameter_iterations,
-)
-@info "Parameters: $params"
-
 using Logging
 using LoggingExtras
+using AlgorithmicCompetition
+using Dates
+using Distributed
+
+params = extract_params_from_environment()
+
+@info "Parameters: $params"
 
 f_logger = FileLogger("log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
 debuglogger = MinLevelLogger(f_logger, Logging.Info)
 
 global_logger(debuglogger)
-
-@info "Loading AlgComp packages."
-using AlgorithmicCompetition
-using Dates
-using Distributed
 
 @info "Running DDDC batch."
 
@@ -57,12 +31,13 @@ if params[:n_cores] > 1
 
     @everywhere begin
         using Logging
-        using LoggingExtras
+        using LoggingExtras: FileLogger, MinLevelLogger
 
         using Pkg
         Pkg.instantiate()
-        using AlgorithmicCompetition: run_and_extract
+        using AlgorithmicCompetition: run_and_extract, extract_params_from_environment
 
+        params = extract_params_from_environment()
         f_logger = FileLogger("log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
         
         debuglogger = MinLevelLogger(f_logger, Logging.Info)
