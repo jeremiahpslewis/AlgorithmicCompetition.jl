@@ -93,7 +93,7 @@ function run_dddc(;
 
     exp_list = @distributed for hp in hyperparameter_vect
         try
-            append!(exp_list, run_and_extract(hp))
+            push!(exp_list, run_and_extract(hp))
         catch e
             @warn e
         end
