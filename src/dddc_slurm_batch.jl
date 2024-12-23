@@ -1,18 +1,3 @@
-using Logging
-using LoggingExtras
-
-f_logger = FileLogger("log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
-debuglogger = MinLevelLogger(f_logger, Logging.Info)
-
-global_logger(debuglogger)
-
-@info "Loading AlgComp packages."
-using AlgorithmicCompetition
-using Dates
-using Distributed
-
-@info "Running DDDC batch."
-
 if Sys.isapple()
     # For debugging on MacOS
     ENV["DEBUG"] = 0
@@ -23,7 +8,6 @@ if Sys.isapple()
     ENV["N_GRID_INCREMENTS"] = 20
     ENV["N_PARAMETER_ITERATIONS"] = 5
 end
-
 
 debug = parse(Int, ENV["DEBUG"]) == 1
 SLURM_ARRAY_TASK_ID = parse(Int, ENV["SLURM_ARRAY_TASK_ID"])
@@ -41,6 +25,21 @@ params = Dict(
     "n_parameter_iterations" => n_parameter_iterations,
 )
 @info "Parameters: $params"
+
+using Logging
+using LoggingExtras
+
+f_logger = FileLogger("log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
+debuglogger = MinLevelLogger(f_logger, Logging.Info)
+
+global_logger(debuglogger)
+
+@info "Loading AlgComp packages."
+using AlgorithmicCompetition
+using Dates
+using Distributed
+
+@info "Running DDDC batch."
 
 # Overrride in case of debugging
 if debug && Sys.isapple()
