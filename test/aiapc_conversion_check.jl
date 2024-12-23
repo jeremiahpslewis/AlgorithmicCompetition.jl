@@ -40,7 +40,7 @@ function test_key_AIAPC_points(; n_parameter_iterations = 1000)
             (competition_solution_dict,),
         )
     exp_list_ = AIAPCSummary[]
-    exp_list = @showprogress pmap(
+    exp_list = pmap(
         run_and_extract,
         shuffle(repeat(hyperparameter_vect, n_parameter_iterations));
         on_error = identity,

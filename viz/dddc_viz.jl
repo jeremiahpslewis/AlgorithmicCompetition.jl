@@ -41,7 +41,7 @@ df_raw_ = arrow_files[.!is_summary_file]
 
 if rebuild_summary_files
     rm.(df_summary_)
-    @showprogress for i in eachindex(df_raw_)
+    for i in eachindex(df_raw_)
         df = DataFrame(Arrow.Table(df_raw_[i]))
         if nrow(df) > 0
             df = expand_and_extract_dddc(df)

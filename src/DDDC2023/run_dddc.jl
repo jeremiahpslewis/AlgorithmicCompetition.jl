@@ -1,4 +1,3 @@
-import ProgressMeter: @showprogress
 using Distributed
 using Random
 using StatsBase

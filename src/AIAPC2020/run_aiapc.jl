@@ -1,4 +1,3 @@
-import ProgressMeter: @showprogress
 using Distributed
 using Random
 using StatsBase
@@ -108,7 +107,7 @@ function run_aiapc(;
         file_name =
             joinpath(folder_name, savename((parameter_iteration = i, suffix = "arrow")))
         exp_list_ = AIAPCSummary[]
-        exp_list = @showprogress pmap(
+        exp_list = pmap(
             run_and_extract,
             hyperparameter_vect;
             on_error = identity,

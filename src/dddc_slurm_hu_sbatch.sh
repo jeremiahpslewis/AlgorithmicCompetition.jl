@@ -23,4 +23,4 @@ module load julia
 
 # apptainer run algorithmiccompetition.jl_main.sif julia --project=/algcomp /algcomp/src/dddc_slurm_batch.jl
 
-julia --project=. dddc_slurm_batch.jl
+julia --project=. src/dddc_slurm_batch.jl
