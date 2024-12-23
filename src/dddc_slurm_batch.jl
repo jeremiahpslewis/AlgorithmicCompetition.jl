@@ -52,7 +52,7 @@ if params[:n_cores] > 1
     end
 end
 
-if params[:debug] && SLURM_ARRAY_TASK_ID > 10
+if params[:debug] && params[:SLURM_ARRAY_TASK_ID] > 10
     return
 else
     @info "Running DDDC batch with n_grid_increments = $(params[:n_grid_increments])."
