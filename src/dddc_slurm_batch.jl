@@ -15,20 +15,6 @@ global_logger(debuglogger)
 
 @info "Running DDDC batch."
 
-# Overrride in case of debugging
-if params[:debug] && Sys.isapple()
-    params[:n_grid_increments] = 2
-    params[:max_iter] = Int(1e9)
-    params[:convergence_threshold] = Int(1e5)
-elseif params[:debug]
-    params[:n_grid_increments] = 10
-    params[:max_iter] = Int(1e6)
-    params[:convergence_threshold] = Int(1e2)
-else
-    params[:max_iter] = Int(1e9)
-    params[:convergence_threshold] = Int(1e5)
-end
-
 if params[:n_cores] > 1
     _procs = addprocs(
         params[:n_cores],

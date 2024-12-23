@@ -82,6 +82,21 @@ function extract_params_from_environment()
     n_grid_increments = parse(Int, ENV["N_GRID_INCREMENTS"])
     n_parameter_iterations = parse(Int, ENV["N_PARAMETER_ITERATIONS"])
 
+    # Overrride in case of debugging
+    if params[:debug] && Sys.isapple()
+        params[:n_grid_increments] = 2
+        params[:max_iter] = Int(1e9)
+        params[:convergence_threshold] = Int(1e5)
+    elseif params[:debug]
+        params[:n_grid_increments] = 10
+        params[:max_iter] = Int(1e6)
+        params[:convergence_threshold] = Int(1e2)
+    else
+        params[:max_iter] = Int(1e9)
+        params[:convergence_threshold] = Int(1e5)
+    end
+
+
     params = Dict(
         :debug => debug,
         :SLURM_ARRAY_TASK_ID => SLURM_ARRAY_TASK_ID,
