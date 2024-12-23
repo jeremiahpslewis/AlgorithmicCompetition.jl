@@ -19,6 +19,8 @@ git pull
 
 apptainer pull --force docker://ghcr.io/jeremiahpslewis/algorithmiccompetition.jl:main
 
+# julia -e 'using Pkg; Pkg.activate("."); Pkg.update(); Pkg.instantiate(); Pkg.precompile()'
+
 mkdir -p log # Log directory for slurm task output
 
 if [[ "$TASK" == "DDDC" ]]; then
