@@ -82,6 +82,15 @@ function extract_params_from_environment()
     n_grid_increments = parse(Int, ENV["N_GRID_INCREMENTS"])
     n_parameter_iterations = parse(Int, ENV["N_PARAMETER_ITERATIONS"])
 
+    params = Dict(
+        :debug => debug,
+        :SLURM_ARRAY_TASK_ID => SLURM_ARRAY_TASK_ID,
+        :SLURM_ARRAY_JOB_ID => SLURM_ARRAY_JOB_ID,
+        :n_cores => n_cores,
+        :n_grid_increments => n_grid_increments,
+        :n_parameter_iterations => n_parameter_iterations,
+    )
+
     # Overrride in case of debugging
     if params[:debug] && Sys.isapple()
         params[:n_grid_increments] = 2
@@ -97,12 +106,4 @@ function extract_params_from_environment()
     end
 
 
-    params = Dict(
-        :debug => debug,
-        :SLURM_ARRAY_TASK_ID => SLURM_ARRAY_TASK_ID,
-        :SLURM_ARRAY_JOB_ID => SLURM_ARRAY_JOB_ID,
-        :n_cores => n_cores,
-        :n_grid_increments => n_grid_increments,
-        :n_parameter_iterations => n_parameter_iterations,
-    )
 end
