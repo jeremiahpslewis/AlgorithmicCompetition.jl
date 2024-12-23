@@ -18,6 +18,8 @@ global_logger(debuglogger)
 # Overrride in case of debugging
 if params[:debug] && Sys.isapple()
     params[:n_grid_increments] = 2
+    params[:max_iter] = Int(1e9)
+    params[:convergence_threshold] = Int(1e5)
 elseif params[:debug]
     params[:n_grid_increments] = 10
     params[:max_iter] = Int(1e6)
