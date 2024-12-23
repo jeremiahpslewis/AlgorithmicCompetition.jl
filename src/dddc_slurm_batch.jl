@@ -1,10 +1,7 @@
 using Logging
 using LoggingExtras
 
-f_logger = FormatLogger(stderr) do io, args
-    println(io, args._module, " | ", "[", args.level, "] ", args.message)
-end
-
+f_logger = FileLogger("log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
 debuglogger = MinLevelLogger(f_logger, Logging.Info)
 
 global_logger(debuglogger)
@@ -67,9 +64,7 @@ if n_cores > 1
         Pkg.instantiate()
         using AlgorithmicCompetition: run_and_extract
 
-        f_logger = FormatLogger(stderr) do io, args
-            println(io, args._module, " | ", "[", args.level, "] ", args.message)
-        end
+        f_logger = FileLogger("log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
         
         debuglogger = MinLevelLogger(f_logger, Logging.Info)
         
