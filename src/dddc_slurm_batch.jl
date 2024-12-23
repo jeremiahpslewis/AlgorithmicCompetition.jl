@@ -60,9 +60,21 @@ if n_cores > 1
     )
 
     @everywhere begin
+        using Logging
+        using LoggingExtras
+
         using Pkg
         Pkg.instantiate()
         using AlgorithmicCompetition: run_and_extract
+
+        f_logger = FormatLogger(stderr) do io, args
+            println(io, args._module, " | ", "[", args.level, "] ", args.message)
+        end
+        
+        debuglogger = MinLevelLogger(f_logger, Logging.Info)
+        
+        global_logger(debuglogger)
+        
     end
 end
 
