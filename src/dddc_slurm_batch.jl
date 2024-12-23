@@ -1,18 +1,12 @@
-using Logging
-using LoggingExtras
 using AlgorithmicCompetition
 using Dates
 using Distributed
 
 params = AlgorithmicCompetition.extract_params_from_environment()
 
-f_logger = FileLogger("log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
-debuglogger = MinLevelLogger(f_logger, Logging.Info)
+AlgorithmicCompetition.setup_logger(params)
 
 @info "Parameters: $params"
-
-
-global_logger(debuglogger)
 
 @info "Running DDDC batch."
 
@@ -24,20 +18,12 @@ if params[:n_cores] > 1
     )
 
     @everywhere begin
-        using Logging
-        using LoggingExtras: FileLogger, MinLevelLogger
-
         using Pkg
         Pkg.instantiate()
-        using AlgorithmicCompetition: run_and_extract, extract_params_from_environment
-
+        using AlgorithmicCompetition:
+            extract_params_from_environment, setup_logger, run_and_extract
         params = extract_params_from_environment()
-        f_logger = FileLogger("log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
-
-        debuglogger = MinLevelLogger(f_logger, Logging.Info)
-
-        global_logger(debuglogger)
-
+        setup_logger(params)
     end
 end
 

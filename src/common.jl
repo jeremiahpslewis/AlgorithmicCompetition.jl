@@ -1,6 +1,8 @@
 import Base.push!
 using ReinforcementLearning
 using DrWatson
+using Logging
+using LoggingExtras
 
 const player_to_index = Dict(Player(1) => 1, Player(2) => 2)
 const demand_to_index = (; :high => 1, :low => 2)
@@ -106,4 +108,10 @@ function extract_params_from_environment()
     end
 
     return params
+end
+
+function setup_logger(params)
+    f_logger = FileLogger("log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
+    debuglogger = MinLevelLogger(f_logger, Logging.Info)
+    global_logger(debuglogger)
 end
