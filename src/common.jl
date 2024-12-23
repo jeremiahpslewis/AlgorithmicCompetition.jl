@@ -66,15 +66,16 @@ end
 # @test ν_inverse(15, 2, 1, ν_tilde(ν_, 0.9, 0.1)) ≈ ν_inverse(15, 2, 1, ν_tilde(ν_, 0.1, 0.9))
 
 function extract_params_from_environment()
+    @info "Extracting parameters from environment variables."
     if Sys.isapple()
         # For debugging on MacOS
-        ENV["DEBUG"] = 0
+        ENV["DEBUG"] = 1
         ENV["SLURM_ARRAY_TASK_ID"] = 1
         ENV["SLURM_ARRAY_JOB_ID"] = 1
         ENV["SLURM_CPUS_PER_TASK"] = 6
         ENV["VERSION"] = "v1"
-        ENV["N_GRID_INCREMENTS"] = 20
-        ENV["N_PARAMETER_ITERATIONS"] = 5
+        ENV["N_GRID_INCREMENTS"] = 10
+        ENV["N_PARAMETER_ITERATIONS"] = 1
     end
 
     debug = parse(Int, ENV["DEBUG"]) == 1
@@ -95,7 +96,6 @@ function extract_params_from_environment()
 
     # Overrride in case of debugging
     if params[:debug] && Sys.isapple()
-        params[:n_grid_increments] = 2
         params[:max_iter] = Int(1e9)
         params[:convergence_threshold] = Int(1e5)
     elseif params[:debug]

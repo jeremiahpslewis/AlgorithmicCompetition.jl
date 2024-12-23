@@ -18,12 +18,14 @@ if params[:n_cores] > 1
     )
 
     @everywhere begin
+        @info "Load dependencies on all processes."
         using Pkg
         Pkg.instantiate()
         using AlgorithmicCompetition:
             extract_params_from_environment, setup_logger, run_and_extract
         params = extract_params_from_environment()
         setup_logger(params)
+        @info "Dependencies loaded."
     end
 end
 

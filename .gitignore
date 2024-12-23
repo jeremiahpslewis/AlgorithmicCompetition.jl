@@ -33,3 +33,4 @@ data_final/
 *.parquet
 *.arrow
 *.jld2
+log/*
