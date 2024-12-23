@@ -9,7 +9,6 @@ using AlgorithmicCompetition:
     profit_gain,
     AIAPCEnv
 using Distributed
-using ProgressMeter
 using Random
 using Chain
 using DataFrameMacros

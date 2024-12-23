@@ -5,7 +5,6 @@ using AlgebraOfGraphics
 using Statistics
 using Test
 using DataFrames
-using ProgressMeter
 
 using AlgorithmicCompetition:
     post_prob_high_low_given_signal,
