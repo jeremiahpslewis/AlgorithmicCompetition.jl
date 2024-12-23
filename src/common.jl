@@ -105,5 +105,5 @@ function extract_params_from_environment()
         params[:convergence_threshold] = Int(1e5)
     end
 
-
+    return params
 end
