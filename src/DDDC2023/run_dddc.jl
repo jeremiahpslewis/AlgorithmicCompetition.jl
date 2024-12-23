@@ -97,6 +97,7 @@ function run_dddc(;
         on_error = identity,
         batch_size = batch_size,
     )
+    append!(exp_list, exp_list_)
 
     folder_name = joinpath(
         "data",
