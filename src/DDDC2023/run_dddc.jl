@@ -91,13 +91,13 @@ function run_dddc(;
 
     @info "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times"
 
-    exp_list_ = pmap(
-        run_and_extract,
-        hyperparameter_vect;
-        on_error = identity,
-        batch_size = batch_size,
-    )
-    append!(exp_list, exp_list_)
+    exp_list = @distributed (vcat) for hp in hyperparameter_vect
+        try
+            append!(exp_list, run_and_extract(hp))
+        catch e
+            @warn e
+        end
+    end
 
     folder_name = joinpath(
         "data",
