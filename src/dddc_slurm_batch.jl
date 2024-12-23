@@ -6,10 +6,11 @@ using Distributed
 
 params = AlgorithmicCompetition.extract_params_from_environment()
 
-@info "Parameters: $params"
-
 f_logger = FileLogger("log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
 debuglogger = MinLevelLogger(f_logger, Logging.Info)
+
+@info "Parameters: $params"
+
 
 global_logger(debuglogger)
 
