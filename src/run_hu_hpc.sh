@@ -8,6 +8,7 @@
 module reset
 
 export APPTAINER_CACHEDIR=/lustre/department/lewisjps/apptainer
+# export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
 
 cd /lustre/wiwi/lewisjps || exit
 
@@ -17,9 +18,9 @@ cd AlgorithmicCompetition.jl || exit
 
 git pull
 
-apptainer pull --force docker://ghcr.io/jeremiahpslewis/algorithmiccompetition.jl:main
+# apptainer pull --force docker://ghcr.io/jeremiahpslewis/algorithmiccompetition.jl:main
 
-# julia -e 'using Pkg; Pkg.activate("."); Pkg.update(); Pkg.instantiate(); Pkg.precompile()'
+julia -e 'using Pkg; Pkg.activate("."); Pkg.update(); Pkg.instantiate(); Pkg.precompile()'
 
 mkdir -p log # Log directory for slurm task output
 
