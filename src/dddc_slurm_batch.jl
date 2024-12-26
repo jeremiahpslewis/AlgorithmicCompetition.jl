@@ -4,7 +4,7 @@ using Distributed
 
 params = AlgorithmicCompetition.extract_params_from_environment()
 
-AlgorithmicCompetition.setup_logger(params)
+# AlgorithmicCompetition.setup_logger(params)
 
 @info "Parameters: $params"
 
@@ -24,7 +24,7 @@ if params[:n_cores] > 1
         using AlgorithmicCompetition:
             extract_params_from_environment, setup_logger, run_and_extract
         params = extract_params_from_environment()
-        setup_logger(params)
+        # setup_logger(params)
         @info "Dependencies loaded."
     end
 end
