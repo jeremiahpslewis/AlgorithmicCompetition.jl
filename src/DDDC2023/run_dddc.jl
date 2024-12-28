@@ -90,7 +90,7 @@ function run_dddc(;
 
     @info "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times"
 
-    exp_list_ = pmap(
+    exp_list_ = @showprogress pmap(
         run_and_extract,
         hyperparameter_vect;
         on_error = identity,
