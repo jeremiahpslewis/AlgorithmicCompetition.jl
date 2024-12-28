@@ -2,6 +2,7 @@ using Distributed
 using Random
 using StatsBase
 using Arrow
+using ProgressMeter
 
 """
     run_dddc(
