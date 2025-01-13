@@ -11,11 +11,8 @@ using AlgorithmicCompetition:
     post_prob_high_low_given_both_signals,
     CompetitionParameters,
     CompetitionSolution,
-    construct_df_summary_dddc,
     DataDemandDigitalParams,
-    DDDCHyperParameters,
-    expand_and_extract_dddc,
-    reduce_dddc
+    DDDCHyperParameters
 using Arrow
 
 include("viz/price_diagnostics.jl")
@@ -25,7 +22,7 @@ rebuild_overall_summary = true
 df_summary_arrow_cache_path = "data_final/dddc_v0.0.9_data_summary.arrow"
 
 arrow_folders = filter!(
-    x -> occursin(r"dddc_version=2024-12-05-dddc-hu-test", x),
+    x -> occursin(r"dddc_version=2024-12-27-dddc-full", x),
     readdir("data", join = true),
 )
 arrow_files = vcat(
@@ -43,8 +40,8 @@ if rebuild_summary_files
     for i in eachindex(df_raw_)
         df = DataFrame(Arrow.Table(df_raw_[i]))
         if nrow(df) > 0
-            df = expand_and_extract_dddc(df)
-            df_summary = construct_df_summary_dddc(df)
+            df = AlgorithmicCompetition.expand_and_extract_dddc(df)
+            df_summary = AlgorithmicCompetition.construct_df_summary_dddc(df)
             Arrow.write(
                 replace(df_raw_[i], ".arrow" => "_df_summary_rebuilt.arrow"),
                 df_summary,
@@ -64,7 +61,7 @@ if rebuild_overall_summary
     end
 
     df_summary = vcat(arrows_...)
-    df_summary = reduce_dddc(df_summary)#, round_parameters=false)
+    df_summary = AlgorithmicCompetition.reduce_dddc(df_summary)#, round_parameters=false)
     mkpath("data_final")
     Arrow.write(df_summary_arrow_cache_path, df_summary)
 end
@@ -83,7 +80,7 @@ mkpath("plots/dddc")
 
 # @test (101 * 101 * 2 * n_simulations_dddc) == nrow(df_)
 
-# df = expand_and_extract_dddc(df_)
+# df = AlgorithmicCompetition.expand_and_extract_dddc(df_)
 
 # Basic correctness assurance tests...
 # @test mean(mean.(df[!, :signal_is_weak] .+ df[!, :signal_is_strong])) == 1
@@ -144,7 +141,7 @@ mkpath("plots/dddc")
 # f1 = draw(plt1)
 # save("plots/dddc/plot_1.svg", f1)
 
-# df_summary = construct_df_summary_dddc(df_)
+# df_summary = AlgorithmicCompetition.construct_df_summary_dddc(df_)
 # @assert nrow(df_summary) == 20402
 # TODO: Rereduce summary data across all runs!
 
@@ -153,7 +150,7 @@ mkpath("plots/dddc")
 # in the case where own and opponents' signals are public, the high-high signal state yields the following probability curve over high state base frequency:
 
 strong_signal_level = 0.9
-df_summary = reduce_dddc(DataFrame(Arrow.Table(df_summary_arrow_cache_path)))
+df_summary = AlgorithmicCompetition.reduce_dddc(DataFrame(Arrow.Table(df_summary_arrow_cache_path)))
 
 df_post_prob = DataFrame(
     vcat([
@@ -946,7 +943,7 @@ for freq_high_demand = 0.0:0.1:1
     f8 = draw(plt8) #, axis = (xticks = 0.5:0.1:1,))
     save("plots/dddc/plot_8__freq_high_demand_$freq_high_demand.svg", f8)
 
-    plt8_1 = plt8_partial * contours(levels = 8, labels = true)
+    plt8_1 = plt8_partial * contour(levels = 8, labels = true)
     f81 = draw(plt8_1) #, axis = (xticks = 0.5:0.1:1,))
     save("plots/dddc/plot_81__freq_high_demand_$freq_high_demand.svg", f81)
 
