@@ -42,8 +42,8 @@ function run_dddc(;
     end
 
     competition_params_dict = Dict(
-        :low => CompetitionParameters(0.25, 0.75, (2, 2), (1, 1)),
-        :high => CompetitionParameters(0.25, -0.75, (2, 2), (1, 1)), # Parameter values in Calvano 2020 Stochastic Demand case (a_0 = 0.25, -0.25)
+        :low => CompetitionParameters(0.25, 0.75, (2, 2), (0, 0)),
+        :high => CompetitionParameters(0.25, -0.75, (2, 2), (0, 0)), # Parameter values in Calvano 2020 Stochastic Demand case (a_0 = 0.25, -0.25)
     )
 
     competition_solution_dict =

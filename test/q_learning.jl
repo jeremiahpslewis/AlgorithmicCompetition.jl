@@ -11,8 +11,8 @@
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
-        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :high => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
     )
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
@@ -45,8 +45,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
-        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :high => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
     )
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
@@ -78,8 +78,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, -0.75, (2, 2), (1, 1)),
-        :low => CompetitionParameters(0.25, 0.75, (2, 2), (1, 1)),
+        :high => CompetitionParameters(0.25, -0.75, (2, 2), (0, 0)),
+        :low => CompetitionParameters(0.25, 0.75, (2, 2), (0, 0)),
     )
 
     competition_solution_dict =
@@ -110,7 +110,7 @@ end
 end
 
 @testset "Q" begin
-    params = CompetitionParameters(0.25, 0, (2, 2), (1, 1))
+    params = CompetitionParameters(0.25, 0, (2, 2), (0, 0))
     p_ = [1, 1]
     logit_demand = exp.((params.a .- p_) ./ params.μ)
     q_logit_demand =
@@ -119,9 +119,9 @@ end
 
     Q(p_[1], p_[2], params) == q_logit_demand
 
-    @test Q(1.47293, 1.47293, CompetitionParameters(0.25, 0, (2, 2), (1, 1))) ≈
+    @test Q(1.47293, 1.47293, CompetitionParameters(0.25, 0, (2, 2), (0, 0))) ≈
           fill(0.47138, 2) atol = 0.01
-    @test Q(1.92498, 1.92498, CompetitionParameters(0.25, 0, (2, 2), (1, 1))) ≈
+    @test Q(1.92498, 1.92498, CompetitionParameters(0.25, 0, (2, 2), (0, 0))) ≈
           fill(0.36486, 2) atol = 0.01
 end
 
@@ -136,8 +136,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
-        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :high => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
     )
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
