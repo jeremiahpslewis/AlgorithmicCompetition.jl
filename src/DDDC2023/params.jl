@@ -52,8 +52,6 @@ struct DDDCHyperParameters
         n_players = 2
         memory_length = 1
 
-        d = Dict(:a => 1, :b => 2)
-
         p_monop_opt_min = minimum(
             competition_solution_dict[demand_mode].p_monop_opt for
             demand_mode in [:high, :low]
