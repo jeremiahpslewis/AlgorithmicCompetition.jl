@@ -65,8 +65,8 @@ struct DDDCHyperParameters
         p_range_pad = ξ * maximum(p_critical) - minimum(p_critical)
         # Price options are high and low demand critical prices, upper and lower bounds padded
         price_options = [
-                p_Bert_nash_equilibrium_min - p_range_pad,
-                p_monop_opt_max + p_range_pad,
+                minimum(p_critical) - p_range_pad,
+                maximum(p_critical) + p_range_pad,
                 p_critical...
         ]
         @assert length(price_options) == n_prices
