@@ -108,8 +108,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
-        :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0.75, (2, 2), (1, 1)),
+        :high => CompetitionParameters(0.25, -0.75, (2, 2), (1, 1)),
     )
 
     competition_solution_dict =
