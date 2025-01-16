@@ -122,6 +122,6 @@ function run_aiapc(;
     exp_df = vcat(exp_df...)
 
     Arrow.write(folder_name * ".arrow", exp_df)
-    rm(folder_name, recursive = true) # Remove folder after merging and writing to CSV
+    rm(folder_name, recursive = true) # Remove folder after merging and writing to Arrow
     return exp_df
 end

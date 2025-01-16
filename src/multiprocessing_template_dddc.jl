@@ -41,7 +41,7 @@ end
 
 rmprocs(_procs)
 
-file_name = "simulation_results_v$(version)_dddc_$(start_timestamp).csv"
+file_name = "simulation_results_v$(version)_dddc_$(start_timestamp).arrow"
 exp_list_ = AlgorithmicCompetition.DDDCSummary[exp_list...]
 df = AlgorithmicCompetition.extract_sim_results(exp_list_)
 Arrow.write(file_name, df)

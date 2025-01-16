@@ -15,15 +15,15 @@ using Statistics
 
 
 job_id = "7799305"
-csv_files = filter!(
+arrow_files = filter!(
     x -> occursin(Regex("data/SLURM_ARRAY_JOB_ID=$(job_id).*.arrow"), x),
     readdir("data", join = true),
 )
 
-df_ = DataFrame.(CSV.File.(csv_files))
+df_ = DataFrame.(Arrow.Table.(arrow_files))
 
 for i in eachindex(df_, 2)
-    df_[i][!, "metadata"] .= csv_files[i]
+    df_[i][!, "metadata"] .= arrow_files[i]
 end
 df = vcat(df_...)
 # df[!, "metadata_dict"] = parse_savename.(df[!, "metadata"])
