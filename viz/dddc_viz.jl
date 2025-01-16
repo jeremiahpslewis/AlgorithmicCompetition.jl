@@ -13,6 +13,7 @@ using AlgorithmicCompetition:
     CompetitionSolution,
     DataDemandDigitalParams,
     DDDCHyperParameters
+using AlgorithmicCompetition
 using Arrow
 
 include("viz/price_diagnostics.jl")
@@ -22,7 +23,7 @@ rebuild_overall_summary = true
 df_summary_arrow_cache_path = "data_final/dddc_v0.0.9_data_summary.arrow"
 
 arrow_folders = filter!(
-    x -> occursin(r"dddc_version=2024-12-27-dddc-full", x),
+    x -> occursin(r"dddc_version=2025-01-14-dddc-mini", x),
     readdir("data", join = true),
 )
 arrow_files = vcat(
