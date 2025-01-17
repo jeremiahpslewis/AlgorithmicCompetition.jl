@@ -48,11 +48,9 @@ struct DDDCHyperParameters
         @assert max_iter > convergence_threshold
         ξ = 0.1
         δ = 0.95
-        n_prices = 15
+        n_prices = 7
         n_players = 2
         memory_length = 1
-
-        d = Dict(:a => 1, :b => 2)
 
         p_monop_opt_min = minimum(
             competition_solution_dict[demand_mode].p_monop_opt for
