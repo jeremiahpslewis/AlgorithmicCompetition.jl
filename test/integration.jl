@@ -239,9 +239,7 @@ end
     δ = 0.95
     ξ = 0.1
     δ = 0.95
-    n_prices = 15
     max_iter = Int(1e6)
-    price_index = 1:n_prices
 
     competition_params_dict = Dict(
         :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
@@ -255,7 +253,7 @@ end
         weak_signal_quality_level = 1,
         strong_signal_quality_level = 1,
         signal_is_strong = [false, false],
-        frequency_high_demand = 0.7,
+        frequency_high_demand = 0.5,
     )
 
     hyperparams = DDDCHyperParameters(
@@ -310,9 +308,7 @@ end
     δ = 0.95
     ξ = 0.1
     δ = 0.95
-    n_prices = 15
     max_iter = Int(1e6)
-    price_index = 1:n_prices
 
     competition_params_dict = Dict(
         :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
