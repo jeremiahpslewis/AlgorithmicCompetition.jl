@@ -464,7 +464,7 @@ end
         δ,
         max_iter,
         competition_solution_dict;
-        convergence_threshold = 1e4,
+        convergence_threshold = Int(1e4),
     )
 
     c_out = run(hyperparameters; stop_on_convergence = true)
