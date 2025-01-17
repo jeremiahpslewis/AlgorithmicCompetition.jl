@@ -33,7 +33,7 @@ function run_dddc(;
 )
     signal_quality_vect = [[true, false]] # With signal_quality_range over both weak and strong, [false, false] case is redundant
 
-    frequency_high_demand_range = Float64.(range(0.0, 1.0, n_grid_increments + 1))
+    frequency_high_demand_range = [0.5]
     signal_quality_level_range = Float64.(range(0.5, 1.0, n_grid_increments + 1))
 
     if debug
@@ -51,8 +51,6 @@ function run_dddc(;
 
     α = Float64(0.15)
     β = Float64(4e-1)
-    frequency_high_demand = 0.3
-    weak_signal_quality_level = 0.1
     δ = 0.95
 
     data_demand_digital_param_set = [
