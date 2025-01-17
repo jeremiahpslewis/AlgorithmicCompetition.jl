@@ -78,9 +78,9 @@ struct DDDCHyperParameters
                 n_prices,
             )...,
         ]
-        # todo: deal with this temp override
+        # todo: deal with this temp price override
         price_options = [[competition_solution_dict[demand_mode].p_Bert_nash_equilibrium for
-        demand_mode in [:high, :low]]..., [competition_solution_dict[demand_mode].p_monop_opt for demand_mode in [:high, :low]]..., p_Bert_nash_equilibrium_min - p_range_pad, p_monop_opt_max + p_range_pad]
+        demand_mode in [:high, :low]]..., [competition_solution_dict[demand_mode].p_monop_opt for demand_mode in [:high, :low]]..., p_Bert_nash_equilibrium_min - p_range_pad, p_monop_opt_max + p_range_pad, mean([p_Bert_nash_equilibrium_max, p_monop_opt_min])]
 
         new(
             α,
