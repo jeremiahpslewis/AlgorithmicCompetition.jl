@@ -76,6 +76,7 @@ end
 
 
 function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::AbstractHook)
+    @info "Collect summary stats"
     convergence_threshold = env.convergence_threshold
     iterations_until_convergence = Int64[
         hook[player][1].iterations_until_convergence for player in [Player(1), Player(2)]

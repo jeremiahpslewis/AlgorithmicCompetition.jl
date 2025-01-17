@@ -12,12 +12,15 @@
 export N_GRID_INCREMENTS=20 # Number of grid increments
 export N_PARAMETER_ITERATIONS=1 # Number of iterations over all parameter sets per job
 export VERSION="2024-12-16-dddc-dynamic-epsilon-greedy-beta"
-export DEBUG=0
+export DEBUG=1
 echo "Bash: Running DDDC with $N_GRID_INCREMENTS grid increments"
 
 export APPTAINERENV_SLURM_ARRAY_TASK_ID="$SLURM_ARRAY_TASK_ID"
 export APPTAINERENV_SLURM_ARRAY_JOB_ID="$SLURM_ARRAY_JOB_ID"
 export APPTAINERENV_SLURM_CPUS_PER_TASK="$SLURM_CPUS_PER_TASK"
 
-apptainer run algorithmiccompetition.jl_main.sif julia --project=/algcomp /algcomp/src/dddc_slurm_batch.jl
+module load julia
 
+# apptainer run algorithmiccompetition.jl_main.sif julia --project=/algcomp /algcomp/src/dddc_slurm_batch.jl
+
+julia --project=. src/dddc_slurm_batch.jl

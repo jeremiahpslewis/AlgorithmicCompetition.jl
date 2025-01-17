@@ -1,8 +1,8 @@
-import ProgressMeter: @showprogress
 using Distributed
 using Random
 using StatsBase
 using Arrow
+using ProgressMeter
 
 """
     run_dddc(
@@ -29,11 +29,11 @@ function run_dddc(;
     batch_size = 1,
     batch_metadata = (SLURM_ARRAY_JOB_ID = 0, SLURM_ARRAY_TASK_ID = 0),
     debug = false,
+    precompile = false,
 )
-    # signal_quality_vect = [[true, false], [false, false]]
     signal_quality_vect = [[true, false]] # With signal_quality_range over both weak and strong, [false, false] case is redundant
 
-    frequency_high_demand_range = Float64.(range(0.0, 1.0, n_grid_increments + 1))
+    frequency_high_demand_range = [0.5]
     signal_quality_level_range = Float64.(range(0.5, 1.0, n_grid_increments + 1))
 
     if debug
@@ -50,9 +50,7 @@ function run_dddc(;
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
     α = Float64(0.15)
-    ν_ = 20.0 # From Calvano 2020
-    frequency_high_demand = 0.3
-    weak_signal_quality_level = 0.1
+    β = Float64(4e-1)
     δ = 0.95
 
     data_demand_digital_param_set = [
@@ -71,12 +69,7 @@ function run_dddc(;
     hyperparameter_vect = [
         DDDCHyperParameters(
             α,
-            ν_inverse(
-                15,
-                2,
-                1,
-                ν_tilde(ν_, frequency_high_demand, weak_signal_quality_level),
-            ), # \beta value
+            β, # \beta value
             δ,
             max_iter,
             competition_solution_dict,
@@ -91,9 +84,13 @@ function run_dddc(;
 
     @info "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times"
 
-    exp_list_ = @showprogress @distributed for i in 1:size(hyperparameter_vect)
-        append!(exp_list_, run_and_extract(hyperparameter_vect[i]))
-    end
+    exp_list_ = @showprogress pmap(
+        run_and_extract,
+        hyperparameter_vect;
+        on_error = identity,
+        batch_size = batch_size,
+    )
+    append!(exp_list, exp_list_)
 
     folder_name = joinpath(
         "data",
@@ -110,9 +107,13 @@ function run_dddc(;
     )
     mkpath(folder_name)
     df = extract_sim_results(exp_list)
-    Arrow.write(folder_name * ".arrow", df)
+    if !precompile
+        Arrow.write(folder_name * ".arrow", df)
+    end
     df = expand_and_extract_dddc(df)
     df_summary = construct_df_summary_dddc(df)
-    Arrow.write(folder_name * "_df_summary.arrow", df_summary)
+    if !precompile
+        Arrow.write(folder_name * "_df_summary.arrow", df_summary)
+    end
     return exp_list
 end

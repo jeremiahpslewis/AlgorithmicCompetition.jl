@@ -1,7 +1,7 @@
 using AlgorithmicCompetition
 using Statistics
 using DataFrames
-using CSV
+using Arrow
 using Distributed
 using Dates
 
@@ -41,7 +41,7 @@ end
 
 rmprocs(_procs)
 
-file_name = "simulation_results_v$(version)_dddc_$(start_timestamp).csv"
+file_name = "simulation_results_v$(version)_dddc_$(start_timestamp).arrow"
 exp_list_ = AlgorithmicCompetition.DDDCSummary[exp_list...]
 df = AlgorithmicCompetition.extract_sim_results(exp_list_)
-CSV.write(file_name, df)
+Arrow.write(file_name, df)

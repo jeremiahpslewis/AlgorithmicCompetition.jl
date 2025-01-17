@@ -174,3 +174,11 @@ RLBase.StateStyle(::AIAPCEnv) = Observation{Int64}()
 RLBase.RewardStyle(::AIAPCEnv) = STEP_REWARD
 RLBase.UtilityStyle(::AIAPCEnv) = GENERAL_SUM
 RLBase.ChanceStyle(::AIAPCEnv) = DETERMINISTIC
+
+
+# Need special handling of episodes and experiments for the AIAPC and DDDC environments: an episode is a single price setting interaction, and an experiment is a sequence of episodes, but the environment state is not reset between episodes. As a result, the state is initialized once, in the PreExperimentStage and PreEpisodeStage becomes a no-op.
+Base.push!(agent::Agent, ::PreEpisodeStage, env::AIAPCEnv, player::Player) = nothing
+
+function Base.push!(agent::Agent, ::PreExperimentStage, env::AIAPCEnv, player::Player)
+    push!(agent.trajectory, (state = state(env, player),))
+end

@@ -60,6 +60,7 @@ end
     # First three rounds
 
     # t=1
+    push!(policy, PreExperimentStage(), env)
     push!(policy, PreEpisodeStage(), env)
     push!(policy, PreActStage(), env)
     @test length(policy.agents[Player(1)].trajectory.container) == 0

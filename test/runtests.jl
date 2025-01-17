@@ -9,6 +9,7 @@ using ReinforcementLearning:
     PreActStage,
     PostEpisodeStage,
     PreEpisodeStage,
+    PreExperimentStage,
     state,
     reward,
     current_player,
@@ -20,7 +21,9 @@ using ReinforcementLearning:
     RLBase,
     AbstractPolicy,
     act!,
-    plan!
+    plan!,
+    Player
+
 import ReinforcementLearning: RLCore
 using Statistics
 using AlgorithmicCompetition:
@@ -43,8 +46,8 @@ using AlgorithmicCompetition:
     DataDemandDigitalParams,
     DDDCEnv,
     DDDCHyperParameters,
-    DDDCTotalRewardPerLastNEpisodes,
     DDDCPolicy,
+    DDDCTotalRewardPerLastNEpisodes,
     economic_summary,
     Experiment,
     extract_profit_vars,
@@ -58,15 +61,20 @@ using AlgorithmicCompetition:
     profit_gain,
     Q_i_0,
     Q,
+    QBasedPolicy,
     reward,
     run_and_extract,
     run,
     solve_bertrand,
     solve_monopolist,
+    TabularApproximator,
+    TabularQApproximator,
+    TabularVApproximator,
+    TDLearner,
     TDLearner,
     π
 using Distributed
-
+    
 @testset "AlgorithmicCompetition.jl" begin
     @testset "Paramter tests" begin
         include("alpha_beta.jl")

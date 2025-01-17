@@ -40,5 +40,5 @@ end
 
 rmprocs(_procs)
 
-file_name = "simulation_results_aiapc_$(version)_$(start_timestamp).csv"
-CSV.write(file_name, exp_df)
+file_name = "simulation_results_aiapc_$(version)_$(start_timestamp).arrow"
+Arrow.write(file_name, exp_df)

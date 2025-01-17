@@ -1,9 +1,3 @@
-using Test
-using AlgorithmicCompetition:
-    TabularApproximator, TabularVApproximator, TabularQApproximator, TDLearner, QBasedPolicy
-import ReinforcementLearning: RLBase
-using ReinforcementLearning
-
 @testset "Constructors" begin
     @test TabularApproximator(fill(1, 10, 10)) isa TabularApproximator
     @test TabularVApproximator(n_state = 10) isa TabularApproximator{Vector{Float64}}
