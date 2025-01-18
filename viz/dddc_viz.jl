@@ -151,7 +151,8 @@ mkpath("plots/dddc")
 # in the case where own and opponents' signals are public, the high-high signal state yields the following probability curve over high state base frequency:
 
 strong_signal_level = 0.9
-df_summary = AlgorithmicCompetition.reduce_dddc(DataFrame(Arrow.Table(df_summary_arrow_cache_path)))
+df_summary =
+    AlgorithmicCompetition.reduce_dddc(DataFrame(Arrow.Table(df_summary_arrow_cache_path)))
 
 df_post_prob = DataFrame(
     vcat([
