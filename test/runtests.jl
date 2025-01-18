@@ -74,7 +74,7 @@ using AlgorithmicCompetition:
     TDLearner,
     π
 using Distributed
-    
+
 @testset "AlgorithmicCompetition.jl" begin
     @testset "Paramter tests" begin
         include("alpha_beta.jl")
