@@ -8,9 +8,9 @@ mutable struct DDDCMemory
 end
 
 """
-    DDDCEnv(p::AIAPCHyperParameters)
+    DDDCEnv(p::DDDCHyperParameters)
 
-    Build an environment to reproduce the results of the Lewis 2023 extentions to AIAPC.
+    Build an environment to reproduce the results of the Lewis 2023 extensions to AIAPC.
 """
 struct DDDCEnv <: AbstractEnv # N is profit_array dimension
     α::Float64                              # Learning parameter

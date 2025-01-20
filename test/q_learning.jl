@@ -73,9 +73,7 @@ end
     δ = 0.95
     ξ = 0.1
     δ = 0.95
-    n_prices = 15
     max_iter = Int(1e6) # 1e8
-    price_index = 1:n_prices
 
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
@@ -105,8 +103,8 @@ end
 
     env = DDDCEnv(hyperparams)
 
-    @test minimum(Q_i_0(env)) == 0.2003206598478015
-    @test maximum(Q_i_0(env)) == 0.3694013307458184
+    @test minimum(Q_i_0(env)) == 0.1902643937562921
+    @test maximum(Q_i_0(env)) == 0.3262206082807238
 end
 
 @testset "Q" begin

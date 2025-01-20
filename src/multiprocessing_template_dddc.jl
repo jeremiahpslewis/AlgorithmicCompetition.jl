@@ -5,7 +5,7 @@ using Arrow
 using Distributed
 using Dates
 
-version = 0.6
+version = 0.7
 start_timestamp = now()
 start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd__HH_MM_SS")
 

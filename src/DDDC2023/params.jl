@@ -48,39 +48,29 @@ struct DDDCHyperParameters
         @assert max_iter > convergence_threshold
         ξ = 0.1
         δ = 0.95
-        n_prices = 15
+        n_prices = 6
         n_players = 2
         memory_length = 1
 
-        d = Dict(:a => 1, :b => 2)
-
-        p_monop_opt_min = minimum(
-            competition_solution_dict[demand_mode].p_monop_opt for
-            demand_mode in [:high, :low]
-        )
-        p_monop_opt_max = maximum(
-            competition_solution_dict[demand_mode].p_monop_opt for
-            demand_mode in [:high, :low]
-        )
-
-        p_Bert_nash_equilibrium_min = minimum(
+  
+        p_Bert_nash_equilibrium = [
             competition_solution_dict[demand_mode].p_Bert_nash_equilibrium for
             demand_mode in [:high, :low]
-        )
-        p_Bert_nash_equilibrium_max = maximum(
-            competition_solution_dict[demand_mode].p_Bert_nash_equilibrium for
-            demand_mode in [:high, :low]
-        )
-
-        p_range_pad = ξ * (p_monop_opt_max - p_Bert_nash_equilibrium_min)
-        price_options = [
-            range(
-                p_Bert_nash_equilibrium_min - p_range_pad,
-                p_monop_opt_max + p_range_pad,
-                n_prices,
-            )...,
         ]
-
+        p_monop_opt = [
+            competition_solution_dict[demand_mode].p_monop_opt for
+            demand_mode in [:high, :low]
+        ]
+        p_critical = [p_Bert_nash_equilibrium..., p_monop_opt...]
+        p_range_pad = ξ * (maximum(p_critical) - minimum(p_critical))
+        # Price options are high and low demand critical prices, upper and lower bounds padded
+        price_options = [
+                minimum(p_critical) - p_range_pad,
+                maximum(p_critical) + p_range_pad,
+                p_critical...
+        ]
+        sort!(price_options)
+        @assert length(price_options) == n_prices
         new(
             α,
             β,

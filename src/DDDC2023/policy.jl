@@ -18,7 +18,7 @@ end
 """
     InitMatrix(env::DDDCEnv, mode = "zero")
 
-Initialize the Q-matrix for the AIAPC environment.
+Initialize the Q-matrix for the DDDC environment.
 """
 function InitMatrix(env::DDDCEnv; mode = "zero")
     if mode == "zero"
