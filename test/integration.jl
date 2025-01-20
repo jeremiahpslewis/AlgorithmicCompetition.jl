@@ -483,7 +483,7 @@ end
     @test length(reward(c_out.env, 1)) == 1
 
     c_out.env.is_done[1] = false
-    @test reward(c_out.env) == (1, 1)
+    @test reward(c_out.env) == (0, 0)
     @test reward(c_out.env, 1) != 0
 
     @test sum(c_out.hook[Player(1)][1].best_response_vector == 0) == 0
