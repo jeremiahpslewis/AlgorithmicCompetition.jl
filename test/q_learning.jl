@@ -73,7 +73,6 @@ end
     δ = 0.95
     ξ = 0.1
     δ = 0.95
-    n_prices = 15
     max_iter = Int(1e6) # 1e8
     price_index = 1:n_prices
 

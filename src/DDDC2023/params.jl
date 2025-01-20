@@ -57,18 +57,19 @@ struct DDDCHyperParameters
             competition_solution_dict[demand_mode].p_Bert_nash_equilibrium for
             demand_mode in [:high, :low]
         ]
-        p_Bert_nash_equilibrium = [
-            competition_solution_dict[demand_mode].p_Bert_nash_equilibrium for
+        p_monop_opt = [
+            competition_solution_dict[demand_mode].p_monop_opt for
             demand_mode in [:high, :low]
         ]
-        p_critical = [p_Bert_nash_equilibrium..., p_Bert_nash_equilibrium...]
-        p_range_pad = ξ * maximum(p_critical) - minimum(p_critical)
+        p_critical = [p_Bert_nash_equilibrium..., p_monop_opt...]
+        p_range_pad = ξ * (maximum(p_critical) - minimum(p_critical))
         # Price options are high and low demand critical prices, upper and lower bounds padded
         price_options = [
                 minimum(p_critical) - p_range_pad,
                 maximum(p_critical) + p_range_pad,
                 p_critical...
         ]
+        sort!(price_options)
         @assert length(price_options) == n_prices
         new(
             α,
