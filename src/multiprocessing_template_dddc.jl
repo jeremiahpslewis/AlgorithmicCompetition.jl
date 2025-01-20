@@ -12,7 +12,7 @@ start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd__HH_MM_SS")
 if Sys.isapple()
     n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
 
-    n_parameter_iterations = 1
+    n_parameter_iterations = 500
     n_grid_increments = 10
 else
     n_procs_ = 63
