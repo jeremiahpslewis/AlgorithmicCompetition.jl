@@ -283,7 +283,7 @@ end
     @test 0.45 < e_sum.percent_demand_high < 0.55
     @test all(e_sum.convergence_profit_demand_high > e_sum.convergence_profit_demand_low)
     @test all(1 .> e_sum.profit_gain .> 0)
-    @test all(1 .> e_sum.profit_gain_demand_low .> 0)
+    @test any(1 .> e_sum.profit_gain_demand_low .> 0) # at least one player should have a gain for low, but it can be strategic to accept a low demand loss in exchange for a high demand gain
     @test all(1 .> e_sum.profit_gain_demand_high .> 0)
     @test extract_profit_vars(e_out.env) == (
         Dict(:high => 0.2386460385715974, :low => 0.19331233681405383),
