@@ -282,7 +282,7 @@ end
         1e-2
     @test mean(e_out.env.profit_array[:, :, :, 1]) >
           mean(e_out.env.profit_array[:, :, :, 2])
-    @test 0.65 < e_sum.percent_demand_high < 0.25
+    @test 0.65 < e_sum.percent_demand_high < 0.75
     @test all(e_sum.convergence_profit_demand_high > e_sum.convergence_profit_demand_low)
     @test all(1 .> e_sum.profit_gain .> 0)
     @test all(1 .> e_sum.profit_gain_demand_low .> 0)
