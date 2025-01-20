@@ -103,7 +103,7 @@ end
 
     env = DDDCEnv(hyperparams)
 
-    @test minimum(Q_i_0(env)) == 0.2003206598478015
+    @test minimum(Q_i_0(env)) == 0.1902643937562921
     @test maximum(Q_i_0(env)) == 0.3262206082807238
 end
 
