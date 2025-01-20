@@ -51,7 +51,7 @@ function run_dddc(;
 
     α = Float64(0.15)
     ν_ = 20.0 # From Calvano 2020
-    β = Float(4e-1)
+    β = Float64(4e-1)
     frequency_high_demand = 0.3
     weak_signal_quality_level = 0.1
     δ = 0.95
