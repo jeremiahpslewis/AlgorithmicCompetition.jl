@@ -10,8 +10,8 @@ using CircularArrayBuffers: capacity
     max_iter = 10000
 
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
-        :low => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
@@ -41,8 +41,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, -0.75, (2, 2), (0, 0)),
-        :low => CompetitionParameters(0.25, 0.75, (2, 2), (0, 0)),
+        :high => CompetitionParameters(0.25, -0.75, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0.75, (2, 2), (1, 1)),
     )
 
     competition_solution_dict =
@@ -94,8 +94,8 @@ end
 
 @testset "Profit gain check AIAPC" begin
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
-        :low => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
@@ -155,8 +155,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
-        :low => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
@@ -213,8 +213,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
-        :low => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
@@ -244,8 +244,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :low => CompetitionParameters(0.25, 0.75, (2, 2), (0, 0)),
-        :high => CompetitionParameters(0.25, -0.75, (2, 2), (0, 0)),
+        :low => CompetitionParameters(0.25, 0.75, (2, 2), (1, 1)),
+        :high => CompetitionParameters(0.25, -0.75, (2, 2), (1, 1)),
     )
 
     competition_solution_dict =
@@ -315,8 +315,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :low => CompetitionParameters(0.25, 0.75, (2, 2), (0, 0)),
-        :high => CompetitionParameters(0.25, -0.75, (2, 2), (0, 0)),
+        :low => CompetitionParameters(0.25, 0.75, (2, 2), (1, 1)),
+        :high => CompetitionParameters(0.25, -0.75, (2, 2), (1, 1)),
     )
 
     competition_solution_dict =
@@ -389,8 +389,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :low => CompetitionParameters(0.25, 0.75, (2, 2), (0, 0)),
-        :high => CompetitionParameters(0.25, -0.75, (2, 2), (0, 0)),
+        :low => CompetitionParameters(0.25, 0.75, (2, 2), (1, 1)),
+        :high => CompetitionParameters(0.25, -0.75, (2, 2), (1, 1)),
     )
 
     competition_solution_dict =
@@ -456,8 +456,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
-        :low => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
@@ -483,7 +483,7 @@ end
     @test length(reward(c_out.env, 1)) == 1
 
     c_out.env.is_done[1] = false
-    @test reward(c_out.env) == (0, 0)
+    @test reward(c_out.env) == (1, 1)
     @test reward(c_out.env, 1) != 0
 
     @test sum(c_out.hook[Player(1)][1].best_response_vector == 0) == 0
@@ -493,8 +493,8 @@ end
 
 @testset "Run a set of AIAPC experiments." begin
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
-        :low => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
@@ -537,8 +537,8 @@ end
     n_parameter_iterations = 2
 
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
-        :low => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
@@ -572,8 +572,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
-        :low => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
@@ -637,8 +637,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
-        :low => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
@@ -668,8 +668,8 @@ end
 
     policy = RandomPolicy()
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
-        :low => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])

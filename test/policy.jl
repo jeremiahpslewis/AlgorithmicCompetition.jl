@@ -9,8 +9,8 @@
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
-        :low => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
@@ -36,8 +36,8 @@ end
 
 @testset "policy push! and optimise! test" begin
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
-        :low => CompetitionParameters(0.25, 0, (2, 2), (0, 0)),
+        :high => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0, (2, 2), (1, 1)),
     )
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
