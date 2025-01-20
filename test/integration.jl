@@ -41,8 +41,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :high => CompetitionParameters(0.25, -0.75, (2, 2), (1, 1)),
-        :low => CompetitionParameters(0.25, 0.75, (2, 2), (1, 1)),
+        :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
     )
 
     competition_solution_dict =
@@ -244,8 +244,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :low => CompetitionParameters(0.25, 0.75, (2, 2), (1, 1)),
-        :high => CompetitionParameters(0.25, -0.75, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
+        :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
     )
 
     competition_solution_dict =
@@ -282,7 +282,7 @@ end
         1e-2
     @test mean(e_out.env.profit_array[:, :, :, 1]) >
           mean(e_out.env.profit_array[:, :, :, 2])
-    @test 0.65 < e_sum.percent_demand_high < 0.75
+    @test 0.65 < e_sum.percent_demand_high < 0.25
     @test all(e_sum.convergence_profit_demand_high > e_sum.convergence_profit_demand_low)
     @test all(1 .> e_sum.profit_gain .> 0)
     @test all(1 .> e_sum.profit_gain_demand_low .> 0)
@@ -315,8 +315,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :low => CompetitionParameters(0.25, 0.75, (2, 2), (1, 1)),
-        :high => CompetitionParameters(0.25, -0.75, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
+        :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
     )
 
     competition_solution_dict =
@@ -389,8 +389,8 @@ end
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
-        :low => CompetitionParameters(0.25, 0.75, (2, 2), (1, 1)),
-        :high => CompetitionParameters(0.25, -0.75, (2, 2), (1, 1)),
+        :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
+        :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
     )
 
     competition_solution_dict =
