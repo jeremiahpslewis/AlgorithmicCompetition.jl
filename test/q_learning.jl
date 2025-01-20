@@ -74,7 +74,6 @@ end
     ξ = 0.1
     δ = 0.95
     max_iter = Int(1e6) # 1e8
-    price_index = 1:n_prices
 
     competition_params_dict = Dict(
         :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
