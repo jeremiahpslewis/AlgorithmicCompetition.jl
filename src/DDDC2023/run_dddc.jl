@@ -33,11 +33,11 @@ function run_dddc(;
 )
     signal_quality_vect = [[true, false]] # With signal_quality_range over both weak and strong, [false, false] case is redundant
 
-    frequency_high_demand_range = Float64.(range(0.0, 1.0, n_grid_increments + 1))
+    frequency_high_demand_range = Float64.([0, 0.5, 1])
     signal_quality_level_range = Float64.(range(0.5, 1.0, n_grid_increments + 1))
 
     if debug
-        frequency_high_demand_range = frequency_high_demand_range[1:10:end]
+        # frequency_high_demand_range = frequency_high_demand_range[1:10:end]
         signal_quality_level_range = signal_quality_level_range[1:10:end]
     end
 
@@ -51,6 +51,7 @@ function run_dddc(;
 
     α = Float64(0.15)
     ν_ = 20.0 # From Calvano 2020
+    β = Float(4e-1)
     frequency_high_demand = 0.3
     weak_signal_quality_level = 0.1
     δ = 0.95
@@ -71,12 +72,13 @@ function run_dddc(;
     hyperparameter_vect = [
         DDDCHyperParameters(
             α,
-            ν_inverse(
-                15,
-                2,
-                1,
-                ν_tilde(ν_, frequency_high_demand, weak_signal_quality_level),
-            ), # \beta value
+            β,
+            # ν_inverse(
+            #     15,
+            #     2,
+            #     1,
+            #     ν_tilde(ν_, frequency_high_demand, weak_signal_quality_level),
+            # ), # \beta value
             δ,
             max_iter,
             competition_solution_dict,
