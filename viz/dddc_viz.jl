@@ -23,7 +23,7 @@ rebuild_overall_summary = true
 df_summary_arrow_cache_path = "data_final/dddc_v0.0.9_data_summary.arrow"
 
 arrow_folders = filter!(
-    x -> occursin(r"dddc_version=2025-01-14-dddc-mini", x),
+    x -> occursin(r"2025-01-20", x),
     readdir("data", join = true),
 )
 arrow_files = vcat(
