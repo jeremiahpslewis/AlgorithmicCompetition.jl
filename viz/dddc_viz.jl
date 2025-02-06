@@ -19,11 +19,11 @@ using Arrow
 include("viz/price_diagnostics.jl")
 
 rebuild_summary_files = false
-rebuild_overall_summary = false
-df_summary_arrow_cache_path = "data_final/dddc_v0.0.9_data_summary.arrow"
+rebuild_overall_summary = true
+df_summary_arrow_cache_path = "data_final/dddc_v0.1.0_data_summary.arrow"
 
 arrow_folders = filter!(
-    x -> occursin(r"dddc_version=2025-01-14-dddc-mini", x),
+    x -> occursin(r"model=dddc_version=2025-01-20-dddc-revised-prices", x),
     readdir("data", join = true),
 )
 arrow_files = vcat(
@@ -62,7 +62,7 @@ if rebuild_overall_summary
     end
 
     df_summary = vcat(arrows_...)
-    df_summary = AlgorithmicCompetition.reduce_dddc(df_summary)#, round_parameters=false)
+    df_summary = AlgorithmicCompetition.reduce_dddc(df_summary)
     mkpath("data_final")
     Arrow.write(df_summary_arrow_cache_path, df_summary)
 end
@@ -1149,3 +1149,24 @@ f10_4 = draw(
     ),
 )
 save("plots/dddc/plot_10_4.svg", f10_4)
+
+
+df_profit_max_min_signal_weak = @chain df_summary begin
+    @groupby(:weak_signal_quality_level)
+    @combine(:profit_gain_10pct = quantile(:profit_gain_strong_signal_player, 0.1),
+             :profit_gain_90pct = quantile(:profit_gain_strong_signal_player, 0.9)
+            )
+end
+
+    @combine(
+        :strong_player__signal_quality_for_profit_max__strong_player_preferences =
+            :strong_signal_quality_level[argmax(:profit_gain_strong_signal_player)],
+        :strong_player__signal_quality_for_profit_max__weak_player_preferences =
+            :strong_signal_quality_level[argmax(:profit_gain_weak_signal_player)],
+        :strong_player__signal_quality_for_profit_min =
+            :strong_signal_quality_level[argmin(
+                (:profit_gain_strong_signal_player + :profit_gain_weak_signal_player) / 2,
+            )],
+    )
+end
+

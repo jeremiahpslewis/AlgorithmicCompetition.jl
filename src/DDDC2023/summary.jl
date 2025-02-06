@@ -312,7 +312,7 @@ end
 
 
 function reduce_dddc(df_summary::DataFrame)
-    if !(:n_obs ∈ names(df_summary))
+    if !("n_obs" ∈ names(df_summary))
         df_summary[!, :n_obs] .= 1
     end
 
