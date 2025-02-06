@@ -19,7 +19,7 @@ using Arrow
 include("viz/price_diagnostics.jl")
 
 rebuild_summary_files = false
-rebuild_overall_summary = true
+rebuild_overall_summary = false
 df_summary_arrow_cache_path = "data_final/dddc_v0.0.9_data_summary.arrow"
 
 arrow_folders = filter!(
@@ -66,91 +66,10 @@ if rebuild_overall_summary
     mkpath("data_final")
     Arrow.write(df_summary_arrow_cache_path, df_summary)
 end
-# mkpath("data_final")
-# arrow_file_name = "data_final/dddc_v0.0.8_data.arrow"
-# Arrow.write(arrow_file_name, df_)
 
 mkpath("plots/dddc")
-# df_ = DataFrame(Arrow.read(arrow_file_name))
 
-# n_simulations_dddc = @chain df_ @subset(
-#     (:weak_signal_quality_level == 1) &
-#     (:frequency_high_demand == 1) &
-#     (:strong_signal_quality_level == :weak_signal_quality_level)
-# ) nrow()
-
-# @test (101 * 101 * 2 * n_simulations_dddc) == nrow(df_)
-
-# df = AlgorithmicCompetition.expand_and_extract_dddc(df_)
-
-# Basic correctness assurance tests...
-# @test mean(mean.(df[!, :signal_is_weak] .+ df[!, :signal_is_strong])) == 1
-
-# @chain df begin
-#     @subset(:signal_is_strong ∉ ([0, 0], [1, 1]))
-#     @transform(
-#         :profit_gain_sum_1 =
-#             (:profit_gain_weak_signal_player + :profit_gain_strong_signal_player),
-#         :profit_gain_sum_2 = sum(:profit_gain),
-#     )
-#     @transform(:profit_gain_check = :profit_gain_sum_1 != :profit_gain_sum_2)
-#     @combine(sum(:profit_gain_check))
-#     @test _[1, :profit_gain_check_sum] == 0
-# end
-
-# @chain df begin
-#     @subset(:signal_is_strong ∉ ([0, 0], [1, 1]))
-#     @transform(
-#         :profit_gain_sum_1 = (
-#             :profit_gain_demand_high_weak_signal_player +
-#             :profit_gain_demand_high_strong_signal_player
-#         ),
-#         :profit_gain_sum_2 = sum(:profit_gain_demand_high),
-#     )
-#     @transform(:profit_gain_check = :profit_gain_sum_1 != :profit_gain_sum_2)
-#     @combine(sum(:profit_gain_check))
-#     @test _[1, :profit_gain_check_sum] == 0
-# end
-
-# @chain df begin
-#     @subset(
-#         (:signal_is_strong ∉ ([0, 0], [1, 1])) & (:frequency_high_demand != 1)
-#     )
-#     @transform(
-#         :profit_gain_sum_1 = (
-#             :profit_gain_demand_low_weak_signal_player +
-#             :profit_gain_demand_low_strong_signal_player
-#         ),
-#         :profit_gain_sum_2 = sum(:profit_gain_demand_low),
-#     )
-#     @transform(:profit_gain_check = :profit_gain_sum_1 != :profit_gain_sum_2)
-#     @combine(sum(:profit_gain_check))
-#     @test _[1, :profit_gain_check_sum] == 0
-# end
-
-# plt1 = @chain df begin
-#     @transform(:signal_is_strong = string(:signal_is_strong))
-#     data(_) *
-#     mapping(
-#         :frequency_high_demand => "High Demand Frequency",
-#         :profit_mean => "Average Profit",
-#         color = :signal_is_strong => nonnumeric,
-#         row = :signal_is_strong,
-#     ) *
-#     visual(Scatter)
-# end
-# f1 = draw(plt1)
-# save("plots/dddc/plot_1.svg", f1)
-
-# df_summary = AlgorithmicCompetition.construct_df_summary_dddc(df_)
-# @assert nrow(df_summary) == 20402
-# TODO: Rereduce summary data across all runs!
-
-# Question is how existence of low state destabilizes the high state / overall collusion and to what extent...
-# Question becomes 'given signal, estimated demand state prob, which opponent do I believe I am competing against?' the low demand believing opponent or the high demand one...
-# in the case where own and opponents' signals are public, the high-high signal state yields the following probability curve over high state base frequency:
-
-strong_signal_level = 0.9
+strong_signal_level = 1.0
 df_summary = AlgorithmicCompetition.reduce_dddc(DataFrame(Arrow.Table(df_summary_arrow_cache_path)))
 
 df_post_prob = DataFrame(
@@ -805,27 +724,10 @@ end
 f3 = draw(plt3, axis = (xticks = 0.0:0.1:1,))
 save("plots/dddc/plot_3.svg", f3)
 
-freq_high_demand = 0.9
-for freq_high_demand = 0.0:0.1:1
+freq_high_demand = 0.5
+for freq_high_demand = [0.0, 0.5, 1.0]
     n_bins_ = 200
-    df_summary_rounded = @chain df_summary begin
-        # @subset(!ismissing(:profit_gain_min)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
-        # @subset(!ismissing(:profit_gain_max)) # TODO: Remove this once you figure out why missings are in data (or
-        # @subset(!ismissing(:profit_gain_demand_high_weak_signal_player)) # TODO: Remove this once you figure out why missings are in data (or
-        # @subset(!ismissing(:profit_gain_demand_high_strong_signal_player)) # TODO: Remove this once you figure out why missings are in data (or
-        # @transform(
-        #     :weak_signal_quality_level = round(:weak_signal_quality_level * n_bins_; digits=0) / n_bins_,
-        #     :strong_signal_quality_level = round(:strong_signal_quality_level * n_bins_; digits=0) / n_bins_,
-        #     :frequency_high_demand = round(:frequency_high_demand * 10; digits=0) / 10,
-        # # ) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
-        # @groupby(:weak_signal_quality_level, :strong_signal_quality_level, :frequency_high_demand)
-        # @combine(
-        #     :profit_gain_min = mean(:profit_gain_min),
-        #     :profit_gain_max = mean(:profit_gain_max),
-        #     :profit_gain_weak_signal_player = mean(:profit_gain_demand_high_weak_signal_player),
-        #     :profit_gain_strong_signal_player = mean(:profit_gain_demand_high_strong_signal_player),
-        # )
-    end
+    df_summary_rounded = df_summary
     df_summary_weak_weak = @chain df_summary_rounded begin
         @subset(:frequency_high_demand == freq_high_demand)
         @subset(:weak_signal_quality_level == :strong_signal_quality_level)
@@ -852,17 +754,17 @@ for freq_high_demand = 0.0:0.1:1
             renamecols = "" => "_signal_floor",
         )
         @transform(
-            :profit_gain_delta_strong_player_signal_ceil =
-                :profit_gain_strong_signal_player - :profit_gain_avg_signal_ceil,
-            :profit_gain_delta_strong_player_signal_floor =
-                :profit_gain_strong_signal_player - :profit_gain_avg_signal_floor,
+            :profit_gain_delta_strong_player_signal_level_up =
+                :profit_gain_avg_signal_ceil - :profit_gain_strong_signal_player,
+            :profit_gain_delta_strong_player_signal_level_down =
+            :profit_gain_avg_signal_floor - :profit_gain_strong_signal_player,
         )
         # @subset(!ismissing(:profit_gain_strong_signal_player)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
         @transform(
-            :profit_gain_delta_weak_player_signal_ceil =
-                :profit_gain_weak_signal_player - :profit_gain_avg_signal_ceil,
-            :profit_gain_delta_weak_player_signal_floor =
-                :profit_gain_weak_signal_player - :profit_gain_avg_signal_floor,
+            :profit_gain_delta_weak_player_signal_level_up =
+                :profit_gain_avg_signal_ceil - :profit_gain_weak_signal_player,
+            :profit_gain_delta_weak_player_signal_level_down =
+                :profit_gain_avg_signal_floor - :profit_gain_weak_signal_player,
         )
         @transform(
             :weak_player_best_information = argmax([
@@ -919,10 +821,10 @@ for freq_high_demand = 0.0:0.1:1
     plt8_partial = @chain df_rework begin
         stack(
             [
-                :profit_gain_delta_strong_player_signal_ceil,
-                :profit_gain_delta_strong_player_signal_floor,
-                :profit_gain_delta_weak_player_signal_ceil,
-                :profit_gain_delta_weak_player_signal_floor,
+                :profit_gain_delta_strong_player_signal_level_up,
+                :profit_gain_delta_strong_player_signal_level_down,
+                :profit_gain_delta_weak_player_signal_level_up,
+                :profit_gain_delta_weak_player_signal_level_down,
             ],
             variable_name = :signal_intervention,
             value_name = :profit_gain_delta,
@@ -930,14 +832,18 @@ for freq_high_demand = 0.0:0.1:1
         @transform(:player = occursin("weak", :signal_intervention) ? "weak" : "strong")
         @transform(
             :signal_intervention =
-                replace(:signal_intervention, r"profit_gain_delta_.*_player_" => "")
+                replace(:signal_intervention, r"profit_gain_delta_.*_player_signal_" => "")
         )
+        @transform(:signal_intervention = replace(:signal_intervention, "_" => " "))
+        @transform(:signal_intervention = titlecase(:signal_intervention))
+        @transform(:profit_gain_delta_pp = :profit_gain_delta * 100)
+        @transform(:player = titlecase(:player) * " Player")
         data(_) * mapping(
-            :weak_signal_quality_level,
-            :strong_signal_quality_level,
-            :profit_gain_delta,
+            :weak_signal_quality_level => "Weak Signal Strength",
+            :strong_signal_quality_level => "Strong Signal Strength",
+            :profit_gain_delta_pp => "Change in Profit Gain (p.p.)",
             col = :signal_intervention,
-            row = :player,
+            row = :player => titlecase,
         )
     end
     plt8 = plt8_partial * visual(Heatmap)
@@ -1058,7 +964,7 @@ end
 
 
 df_profit_max_min_signal_strength = @chain df_summary begin
-    @subset((:strong_signal_quality_level <= 0.9) & (:weak_signal_quality_level <= 0.9))
+    # @subset((:strong_signal_quality_level <= 0.9) & (:weak_signal_quality_level <= 0.9))
     @groupby(:frequency_high_demand)
     @combine(
         :weak_player__signal_quality_for_profit_max__strong_player_preferences =
@@ -1154,78 +1060,7 @@ f10_2 = draw(
     axis = (
         xticks = 0.0:0.2:1,
         title = "Profit Minimizing Signal Strength",
-        subtitle = "(Signal strength capped at 0.9)",
+        # subtitle = "(Signal strength capped at 0.9)",
     ),
 )
 save("plots/dddc/plot_10_2.svg", f10_2)
-
-# plt4 = @chain df_summary begin
-#     @subset(:weak_signal_quality_level == round(:weak_signal_quality_level; digits=1) & (:strong_signal_quality_level == strong_signal_level))
-#     data(_) *
-#     mapping(
-#         :frequency_high_demand => "High Demand Frequency",
-#         :profit_min => "Minimum Player Profit per Trial",
-#         color = :signal_is_strong => nonnumeric,
-#     ) *
-#     (visual(Lines))
-# end
-# f4 = draw(plt4)
-# save("plots/dddc/plot_4.svg", f4)
-
-# plt5 = @chain df_summary begin
-#     data(_) *
-#     mapping(
-#         :frequency_high_demand => "High Demand Frequency",
-#         :profit_max_mean => "Maximum Player Profit per Trial",
-#         color = :signal_is_strong => nonnumeric,
-#     ) *
-#     (visual(Scatter) + linear())
-# end
-# f5 = draw(plt5)
-# save("plots/dddc/plot_5.svg", f5)
-
-# α = Float64(0.125)
-# β = Float64(4e-1)
-# δ = 0.95
-# ξ = 0.1
-# δ = 0.95
-# n_prices = 15
-# max_iter = Int(1e6) # 1e8
-# price_index = 1:n_prices
-
-# competition_params_dict = Dict(
-#     :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
-#     :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
-# )
-
-# competition_solution_dict =
-#     Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
-
-# data_demand_digital_params = DataDemandDigitalParams(
-#     weak_signal_quality_level = 0.99,
-#     strong_signal_quality_level = 0.995,
-#     signal_is_strong = [true, false],
-#     frequency_high_demand = 0.9,
-# )
-
-# hyperparams = DDDCHyperParameters(
-#     α,
-#     β,
-#     δ,
-#     max_iter,
-#     competition_solution_dict,
-#     data_demand_digital_params;
-#     convergence_threshold = Int(1e5),
-# )
-
-# plt = draw_price_diagnostic(hyperparams)
-# f6 = draw(
-#     plt,
-#     axis = (
-#         title = "Profit Levels across Price Options",
-#         subtitle = "(Solid line is profit for symmetric prices, shaded region shows range based on price options)",
-#         xlabel = "Competitor's Price Choice",
-#     ),
-#     legend = (position = :bottom, titleposition = :left, framevisible = true, padding = 5),
-# )
-# save("plots/dddc/plot_6.svg", f6)
