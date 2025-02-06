@@ -969,7 +969,6 @@ end
 
 
 df_profit_max_min_signal_strength = @chain df_summary begin
-    # @subset((:strong_signal_quality_level <= 0.9) & (:weak_signal_quality_level <= 0.9))
     @groupby(:frequency_high_demand)
     @combine(
         :weak_player__signal_quality_for_profit_max__strong_player_preferences =
@@ -1061,3 +1060,92 @@ f10_2 = draw(
     ),
 )
 save("plots/dddc/plot_10_2.svg", f10_2)
+
+
+df_profit_max_min_signal_strong = @chain df_summary begin
+    @groupby(:strong_signal_quality_level)
+    @combine(
+        :weak_player__signal_quality_for_profit_max__strong_player_preferences =
+            :weak_signal_quality_level[argmax(:profit_gain_strong_signal_player)],
+        :weak_player__signal_quality_for_profit_max__weak_player_preferences =
+            :weak_signal_quality_level[argmax(:profit_gain_weak_signal_player)],
+        :weak_player__signal_quality_for_profit_min =
+            :weak_signal_quality_level[argmin(
+                (:profit_gain_strong_signal_player + :profit_gain_weak_signal_player) / 2,
+            )],
+    )
+end
+
+df_profit_max_min_signal_weak = @chain df_summary begin
+    @groupby(:weak_signal_quality_level)
+    @combine(
+        :strong_player__signal_quality_for_profit_max__strong_player_preferences =
+            :strong_signal_quality_level[argmax(:profit_gain_strong_signal_player)],
+        :strong_player__signal_quality_for_profit_max__weak_player_preferences =
+            :strong_signal_quality_level[argmax(:profit_gain_weak_signal_player)],
+        :strong_player__signal_quality_for_profit_min =
+            :strong_signal_quality_level[argmin(
+                (:profit_gain_strong_signal_player + :profit_gain_weak_signal_player) / 2,
+            )],
+    )
+end
+
+plt_10_3 = @chain df_profit_max_min_signal_strong begin
+    stack(
+        [
+            :weak_player__signal_quality_for_profit_max__strong_player_preferences,
+            :weak_player__signal_quality_for_profit_max__weak_player_preferences,
+            :weak_player__signal_quality_for_profit_min,
+        ],
+        variable_name = :player_situation,
+        value_name = :signal_quality_opponent,
+    )
+    @transform(:player_situation = replace(:player_situation, "weak_player__signal_quality_for_profit_" => ""))
+    @sort(:strong_signal_quality_level)
+    data(_) *
+    mapping(
+        :strong_signal_quality_level => "Signal Quality",
+        :signal_quality_opponent => "Opponent's Signal Quality",
+        color = :player_situation => titlecase => "",
+    ) *
+    visual(Lines)
+end
+f10_3 = draw(
+    plt_10_3,
+    axis = (
+        xticks = 0.0:0.2:1,
+        title = "Profit Minimizing Signal Strength",
+        # subtitle = "(Signal strength capped at 0.9)",
+    ),
+)
+save("plots/dddc/plot_10_3.svg", f10_3)
+
+plt_10_4 = @chain df_profit_max_min_signal_weak begin
+    stack(
+        [
+            :strong_player__signal_quality_for_profit_max__strong_player_preferences,
+            :strong_player__signal_quality_for_profit_max__weak_player_preferences,
+            :strong_player__signal_quality_for_profit_min,
+        ],
+        variable_name = :player_situation,
+        value_name = :signal_quality_opponent,
+    )
+    @transform(:player_situation = replace(:player_situation, "strong_player__signal_quality_for_profit_" => ""))
+    @sort(:weak_signal_quality_level)
+    data(_) *
+    mapping(
+        :weak_signal_quality_level => "Signal Quality",
+        :signal_quality_opponent => "Opponent's Signal Quality",
+        color = :player_situation => titlecase => "",
+    ) *
+    visual(Lines)
+end
+f10_4 = draw(
+    plt_10_4,
+    axis = (
+        xticks = 0.0:0.2:1,
+        title = "Profit Minimizing Signal Strength (Flipped)",
+        # subtitle = "(Signal strength capped at 0.9)",
+    ),
+)
+save("plots/dddc/plot_10_4.svg", f10_4)
