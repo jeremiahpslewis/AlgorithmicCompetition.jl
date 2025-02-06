@@ -847,37 +847,52 @@ for freq_high_demand = [0.0, 0.5, 1.0]
         )
     end
     plt8 = plt8_partial * visual(Heatmap)
-    f8 = draw(plt8) #, axis = (xticks = 0.5:0.1:1,))
+
+    draw(plt8, figure = (; title = "Effect of Signal 'Leveling' on Competition", subtitle = "(High Demand Freq. $freq_high_demand)"))
     save("plots/dddc/plot_8__freq_high_demand_$freq_high_demand.svg", f8)
 
-    plt8_1 = plt8_partial * contour(levels = 8, labels = true)
-    f81 = draw(plt8_1) #, axis = (xticks = 0.5:0.1:1,))
+    plt8_1 = plt8_partial * visual(Contour; levels = 4, labels = false)
+    f81 = draw(
+        plt8_1,
+        figure = (
+            title = "Effect of Signal 'Leveling' on Competition",
+            subtitle = "(High Demand Freq. $freq_high_demand)",
+        ),
+        axis = (xticks = 0.0:0.2:1,)
+    )
     save("plots/dddc/plot_81__freq_high_demand_$freq_high_demand.svg", f81)
 
     plt82 = @chain df_rework begin
+        @transform(
+            :joint_best_information =
+                ((:joint_best_information != "ss") & (:joint_best_information != "dd")) ?
+                    "Disagree" : :joint_best_information
+        )
         data(_) *
         mapping(
-            :weak_signal_quality_level,
-            :strong_signal_quality_level,
-            :joint_best_information,
+            :weak_signal_quality_level => "Weak Signal Strength",
+            :strong_signal_quality_level => "Strong Signal Strength",
+            :joint_best_information => "Best Intervention for Firms",
         ) *
         visual(Heatmap)
     end
     scale_custom_color = scales(
         Color = (;
             categories = [
-                "ss" => "Share/Share",
-                "dd" => "Discard/Discard",
-                "hh" => "Hoard/Hoard",
-                "hs" => "Hoard/Share",
-                "sh" => "Share/Hoard",
-                "dh" => "Discard/Hoard",
-                "hd" => "Hoard/Discard",
-                "ds" => "Discard/Share",
+                "ss" => "Agree: Level Up",
+                "dd" => "Agree: Level Down",
+                # "hh" => "Hoard/Hoard",
+                # "hs" => "Hoard/Share",
+                # "sh" => "Share/Hoard",
+                # "dh" => "Discard/Hoard",
+                # "hd" => "Hoard/Discard",
+                # "ds" => "Discard/Share",
+                "Disagree" => "Disagree",
             ],
         ),
     )
-    f82 = draw(plt82, scale_custom_color)
+    f82 = draw(plt82, scale_custom_color, figure = (; title = "Best Intervention for Firms", subtitle="(High Demand Freq. $freq_high_demand)"))
+    
     save("plots/dddc/plot_82__freq_high_demand_$freq_high_demand.svg", f82)
 
     plt83 = @chain df_rework begin
@@ -922,21 +937,11 @@ plt9 = @chain df_information_summary begin
     ) *
     visual(Band)
 end
-
-f912 = Figure(; size = (800, 600))
-subfig = f912[1, 1]
-grid = draw!(subfig, plt9, axis = (xticks = 0.0:0.2:1, title = ""))
-legend!(f912[1, 2], grid)
-titlelayout = GridLayout(f912[0, 1], halign = :left, tellwidth = false)
-Label(
-    titlelayout[1, 1],
-    "Profit Possibilities Range",
-    halign = :left,
-    fontsize = 20,
-    font = "TeX Gyre Heros Bold Makie",
+f912 = draw(
+    plt9,
+    figure = (; size = (800, 600), title = "Profit Possibilities Range"),
+    axis = (xticks = 0.0:0.2:1, title = "")
 )
-rowgap!(titlelayout, 0)
-f912
 save("plots/dddc/plot_9.svg", f912)
 
 # TODO: Look into using Bayes' Factor instead of frequency high demand for plot...
@@ -1017,20 +1022,12 @@ plt_10_1 = @chain df_profit_max_min_signal_strength begin
 end
 
 
-f = Figure(; size = (800, 600))
-subfig = f[1, 1]
-grid = draw!(subfig, plt_10_1, axis = (xticks = 0.0:0.2:1, yticks = 0.0:0.1:1, title = ""))
-legend!(f[1, 2], grid)
-titlelayout = GridLayout(f[0, 1], halign = :left, tellwidth = false)
-Label(
-    titlelayout[1, 1],
-    "Profit Maximizing Signal Strengths",
-    halign = :left,
-    fontsize = 20,
-    font = "TeX Gyre Heros Bold Makie",
+f = draw(
+    plt_10_1,
+    figure = (size = (800, 600), title = "Profit Maximizing Signal Strengths"),
+    axis = (xticks = 0.0:0.2:1, yticks = 0.0:0.1:1),
+    legend = (position = :right, title = "")
 )
-rowgap!(titlelayout, 0)
-f
 save("plots/dddc/plot_10_1.svg", f)
 
 plt_10_2 = @chain df_profit_max_min_signal_strength begin
