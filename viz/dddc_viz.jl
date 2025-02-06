@@ -1151,22 +1151,146 @@ f10_4 = draw(
 save("plots/dddc/plot_10_4.svg", f10_4)
 
 
-df_profit_max_min_signal_weak = @chain df_summary begin
+df_profit_by_weak_signal_level = @chain df_summary begin
     @groupby(:weak_signal_quality_level)
-    @combine(:profit_gain_10pct = quantile(:profit_gain_strong_signal_player, 0.1),
-             :profit_gain_90pct = quantile(:profit_gain_strong_signal_player, 0.9)
-            )
-end
-
     @combine(
-        :strong_player__signal_quality_for_profit_max__strong_player_preferences =
-            :strong_signal_quality_level[argmax(:profit_gain_strong_signal_player)],
-        :strong_player__signal_quality_for_profit_max__weak_player_preferences =
-            :strong_signal_quality_level[argmax(:profit_gain_weak_signal_player)],
-        :strong_player__signal_quality_for_profit_min =
-            :strong_signal_quality_level[argmin(
-                (:profit_gain_strong_signal_player + :profit_gain_weak_signal_player) / 2,
-            )],
+        :profit_gain_strong_10pct = quantile(:profit_gain_strong_signal_player, 0.1),
+        :profit_gain_strong_90pct = quantile(:profit_gain_strong_signal_player, 0.9),
+        :profit_gain_weak_10pct   = quantile(:profit_gain_weak_signal_player, 0.1),
+        :profit_gain_weak_90pct   = quantile(:profit_gain_weak_signal_player, 0.9)
     )
 end
 
+
+df_summary_weak_signal_summary = @chain df_summary begin
+    leftjoin(
+        df_profit_by_weak_signal_level,
+        on = :weak_signal_quality_level => :weak_signal_quality_level,
+    )
+    @groupby(:weak_signal_quality_level)
+    @combine(
+        :signal_for_strong_player_profit_max_lower_bound = minimum(:strong_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_weak_90pct]),
+        :signal_for_strong_player_profit_max_upper_bound = maximum(:strong_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_weak_90pct]),
+        :signal_for_weak_player_profit_max_lower_bound   = minimum(:strong_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_strong_90pct]),
+        :signal_for_weak_player_profit_max_upper_bound   = maximum(:strong_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_strong_90pct])
+    )
+end
+
+
+# Create a row for the weak player's bounds (based on weak signal quality grouping)
+df_lower = @chain df_summary_weak_signal_summary begin
+    @select(
+        :weak_signal_quality_level,
+        :lower_bound = :signal_for_weak_player_profit_max_lower_bound,
+        :upper_bound = :signal_for_weak_player_profit_max_upper_bound
+    )
+    @transform(:player = "Weak Player")
+end
+
+# Create a row for the strong player's bounds (based on weak signal quality grouping)
+df_strong = @chain df_summary_weak_signal_summary begin
+    @select(
+        :weak_signal_quality_level,
+        :lower_bound = :signal_for_strong_player_profit_max_lower_bound,
+        :upper_bound = :signal_for_strong_player_profit_max_upper_bound
+    )
+    @transform(:player = "Strong Player")
+end
+
+# Combine the two sets of rows (for weak signal quality grouping)
+df_combined = vcat(df_lower, df_strong)
+
+plt_11_1 = @chain df_combined begin
+    @sort(:weak_signal_quality_level)
+    data(_) *
+    mapping(
+        :weak_signal_quality_level  => "Weak Signal Strength",
+        :lower_bound,
+        lower = :lower_bound         => "Lower Bound",
+        upper = :upper_bound         => "Upper Bound",
+        color = :player              => nonnumeric => "Profit Maximizing for:"
+    ) *
+    visual(LinesFill)
+end
+
+f11_1 = draw(
+    plt_11_1,
+    axis = (
+        xticks = 0.5:0.1:1,
+        yticks = 0.5:0.1:1,
+        title = "Signal Strength for Profit Maximization"
+    )
+)
+
+################################################################################
+# Now add the same thing for strong_signal_quality_level
+
+df_profit_by_strong_signal_level = @chain df_summary begin
+    @groupby(:strong_signal_quality_level)
+    @combine(
+        :profit_gain_strong_10pct = quantile(:profit_gain_strong_signal_player, 0.1),
+        :profit_gain_strong_90pct = quantile(:profit_gain_strong_signal_player, 0.9),
+        :profit_gain_weak_10pct   = quantile(:profit_gain_weak_signal_player, 0.1),
+        :profit_gain_weak_90pct   = quantile(:profit_gain_weak_signal_player, 0.9)
+    )
+end
+
+
+df_summary_strong_signal_summary = @chain df_summary begin
+    leftjoin(
+        df_profit_by_strong_signal_level,
+        on = :strong_signal_quality_level => :strong_signal_quality_level,
+    )
+    @groupby(:strong_signal_quality_level)
+    @combine(
+        :signal_for_strong_player_profit_max_lower_bound = minimum(:weak_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_weak_90pct]),
+        :signal_for_strong_player_profit_max_upper_bound = maximum(:weak_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_weak_90pct]),
+        :signal_for_weak_player_profit_max_lower_bound   = minimum(:weak_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_strong_90pct]),
+        :signal_for_weak_player_profit_max_upper_bound   = maximum(:weak_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_strong_90pct])
+    )
+end
+
+# Create a row for the weak player's bounds (based on strong signal quality grouping)
+df_lower_strong = @chain df_summary_strong_signal_summary begin
+    @select(
+        :strong_signal_quality_level,
+        :lower_bound = :signal_for_weak_player_profit_max_lower_bound,
+        :upper_bound = :signal_for_weak_player_profit_max_upper_bound
+    )
+    @transform(:player = "Weak Player")
+end
+
+# Create a row for the strong player's bounds (based on strong signal quality grouping)
+df_strong_strong = @chain df_summary_strong_signal_summary begin
+    @select(
+        :strong_signal_quality_level,
+        :lower_bound = :signal_for_strong_player_profit_max_lower_bound,
+        :upper_bound = :signal_for_strong_player_profit_max_upper_bound
+    )
+    @transform(:player = "Strong Player")
+end
+
+# Combine the two sets of rows (for strong signal quality grouping)
+df_combined_strong = vcat(df_lower_strong, df_strong_strong)
+
+plt_11_2 = @chain df_combined_strong begin
+    @sort(:strong_signal_quality_level)
+    data(_) *
+    mapping(
+        :strong_signal_quality_level  => "Strong Signal Strength",
+        :lower_bound,
+        lower = :lower_bound           => "Lower Bound",
+        upper = :upper_bound           => "Upper Bound",
+        color = :player                => nonnumeric => "Profit Maximizing for:"
+    ) *
+    visual(LinesFill)
+end
+
+f11_2 = draw(
+    plt_11_2,
+    axis = (
+        xticks = 0.5:0.1:1,
+        yticks = 0.5:0.1:1,
+        title = "Signal Strength for Profit Maximization (Strong Signals)"
+    )
+)
