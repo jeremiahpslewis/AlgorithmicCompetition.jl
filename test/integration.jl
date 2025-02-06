@@ -263,7 +263,7 @@ end
         max_iter,
         competition_solution_dict,
         data_demand_digital_params;
-        convergence_threshold = Int(1e5),
+        convergence_threshold = Int(1e7),
     )
 
     e_out = run(hyperparams; stop_on_convergence = true)
@@ -308,7 +308,7 @@ end
     δ = 0.95
     ξ = 0.1
     δ = 0.95
-    max_iter = Int(1e6)
+    max_iter = Int(1e7)
 
     competition_params_dict = Dict(
         :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
@@ -381,7 +381,7 @@ end
     ξ = 0.1
     δ = 0.95
     n_prices = 15
-    max_iter = Int(1e6)
+    max_iter = Int(1e7)
     price_index = 1:n_prices
 
     competition_params_dict = Dict(
