@@ -106,7 +106,7 @@ function extract_params_from_environment()
         params[:max_iter] = Int(1e9)
         params[:convergence_threshold] = Int(1e5)
     end
-
+    @info "Parameters extracted from environment variables: $(params)"
     return params
 end
 
