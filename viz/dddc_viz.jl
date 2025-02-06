@@ -1169,10 +1169,10 @@ df_summary_weak_signal_summary = @chain df_summary begin
     )
     @groupby(:weak_signal_quality_level)
     @combine(
-        :signal_for_strong_player_profit_max_lower_bound = minimum(:strong_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_weak_90pct]),
-        :signal_for_strong_player_profit_max_upper_bound = maximum(:strong_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_weak_90pct]),
-        :signal_for_weak_player_profit_max_lower_bound   = minimum(:strong_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_strong_90pct]),
-        :signal_for_weak_player_profit_max_upper_bound   = maximum(:strong_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_strong_90pct])
+        :signal_for_strong_player_profit_max_lower_bound = minimum(:strong_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_strong_90pct]),
+        :signal_for_strong_player_profit_max_upper_bound = maximum(:strong_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_strong_90pct]),
+        :signal_for_weak_player_profit_max_lower_bound   = minimum(:strong_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_weak_90pct]),
+        :signal_for_weak_player_profit_max_upper_bound   = maximum(:strong_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_weak_90pct])
     )
 end
 
@@ -1243,10 +1243,10 @@ df_summary_strong_signal_summary = @chain df_summary begin
     )
     @groupby(:strong_signal_quality_level)
     @combine(
-        :signal_for_strong_player_profit_max_lower_bound = minimum(:weak_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_weak_90pct]),
-        :signal_for_strong_player_profit_max_upper_bound = maximum(:weak_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_weak_90pct]),
-        :signal_for_weak_player_profit_max_lower_bound   = minimum(:weak_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_strong_90pct]),
-        :signal_for_weak_player_profit_max_upper_bound   = maximum(:weak_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_strong_90pct])
+        :signal_for_strong_player_profit_max_lower_bound = minimum(:weak_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_strong_90pct]),
+        :signal_for_strong_player_profit_max_upper_bound = maximum(:weak_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_strong_90pct]),
+        :signal_for_weak_player_profit_max_lower_bound   = minimum(:weak_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_weak_90pct]),
+        :signal_for_weak_player_profit_max_upper_bound   = maximum(:weak_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_weak_90pct])
     )
 end
 
