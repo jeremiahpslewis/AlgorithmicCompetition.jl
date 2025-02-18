@@ -252,14 +252,50 @@ f22 = draw(
 )
 save("plots/dddc/plot_22.svg", f22)
 
-plt22a = @chain df_summary begin
-    stack(
-        [:convergence_profit_demand_high, :convergence_profit_demand_low],
-        variable_name = :demand_level,
-        value_name = :profit,
+plt22aa = @chain df_summary begin
+    @transform(
+        :profit_gain_demand_high = (:profit_gain_demand_high_max + :profit_gain_demand_high_min) / 2,
+        :profit_gain_demand_low = (:profit_gain_demand_low_max + :profit_gain_demand_low_min) / 2,
     )
-    @subset(!ismissing(:profit) & (:frequency_high_demand == 0.5))
-    @transform(:demand_level = replace(:demand_level, "convergence_profit_demand_" => ""))
+    stack(
+        [:profit_gain_demand_high, :profit_gain_demand_low],
+        variable_name = :demand_level,
+        value_name = :profit_gain,
+    )
+    @subset(
+        (:strong_signal_quality_level == :weak_signal_quality_level) & !ismissing(:profit_gain))
+    @transform(:demand_level = replace(:demand_level, "profit_gain_demand_" => ""))
+    @sort(:weak_signal_quality_level)
+    @transform(
+        :demand_level_str = string("Demand Level: ", :demand_level)
+    )
+    data(_) *
+    mapping(
+        :weak_signal_quality_level => "Signal Strength",
+        :profit_gain               => "Profit Gain",
+        color = :demand_level_str  => nonnumeric => "Demand Level",
+        row = :frequency_high_demand => nonnumeric => "High Demand Frequency",
+    ) *
+    visual(Lines)
+end
+f22aa = draw(
+    plt22aa,
+    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+)
+save("plots/dddc/plot_22aa.svg", f22aa)
+
+plt22a = @chain df_summary begin
+    @subset((:frequency_high_demand == 0.5))
+    @transform(
+        :profit_gain_demand_high = (:profit_gain_demand_high_max + :profit_gain_demand_high_min) / 2,
+        :profit_gain_demand_low = (:profit_gain_demand_low_max + :profit_gain_demand_low_min) / 2,
+    )
+    stack(
+        [:profit_gain_demand_high, :profit_gain_demand_low],
+        variable_name = :demand_level,
+        value_name = :profit_gain,
+    )
+    @transform(:demand_level = replace(:demand_level, "profit_gain_demand_" => ""))
     @sort(:weak_signal_quality_level)
     @transform(
         :demand_level_str = string("Demand Level: ", :demand_level)
@@ -268,7 +304,7 @@ plt22a = @chain df_summary begin
     data(_) *
     mapping(
         :weak_signal_quality_level => "Weak Signal Strength",
-        :profit                      => "Average Profit",
+        :profit_gain                      => "Average Profit",
         color = :strong_signal_quality_level        => nonnumeric => "Strong Signal Strength",
         row = :demand_level_str => nonnumeric => "High Demand Frequency",
     ) *
