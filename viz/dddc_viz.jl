@@ -927,7 +927,7 @@ for freq_high_demand = [0.0, 0.5, 1.0]
     end
     plt8 = plt8_partial * visual(Heatmap)
 
-    draw(plt8, figure = (; title = "Effect of Signal 'Leveling' on Competition", subtitle = "(High Demand Freq. $freq_high_demand)"))
+    f8 = draw(plt8, figure = (; title = "Effect of Signal 'Leveling' on Competition", subtitle = "(High Demand Freq. $freq_high_demand)"))
     save("plots/dddc/plot_8__freq_high_demand_$freq_high_demand.svg", f8)
 
     plt8_1 = plt8_partial * visual(Contour; levels = 4, labels = false)
@@ -970,7 +970,7 @@ for freq_high_demand = [0.0, 0.5, 1.0]
             ],
         ),
     )
-    f82 = draw(plt82, scale_custom_color, figure = (; title = "Best Intervention for Firms", subtitle="(High Demand Freq. $freq_high_demand)"))
+    f82 = draw(plt82, figure = (; title = "Best Intervention for Firms", subtitle="(High Demand Freq. $freq_high_demand)"))
     
     save("plots/dddc/plot_82__freq_high_demand_$freq_high_demand.svg", f82)
 
@@ -983,7 +983,7 @@ for freq_high_demand = [0.0, 0.5, 1.0]
         ) *
         visual(Heatmap)
     end
-    f83 = draw(plt83, scale_custom_color)
+    f83 = draw(plt83)
     save("plots/dddc/plot_83__freq_high_demand_$freq_high_demand.svg", f82)
 end
 
@@ -1022,6 +1022,90 @@ f912 = draw(
     axis = (xticks = 0.0:0.2:1, title = "")
 )
 save("plots/dddc/plot_9.svg", f912)
+
+df_information_summary_a = @chain df_summary begin
+    # @subset(:frequency_high_demand == 0.5)
+    stack(
+        [:profit_gain_strong_signal_player, :profit_gain_weak_signal_player],
+        variable_name = :signal_player,
+        value_name = :profit_gain_delta,
+    )
+    @transform(:signal_player = replace(:signal_player, r"profit_gain_" => ""))
+    @groupby(:frequency_high_demand, :strong_signal_quality_level, :signal_player)
+    @combine(
+        :profit_gain_delta_max = maximum(:profit_gain_delta),
+        :profit_gain_delta_min = minimum(:profit_gain_delta),
+    )
+    @transform(:information_value = :profit_gain_delta_max - :profit_gain_delta_min)
+    @sort(:strong_signal_quality_level)
+    @transform(:signal_player = replace(:signal_player, "_" => " "))
+    @transform(:signal_player = titlecase(:signal_player))
+end
+
+plt9a = @chain df_information_summary_a begin
+    data(_) *
+    mapping(
+        :strong_signal_quality_level => "Strong Signal Strength",
+        :profit_gain_delta_min => "Profit Gain",
+        :profit_gain_delta_max => "Profit Gain",
+        color = :signal_player => nonnumeric => "Signal Player",
+        col = :signal_player => nonnumeric,
+        row = :frequency_high_demand => nonnumeric => "High Demand Frequency",
+    ) *
+    visual(Band)
+end
+f912a = draw(
+    plt9a,
+    figure = (; size = (800, 600), title = "Profit Possibilities Range"),
+    axis = (xticks = 0.0:0.2:1, title = "")
+)
+save("plots/dddc/plot_9a.svg", f912a)
+
+
+df_information_summary_b = @chain df_summary begin
+    # @subset(:frequency_high_demand == 0.5)
+    stack(
+        [:profit_gain_demand_high_weak_signal_player, 
+        :profit_gain_demand_low_weak_signal_player,
+        :profit_gain_demand_high_strong_signal_player,
+        :profit_gain_demand_low_strong_signal_player],
+        variable_name = :demand_signal_player,
+        value_name = :profit_gain_delta,
+    )
+    @transform(:signal_player = replace(:demand_signal_player, r"profit_gain_demand_[^_]+_" => ""))
+    @transform(:demand_level = replace(:demand_signal_player, r"profit_gain_demand_([a-z]+)_.*" => s"\1"))
+    @groupby(:frequency_high_demand, :strong_signal_quality_level, :signal_player, :demand_level)
+    @combine(
+        :profit_gain_delta_max = maximum(:profit_gain_delta),
+        :profit_gain_delta_min = minimum(:profit_gain_delta),
+    )
+    @transform(:information_value = :profit_gain_delta_max - :profit_gain_delta_min)
+    @sort(:strong_signal_quality_level)
+    @transform(:signal_player = replace(:signal_player, "_" => " "))
+    @transform(:signal_player = titlecase(:signal_player))
+    @transform(:demand_level_player_type = :demand_level * " " * :signal_player)
+    @subset(!ismissing(:information_value))
+end
+
+plt9b = @chain df_information_summary_b begin
+    data(_) *
+    mapping(
+        :strong_signal_quality_level => "Strong Signal Strength",
+        :profit_gain_delta_min => "Profit Gain",
+        :profit_gain_delta_max => "Profit Gain",
+        color = :signal_player => nonnumeric => "Signal Player",
+        col = :demand_level_player_type => nonnumeric,
+        row = :frequency_high_demand => nonnumeric => "High Demand Frequency",
+    ) *
+    visual(Band)
+end
+f912b = draw(
+    plt9b,
+    figure = (; size = (800, 600), title = "Profit Possibilities Range"),
+    axis = (xticks = 0.0:0.2:1, title = "")
+)
+save("plots/dddc/plot_9b.svg", f912b)
+
 
 # TODO: Look into using Bayes' Factor instead of frequency high demand for plot...
 
