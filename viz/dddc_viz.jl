@@ -19,8 +19,8 @@ using Arrow
 include("viz/price_diagnostics.jl")
 
 rebuild_summary_files = false
-rebuild_overall_summary = false
-df_summary_arrow_cache_path = "data_final/dddc_v0.1.0_data_summary.arrow"
+rebuild_overall_summary = true
+df_summary_arrow_cache_path = "data_final/dddc_v0.1.1_data_summary.arrow"
 
 arrow_folders = filter!(
     x -> occursin(r"model=dddc_version=2025-01-20-dddc-revised-prices", x),
