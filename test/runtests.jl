@@ -72,7 +72,8 @@ using AlgorithmicCompetition:
     TabularVApproximator,
     TDLearner,
     TDLearner,
-    π
+    π,
+    DDDCPricesPerLastNEpisodes
 using Distributed
 
 @testset "AlgorithmicCompetition.jl" begin

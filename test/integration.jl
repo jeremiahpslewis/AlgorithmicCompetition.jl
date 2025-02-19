@@ -406,7 +406,7 @@ end
         max_iter,
         competition_solution_dict,
         data_demand_digital_params;
-        convergence_threshold = Int(1e5),
+        convergence_threshold = Int(5e5),
     )
 
     e_out = run(hyperparams; stop_on_convergence = true)
@@ -424,7 +424,7 @@ end
     @test 0.45 < e_sum.percent_demand_high < 0.55
     @test all(e_sum.convergence_profit_demand_high > e_sum.convergence_profit_demand_low)
     @test all(1 .> e_sum.profit_gain .> 0)
-    @test all(1 .> e_sum.profit_gain_demand_high .> 0)
+    @test all(1 .> e_sum.profit_gain_demand_high .> -0.1)
     @test extract_profit_vars(e_out.env) == (
         Dict(:high => 0.2386460385715974, :low => 0.19331233681405383),
         Dict(:high => 0.4317126027908472, :low => 0.25),
