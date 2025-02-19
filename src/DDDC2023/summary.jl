@@ -24,6 +24,8 @@ struct DDDCSummary
     price_response_to_demand_signal_mse::Vector{Union{Float64,Missing}}
     percent_demand_high::Float64
     percent_unexplored_states::Vector{Float64}
+    action_index::Vector{String}
+    action_price::Vector{String}
 end
 
 """
@@ -87,11 +89,17 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
     is_converged = Bool[]
     percent_unexplored_states = Float64[]
     convergence_profit = get_convergence_profit_from_hook(hook)
-
+    action_index = String[]
+    action_price = String[]
 
     for player_ in (Player(1), Player(2))
         push!(is_converged, hook[player_][1].is_converged)
         push!(percent_unexplored_states, mean(hook[player_][1].best_response_vector .== 0))
+        push!(action_index, join(hook[player_][3].prices, ","))
+
+        # Extract the price value for each action
+        action_price_vect_ = [env.price_options[i] for i in hook[player_][3].prices]
+        push!(action_price, join(action_price_vect_, ","))
     end
 
     price_vs_demand_signal_counterfactuals =
@@ -112,6 +120,8 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
         [e_[1] for e_ in price_vs_demand_signal_counterfactuals],
         percent_demand_high,
         percent_unexplored_states,
+        action_index,
+        action_price,
     )
 end
 
