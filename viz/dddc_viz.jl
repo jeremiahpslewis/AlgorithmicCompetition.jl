@@ -805,8 +805,8 @@ end
 f3 = draw(plt3, axis = (xticks = 0.0:0.1:1,))
 save("plots/dddc/plot_3.svg", f3)
 
-freq_high_demand = 0.9
-for freq_high_demand = 0.0:0.1:1
+freq_high_demand = 0.5
+for freq_high_demand = [0.0, 0.5, 1.0]
     n_bins_ = 200
     df_summary_rounded = @chain df_summary begin
         # @subset(!ismissing(:profit_gain_min)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
@@ -944,9 +944,9 @@ for freq_high_demand = 0.0:0.1:1
     f8 = draw(plt8) #, axis = (xticks = 0.5:0.1:1,))
     save("plots/dddc/plot_8__freq_high_demand_$freq_high_demand.svg", f8)
 
-    plt8_1 = plt8_partial * contour(levels = 8, labels = true)
-    f81 = draw(plt8_1) #, axis = (xticks = 0.5:0.1:1,))
-    save("plots/dddc/plot_81__freq_high_demand_$freq_high_demand.svg", f81)
+    # plt8_1 = plt8_partial * contour(levels = 8, labels = true)
+    # f81 = draw(plt8_1) #, axis = (xticks = 0.5:0.1:1,))
+    # save("plots/dddc/plot_81__freq_high_demand_$freq_high_demand.svg", f81)
 
     plt82 = @chain df_rework begin
         data(_) *
