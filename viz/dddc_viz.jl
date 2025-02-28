@@ -284,6 +284,47 @@ f22aa = draw(
 )
 save("plots/dddc/plot_22aa.svg", f22aa)
 
+# Mean, max, mean, symmetric
+plt22aaa = @chain df_summary begin
+    @transform(
+        :profit_gain_demand_high = (:profit_gain_demand_high_max + :profit_gain_demand_high_min) / 2,
+        :profit_gain_demand_low = (:profit_gain_demand_low_max + :profit_gain_demand_low_min) / 2,
+    )
+    stack(
+        [:profit_gain_demand_high, :profit_gain_demand_low],
+        variable_name = :demand_level,
+        value_name = :profit_gain,
+    )
+    @subset(!ismissing(:profit_gain))
+    @transform(:min_signal_quality_level = min(:strong_signal_quality_level, :weak_signal_quality_level), :max_signal_quality_level = max(:strong_signal_quality_level, :weak_signal_quality_level), :mean_signal_quality_level = (:strong_signal_quality_level + :weak_signal_quality_level) / 2)
+    stack(
+        [:min_signal_quality_level, :max_signal_quality_level, :mean_signal_quality_level],
+        variable_name = :signal_quality_level_type,
+        value_name = :signal_quality_level,
+    )
+    @groupby(:demand_level, :frequency_high_demand, :signal_quality_level_type, :signal_quality_level)
+    @combine(:profit_gain = mean(:profit_gain))
+    @transform(:demand_level = replace(:demand_level, "profit_gain_demand_" => ""))
+    @sort(:signal_quality_level)
+    @transform(
+        :demand_level_str = string("Demand Level: ", :demand_level)
+    )
+    data(_) *
+    mapping(
+        :signal_quality_level => "Signal Strength",
+        :profit_gain               => "Profit Gain",
+        color = :signal_quality_level_type => "Signal Strength",
+        col = :demand_level_str  => nonnumeric => "Demand Level",
+        row = :frequency_high_demand => nonnumeric => "High Demand Frequency",
+    ) *
+    visual(Lines)
+end
+f22aaa = draw(
+    plt22aaa,
+    legend = (position = :top, titleposition = :left, framevisible = true, padding = 5),
+)
+save("plots/dddc/plot_22aaa.svg", f22aa)
+
 plt22a = @chain df_summary begin
     @subset((:frequency_high_demand == 0.5))
     @transform(
