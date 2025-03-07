@@ -16,10 +16,10 @@ using AlgorithmicCompetition:
 using AlgorithmicCompetition
 using Arrow
 
-include("viz/price_diagnostics.jl")
+include("price_diagnostics.jl")
 
 rebuild_summary_files = false
-rebuild_overall_summary = true
+rebuild_overall_summary = false
 df_summary_arrow_cache_path = "data_final/dddc_v0.1.1_data_summary.arrow"
 
 arrow_folders = filter!(
@@ -256,11 +256,15 @@ plt22aa = @chain df_summary begin
     @transform(
         :profit_gain_demand_high = (:profit_gain_demand_high_max + :profit_gain_demand_high_min) / 2,
         :profit_gain_demand_low = (:profit_gain_demand_low_max + :profit_gain_demand_low_min) / 2,
+        :profit_gain_avg = (:profit_gain_max + :profit_gain_min) / 2,
     )
     stack(
-        [:profit_gain_demand_high, :profit_gain_demand_low],
+        [:profit_gain_demand_high, :profit_gain_demand_low, :profit_gain_avg],
         variable_name = :demand_level,
         value_name = :profit_gain,
+    )
+    @subset(
+        !((:demand_level == "profit_gain") & (:weak_signal_quality_level ∈ [0.0, 1.0]))
     )
     @subset(
         (:strong_signal_quality_level == :weak_signal_quality_level) & !ismissing(:profit_gain))
@@ -970,6 +974,39 @@ for freq_high_demand = [0.0, 0.5, 1.0]
 
     f8 = draw(plt8, figure = (; title = "Effect of Signal 'Leveling' on Competition", subtitle = "(High Demand Freq. $freq_high_demand)"))
     save("plots/dddc/plot_8__freq_high_demand_$freq_high_demand.svg", f8)
+
+    plt8_partial = @chain df_rework begin
+        stack(
+            [
+                :profit_gain_delta_strong_player_signal_level_up,
+                :profit_gain_delta_strong_player_signal_level_down,
+                :profit_gain_delta_weak_player_signal_level_up,
+                :profit_gain_delta_weak_player_signal_level_down,
+            ],
+            variable_name = :signal_intervention,
+            value_name = :profit_gain_delta,
+        )
+        @transform(:player = occursin("weak", :signal_intervention) ? "weak" : "strong")
+        @transform(
+            :signal_intervention =
+                replace(:signal_intervention, r"profit_gain_delta_.*_player_signal_" => "")
+        )
+        @transform(:signal_intervention = replace(:signal_intervention, "_" => " "))
+        @transform(:signal_intervention = titlecase(:signal_intervention))
+        @transform(:profit_gain_delta_pp = :profit_gain_delta * 100)
+        @transform(:player = titlecase(:player) * " Player")
+        data(_) * mapping(
+            :weak_signal_quality_level => "Weak Signal Strength",
+            :strong_signal_quality_level => "Strong Signal Strength",
+            :profit_gain => "Profit Gain",
+            col = :signal_intervention,
+            row = :player => titlecase,
+        )
+    end
+    plt8a = plt8_partial * visual(Heatmap)
+
+    f8a = draw(plt8a, figure = (; title = "Effect of Signal 'Leveling' on Competition", subtitle = "(High Demand Freq. $freq_high_demand)"))
+    save("plots/dddc/plot_8a__freq_high_demand_$freq_high_demand.svg", f8a)
 
     plt8_1 = plt8_partial * visual(Contour; levels = 4, labels = false)
     f81 = draw(
