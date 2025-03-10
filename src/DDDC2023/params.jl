@@ -70,7 +70,6 @@ struct DDDCHyperParameters
             demand_mode in [:high, :low]
         )
 
-
         p_Bert_nash_equilibrium = [competition_solution_dict[demand_mode].p_Bert_nash_equilibrium for
         demand_mode in [:high, :low]]
 
