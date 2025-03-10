@@ -24,6 +24,7 @@ module load JuliaHPC   # loading the latest JuliaHPC
 export SINGULARITYENV_SLURM_ARRAY_TASK_ID="$SLURM_ARRAY_TASK_ID"
 export SINGULARITYENV_SLURM_ARRAY_JOB_ID="$SLURM_ARRAY_JOB_ID"
 export SINGULARITYENV_SLURM_CPUS_PER_TASK="$SLURM_CPUS_PER_TASK"
+export PROJECTDIR="/scratch/hpc-prf-irddcc/AlgorithmicCompetition.jl"
 
 # singularity run algorithmiccompetition.jl_main.sif julia --project=/algcomp /algcomp/src/dddc_slurm_batch.jl
 

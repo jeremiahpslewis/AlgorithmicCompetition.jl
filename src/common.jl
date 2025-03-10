@@ -84,6 +84,7 @@ function extract_params_from_environment()
     n_cores = parse(Int, ENV["SLURM_CPUS_PER_TASK"])
     n_grid_increments = parse(Int, ENV["N_GRID_INCREMENTS"])
     n_parameter_iterations = parse(Int, ENV["N_PARAMETER_ITERATIONS"])
+    project_dir = ENV["PROJECTDIR"]
 
     params = Dict(
         :debug => debug,
@@ -92,6 +93,7 @@ function extract_params_from_environment()
         :n_cores => n_cores,
         :n_grid_increments => n_grid_increments,
         :n_parameter_iterations => n_parameter_iterations,
+        :project_dir => project_dir,
     )
 
     # Overrride in case of debugging
@@ -111,7 +113,7 @@ function extract_params_from_environment()
 end
 
 function setup_logger(params)
-    f_logger = FileLogger("/scratch/hpc-prf-irddcc/AlgorithmicCompetition.jl/log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
+    f_logger = FileLogger("$(params[:project_dir])/log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
     debuglogger = MinLevelLogger(f_logger, Logging.Info)
     global_logger(debuglogger)
 end
