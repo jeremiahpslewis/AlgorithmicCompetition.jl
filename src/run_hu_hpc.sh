@@ -5,9 +5,7 @@
 # or
 # TASK=AIAPC bash src/run_hu_hpc.sh
 
-juliaup update
-
-module reset
+module load julia
 
 export APPTAINER_CACHEDIR=/lustre/department/lewisjps/apptainer
 # export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
