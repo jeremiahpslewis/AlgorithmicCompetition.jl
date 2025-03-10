@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # In order to run this script, do the following:
-# TASK=DDDC bash src/run_pc2.sh
+# TASK=DDDC bash src/run_hu_hpc.sh
 # or
-# TASK=AIAPC bash src/run_pc2.sh
+# TASK=AIAPC bash src/run_hu_hpc.sh
 
 module reset
 
