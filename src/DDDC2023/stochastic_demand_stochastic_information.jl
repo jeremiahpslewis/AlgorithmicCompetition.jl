@@ -31,7 +31,7 @@ function get_demand_signals(
 )
     # If both signal qualities are zero, then we return a CONSTANT true signal, this is equivalent to Calvano et al. (2019)'s stochastic demand, NO signal
     if weak_signal_quality_level == 0.0 && strong_signal_quality_level == 0.0
-        return true
+        return [true, true]
     end
 
     true_signal_probability =
