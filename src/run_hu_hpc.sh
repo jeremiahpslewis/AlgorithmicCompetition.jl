@@ -5,6 +5,8 @@
 # or
 # TASK=AIAPC bash src/run_hu_hpc.sh
 
+juliaup update
+
 module reset
 
 export APPTAINER_CACHEDIR=/lustre/department/lewisjps/apptainer
