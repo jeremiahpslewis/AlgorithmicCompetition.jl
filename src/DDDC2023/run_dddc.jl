@@ -35,6 +35,7 @@ function run_dddc(;
 
     frequency_high_demand_range = [0.5]
     signal_quality_level_range = Float64.(range(0.5, 1.0, n_grid_increments + 1))
+    push!(signal_quality_level_range, 0.0) # Add NO signal stochastic demand case
 
     if debug
         frequency_high_demand_range = frequency_high_demand_range[1:10:end]
