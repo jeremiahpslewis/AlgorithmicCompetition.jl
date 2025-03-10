@@ -5,15 +5,15 @@ using Arrow
 using Distributed
 using Dates
 
-version = 0.6
+version = 0.1
 start_timestamp = now()
 start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd__HH_MM_SS")
 
 if Sys.isapple()
     n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
 
-    n_parameter_iterations = 1
-    n_grid_increments = 10
+    n_parameter_iterations = 100
+    n_grid_increments = 1
 else
     n_procs_ = 63
 
