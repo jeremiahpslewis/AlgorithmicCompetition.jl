@@ -17,4 +17,4 @@ echo "Bash: Running DDDC with $N_GRID_INCREMENTS grid increments"
 
 module load julia
 
-julia --project=. ~/AlgorithmicCompetiton.jl/src/dddc_slurm_batch.jl
+julia --project=. ~/AlgorithmicCompetition.jl/src/dddc_slurm_batch.jl
