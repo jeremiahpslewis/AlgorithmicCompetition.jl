@@ -263,7 +263,7 @@ end
         max_iter,
         competition_solution_dict,
         data_demand_digital_params;
-        convergence_threshold = Int(1e7),
+        convergence_threshold = Int(1e5),
     )
 
     e_out = run(hyperparams; stop_on_convergence = true)
