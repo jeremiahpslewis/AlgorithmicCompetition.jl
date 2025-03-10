@@ -6,7 +6,7 @@
 #SBATCH --mem-per-cpu=1600M
 #SBATCH --cpus-per-task=16 # 128 core
 #SBATCH --time=24:00:00 # For full run true value should be <13 hours
-#SBATCH --partition standard*
+#SBATCH --partition standard
 
 # For full version, N_GRID_INCREMENTS=100
 export N_GRID_INCREMENTS=20 # Number of grid increments
@@ -17,4 +17,4 @@ echo "Bash: Running DDDC with $N_GRID_INCREMENTS grid increments"
 
 module load julia
 
-julia --project=. src/dddc_slurm_batch.jl
+julia --project=. ~/AlgorithmicCompetiton.jl/src/dddc_slurm_batch.jl
