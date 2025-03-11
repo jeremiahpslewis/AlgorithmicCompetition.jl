@@ -17,7 +17,7 @@ start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd__HH_MM_SS")
 
 n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
 
-ENV["N_PARAMETER_ITERATIONS"] = 1000
+ENV["N_PARAMETER_ITERATIONS"] = 1
 ENV["N_GRID_INCREMENTS"] = 0
 ENV["DEBUG"] = 0
 ENV["VERSION"] = "v0.1.1"
@@ -54,7 +54,7 @@ AlgorithmicCompetition.run_dddc(
     n_parameter_iterations = params[:n_parameter_iterations],
     n_grid_increments = params[:n_grid_increments],
     debug = params[:debug],
-);
+)
 
 if params[:n_cores] > 1
     rmprocs(_procs)

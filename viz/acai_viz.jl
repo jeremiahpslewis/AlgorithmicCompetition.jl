@@ -15,7 +15,7 @@ using AlgorithmicCompetition
 using Arrow
 using Tidier
 
-df_summary_arrow_cache_path = "data/SLURM_ARRAY_JOB_ID=0_debug=true_model=dddc_version=v0.1.1/SLURM_ARRAY_TASK_ID=0_start_timestamp=2025-03-11T11:22:48.287_df_summary.arrow"
+df_summary_arrow_cache_path = "data/SLURM_ARRAY_JOB_ID=0_debug=true_model=dddc_version=v0.1.1/SLURM_ARRAY_TASK_ID=0_start_timestamp=2025-03-11T14:11:10.744_df_summary.arrow"
 df_full = DataFrame(Arrow.Table(df_summary_arrow_cache_path))
 df_summary = AlgorithmicCompetition.reduce_dddc(df_full)
 

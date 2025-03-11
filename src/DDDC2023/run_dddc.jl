@@ -41,11 +41,6 @@ function run_dddc(;
     else    
         signal_quality_level_range = Float64.(range(0.5, 1.0, n_grid_increments + 1))
     end
-    # Always run 'missing' signal stochastic demand case
-    push!(signal_quality_level_range, 0.0)
-
-    # Always run 'sunspot' signal stochastic demand case
-    push!(signal_quality_level_range, -1.0)
 
     if debug
         signal_quality_level_range = signal_quality_level_range[1:10:end]
@@ -73,7 +68,26 @@ function run_dddc(;
         signal_quality_players in signal_quality_vect for
         weak_signal_quality_level in signal_quality_level_range for
         strong_signal_quality_level in signal_quality_level_range if
-        weak_signal_quality_level <= strong_signal_quality_level
+        weak_signal_quality_level <= strong_signal_quality_level 
+    ]
+
+    # Always run 'missing' signal stochastic demand case, 0.0
+    # Always run 'sunspot' joint random signal stochastic demand case -1.0
+    signal_quality_joint_vect = [0.0, -1.0]
+    data_demand_digital_param_special_set = [
+        DataDemandDigitalParams(
+            weak_signal_quality_level = signal_quality_level,
+            strong_signal_quality_level = signal_quality_level,
+            signal_is_strong = signal_quality_players,
+            frequency_high_demand = frequency_high_demand,
+        ) for frequency_high_demand in frequency_high_demand_range for
+        signal_quality_players in signal_quality_vect for
+        signal_quality_level in signal_quality_joint_vect
+    ]
+
+    data_demand_digital_param_set = [
+        data_demand_digital_param_set...,
+        data_demand_digital_param_special_set...
     ]
 
     hyperparameter_vect = [
