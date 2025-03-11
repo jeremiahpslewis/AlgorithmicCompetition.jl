@@ -16,15 +16,23 @@ using Arrow
 using Tidier
 
 df_summary_arrow_cache_path = "data_final/dddc_v0.1.1_data_summary.arrow"
-df_summary = AlgorithmicCompetition.reduce_dddc(DataFrame(Arrow.Table(df_summary_arrow_cache_path)))
+df_full = DataFrame(Arrow.Table(df_summary_arrow_cache_path))
+df_patch = AlgorithmicCompetition.construct_df_summary_dddc(AlgorithmicCompetition.expand_and_extract_dddc(DataFrame(Arrow.Table("data_final/dddc_v0.1.1_data_patch.arrow"))))
+df_full = vcat(df_full, df_patch)
+df_summary = AlgorithmicCompetition.reduce_dddc(df_full)
+
 mkpath("plots/acai")
 
-demand_cat(x) = x == 1 ? "Always High" : x == 0 ? "Always Low" : "High / Low Split"
+demand_cat(x) = x == 1 ? "Always High" : x == 0 ? "Always Low" : x == 0.5 ? "High / Low Split" : "Invalid"
 function signal_cat(signal_quality_level)
     if signal_quality_level == 1
         return "Perfect"
-    else
+    elseif signal_quality_level == 0.5
         return "Noise"
+    elseif signal_quality_level == 0
+        return "None"
+    else
+        error("Invalid signal quality level: $signal_quality_level")
     end
 end
 
@@ -50,9 +58,9 @@ f1 = draw(v1)
 save("plots/acai/plot_1_barplot_profit_gain_by_signal_and_demand_scenario.svg", f1)
 
 v1 = @chain df_summary begin
-    @filter((weak_signal_quality_level ∈ [0.5, 1.0]) & (strong_signal_quality_level ∈ [0.5, 1.0]) & (strong_signal_quality_level == weak_signal_quality_level))
+    @filter((weak_signal_quality_level ∈ [0.0, 0.5, 1.0]) & (strong_signal_quality_level ∈ [0.0, 0.5, 1.0]) & (strong_signal_quality_level == weak_signal_quality_level))
     @mutate(
-        signal_quality_level = categorical(signal_cat(weak_signal_quality_level, frequency_high_demand), levels=["None", "Perfect", "Noise"], ordered=true),
+        signal_quality_level = categorical(signal_cat(weak_signal_quality_level), levels=["None", "Perfect", "Noise"], ordered=true),
         profit_gain = (profit_gain_min + profit_gain_max) / 2,
         demand_scenario = demand_cat(frequency_high_demand)
     )

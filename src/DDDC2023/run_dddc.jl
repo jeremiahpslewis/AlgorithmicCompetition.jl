@@ -34,8 +34,15 @@ function run_dddc(;
     signal_quality_vect = [[true, false]] # With signal_quality_range over both weak and strong, [false, false] case is redundant
 
     frequency_high_demand_range = [0, 0.5, 1.0]
-    signal_quality_level_range = Float64.(range(0.5, 1.0, n_grid_increments + 1))
-    push!(signal_quality_level_range, 0.0) # Add NO signal stochastic demand case
+
+    # if n_grid_increments == 0, then only consider perfect and noisy signal cases
+    if n_grid_increments == 0
+        signal_quality_level_range = [0.5, 1.0]
+    else    
+        signal_quality_level_range = Float64.(range(0.5, 1.0, n_grid_increments + 1))
+    end
+    # Always run 'missing' signal stochastic demand case
+    push!(signal_quality_level_range, 0.0)
 
     if debug
         signal_quality_level_range = signal_quality_level_range[1:10:end]
