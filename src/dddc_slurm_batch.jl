@@ -48,3 +48,8 @@ else
         debug = params[:debug],
     )
 end
+
+if params[:n_cores] > 1
+    rmprocs(_procs)
+end
+
