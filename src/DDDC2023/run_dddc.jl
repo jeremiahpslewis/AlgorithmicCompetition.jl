@@ -44,6 +44,9 @@ function run_dddc(;
     # Always run 'missing' signal stochastic demand case
     push!(signal_quality_level_range, 0.0)
 
+    # Always run 'sunspot' signal stochastic demand case
+    push!(signal_quality_level_range, -1.0)
+
     if debug
         signal_quality_level_range = signal_quality_level_range[1:10:end]
     end

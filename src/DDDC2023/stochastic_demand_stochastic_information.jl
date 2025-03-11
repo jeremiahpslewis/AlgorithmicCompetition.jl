@@ -34,6 +34,12 @@ function get_demand_signals(
         return [true, true]
     end
 
+    # If both signal qualities are -1, then we return a common sunspot signal, e.g. identical for both players, but independent of demand
+    if weak_signal_quality_level == -1.0 && strong_signal_quality_level == -1.0
+        sunspot_value = rand(Bool)
+        return [sunspot_value, sunspot_value]
+    end
+
     true_signal_probability =
         (weak_signal_quality_level .* .!signal_is_strong) .+
         (strong_signal_quality_level .* signal_is_strong)

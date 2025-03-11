@@ -18,7 +18,7 @@ else
     n_procs_ = 63
 
     n_parameter_iterations = 40 * 14 # 40 takes about an hour on 63 cores
-    n_grid_increments = 10
+    n_grid_increments = 0 # run only perfect, noisy, and 'missing' signal cases
 end
 
 _procs = addprocs(
