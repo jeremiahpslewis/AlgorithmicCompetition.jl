@@ -10,8 +10,8 @@
 #SBATCH --mail-user=irddcc1@mail.uni-paderborn.de   # Where to send mail	
 
 # For full version, N_GRID_INCREMENTS=100
-export N_GRID_INCREMENTS=20
-export N_PARAMETER_ITERATIONS=1 # Number of iterations over all parameter sets per job
+export N_GRID_INCREMENTS=1
+export N_PARAMETER_ITERATIONS=500 # Number of iterations over all parameter sets per job
 export VERSION="2024-12-23-dddc-full-test"
 export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
 export DEBUG=0
