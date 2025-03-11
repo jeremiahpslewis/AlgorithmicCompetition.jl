@@ -3,6 +3,11 @@ using AlgorithmicCompetition
 using Dates
 using Distributed
 
+ENV["N_PARAMETER_ITERATIONS"] = 900
+ENV["N_GRID_INCREMENTS"] = 0
+ENV["DEBUG"] = 0
+ENV["VERSION"] = "v0.1.1"
+
 params = AlgorithmicCompetition.extract_params_from_environment()
 
 AlgorithmicCompetition.setup_logger(params)
@@ -17,10 +22,6 @@ start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd__HH_MM_SS")
 
 n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
 
-ENV["N_PARAMETER_ITERATIONS"] = 1
-ENV["N_GRID_INCREMENTS"] = 0
-ENV["DEBUG"] = 0
-ENV["VERSION"] = "v0.1.1"
 
 _procs = addprocs(
     n_procs_,
@@ -41,10 +42,7 @@ if params[:n_cores] > 1
         Pkg.instantiate()
         using AlgorithmicCompetition:
             extract_params_from_environment, setup_logger, run_and_extract
-        ENV["N_PARAMETER_ITERATIONS"] = 1
-        ENV["N_GRID_INCREMENTS"] = 0
-        ENV["DEBUG"] = 0
-        ENV["VERSION"] = "v0.1.1"
+
         params = extract_params_from_environment()
         setup_logger(params)
         @info "Dependencies loaded."

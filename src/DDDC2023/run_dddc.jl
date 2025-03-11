@@ -36,11 +36,14 @@ function run_dddc(;
     frequency_high_demand_range = [0, 0.5, 1.0]
 
     # if n_grid_increments == 0, then only consider perfect and noisy signal cases
+    @info "Running DDDC with n_grid_increments = $n_grid_increments"
     if n_grid_increments == 0
         signal_quality_level_range = [0.5, 1.0]
     else    
         signal_quality_level_range = Float64.(range(0.5, 1.0, n_grid_increments + 1))
     end
+
+    @info "Signal quality level range: $signal_quality_level_range"
 
     if debug
         signal_quality_level_range = signal_quality_level_range[1:10:end]
@@ -130,7 +133,9 @@ function run_dddc(;
         )),
     )
     mkpath(folder_name)
+    @info "Saving $(length(exp_list)) results to $folder_name"
     df = extract_sim_results(exp_list)
+
     if !precompile
         Arrow.write(folder_name * ".arrow", df)
     end
