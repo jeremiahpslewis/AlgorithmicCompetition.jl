@@ -87,6 +87,7 @@ function extract_params_from_environment()
     n_parameter_iterations = parse(Int, get(ENV, "N_PARAMETER_ITERATIONS", "1"))
 
     params = Dict(
+        :version => version,
         :debug => debug,
         :SLURM_ARRAY_TASK_ID => SLURM_ARRAY_TASK_ID,
         :SLURM_ARRAY_JOB_ID => SLURM_ARRAY_JOB_ID,

@@ -34,7 +34,7 @@ if params[:debug] && params[:SLURM_ARRAY_TASK_ID] > 10
 else
     @info "Running DDDC batch with n_grid_increments = $(params[:n_grid_increments])."
     AlgorithmicCompetition.run_dddc(
-        version = ENV["VERSION"],
+        version = params[:version],
         start_timestamp = now(),
         n_parameter_iterations = params[:n_parameter_iterations],
         n_grid_increments = params[:n_grid_increments],
