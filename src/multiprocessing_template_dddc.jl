@@ -19,6 +19,7 @@ n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
 
 params[:n_parameter_iterations] = 1000
 params[:n_grid_increments] = 0
+params[:debug] = 0
 
 _procs = addprocs(
     n_procs_,
@@ -45,18 +46,14 @@ if params[:n_cores] > 1
     end
 end
 
-if params[:debug] && params[:SLURM_ARRAY_TASK_ID] > 10
-    return
-else
-    @info "Running DDDC batch with n_grid_increments = $(params[:n_grid_increments])."
-    AlgorithmicCompetition.run_dddc(
-        version = params[:version],
-        start_timestamp = now(),
-        n_parameter_iterations = params[:n_parameter_iterations],
-        n_grid_increments = params[:n_grid_increments],
-        debug = params[:debug],
-    );
-end
+@info "Running DDDC batch with n_grid_increments = $(params[:n_grid_increments])."
+AlgorithmicCompetition.run_dddc(
+    version = params[:version],
+    start_timestamp = now(),
+    n_parameter_iterations = params[:n_parameter_iterations],
+    n_grid_increments = params[:n_grid_increments],
+    debug = params[:debug],
+);
 
 if params[:n_cores] > 1
     rmprocs(_procs)
