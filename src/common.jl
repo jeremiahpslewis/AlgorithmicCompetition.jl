@@ -113,8 +113,9 @@ function extract_params_from_environment()
 end
 
 function setup_logger(params)
-    mkpath("$(params[:project_dir])/log", exist_ok=true)
+    mkpath("$(params[:project_dir])/log")
     f_logger = FileLogger("$(params[:project_dir])/log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
     debuglogger = MinLevelLogger(f_logger, Logging.Info)
     global_logger(debuglogger)
+    @info "Logger setup complete."
 end
