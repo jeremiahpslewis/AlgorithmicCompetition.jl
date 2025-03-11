@@ -67,16 +67,6 @@ end
 
 function extract_params_from_environment()
     @info "Extracting parameters from environment variables."
-    if Sys.isapple()
-        # For debugging on MacOS
-        ENV["DEBUG"] = 1
-        ENV["SLURM_ARRAY_TASK_ID"] = 1
-        ENV["SLURM_ARRAY_JOB_ID"] = 1
-        ENV["SLURM_CPUS_PER_TASK"] = 6
-        ENV["VERSION"] = "v1"
-        ENV["N_GRID_INCREMENTS"] = 10
-        ENV["N_PARAMETER_ITERATIONS"] = 1
-    end
 
     version = get(ENV, "VERSION", "v1")
     debug = parse(Int, get(ENV, "SLURM_ARRAY_TASK_ID", "1")) == 1
