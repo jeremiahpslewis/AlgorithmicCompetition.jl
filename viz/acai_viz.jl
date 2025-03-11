@@ -15,10 +15,8 @@ using AlgorithmicCompetition
 using Arrow
 using Tidier
 
-df_summary_arrow_cache_path = "data_final/dddc_v0.1.1_data_summary.arrow"
+df_summary_arrow_cache_path = "data/SLURM_ARRAY_JOB_ID=0_debug=true_model=dddc_version=v0.1.1/SLURM_ARRAY_TASK_ID=0_start_timestamp=2025-03-11T11:22:48.287_df_summary.arrow"
 df_full = DataFrame(Arrow.Table(df_summary_arrow_cache_path))
-df_patch = AlgorithmicCompetition.construct_df_summary_dddc(AlgorithmicCompetition.expand_and_extract_dddc(DataFrame(Arrow.Table("data_final/dddc_v0.1.1_data_patch.arrow"))))
-df_full = vcat(df_full, df_patch)
 df_summary = AlgorithmicCompetition.reduce_dddc(df_full)
 
 mkpath("plots/acai")
