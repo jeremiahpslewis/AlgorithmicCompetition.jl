@@ -41,6 +41,10 @@ if params[:n_cores] > 1
         Pkg.instantiate()
         using AlgorithmicCompetition:
             extract_params_from_environment, setup_logger, run_and_extract
+        ENV["N_PARAMETER_ITERATIONS"] = 1
+        ENV["N_GRID_INCREMENTS"] = 0
+        ENV["DEBUG"] = 0
+        ENV["VERSION"] = "v0.1.1"
         params = extract_params_from_environment()
         setup_logger(params)
         @info "Dependencies loaded."
@@ -48,7 +52,7 @@ if params[:n_cores] > 1
 end
 
 @info "Running DDDC batch with n_grid_increments = $(params[:n_grid_increments])."
-AlgorithmicCompetition.run_dddc(
+exp_list = AlgorithmicCompetition.run_dddc(
     version = params[:version],
     start_timestamp = now(),
     n_parameter_iterations = params[:n_parameter_iterations],

@@ -3,6 +3,7 @@ using ReinforcementLearning
 using DataFrames
 using Flux: mse
 using DataFrameMacros
+import Base
 
 """
     DDDCSummary(α, β, is_converged, data_demand_digital_params, convergence_profit, convergence_profit_demand_high, convergence_profit_demand_low, profit_gain, profit_gain_demand_high, profit_gain_demand_low, iterations_until_convergence, price_response_to_demand_signal_mse, percent_demand_high)
@@ -26,6 +27,26 @@ struct DDDCSummary
     percent_unexplored_states::Vector{Float64}
     action_index::Vector{String}
     action_price::Vector{String}
+end
+
+function Base.show(io::IO, s::DDDCSummary)
+    println(io, "DDDCSummary:")
+    println(io, "  α: ", s.α)
+    println(io, "  β: ", s.β)
+    println(io, "  Convergence: ", s.is_converged)
+    println(io, "  Data Demand Params: ", s.data_demand_digital_params)
+    println(io, "  Convergence Profit (overall): ", s.convergence_profit)
+    println(io, "  Convergence Profit (high demand): ", s.convergence_profit_demand_high)
+    println(io, "  Convergence Profit (low demand): ", s.convergence_profit_demand_low)
+    println(io, "  Profit Gain: ", s.profit_gain)
+    println(io, "  Profit Gain (high demand): ", s.profit_gain_demand_high)
+    println(io, "  Profit Gain (low demand): ", s.profit_gain_demand_low)
+    println(io, "  Iterations Until Convergence: ", s.iterations_until_convergence)
+    println(io, "  Price Response MSE: ", s.price_response_to_demand_signal_mse)
+    println(io, "  Percent Demand High: ", s.percent_demand_high)
+    println(io, "  Percent Unexplored States: ", s.percent_unexplored_states)
+    println(io, "  Action Index: ", s.action_index[1][1:5], "; ", s.action_index[2][1:5])
+    println(io, "  Action Price: ", s.action_price[1][1:10], "; ", s.action_price[2][1:10])
 end
 
 """
