@@ -79,12 +79,11 @@ function extract_params_from_environment()
     end
 
     debug = parse(Int, ENV["DEBUG"]) == 1
-    SLURM_ARRAY_TASK_ID = parse(Int, ENV["SLURM_ARRAY_TASK_ID"])
-    SLURM_ARRAY_JOB_ID = parse(Int, ENV["SLURM_ARRAY_JOB_ID"])
-    n_cores = parse(Int, ENV["SLURM_CPUS_PER_TASK"])
-    n_grid_increments = parse(Int, ENV["N_GRID_INCREMENTS"])
-    n_parameter_iterations = parse(Int, ENV["N_PARAMETER_ITERATIONS"])
-    project_dir = ENV["PROJECTDIR"]
+    SLURM_ARRAY_TASK_ID = parse(Int,  get(ENV, "SLURM_ARRAY_TASK_ID", "1"))
+    SLURM_ARRAY_JOB_ID = parse(Int, get(ENV, "SLURM_ARRAY_JOB_ID", "1"))
+    n_cores = parse(Int, get(ENV, "SLURM_CPUS_PER_TASK", "2"))
+    n_grid_increments = parse(Int, get(ENV, "N_GRID_INCREMENTS", "10"))
+    n_parameter_iterations = parse(Int, get(ENV, "N_PARAMETER_ITERATIONS", "1"))
 
     params = Dict(
         :debug => debug,
@@ -93,7 +92,6 @@ function extract_params_from_environment()
         :n_cores => n_cores,
         :n_grid_increments => n_grid_increments,
         :n_parameter_iterations => n_parameter_iterations,
-        :project_dir => project_dir,
     )
 
     # Overrride in case of debugging
@@ -113,8 +111,8 @@ function extract_params_from_environment()
 end
 
 function setup_logger(params)
-    mkpath("$(params[:project_dir])/log")
-    f_logger = FileLogger("$(params[:project_dir])/log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
+    mkpath("log")
+    f_logger = FileLogger("log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
     debuglogger = MinLevelLogger(f_logger, Logging.Info)
     global_logger(debuglogger)
     @info "Logger setup complete."
