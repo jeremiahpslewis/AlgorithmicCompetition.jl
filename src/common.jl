@@ -78,6 +78,7 @@ function extract_params_from_environment()
         ENV["N_PARAMETER_ITERATIONS"] = 1
     end
 
+    version = get(ENV, "VERSION", "v1")
     debug = parse(Int, get(ENV, "SLURM_ARRAY_TASK_ID", "1")) == 1
     SLURM_ARRAY_TASK_ID = parse(Int,  get(ENV, "SLURM_ARRAY_TASK_ID", "1"))
     SLURM_ARRAY_JOB_ID = parse(Int, get(ENV, "SLURM_ARRAY_JOB_ID", "1"))
