@@ -47,7 +47,7 @@ edge_cases = [0.5, 1.0, 0.0, -1.0]
 v1 = @chain df_summary begin
     @filter((weak_signal_quality_level ∈ !!edge_cases) & (strong_signal_quality_level ∈ !!edge_cases))
     @mutate(
-        signal_quality_level = categorical(signal_cat(weak_signal_quality_level, strong_signal_quality_level), levels=["None", "Perfect", "Noise", "Common Sunspot", "Perfect / Noise Split"], ordered=true),
+        signal_quality_level = categorical(signal_cat(weak_signal_quality_level, strong_signal_quality_level), levels=["None", "Perfect", "Common Sunspot", "Perfect / Noise Split", "Noise"], ordered=true),
         profit_gain = (profit_gain_min + profit_gain_max) / 2,
         demand_scenario = demand_cat(frequency_high_demand)
     )
