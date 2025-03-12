@@ -44,14 +44,17 @@ function signal_cat(weak_signal_quality_level, strong_signal_quality_level)
 end
 
 edge_cases = [0.5, 1.0, 0.0, -1.0]
-v1 = @chain df_summary begin
+key_viz_data = @chain df_summary begin
     @filter((weak_signal_quality_level ∈ !!edge_cases) & (strong_signal_quality_level ∈ !!edge_cases))
     @mutate(
         signal_quality_level = categorical(signal_cat(weak_signal_quality_level, strong_signal_quality_level), levels=["None", "Perfect", "Common Sunspot", "Perfect / Noise Split", "Noise"], ordered=true),
         profit_gain = (profit_gain_min + profit_gain_max) / 2,
         demand_scenario = demand_cat(frequency_high_demand)
     )
-    @select(signal_quality_level, demand_scenario, profit_gain)
+    @select(signal_quality_level, demand_scenario, profit_gain, profit_mean)
+end
+
+v1 = @chain viz_data begin
     data(_) *
     mapping(
         :signal_quality_level => nonnumeric => "",
@@ -65,3 +68,18 @@ end
 f1 = draw(v1, axis = (; xticklabelrotation = 45),
 figure = (; size = (800, 600), title = "Algorithmic Collusion Outcomes by Information Set", subtitle="Mean of $(df_summary[1, :n_obs]) simulations per scenario", fontsize = 16))
 save("plots/acai/plot_1_barplot_profit_gain_by_signal_and_demand_scenario.svg", f1)
+
+v2 = @chain key_viz_data begin
+    data(_) *
+    mapping(
+        :signal_quality_level => nonnumeric => "",
+        :profit_mean => "Avg. Profit",
+        color = :signal_quality_level => nonnumeric => "Scenario",
+        col = :demand_scenario => nonnumeric => "Demand Scenario",
+    ) *
+    (visual(BarPlot))
+end
+
+f2 = draw(v2, axis = (; xticklabelrotation = 45),
+figure = (; size = (800, 600), title = "Algorithmic Collusion Outcomes by Information Set", subtitle="Mean of $(df_summary[1, :n_obs]) simulations per scenario", fontsize = 16))
+save("plots/acai/plot_2_barplot_avg_profit_by_signal_and_demand_scenario.svg", f2)
