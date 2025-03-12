@@ -347,6 +347,10 @@ function reduce_dddc(df_summary::DataFrame)
         df_summary[!, :n_obs] .= 1
     end
 
+    if length(unique(df_summary[!, :n_obs])) > 1
+        @warn "n_obs is not constant across rows"
+    end
+
     df_reduced = @chain df_summary begin
         @groupby(
             :weak_signal_quality_level,

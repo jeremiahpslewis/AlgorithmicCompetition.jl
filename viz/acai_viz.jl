@@ -15,7 +15,7 @@ using AlgorithmicCompetition
 using Arrow
 using Tidier
 
-arrow_files = readdir("data/SLURM_ARRAY_JOB_ID=0_debug=false_model=dddc_version=v0.1.1", join = true)
+arrow_files = readdir("data/SLURM_ARRAY_JOB_ID=0_debug=false_model=dddc_version=v0.1.2", join = true)
 arrow_files = filter(y -> occursin("df_summary.arrow", y), arrow_files)
 df_full = vcat(DataFrame.(Arrow.Table.(arrow_files))...)
 df_summary = AlgorithmicCompetition.reduce_dddc(df_full)
@@ -23,25 +23,31 @@ df_summary = AlgorithmicCompetition.reduce_dddc(df_full)
 mkpath("plots/acai")
 
 demand_cat(x) = x == 1 ? "Always High" : x == 0 ? "Always Low" : x == 0.5 ? "High / Low Split" : "Invalid"
-function signal_cat(signal_quality_level)
-    if signal_quality_level == 1
-        return "Perfect"
-    elseif signal_quality_level == 0.5
-        return "Noise"
-    elseif signal_quality_level == 0
-        return "None"
-    elseif signal_quality_level == -1
-        return "Common Sunspot"
+function signal_cat(weak_signal_quality_level, strong_signal_quality_level)
+    if weak_signal_quality_level == strong_signal_quality_level
+        if weak_signal_quality_level == 1
+            return "Perfect"
+        elseif weak_signal_quality_level == 0.5
+            return "Noise"
+        elseif weak_signal_quality_level == 0
+            return "None"
+        elseif weak_signal_quality_level == -1
+            return "Common Sunspot"
+        end
     else
-        error("Invalid signal quality level: $signal_quality_level")
+        if strong_signal_quality_level == 1 && weak_signal_quality_level == 0.5
+            return "Perfect / Noise Split"
+        end
     end
+
+    error("Invalid signal quality level: $weak_signal_quality_level, $strong_signal_quality_level")
 end
 
 edge_cases = [0.5, 1.0, 0.0, -1.0]
 v1 = @chain df_summary begin
-    @filter((weak_signal_quality_level ∈ !!edge_cases) & (strong_signal_quality_level ∈ !!edge_cases) & (strong_signal_quality_level == weak_signal_quality_level))
+    @filter((weak_signal_quality_level ∈ !!edge_cases) & (strong_signal_quality_level ∈ !!edge_cases))
     @mutate(
-        signal_quality_level = categorical(signal_cat(weak_signal_quality_level), levels=["None", "Perfect", "Noise", "Common Sunspot"], ordered=true),
+        signal_quality_level = categorical(signal_cat(weak_signal_quality_level, strong_signal_quality_level), levels=["None", "Perfect", "Noise", "Common Sunspot", "Perfect / Noise Split"], ordered=true),
         profit_gain = (profit_gain_min + profit_gain_max) / 2,
         demand_scenario = demand_cat(frequency_high_demand)
     )
