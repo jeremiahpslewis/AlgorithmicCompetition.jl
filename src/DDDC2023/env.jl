@@ -60,9 +60,9 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
         state_space_lookup = construct_DDDC_state_space_lookup(action_space, n_prices)
 
         # Randomly initialize demand signals for previous episode based on high demand frequency
-        is_high_demand_prev_episode = rand(2) .< p.data_demand_digital_params.frequency_high_demand
+        is_high_demand_prev_episode = rand() < p.data_demand_digital_params.frequency_high_demand
         
-        is_high_demand_episode = rand(2) .< p.data_demand_digital_params.frequency_high_demand
+        is_high_demand_episode = rand() < p.data_demand_digital_params.frequency_high_demand
 
         new(
             p.α,
