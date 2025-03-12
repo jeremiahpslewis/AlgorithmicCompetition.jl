@@ -15,8 +15,9 @@ using AlgorithmicCompetition
 using Arrow
 using Tidier
 
-df_summary_arrow_cache_path = "data/SLURM_ARRAY_JOB_ID=0_debug=false_model=dddc_version=v0.1.1/SLURM_ARRAY_TASK_ID=0_start_timestamp=2025-03-11T19:21:11.604_df_summary.arrow"
-df_full = DataFrame(Arrow.Table(df_summary_arrow_cache_path))
+arrow_files = readdir("data/SLURM_ARRAY_JOB_ID=0_debug=false_model=dddc_version=v0.1.1", join = true)
+arrow_files = filter(y -> occursin("df_summary.arrow", y), arrow_files)
+df_full = vcat(DataFrame.(Arrow.Table.(arrow_files))...)
 df_summary = AlgorithmicCompetition.reduce_dddc(df_full)
 
 mkpath("plots/acai")
@@ -55,5 +56,6 @@ v1 = @chain df_summary begin
     (visual(BarPlot))
 end
 
-f1 = draw(v1, axis = (; xticklabelrotation = 45))
+f1 = draw(v1, axis = (; xticklabelrotation = 45),
+figure = (; size = (800, 600), title = "Algorithmic Collusion Outcomes by Information Set", subtitle="Mean of $(df_summary[1, :n_obs]) simulations per scenario", fontsize = 16))
 save("plots/acai/plot_1_barplot_profit_gain_by_signal_and_demand_scenario.svg", f1)

@@ -3,7 +3,7 @@ using AlgorithmicCompetition
 using Dates
 using Distributed
 
-ENV["N_PARAMETER_ITERATIONS"] = 900
+ENV["N_PARAMETER_ITERATIONS"] = 100
 ENV["N_GRID_INCREMENTS"] = 0
 ENV["DEBUG"] = 0
 ENV["VERSION"] = "v0.1.1"

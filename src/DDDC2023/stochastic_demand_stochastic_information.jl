@@ -40,6 +40,7 @@ function get_demand_signals(
         return [sunspot_value, sunspot_value]
     end
 
+    # Merge signal qualities and player role into a single signal quality vector
     true_signal_probability =
         (weak_signal_quality_level .* .!signal_is_strong) .+
         (strong_signal_quality_level .* signal_is_strong)
