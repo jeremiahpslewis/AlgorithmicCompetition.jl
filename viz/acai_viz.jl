@@ -54,7 +54,7 @@ key_viz_data = @chain df_summary begin
     @select(signal_quality_level, demand_scenario, profit_gain, profit_mean)
 end
 
-v1 = @chain viz_data begin
+v1 = @chain key_viz_data begin
     data(_) *
     mapping(
         :signal_quality_level => nonnumeric => "",
