@@ -28,7 +28,7 @@ function signal_cat(weak_signal_quality_level, strong_signal_quality_level)
         if weak_signal_quality_level == 1
             return "Perfect"
         elseif weak_signal_quality_level == 0.5
-            return "Noise"
+            return "Random"
         elseif weak_signal_quality_level == 0
             return "None"
         elseif weak_signal_quality_level == -1
@@ -36,7 +36,7 @@ function signal_cat(weak_signal_quality_level, strong_signal_quality_level)
         end
     else
         if strong_signal_quality_level == 1 && weak_signal_quality_level == 0.5
-            return "Perfect / Noise Split"
+            return "Perfect / Random Split"
         end
     end
 
@@ -47,7 +47,7 @@ edge_cases = [0.5, 1.0, 0.0, -1.0]
 key_viz_data = @chain df_summary begin
     @filter((weak_signal_quality_level ∈ !!edge_cases) & (strong_signal_quality_level ∈ !!edge_cases))
     @mutate(
-        signal_quality_level = categorical(signal_cat(weak_signal_quality_level, strong_signal_quality_level), levels=["None", "Perfect", "Common Sunspot", "Perfect / Noise Split", "Noise"], ordered=true),
+        signal_quality_level = categorical(signal_cat(weak_signal_quality_level, strong_signal_quality_level), levels=["None", "Perfect", "Common Sunspot", "Perfect / Random Split", "Random"], ordered=true),
         profit_gain = (profit_gain_min + profit_gain_max) / 2,
         demand_scenario = demand_cat(frequency_high_demand)
     )
@@ -59,8 +59,8 @@ v1 = @chain key_viz_data begin
     mapping(
         :signal_quality_level => nonnumeric => "",
         :profit_gain => "Profit Gain",
-        color = :signal_quality_level => nonnumeric => "Scenario",
-        col = :demand_scenario => nonnumeric => "Demand Scenario",
+        color = :signal_quality_level => nonnumeric => "Signal",
+        col = :demand_scenario => nonnumeric => "Demand Environment",
     ) *
     (visual(BarPlot))
 end
@@ -74,8 +74,8 @@ v2 = @chain key_viz_data begin
     mapping(
         :signal_quality_level => nonnumeric => "",
         :profit_mean => "Avg. Profit",
-        color = :signal_quality_level => nonnumeric => "Scenario",
-        col = :demand_scenario => nonnumeric => "Demand Scenario",
+        color = :signal_quality_level => nonnumeric => "Signal",
+        col = :demand_scenario => nonnumeric => "Demand Environment",
     ) *
     (visual(BarPlot))
 end
