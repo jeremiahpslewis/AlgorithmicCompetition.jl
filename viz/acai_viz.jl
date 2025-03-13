@@ -26,7 +26,7 @@ demand_cat(x) = x == 1 ? "Always High Demand" : x == 0 ? "Always Low Demand" : x
 function signal_cat(weak_signal_quality_level, strong_signal_quality_level)
     if weak_signal_quality_level == strong_signal_quality_level
         if weak_signal_quality_level == 1
-            return "Perfect"
+            return "True State"
         elseif weak_signal_quality_level == 0.5
             return "Independent Random"
         elseif weak_signal_quality_level == 0
@@ -46,7 +46,7 @@ key_viz_data = @chain df_summary begin
     @filter((weak_signal_quality_level ∈ !!edge_cases) & (strong_signal_quality_level ∈ !!edge_cases))
     @filter(!((weak_signal_quality_level == 1) & (strong_signal_quality_level == 1) & (frequency_high_demand ∈ [0, 1])))
     @mutate(
-        signal_quality_level = categorical(signal_cat(weak_signal_quality_level, strong_signal_quality_level), levels=["No Signal", "Perfect", "Common Random", "P1 Perfect / P2 Random", "Independent Random"], ordered=true),
+        signal_quality_level = categorical(signal_cat(weak_signal_quality_level, strong_signal_quality_level), levels=["No Signal", "True State", "Common Random", "P1 Perfect / P2 Random", "Independent Random"], ordered=true),
         profit_gain = (profit_gain_min + profit_gain_max) / 2,
         demand_scenario = demand_cat(frequency_high_demand)
     )
