@@ -59,7 +59,7 @@ v1 = @chain key_viz_data begin
     mapping(
         :signal_quality_level => nonnumeric => "",
         :profit_gain => "Profit Gain",
-        color = :signal_quality_level => nonnumeric => "Signal",
+        color = :signal_quality_level => nonnumeric => "Demand Signal",
         col = :demand_scenario => nonnumeric => "Demand Environment",
     ) *
     (visual(BarPlot))
@@ -74,7 +74,7 @@ v2 = @chain key_viz_data begin
     mapping(
         :signal_quality_level => nonnumeric => "",
         :profit_mean => "Avg. Profit",
-        color = :signal_quality_level => nonnumeric => "Signal",
+        color = :signal_quality_level => nonnumeric => "Demand Signal",
         col = :demand_scenario => nonnumeric => "Demand Environment",
     ) *
     (visual(BarPlot))
