@@ -28,11 +28,11 @@ function signal_cat(weak_signal_quality_level, strong_signal_quality_level)
         if weak_signal_quality_level == 1
             return "Perfect"
         elseif weak_signal_quality_level == 0.5
-            return "Random"
+            return "Independent Random"
         elseif weak_signal_quality_level == 0
             return "No Signal"
         elseif weak_signal_quality_level == -1
-            return "Common Sunspot"
+            return "Common Random"
         end
     elseif strong_signal_quality_level == 1 && weak_signal_quality_level == 0.5
         return "P1 Perfect / P2 Random"
@@ -46,10 +46,11 @@ key_viz_data = @chain df_summary begin
     @filter((weak_signal_quality_level ∈ !!edge_cases) & (strong_signal_quality_level ∈ !!edge_cases))
     @filter(!((weak_signal_quality_level == 1) & (strong_signal_quality_level == 1) & (frequency_high_demand ∈ [0, 1])))
     @mutate(
-        signal_quality_level = categorical(signal_cat(weak_signal_quality_level, strong_signal_quality_level), levels=["No Signal", "Perfect", "Common Sunspot", "P1 Perfect / P2 Random", "Random"], ordered=true),
+        signal_quality_level = categorical(signal_cat(weak_signal_quality_level, strong_signal_quality_level), levels=["No Signal", "Perfect", "Common Random", "P1 Perfect / P2 Random", "Independent Random"], ordered=true),
         profit_gain = (profit_gain_min + profit_gain_max) / 2,
         demand_scenario = demand_cat(frequency_high_demand)
     )
+    @filter(signal_quality_level != "P1 Perfect / P2 Random")
     @select(signal_quality_level, demand_scenario, profit_gain, profit_mean)
 end
 
