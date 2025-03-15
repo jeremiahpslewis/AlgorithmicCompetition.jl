@@ -50,7 +50,8 @@ key_viz_data = @chain df_summary begin
         profit_gain = (profit_gain_min + profit_gain_max) / 2,
         demand_scenario = demand_cat(frequency_high_demand)
     )
-    @filter(signal_quality_level != "P1 Perfect / P2 Random")
+    # @filter(signal_quality_level != "P1 Perfect / P2 Random")
+    # @filter(signal_quality_level != "True State") # Might be interesting to look at signal-conditional memory, e.g. remember prices and state from last x periods in which signal was same as current...
     @select(signal_quality_level, demand_scenario, profit_gain, profit_mean)
 end
 
@@ -66,7 +67,7 @@ v1 = @chain key_viz_data begin
 end
 
 f1 = draw(v1, axis = (; xticklabelrotation = 45),
-figure = (; size = (800, 600), title = "Algorithmic Collusion Outcomes by Information Set", subtitle="Mean of $(df_summary[1, :n_obs]) simulations per scenario", fontsize = 16, xlabel = "Information Set"))
+figure = (; size = (800, 400), title = "Algorithmic Collusion Outcomes by Information Set", subtitle="Mean of $(df_summary[1, :n_obs]) simulations per scenario", fontsize = 16, xlabel = "Information Set"))
 save("plots/acai/plot_1_barplot_profit_gain_by_signal_and_demand_scenario.svg", f1)
 
 v2 = @chain key_viz_data begin
@@ -81,5 +82,5 @@ v2 = @chain key_viz_data begin
 end
 
 f2 = draw(v2, axis = (; xticklabelrotation = 45),
-figure = (; size = (800, 600), title = "Algorithmic Collusion Outcomes by Information Set", subtitle="Mean of $(df_summary[1, :n_obs]) simulations per scenario", fontsize = 16, xlabel = "Information Set"))
+figure = (; size = (800, 400), title = "Algorithmic Collusion Outcomes by Information Set", subtitle="Mean of $(df_summary[1, :n_obs]) simulations per scenario", fontsize = 16, xlabel = "Information Set"))
 save("plots/acai/plot_2_barplot_avg_profit_by_signal_and_demand_scenario.svg", f2)
