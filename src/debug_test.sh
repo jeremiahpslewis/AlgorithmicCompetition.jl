@@ -13,12 +13,10 @@ export N_GRID_INCREMENTS=20 # Number of grid increments
 export N_PARAMETER_ITERATIONS=1 # Number of iterations over all parameter sets per job
 export VERSION="2025-03-10-7price-config"
 export DEBUG=1
-export JULIA_DEPOT_PATH=/lustre/wiwi/lewisjps/.julia
-
 echo "Bash: Running DDDC with $N_GRID_INCREMENTS grid increments"
 
 module load julia
 
 cd /lustre/wiwi/lewisjps/AlgorithmicCompetition.jl || exit
 
-julia --project=. src/dddc_slurm_batch.jl
+julia --project=. src/debug_test.jl

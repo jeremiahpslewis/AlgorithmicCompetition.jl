@@ -1,25 +1,27 @@
-using AlgorithmicCompetition
-using Statistics
-using DataFrames
-using Arrow
-using Distributed
 using Dates
+using AlgorithmicCompetition
+using Dates
+using Distributed
 
-version = 0.6
+ENV["N_PARAMETER_ITERATIONS"] = 100
+ENV["N_GRID_INCREMENTS"] = 0
+ENV["DEBUG"] = 0
+ENV["VERSION"] = "v0.1.2"
+
+params = AlgorithmicCompetition.extract_params_from_environment()
+
+AlgorithmicCompetition.setup_logger(params)
+
+@info "Parameters: $params"
+
+@info "Running DDDC batch."
+
+version = 0.1
 start_timestamp = now()
 start_timestamp = Dates.format(start_timestamp, "yyyy-mm-dd__HH_MM_SS")
 
-if Sys.isapple()
-    n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
+n_procs_ = 7 # up to 8 performance cores on m1 (7 workers + 1 main)
 
-    n_parameter_iterations = 1
-    n_grid_increments = 10
-else
-    n_procs_ = 63
-
-    n_parameter_iterations = 40 * 14 # 40 takes about an hour on 63 cores
-    n_grid_increments = 10
-end
 
 _procs = addprocs(
     n_procs_,
@@ -27,21 +29,35 @@ _procs = addprocs(
     exeflags = ["--threads=1", "--project=$(Base.active_project())"],
 )
 
-@everywhere begin
-    using Pkg
-    Pkg.instantiate()
-    using AlgorithmicCompetition: run_and_extract
+if params[:n_cores] > 1
+    _procs = addprocs(
+        params[:n_cores],
+        topology = :master_worker,
+        exeflags = ["--threads=1", "--project=$(Base.active_project())"],
+    )
+
+    @everywhere begin
+        @info "Load dependencies on all processes."
+        using Pkg
+        Pkg.instantiate()
+        using AlgorithmicCompetition:
+            extract_params_from_environment, setup_logger, run_and_extract
+
+        params = extract_params_from_environment()
+        setup_logger(params)
+        @info "Dependencies loaded."
+    end
 end
 
-@time exp_list = AlgorithmicCompetition.run_dddc(;
-    n_parameter_iterations = n_parameter_iterations,
-    max_iter = Int(1e9),
-    n_grid_increments = n_grid_increments,
+@info "Running DDDC batch with n_grid_increments = $(params[:n_grid_increments])."
+exp_list = AlgorithmicCompetition.run_dddc(
+    version = params[:version],
+    start_timestamp = now(),
+    n_parameter_iterations = params[:n_parameter_iterations],
+    n_grid_increments = params[:n_grid_increments],
+    debug = params[:debug],
 )
 
-rmprocs(_procs)
-
-file_name = "simulation_results_v$(version)_dddc_$(start_timestamp).arrow"
-exp_list_ = AlgorithmicCompetition.DDDCSummary[exp_list...]
-df = AlgorithmicCompetition.extract_sim_results(exp_list_)
-Arrow.write(file_name, df)
+if params[:n_cores] > 1
+    rmprocs(_procs)
+end

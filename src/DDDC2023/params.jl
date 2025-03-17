@@ -48,11 +48,9 @@ struct DDDCHyperParameters
         @assert max_iter > convergence_threshold
         ξ = 0.1
         δ = 0.95
-        n_prices = 15
+        n_prices = 7
         n_players = 2
         memory_length = 1
-
-        d = Dict(:a => 1, :b => 2)
 
         p_monop_opt_min = minimum(
             competition_solution_dict[demand_mode].p_monop_opt for
@@ -72,14 +70,22 @@ struct DDDCHyperParameters
             demand_mode in [:high, :low]
         )
 
+        p_Bert_nash_equilibrium = [competition_solution_dict[demand_mode].p_Bert_nash_equilibrium for
+        demand_mode in [:high, :low]]
+
+        p_monop_opt = [competition_solution_dict[demand_mode].p_monop_opt for demand_mode in [:high, :low]]
+
         p_range_pad = ξ * (p_monop_opt_max - p_Bert_nash_equilibrium_min)
-        price_options = [
-            range(
-                p_Bert_nash_equilibrium_min - p_range_pad,
-                p_monop_opt_max + p_range_pad,
-                n_prices,
-            )...,
+        p_pad_extreme_options = [p_Bert_nash_equilibrium_min - p_range_pad, p_monop_opt_max + p_range_pad]
+
+        p_mean_high_demand_nash_low_demand_monop = [mean([p_Bert_nash_equilibrium_max, p_monop_opt_min])]
+    
+        price_options = [p_Bert_nash_equilibrium...,
+            p_monop_opt...,
+            p_pad_extreme_options...,
+            p_mean_high_demand_nash_low_demand_monop...
         ]
+        sort!(price_options)
 
         new(
             α,

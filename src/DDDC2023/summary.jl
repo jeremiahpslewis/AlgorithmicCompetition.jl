@@ -3,6 +3,7 @@ using ReinforcementLearning
 using DataFrames
 using Flux: mse
 using DataFrameMacros
+import Base
 
 """
     DDDCSummary(α, β, is_converged, data_demand_digital_params, convergence_profit, convergence_profit_demand_high, convergence_profit_demand_low, profit_gain, profit_gain_demand_high, profit_gain_demand_low, iterations_until_convergence, price_response_to_demand_signal_mse, percent_demand_high)
@@ -24,6 +25,28 @@ struct DDDCSummary
     price_response_to_demand_signal_mse::Vector{Union{Float64,Missing}}
     percent_demand_high::Float64
     percent_unexplored_states::Vector{Float64}
+    action_index::Vector{String}
+    action_price::Vector{String}
+end
+
+function Base.show(io::IO, s::DDDCSummary)
+    println(io, "DDDCSummary:")
+    println(io, "  α: ", s.α)
+    println(io, "  β: ", s.β)
+    println(io, "  Convergence: ", s.is_converged)
+    println(io, "  Data Demand Params: ", s.data_demand_digital_params)
+    println(io, "  Convergence Profit (overall): ", s.convergence_profit)
+    println(io, "  Convergence Profit (high demand): ", s.convergence_profit_demand_high)
+    println(io, "  Convergence Profit (low demand): ", s.convergence_profit_demand_low)
+    println(io, "  Profit Gain: ", s.profit_gain)
+    println(io, "  Profit Gain (high demand): ", s.profit_gain_demand_high)
+    println(io, "  Profit Gain (low demand): ", s.profit_gain_demand_low)
+    println(io, "  Iterations Until Convergence: ", s.iterations_until_convergence)
+    println(io, "  Price Response MSE: ", s.price_response_to_demand_signal_mse)
+    println(io, "  Percent Demand High: ", s.percent_demand_high)
+    println(io, "  Percent Unexplored States: ", s.percent_unexplored_states)
+    println(io, "  Action Index: ", s.action_index[1][1:5], "; ", s.action_index[2][1:5])
+    println(io, "  Action Price: ", s.action_price[1][1:10], "; ", s.action_price[2][1:10])
 end
 
 """
@@ -87,11 +110,17 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
     is_converged = Bool[]
     percent_unexplored_states = Float64[]
     convergence_profit = get_convergence_profit_from_hook(hook)
-
+    action_index = String[]
+    action_price = String[]
 
     for player_ in (Player(1), Player(2))
         push!(is_converged, hook[player_][1].is_converged)
         push!(percent_unexplored_states, mean(hook[player_][1].best_response_vector .== 0))
+        push!(action_index, join(hook[player_][3].prices, ","))
+
+        # Extract the price value for each action
+        action_price_vect_ = [env.price_options[i] for i in hook[player_][3].prices]
+        push!(action_price, join(action_price_vect_, ","))
     end
 
     price_vs_demand_signal_counterfactuals =
@@ -112,6 +141,8 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
         [e_[1] for e_ in price_vs_demand_signal_counterfactuals],
         percent_demand_high,
         percent_unexplored_states,
+        action_index,
+        action_price,
     )
 end
 
@@ -312,8 +343,12 @@ end
 
 
 function reduce_dddc(df_summary::DataFrame)
-    if !(:n_obs ∈ names(df_summary))
+    if !("n_obs" ∈ names(df_summary))
         df_summary[!, :n_obs] .= 1
+    end
+
+    if length(unique(df_summary[!, :n_obs])) > 1
+        @warn "n_obs is not constant across rows"
     end
 
     df_reduced = @chain df_summary begin

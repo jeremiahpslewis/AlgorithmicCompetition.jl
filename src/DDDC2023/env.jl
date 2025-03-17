@@ -8,9 +8,9 @@ mutable struct DDDCMemory
 end
 
 """
-    DDDCEnv(p::AIAPCHyperParameters)
+    DDDCEnv(p::DDDCHyperParameters)
 
-    Build an environment to reproduce the results of the Lewis 2023 extentions to AIAPC.
+    Build an environment to reproduce the results of the Lewis 2023 extensions to AIAPC.
 """
 struct DDDCEnv <: AbstractEnv # N is profit_array dimension
     α::Float64                              # Learning parameter
@@ -59,8 +59,10 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
             construct_DDDC_profit_array(price_options, p.competition_params_dict, n_players)
         state_space_lookup = construct_DDDC_state_space_lookup(action_space, n_prices)
 
-        is_high_demand_prev_episode = rand(Bool)
-        is_high_demand_episode = rand(Bool)
+        # Randomly initialize demand signals for previous episode based on high demand frequency
+        is_high_demand_prev_episode = rand() < p.data_demand_digital_params.frequency_high_demand
+        
+        is_high_demand_episode = rand() < p.data_demand_digital_params.frequency_high_demand
 
         new(
             p.α,

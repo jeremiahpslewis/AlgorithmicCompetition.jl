@@ -29,6 +29,18 @@ function get_demand_signals(
     weak_signal_quality_level::Float64,
     strong_signal_quality_level::Float64,
 )
+    # If both signal qualities are zero, then we return a CONSTANT true signal, this is equivalent to Calvano et al. (2019)'s stochastic demand, NO signal
+    if weak_signal_quality_level == 0.0 && strong_signal_quality_level == 0.0
+        return [true, true]
+    end
+
+    # If both signal qualities are -1, then we return a common sunspot signal, e.g. identical for both players, but independent of demand
+    if weak_signal_quality_level == -1.0 && strong_signal_quality_level == -1.0
+        sunspot_value = rand(Bool)
+        return [sunspot_value, sunspot_value]
+    end
+
+    # Merge signal qualities and player role into a single signal quality vector
     true_signal_probability =
         (weak_signal_quality_level .* .!signal_is_strong) .+
         (strong_signal_quality_level .* signal_is_strong)

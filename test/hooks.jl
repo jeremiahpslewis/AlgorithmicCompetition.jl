@@ -142,3 +142,43 @@ end
     @test reward_hook.rewards[2] isa Float64
     @test reward_hook.demand_state_high_vect[2] ∈ [true, false]
 end
+
+@testset "DDDCPricesPerLastNEpisodes" begin
+    α = Float64(0.125)
+    β = Float64(4e-1)
+    δ = 0.95
+    ξ = 0.1
+    δ = 0.95
+    n_prices = 15
+    max_iter = Int(1e6)
+    price_index = 1:n_prices
+
+    competition_params_dict = Dict(
+        :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
+        :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)),
+    )
+
+    competition_solution_dict =
+        Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
+
+    data_demand_digital_params = DataDemandDigitalParams(
+        weak_signal_quality_level = 1,
+        strong_signal_quality_level = 1,
+        signal_is_strong = [false, false],
+        frequency_high_demand = 0.9,
+    )
+
+    env =
+        DDDCHyperParameters(
+            Float64(0.1),
+            Float64(2e-5),
+            0.95,
+            Int(1e7),
+            competition_solution_dict,
+            data_demand_digital_params;
+            convergence_threshold = Int(1e5),
+        ) |> DDDCEnv
+    policies = env |> DDDCPolicy
+
+    reward_hook = DDDCPricesPerLastNEpisodes(; max_steps = 100)
+end

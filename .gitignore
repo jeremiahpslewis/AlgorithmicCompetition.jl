@@ -34,3 +34,4 @@ data_final/
 *.arrow
 *.jld2
 log/*
+data/*

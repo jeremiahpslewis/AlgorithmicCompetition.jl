@@ -67,25 +67,17 @@ end
 
 function extract_params_from_environment()
     @info "Extracting parameters from environment variables."
-    if Sys.isapple()
-        # For debugging on MacOS
-        ENV["DEBUG"] = 1
-        ENV["SLURM_ARRAY_TASK_ID"] = 1
-        ENV["SLURM_ARRAY_JOB_ID"] = 1
-        ENV["SLURM_CPUS_PER_TASK"] = 6
-        ENV["VERSION"] = "v1"
-        ENV["N_GRID_INCREMENTS"] = 10
-        ENV["N_PARAMETER_ITERATIONS"] = 1
-    end
 
-    debug = parse(Int, ENV["DEBUG"]) == 1
-    SLURM_ARRAY_TASK_ID = parse(Int, ENV["SLURM_ARRAY_TASK_ID"])
-    SLURM_ARRAY_JOB_ID = parse(Int, ENV["SLURM_ARRAY_JOB_ID"])
-    n_cores = parse(Int, ENV["SLURM_CPUS_PER_TASK"])
-    n_grid_increments = parse(Int, ENV["N_GRID_INCREMENTS"])
-    n_parameter_iterations = parse(Int, ENV["N_PARAMETER_ITERATIONS"])
+    version = get(ENV, "VERSION", "v1")
+    debug = parse(Int, get(ENV, "DEBUG", "1")) == 1
+    SLURM_ARRAY_TASK_ID = parse(Int,  get(ENV, "SLURM_ARRAY_TASK_ID", "1"))
+    SLURM_ARRAY_JOB_ID = parse(Int, get(ENV, "SLURM_ARRAY_JOB_ID", "1"))
+    n_cores = parse(Int, get(ENV, "SLURM_CPUS_PER_TASK", "2"))
+    n_grid_increments = parse(Int, get(ENV, "N_GRID_INCREMENTS", "10"))
+    n_parameter_iterations = parse(Int, get(ENV, "N_PARAMETER_ITERATIONS", "1"))
 
     params = Dict(
+        :version => version,
         :debug => debug,
         :SLURM_ARRAY_TASK_ID => SLURM_ARRAY_TASK_ID,
         :SLURM_ARRAY_JOB_ID => SLURM_ARRAY_JOB_ID,
@@ -106,12 +98,14 @@ function extract_params_from_environment()
         params[:max_iter] = Int(1e9)
         params[:convergence_threshold] = Int(1e5)
     end
-
+    @info "Parameters extracted from environment variables: $(params)"
     return params
 end
 
 function setup_logger(params)
-    f_logger = FileLogger("/scratch/hpc-prf-irddcc/AlgorithmicCompetition.jl/log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
+    mkpath("log")
+    f_logger = FileLogger("log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
     debuglogger = MinLevelLogger(f_logger, Logging.Info)
     global_logger(debuglogger)
+    @info "Logger setup complete."
 end

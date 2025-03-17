@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # In order to run this script, do the following:
-# TASK=DDDC bash src/run_pc2.sh
+# TASK=DDDC bash src/run_hu_hpc.sh
 # or
-# TASK=AIAPC bash src/run_pc2.sh
+# TASK=AIAPC bash src/run_hu_hpc.sh
 
-module reset
+module load julia
 
 export APPTAINER_CACHEDIR=/lustre/department/lewisjps/apptainer
 # export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia

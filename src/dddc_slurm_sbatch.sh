@@ -10,8 +10,8 @@
 #SBATCH --mail-user=irddcc1@mail.uni-paderborn.de   # Where to send mail	
 
 # For full version, N_GRID_INCREMENTS=100
-export N_GRID_INCREMENTS=20
-export N_PARAMETER_ITERATIONS=1 # Number of iterations over all parameter sets per job
+export N_GRID_INCREMENTS=1
+export N_PARAMETER_ITERATIONS=500 # Number of iterations over all parameter sets per job
 export VERSION="2024-12-23-dddc-full-test"
 export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
 export DEBUG=0
@@ -24,6 +24,7 @@ module load JuliaHPC   # loading the latest JuliaHPC
 export SINGULARITYENV_SLURM_ARRAY_TASK_ID="$SLURM_ARRAY_TASK_ID"
 export SINGULARITYENV_SLURM_ARRAY_JOB_ID="$SLURM_ARRAY_JOB_ID"
 export SINGULARITYENV_SLURM_CPUS_PER_TASK="$SLURM_CPUS_PER_TASK"
+export PROJECTDIR="/scratch/hpc-prf-irddcc/AlgorithmicCompetition.jl"
 
 # singularity run algorithmiccompetition.jl_main.sif julia --project=/algcomp /algcomp/src/dddc_slurm_batch.jl
 
