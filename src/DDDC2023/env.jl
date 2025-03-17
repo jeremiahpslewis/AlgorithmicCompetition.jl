@@ -42,7 +42,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
     action_space::Tuple                     # Action space
     profit_array::Array{Float64,4}          # Profit given price pair as coordinates
 
-    data_demand_digital_params::DataDemandDigitalParams # Parameters for Data/Demand/Digital AIAPC extension
+    data_demand_digital_params::DDDCExperimentalParams # Parameters for Data/Demand/Digital AIAPC extension
 
     reward::Vector{Float64}
 
@@ -155,10 +155,10 @@ RLBase.state(env::DDDCEnv) = nothing
 Return the current state as an integer, mapped from the environment memory.
 """
 function RLBase.state(env::DDDCEnv, player::Player)
-    # Add trembling hand state
+    # Trembling hand state reached with probability env.data_demand_digital_params.trembling_hand_frequency, in which case we return the last state
     if env.data_demand_digital_params.trembling_hand_frequency > 0.0
-        if rand() < env.trembling_hand_frequency
-            env.n_state_space + 1
+        if rand() < env.data_demand_digital_params.trembling_hand_frequency
+            return env.n_state_space
         end
     end
 

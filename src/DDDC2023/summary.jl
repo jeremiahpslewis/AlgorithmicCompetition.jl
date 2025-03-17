@@ -14,7 +14,7 @@ struct DDDCSummary
     α::Float64
     β::Float64
     is_converged::Vector{Bool}
-    data_demand_digital_params::DataDemandDigitalParams
+    data_demand_digital_params::DDDCExperimentalParams
     convergence_profit::Vector{Float64}
     convergence_profit_demand_high::Vector{Union{Float64,Missing}}
     convergence_profit_demand_low::Vector{Union{Float64,Missing}}
@@ -27,6 +27,7 @@ struct DDDCSummary
     percent_unexplored_states::Vector{Float64}
     action_index::Vector{String}
     action_price::Vector{String}
+
 end
 
 function Base.show(io::IO, s::DDDCSummary)

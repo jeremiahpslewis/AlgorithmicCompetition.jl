@@ -6,7 +6,7 @@ using Distributed
 ENV["N_PARAMETER_ITERATIONS"] = 100
 ENV["N_GRID_INCREMENTS"] = 0
 ENV["DEBUG"] = 0
-ENV["VERSION"] = "v0.1.2"
+ENV["VERSION"] = "v0.1.3"
 
 params = AlgorithmicCompetition.extract_params_from_environment()
 

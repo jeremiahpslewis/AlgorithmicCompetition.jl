@@ -9,7 +9,7 @@ using AlgorithmicCompetition:
     post_prob_high_low_given_both_signals,
     CompetitionParameters,
     CompetitionSolution,
-    DataDemandDigitalParams,
+    DDDCExperimentalParams,
     DDDCHyperParameters
 using AlgorithmicCompetition
 using Arrow

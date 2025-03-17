@@ -9,7 +9,7 @@
 # env.strong_signal_quality_level = 0.3 # high signal quality -> additive deviation from coin flip zero information signal
 # env.weak_signal_quality_level = 0.1 # low signal quality -> base deviation from coin flip zero information signal
 
-@kwdef struct DataDemandDigitalParams
+@kwdef struct DDDCExperimentalParams
     weak_signal_quality_level::Float64 = 0.5 # probability of true signal (0.5 is lowest possible vale)
     strong_signal_quality_level::Float64 = 1.0 # probability of true signal (0.5 is lowest possible vale)
     signal_is_strong::Vector{Bool} = [false, false] # true if signal quality is high
@@ -21,7 +21,7 @@ function get_demand_level(frequency_high_demand::Float64)
     rand() < frequency_high_demand ? true : false
 end
 
-get_demand_level(d::DataDemandDigitalParams) = get_demand_level(d.frequency_high_demand)
+get_demand_level(d::DDDCExperimentalParams) = get_demand_level(d.frequency_high_demand)
 
 
 function get_demand_signals(
@@ -55,7 +55,7 @@ function get_demand_signals(
     return observed_signal_demand_level_is_high
 end
 
-function get_demand_signals(d::DataDemandDigitalParams, is_high_demand_episode::Bool)
+function get_demand_signals(d::DDDCExperimentalParams, is_high_demand_episode::Bool)
     get_demand_signals(
         is_high_demand_episode,
         d.signal_is_strong,

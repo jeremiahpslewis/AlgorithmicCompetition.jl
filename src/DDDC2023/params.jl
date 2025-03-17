@@ -12,7 +12,7 @@ end
         δ::Float64,
         max_iter::Int,
         competition_solution_dict::Dict{Symbol,CompetitionSolution},
-        data_demand_digital_params::DataDemandDigitalParams;
+        data_demand_digital_params::DDDCExperimentalParams;
         convergence_threshold::Int = Int(1e5),
     )
 
@@ -34,7 +34,7 @@ struct DDDCHyperParameters
     p_Bert_nash_equilibrium::Dict{Symbol,Float64}
     p_monop_opt::Dict{Symbol,Float64}
 
-    data_demand_digital_params::DataDemandDigitalParams
+    data_demand_digital_params::DDDCExperimentalParams
 
     function DDDCHyperParameters(
         α::Float64,
@@ -42,7 +42,7 @@ struct DDDCHyperParameters
         δ::Float64,
         max_iter::Int,
         competition_solution_dict::Dict{Symbol,CompetitionSolution},
-        data_demand_digital_params::DataDemandDigitalParams;
+        data_demand_digital_params::DDDCExperimentalParams;
         convergence_threshold::Int = Int(1e5),
     )
         @assert max_iter > convergence_threshold

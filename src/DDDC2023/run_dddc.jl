@@ -63,7 +63,7 @@ function run_dddc(;
     δ = 0.95
 
     data_demand_digital_param_set = [
-        DataDemandDigitalParams(
+        DDDCExperimentalParams(
             weak_signal_quality_level = weak_signal_quality_level,
             strong_signal_quality_level = strong_signal_quality_level,
             signal_is_strong = signal_quality_players,
@@ -80,7 +80,7 @@ function run_dddc(;
     # Always run 'sunspot' joint random signal stochastic demand case -1.0
     signal_quality_joint_vect = [0.0, -1.0]
     data_demand_digital_param_special_set = [
-        DataDemandDigitalParams(
+        DDDCExperimentalParams(
             weak_signal_quality_level = signal_quality_level,
             strong_signal_quality_level = signal_quality_level,
             signal_is_strong = signal_quality_players,
