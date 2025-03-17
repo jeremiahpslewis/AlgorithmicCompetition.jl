@@ -51,7 +51,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
         n_prices = length(p.price_options)
         price_index = Vector{Int64}(Int64.(1:n_prices))
         n_players = p.n_players
-        n_state_space = 4 * n_prices^(p.memory_length * n_players) # 2^2 = 4 possible demand states (ground truth and signal)
+        n_state_space = 4 * n_prices^(p.memory_length * n_players) + 1 # 2^2 = 4 possible demand states (ground truth and signal); plus one at end for trembling hand state
 
         state_space = Base.OneTo(Int64(n_state_space))
         action_space = construct_DDDC_action_space(price_index)
@@ -155,6 +155,13 @@ RLBase.state(env::DDDCEnv) = nothing
 Return the current state as an integer, mapped from the environment memory.
 """
 function RLBase.state(env::DDDCEnv, player::Player)
+    # Add trembling hand state
+    if env.data_demand_digital_params.trembling_hand_frequency > 0.0
+        if rand() < env.trembling_hand_frequency
+            env.n_state_space + 1
+        end
+    end
+
     memory_index = env.memory.prices
     # State is defined by memory, as in AIAPC, plus demand signal given to a player
     index_ = player_to_index[player]

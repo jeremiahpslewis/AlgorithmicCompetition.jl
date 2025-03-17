@@ -47,6 +47,7 @@ function Base.show(io::IO, s::DDDCSummary)
     println(io, "  Percent Unexplored States: ", s.percent_unexplored_states)
     println(io, "  Action Index: ", s.action_index[1][1:5], "; ", s.action_index[2][1:5])
     println(io, "  Action Price: ", s.action_price[1][1:10], "; ", s.action_price[2][1:10])
+    println(io, " Trembling Hand Frequency ", s.data_demand_digital_params.trembling_hand_frequency)
 end
 
 """
@@ -233,6 +234,10 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
 
     percent_unexplored_states =
         [ex.percent_unexplored_states for ex in exp_list if !(ex isa Exception)]
+    trembling_hand_frequencies = [
+        ex.data_demand_digital_params.trembling_hand_frequency for
+        ex in exp_list if !(ex isa Exception)
+    ]
 
     df = DataFrame(
         α = α_result,
@@ -255,6 +260,7 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
         price_response_to_demand_signal_mse = price_response_to_demand_signal_mse,
         percent_demand_high = percent_demand_high,
         percent_unexplored_states = percent_unexplored_states,
+        trembling_hand_frequencies = trembling_hand_frequencies,
     )
     return df
 end
