@@ -15,9 +15,12 @@ using AlgorithmicCompetition
 using Arrow
 using Tidier
 
-arrow_files = readdir("data/SLURM_ARRAY_JOB_ID=0_debug=false_model=dddc_version=v0.1.2", join = true)
-arrow_files = filter(y -> occursin("df_summary.arrow", y), arrow_files)
-df_full = vcat(DataFrame.(Arrow.Table.(arrow_files))...)
+arrow_files = readdir("data/SLURM_ARRAY_JOB_ID=20878043_debug=false_model=dddc_version=2025-03-17-dddc-trembling-hand", join = true)
+arrow_files = filter(y -> occursin(".arrow", y), arrow_files)
+arrow_files = filter(y -> !occursin("df_summary", y), arrow_files)
+df_full_ = AlgorithmicCompetition.expand_and_extract_dddc.(DataFrame.(Arrow.Table.(arrow_files)))
+rename!.(df_full_, :trembling_hand_frequencies => :trembling_hand_frequency)
+df_full = vcat(AlgorithmicCompetition.construct_df_summary_dddc.(df_full_)...)
 df_summary = AlgorithmicCompetition.reduce_dddc(df_full)
 
 mkpath("plots/acai")
@@ -52,7 +55,7 @@ key_viz_data = @chain df_summary begin
     )
     # @filter(signal_quality_level != "P1 Perfect / P2 Random")
     # @filter(signal_quality_level != "True State") # Might be interesting to look at signal-conditional memory, e.g. remember prices and state from last x periods in which signal was same as current...
-    @select(signal_quality_level, demand_scenario, profit_gain, profit_mean)
+    @select(signal_quality_level, demand_scenario, profit_gain, profit_mean, trembling_hand_frequency)
 end
 
 v1 = @chain key_viz_data begin
@@ -62,12 +65,13 @@ v1 = @chain key_viz_data begin
         :profit_gain => "Profit Gain",
         color = :signal_quality_level => nonnumeric => "Demand Signal",
         col = :demand_scenario => nonnumeric => "Demand Environment",
+        row = :trembling_hand_frequency => nonnumeric => "Trembling Hand Frequency"
     ) *
     (visual(BarPlot))
 end
 
 f1 = draw(v1, axis = (; xticklabelrotation = 45),
-figure = (; size = (800, 400), title = "Algorithmic Collusion Outcomes by Information Set", subtitle="Mean of $(df_summary[1, :n_obs]) simulations per scenario", fontsize = 16, xlabel = "Information Set"))
+figure = (; size = (800, 1000), title = "Algorithmic Collusion Outcomes by Information Set", subtitle="Mean of $(df_summary[1, :n_obs]) simulations per scenario", fontsize = 16, xlabel = "Information Set"))
 save("plots/acai/plot_1_barplot_profit_gain_by_signal_and_demand_scenario.svg", f1)
 
 v2 = @chain key_viz_data begin
@@ -77,10 +81,11 @@ v2 = @chain key_viz_data begin
         :profit_mean => "Avg. Profit",
         color = :signal_quality_level => nonnumeric => "Demand Signal",
         col = :demand_scenario => nonnumeric => "Demand Environment",
+        row = :trembling_hand_frequency => nonnumeric => "Trembling Hand Frequency"
     ) *
     (visual(BarPlot))
 end
 
 f2 = draw(v2, axis = (; xticklabelrotation = 45),
-figure = (; size = (800, 400), title = "Algorithmic Collusion Outcomes by Information Set", subtitle="Mean of $(df_summary[1, :n_obs]) simulations per scenario", fontsize = 16, xlabel = "Information Set"))
+figure = (; size = (800, 1000), title = "Algorithmic Collusion Outcomes by Information Set", subtitle="Mean of $(df_summary[1, :n_obs]) simulations per scenario", fontsize = 16, xlabel = "Information Set"))
 save("plots/acai/plot_2_barplot_avg_profit_by_signal_and_demand_scenario.svg", f2)

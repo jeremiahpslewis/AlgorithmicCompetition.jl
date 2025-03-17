@@ -235,7 +235,7 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
 
     percent_unexplored_states =
         [ex.percent_unexplored_states for ex in exp_list if !(ex isa Exception)]
-    trembling_hand_frequencies = [
+    trembling_hand_frequency = [
         ex.data_demand_digital_params.trembling_hand_frequency for
         ex in exp_list if !(ex isa Exception)
     ]
@@ -261,7 +261,7 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
         price_response_to_demand_signal_mse = price_response_to_demand_signal_mse,
         percent_demand_high = percent_demand_high,
         percent_unexplored_states = percent_unexplored_states,
-        trembling_hand_frequencies = trembling_hand_frequencies,
+        trembling_hand_frequency = trembling_hand_frequency,
     )
     return df
 end
@@ -363,6 +363,7 @@ function reduce_dddc(df_summary::DataFrame)
             :weak_signal_quality_level,
             :strong_signal_quality_level,
             :frequency_high_demand,
+            :trembling_hand_frequency,
         )
         @combine(
             :profit_mean = mean(:profit_mean),
