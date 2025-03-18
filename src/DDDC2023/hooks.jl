@@ -79,9 +79,9 @@ function DDDCHook(env::AbstractEnv)
                 DDDCTotalRewardPerLastNEpisodes(;
                     max_steps = env.convergence_threshold + 100,
                 ),
-                DDDCPricesPerLastNEpisodes(;
-                    max_steps = 100,
-                ),
+                # DDDCPricesPerLastNEpisodes(;
+                #     max_steps = 100,
+                # ),
             ) for p in players(env)
         ),
     )

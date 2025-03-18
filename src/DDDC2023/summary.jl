@@ -46,8 +46,8 @@ function Base.show(io::IO, s::DDDCSummary)
     println(io, "  Price Response MSE: ", s.price_response_to_demand_signal_mse)
     println(io, "  Percent Demand High: ", s.percent_demand_high)
     println(io, "  Percent Unexplored States: ", s.percent_unexplored_states)
-    println(io, "  Action Index: ", s.action_index[1][1:5], "; ", s.action_index[2][1:5])
-    println(io, "  Action Price: ", s.action_price[1][1:10], "; ", s.action_price[2][1:10])
+    # println(io, "  Action Index: ", s.action_index[1][1:5], "; ", s.action_index[2][1:5])
+    # println(io, "  Action Price: ", s.action_price[1][1:10], "; ", s.action_price[2][1:10])
     println(io, " Trembling Hand Frequency ", s.data_demand_digital_params.trembling_hand_frequency)
 end
 
@@ -118,11 +118,16 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
     for player_ in (Player(1), Player(2))
         push!(is_converged, hook[player_][1].is_converged)
         push!(percent_unexplored_states, mean(hook[player_][1].best_response_vector .== 0))
-        push!(action_index, join(hook[player_][3].prices, ","))
+        if false # TODO: Fix this so that price tracking can be optionally enabled
+            push!(action_index, join(hook[player_][3].prices, ","))
 
-        # Extract the price value for each action
-        action_price_vect_ = [env.price_options[i] for i in hook[player_][3].prices]
-        push!(action_price, join(action_price_vect_, ","))
+            # Extract the price value for each action
+            action_price_vect_ = [env.price_options[i] for i in hook[player_][3].prices]
+            push!(action_price, join(action_price_vect_, ","))
+        else
+            push!(action_index, "")
+            push!(action_price, "")
+        end
     end
 
     price_vs_demand_signal_counterfactuals =
