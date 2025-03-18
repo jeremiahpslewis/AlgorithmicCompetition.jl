@@ -2,7 +2,6 @@ using Distributed
 using Random
 using StatsBase
 using Arrow
-using ProgressMeter
 
 """
     run_dddc(
@@ -114,15 +113,13 @@ function run_dddc(;
 
     @info "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times"
 
-    for chunk in Iterators.partition(hyperparameter_vect, 300)
-        exp_list_chunk = @showprogress pmap(
-            run_and_extract,
-            chunk;
-            on_error = identity,
-            batch_size = batch_size,
-        )
-        append!(exp_list, exp_list_chunk)
-    end
+    exp_list_chunk = pmap(
+        run_and_extract,
+        chunk;
+        on_error = identity,
+        batch_size = batch_size,
+    )
+    append!(exp_list, exp_list_chunk)
 
     folder_name = joinpath(
         "data",
