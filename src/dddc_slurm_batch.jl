@@ -12,7 +12,7 @@ AlgorithmicCompetition.setup_logger(params)
 
 if params[:n_cores] > 1
     _procs = addprocs(
-        params[:n_cores],
+        params[:n_cores]-1,
         topology = :master_worker,
         exeflags = ["--threads=1", "--project=$(Base.active_project())"],
     )
