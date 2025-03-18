@@ -80,7 +80,7 @@ function DDDCHook(env::AbstractEnv)
                     max_steps = env.convergence_threshold + 100,
                 ),
                 DDDCPricesPerLastNEpisodes(;
-                    max_steps = env.convergence_threshold + 100,
+                    max_steps = 100,
                 ),
             ) for p in players(env)
         ),
