@@ -46,7 +46,7 @@ else
         max_iter = params[:max_iter],
         convergence_threshold = params[:convergence_threshold],
         debug = params[:debug],
-        trembling_hand_parameters = [0.0, 0.001, 0.01, 0.1, 0.5],
+        trembling_hand_parameters = [0.5], #0.0, 0.001, 0.01, 0.1, 
     )
 end
 
