@@ -66,8 +66,9 @@ end
 Helper function. Returns the prices corresponding to the state passed.
 """
 function get_prices_from_state(env::AIAPCEnv, state)
-    prices = findall(x -> x == state, env.state_space_lookup)[1]
-    return [env.price_options[prices[1]], env.price_options[prices[2]]]
+    idx = findfirst(x -> x == state, env.state_space_lookup)
+    @assert idx !== nothing "State not found in state_space_lookup"
+    return [env.price_options[idx[1]], env.price_options[idx[2]]]
 end
 
 """
@@ -133,27 +134,24 @@ function get_convergence_profit_from_env(
     policy::MultiAgentPolicy,
 ) where {E<:AbstractEnv}
     last_observed_state = get_state_from_memory(env)
-
     visited_states = [last_observed_state]
-
     for i = 1:100
         next_price_set = get_optimal_action(env, policy, last_observed_state)
         next_state = get_state_from_prices(env, next_price_set)
-
-        if next_state ∈ visited_states
+        if next_state in visited_states
             break
         else
             push!(visited_states, next_state)
         end
     end
-
-    profit_vects = get_profit_from_state.((env,), visited_states)
-
-    profit_table = hcat(profit_vects...)'
-
-    mean(profit_table, dims = 1)
+    # Accumulate profit directly to avoid allocation of intermediate arrays
+    first_profit = get_profit_from_state(env, visited_states[1])
+    acc = zeros(eltype(first_profit), length(first_profit))
+    for st in visited_states
+        acc .+= get_profit_from_state(env, st)
+    end
+    return acc ./ length(visited_states)
 end
-
 
 """
     extract_sim_results(exp_list::Vector{AIAPCSummary})
