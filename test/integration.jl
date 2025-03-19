@@ -712,7 +712,7 @@ end
             n_parameter_iterations = 1,
             max_iter = Int(1e4),
             convergence_threshold = Int(1e2),
-            n_grid_increments = 0,
+            n_grid_increments = 1,
             debug = debug,
             trembling_hand_parameters = [0.0, 0.01],
         )
