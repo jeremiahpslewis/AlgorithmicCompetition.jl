@@ -1,10 +1,9 @@
 # Patch to improve type stability and try to speed things up (avoid generator)
 function RLBase.plan!(multiagent::MultiAgentPolicy, env::DDDCEnv)
-    action_set = CartesianIndex{2}(
+    return CartesianIndex{2}(
         RLBase.plan!(multiagent[Player(1)], env, Player(1)),
-        RLBase.plan!(multiagent[Player(2)], env, Player(2)),
+        RLBase.plan!(multiagent[Player(2)], env, Player(2))
     )
-    return action_set
 end
 
 function Experiment(env::DDDCEnv; stop_on_convergence = true)
