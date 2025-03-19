@@ -15,6 +15,7 @@ export VERSION="2025-03-19-dddc-trembling-hand"
 export DEBUG=0
 export JULIA_DEPOT_PATH=/lustre/wiwi/lewisjps/.julia
 export LOG_DIR="/lustre/wiwi/lewisjps/AlgorithmicCompetition.jl/log"
+
 echo "Bash: Running DDDC with $N_GRID_INCREMENTS grid increments"
 
 module load julia
