@@ -161,14 +161,12 @@ end
 Extracts the results of a simulation experiment, given a list of AIAPCSummary objects, returns a `DataFrame`.
 """
 function extract_sim_results(exp_list::Vector{AIAPCSummary})
-    α_result = [ex.α for ex in exp_list if !(ex isa Exception)]
-    β_result = [ex.β for ex in exp_list if !(ex isa Exception)]
-    iterations_until_convergence =
-        [ex.iterations_until_convergence[1] for ex in exp_list if !(ex isa Exception)]
-
-    avg_profit_result =
-        [mean(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
-    is_converged = [ex.is_converged for ex in exp_list if !(ex isa Exception)]
+    filter!(x -> !(x isa Exception), exp_list)
+    α_result = [ex.α for ex in exp_list]
+    β_result = [ex.β for ex in exp_list]
+    iterations_until_convergence = [ex.iterations_until_convergence[1] for ex in exp_list]
+    avg_profit_result = [mean(ex.convergence_profit) for ex in exp_list]
+    is_converged = [ex.is_converged for ex in exp_list]
     df = DataFrame(
         α = α_result,
         β = β_result,
