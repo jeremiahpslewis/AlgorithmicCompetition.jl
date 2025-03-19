@@ -1,12 +1,11 @@
-# Patch to improve type stability and try to speed things up (avoid generator)
-function RLBase.plan!(multiagent::MultiAgentPolicy, env::DDDCEnv)
-    return CartesianIndex{2}(
+@inline function RLBase.plan!(multiagent::MultiAgentPolicy, env::DDDCEnv)
+    @inbounds return CartesianIndex{2}(
         RLBase.plan!(multiagent[Player(1)], env, Player(1)),
         RLBase.plan!(multiagent[Player(2)], env, Player(2))
     )
 end
 
-function Experiment(env::DDDCEnv; stop_on_convergence = true)
+@inline function Experiment(env::DDDCEnv; stop_on_convergence = true)
     RLCore.Experiment(
         DDDCPolicy(env),
         env,
@@ -15,7 +14,7 @@ function Experiment(env::DDDCEnv; stop_on_convergence = true)
     )
 end
 
-function Base.run(hyperparameters::DDDCHyperParameters; stop_on_convergence = true)
+@inline function Base.run(hyperparameters::DDDCHyperParameters; stop_on_convergence = true)
     env = DDDCEnv(hyperparameters)
     experiment = Experiment(env; stop_on_convergence = stop_on_convergence)
     RLCore._run(
@@ -33,7 +32,7 @@ end
 
 Runs the experiment and returns the economic summary.
 """
-function run_and_extract(hyperparameters::DDDCHyperParameters; stop_on_convergence = true)
+@inline function run_and_extract(hyperparameters::DDDCHyperParameters; stop_on_convergence = true)
     @info "Running single simulation with hyperparameters: $hyperparameters"
     economic_summary(run(hyperparameters; stop_on_convergence = stop_on_convergence))
 end
