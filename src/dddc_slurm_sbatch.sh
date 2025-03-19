@@ -9,6 +9,10 @@
 #SBATCH -p normal
 #SBATCH --mail-user=irddcc1@mail.uni-paderborn.de # Where to send mail	
 
+module reset
+module load lang       # loading the gateway module
+module load JuliaHPC   # loading the latest JuliaHPC
+
 # For full version, N_GRID_INCREMENTS=100
 export N_GRID_INCREMENTS=1
 export N_PARAMETER_ITERATIONS=100 # Number of iterations over all parameter sets per job
@@ -17,10 +21,6 @@ export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
 export DEBUG=0
 export LOG_DIR="/scratch/hpc-prf-irddcc/AlgorithmicCompetition.jl/log"
 echo "Bash: Running DDDC with $N_GRID_INCREMENTS grid increments"
-
-module reset
-module load lang       # loading the gateway module
-module load JuliaHPC   # loading the latest JuliaHPC
 
 export PROJECTDIR="/scratch/hpc-prf-irddcc/AlgorithmicCompetition.jl"
 
