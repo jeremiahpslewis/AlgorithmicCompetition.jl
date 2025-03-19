@@ -112,13 +112,17 @@ function run_dddc(;
     @info "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times"
 
     chunk_size = 300  # set the desired chunk size
-    @showprogress for hyperparameter_chunk in Iterators.partition(hyperparameter_vect, chunk_size)        
+    n = ceil(Int, length(hyperparameter_vect) / chunk_size)
+    i = 1
+    @showprogress for hyperparameter_chunk in Iterators.partition(hyperparameter_vect, chunk_size)
+        @info "Running chunk $i of $n"      
         exp_list_chunk = pmap(
             run_and_extract,
             hyperparameter_chunk;
             on_error = identity,
         )
         append!(exp_list, exp_list_chunk)
+        i += 1
     end
 
     @info "run_and_extract completed"
