@@ -41,18 +41,16 @@ function get_demand_signals(
         return [sunspot_value, sunspot_value]
     end
 
-    # Merge signal qualities and player role into a single signal quality vector
-    true_signal_probability =
-        (weak_signal_quality_level .* .!signal_is_strong) .+
-        (strong_signal_quality_level .* signal_is_strong)
-
-    # Probability of true signal is a function of true signal probability
-    reveal_true_signal = rand(2) .< true_signal_probability
-
-    # Observed signal is 'whether we are lying' times 'whether true demand signal is high'
-    observed_signal_demand_level_is_high = reveal_true_signal .== demand_level_is_high
-
-    return observed_signal_demand_level_is_high
+    # Manually compute the true signal probability for each player
+    local prob1 = weak_signal_quality_level * (signal_is_strong[1] ? 0.0 : 1.0) +
+                  strong_signal_quality_level * (signal_is_strong[1] ? 1.0 : 0.0)
+    local prob2 = weak_signal_quality_level * (signal_is_strong[2] ? 0.0 : 1.0) +
+                  strong_signal_quality_level * (signal_is_strong[2] ? 1.0 : 0.0)
+    local reveal1 = rand() < prob1
+    local reveal2 = rand() < prob2
+    local obs1 = (reveal1 == demand_level_is_high)
+    local obs2 = (reveal2 == demand_level_is_high)
+    return Bool[obs1, obs2]
 end
 
 function get_demand_signals(d::DDDCExperimentalParams, is_high_demand_episode::Bool)
@@ -73,7 +71,7 @@ function post_prob_high_low_given_signal(pr_high_demand, pr_signal_true)
     num_high = pr_high_demand * pr_signal_true
     num_low = (1 - pr_high_demand) * pr_signal_true
 
-    return [num_high / denom_high, num_low / denom_low]
+    return (num_high / denom_high, num_low / denom_low)
 end
 
 function post_prob_high_low_given_both_signals(pr_high_demand, pr_signal_true)
@@ -89,5 +87,5 @@ function post_prob_high_low_given_both_signals(pr_high_demand, pr_signal_true)
     num_high = pr_high_demand * pr_signal_true^2
     num_low = (1 - pr_high_demand) * pr_signal_true^2
 
-    return [num_high / denom_high, num_low / denom_low]
+    return (num_high / denom_high, num_low / denom_low)
 end
