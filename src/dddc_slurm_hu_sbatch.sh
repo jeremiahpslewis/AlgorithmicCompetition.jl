@@ -3,10 +3,10 @@
 #SBATCH --output=log/%A_%a.out
 #SBATCH --error=log/%A_%a.err
 #SBATCH --array=1-2 # Number of iterations over all parameter sets
-#SBATCH --mem-per-cpu=3000M
+#SBATCH --mem-per-cpu=3gb
 #SBATCH --cpus-per-task=128 # 128 core
 #SBATCH --time=1:00:00 # For full run true value should be <13 hours
-#SBATCH --partition standard
+#SBATCH --partition=standard
 
 # For full version, N_GRID_INCREMENTS=100
 export N_GRID_INCREMENTS=20 # Number of grid increments
