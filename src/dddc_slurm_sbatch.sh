@@ -15,7 +15,7 @@ export N_PARAMETER_ITERATIONS=100 # Number of iterations over all parameter sets
 export VERSION="2025-03-17-dddc-trembling-hand"
 export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
 export DEBUG=0
-export LOG_PATH="/scratch/hpc-prf-irddcc/AlgorithmicCompetition.jl/log"
+export LOG_DIR="/scratch/hpc-prf-irddcc/AlgorithmicCompetition.jl/log"
 echo "Bash: Running DDDC with $N_GRID_INCREMENTS grid increments"
 
 module reset
