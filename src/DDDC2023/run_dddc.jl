@@ -37,7 +37,8 @@ function run_dddc(;
     frequency_high_demand_range = [0, 0.5, 1.0]
 
     # if n_grid_increments == 1, then only consider perfect and noisy signal cases
-    @assert n_grid_increments > 0 "n_grid_increments must be greater than 0, is $n_grid_increments"
+    @assert n_grid_increments >= 0 "n_grid_increments must be greater than or equal to 0, is $n_grid_increments"
+    n_grid_increments = n_grid_increments == 0 ? 1 : n_grid_increments
     @info "Running DDDC with n_grid_increments = $n_grid_increments"
     signal_quality_level_range = Float64.(range(0.5, 1.0, n_grid_increments + 1))
 

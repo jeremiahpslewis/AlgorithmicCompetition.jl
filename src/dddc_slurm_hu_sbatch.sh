@@ -9,7 +9,7 @@
 #SBATCH --partition=standard
 
 # For full version, N_GRID_INCREMENTS=100
-export N_GRID_INCREMENTS=1 # Number of grid increments
+export N_GRID_INCREMENTS=0 # Number of grid increments
 export N_PARAMETER_ITERATIONS=1 # Number of iterations over all parameter sets per job
 export VERSION="2025-03-19-dddc-trembling-hand"
 export DEBUG=0
