@@ -712,9 +712,9 @@ end
             n_parameter_iterations = 1,
             max_iter = Int(1e4),
             convergence_threshold = Int(1e2),
-            n_grid_increments = 2,
+            n_grid_increments = 0,
             debug = debug,
-            trembling_hand_parameters = [0.0, 0.1],
+            trembling_hand_parameters = [0.0, 0.01],
         )
     end
     rmprocs(_procs)
