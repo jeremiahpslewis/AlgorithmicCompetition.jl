@@ -6,7 +6,7 @@
 #SBATCH --mem-per-cpu=3gb
 #SBATCH --cpus-per-task=128 # 128 core
 #SBATCH --time=1:00:00 # For full run true value should be <13 hours
-#SBATCH --partition=standard
+#SBATCH --partition=standard*
 
 # For full version, N_GRID_INCREMENTS=100
 export N_GRID_INCREMENTS=20 # Number of grid increments
