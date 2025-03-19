@@ -70,8 +70,13 @@ function extract_params_from_environment()
 
     version = get(ENV, "VERSION", "v1")
     debug = parse(Int, get(ENV, "DEBUG", "1")) == 1
-    SLURM_ARRAY_TASK_ID = parse(Int,  get(ENV, "SLURM_ARRAY_TASK_ID", "1"))
-    SLURM_ARRAY_JOB_ID = parse(Int, get(ENV, "SLURM_ARRAY_JOB_ID", "1"))
+    if haskey(ENV, "SLURM_ARRAY_TASK_ID")
+        SLURM_ARRAY_TASK_ID = parse(Int, get(ENV, "SLURM_ARRAY_TASK_ID", "1"))
+        SLURM_ARRAY_JOB_ID = parse(Int, get(ENV, "SLURM_ARRAY_JOB_ID", "1"))
+    else
+        SLURM_ARRAY_TASK_ID = 1
+        SLURM_ARRAY_JOB_ID = parse(Int, get(ENV, "SLURM_JOB_ID", "1"))
+    end
     log_dir = get(ENV, "LOG_DIR", "log")
     log_path = joinpath(log_dir, "$(SLURM_ARRAY_JOB_ID)_$(SLURM_ARRAY_TASK_ID).log")
     n_cores = parse(Int, get(ENV, "SLURM_CPUS_PER_TASK", "2"))
