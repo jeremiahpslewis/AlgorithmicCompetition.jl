@@ -106,7 +106,7 @@ function extract_params_from_environment()
 end
 
 function setup_logger(params)
-    mkpath("log")
+    mkpath(params[:log_path])
     f_logger = FileLogger(params[:log_path]; append=true)
     debuglogger = MinLevelLogger(f_logger, Logging.Info)
     global_logger(debuglogger)
