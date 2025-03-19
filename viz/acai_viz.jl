@@ -17,18 +17,18 @@ using Tidier
 
 use_summary_files = true
 
-arrow_files = readdir("data/SLURM_ARRAY_JOB_ID=21091034_debug=false_model=dddc_version=2025-03-17-dddc-trembling-hand", join = true)
+arrow_files = readdir("data/SLURM_ARRAY_JOB_ID=83335_debug=false_model=dddc_version=2025-03-19-dddc-trembling-hand", join = true)
 arrow_files = filter(y -> occursin(".arrow", y), arrow_files)
 
 if use_summary_files
     arrow_files = filter(y -> occursin("df_summary", y), arrow_files)
-    df_full_ = vcat(DataFrame.(Arrow.Table.(arrow_files))...)
+    df_full = vcat(DataFrame.(Arrow.Table.(arrow_files))...)
 else
     arrow_files = filter(y -> !occursin("df_summary", y), arrow_files)
     df_full_ = AlgorithmicCompetition.build_summary_from_raw_arrow_file.(arrow_files)
+    df_full = vcat(df_full_...)
 end
 
-df_full = vcat(df_full_...)
 df_summary = AlgorithmicCompetition.reduce_dddc(df_full)
 
 mkpath("plots/acai")
