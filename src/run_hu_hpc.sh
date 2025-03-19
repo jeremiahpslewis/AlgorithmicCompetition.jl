@@ -11,7 +11,7 @@ export JULIA_DEPOT_PATH=/lustre/wiwi/lewisjps/.julia
 
 cd /lustre/wiwi/lewisjps || exit
 
-[ ! -d 'AlgorithmicCompetition.jl' ] && git clone https://github.com/jeremiahpslewis/AlgorithmicCompetition.jl.git
+[ ! -d 'AlgorithmicCompetition.jl' ] && git clone https://github.com/jeremiahpslewis/AlgorithmicCompetition.jl.git 
 
 cd AlgorithmicCompetition.jl || exit
 
