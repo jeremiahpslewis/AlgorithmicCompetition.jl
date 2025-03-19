@@ -111,6 +111,7 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
 
     is_converged = Bool[]
     percent_unexplored_states = Float64[]
+    @info "Extracting convergence profit"
     convergence_profit = get_convergence_profit_from_hook(hook)
     action_index = String[]
     action_price = String[]
@@ -130,9 +131,11 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
         end
     end
 
+    @info "Extracting price vs demand signal counterfactuals"
     price_vs_demand_signal_counterfactuals =
         extract_price_vs_demand_signal_counterfactuals(env, hook)
 
+    @info "Return DDDCSummary"
     return DDDCSummary(
         env.α,
         env.β,
