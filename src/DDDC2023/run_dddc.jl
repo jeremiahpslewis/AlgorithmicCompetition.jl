@@ -122,6 +122,8 @@ function run_dddc(;
     )
     append!(exp_list, exp_list_)
 
+    @info "run_and_extract completed"
+
     folder_name = joinpath(
         "data",
         savename((
@@ -142,8 +144,13 @@ function run_dddc(;
     if !precompile
         Arrow.write(folder_name * ".arrow", df)
     end
+
+    @info "Extracting summary"
+
     df = expand_and_extract_dddc(df)
     df_summary = construct_df_summary_dddc(df)
+
+    @info "Saving summary to $folder_name"
     if !precompile
         Arrow.write(folder_name * "_df_summary.arrow", df_summary)
     end

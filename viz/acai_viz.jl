@@ -16,11 +16,11 @@ using Arrow
 using Tidier
 
 arrow_files = readdir("data/SLURM_ARRAY_JOB_ID=20878043_debug=false_model=dddc_version=2025-03-17-dddc-trembling-hand", join = true)
-arrow_files = filter(y -> occursin(".arrow", y), arrow_files)
-arrow_files = filter(y -> !occursin("df_summary", y), arrow_files)
-df_full_ = AlgorithmicCompetition.expand_and_extract_dddc.(DataFrame.(Arrow.Table.(arrow_files)))
-rename!.(df_full_, :trembling_hand_frequencies => :trembling_hand_frequency)
-df_full = vcat(AlgorithmicCompetition.construct_df_summary_dddc.(df_full_)...)
+arrow_files = filter(y -> occursin("df_summary.arrow", y), arrow_files)
+# arrow_files = filter(y -> !occursin("df_summary", y), arrow_files)
+# df_full_ = AlgorithmicCompetition.expand_and_extract_dddc.n(DataFrame.(Arrow.Table.(arrow_files)))
+# rename!.(df_full_, :trembling_hand_frequencies => :trembling_hand_frequency)
+df_full = vcat(DataFrame.(Arrow.Table.(df_full_)...))
 df_summary = AlgorithmicCompetition.reduce_dddc(df_full)
 
 mkpath("plots/acai")

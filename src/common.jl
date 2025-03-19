@@ -72,6 +72,7 @@ function extract_params_from_environment()
     debug = parse(Int, get(ENV, "DEBUG", "1")) == 1
     SLURM_ARRAY_TASK_ID = parse(Int,  get(ENV, "SLURM_ARRAY_TASK_ID", "1"))
     SLURM_ARRAY_JOB_ID = parse(Int, get(ENV, "SLURM_ARRAY_JOB_ID", "1"))
+    log_path = get(ENV, "LOG_PATH", "log/$(SLURM_ARRAY_JOB_ID)_$(SLURM_ARRAY_TASK_ID).log")
     n_cores = parse(Int, get(ENV, "SLURM_CPUS_PER_TASK", "2"))
     n_grid_increments = parse(Int, get(ENV, "N_GRID_INCREMENTS", "10"))
     n_parameter_iterations = parse(Int, get(ENV, "N_PARAMETER_ITERATIONS", "1"))
@@ -79,6 +80,7 @@ function extract_params_from_environment()
     params = Dict(
         :version => version,
         :debug => debug,
+        :log_path => log_path,
         :SLURM_ARRAY_TASK_ID => SLURM_ARRAY_TASK_ID,
         :SLURM_ARRAY_JOB_ID => SLURM_ARRAY_JOB_ID,
         :n_cores => n_cores,
@@ -104,7 +106,7 @@ end
 
 function setup_logger(params)
     mkpath("log")
-    f_logger = FileLogger("log/$(params[:SLURM_ARRAY_JOB_ID])_$(params[:SLURM_ARRAY_TASK_ID]).log"; append=true)
+    f_logger = FileLogger(params[:log_path]; append=true)
     debuglogger = MinLevelLogger(f_logger, Logging.Info)
     global_logger(debuglogger)
     @info "Logger setup complete."
