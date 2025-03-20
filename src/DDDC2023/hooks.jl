@@ -51,7 +51,7 @@ end
 struct DDDCPricesPerLastNEpisodes <: AbstractHook
     prices::CircularVectorBuffer{Int}
 
-    function DDDCPricesPerLastNEpisodes(; max_steps=100)
+    function DDDCPricesPerLastNEpisodes(; max_steps = 100)
         new(CircularVectorBuffer{Int}(max_steps))
     end
 end
@@ -61,13 +61,25 @@ function Base.push!(h::DDDCPricesPerLastNEpisodes, price::Int)
     return
 end
 
-function Base.push!(h::DDDCPricesPerLastNEpisodes, ::PostActStage, agent::P, env::DDDCEnv, player::Player) where {P<:AbstractPolicy}
+function Base.push!(
+    h::DDDCPricesPerLastNEpisodes,
+    ::PostActStage,
+    agent::P,
+    env::DDDCEnv,
+    player::Player,
+) where {P<:AbstractPolicy}
     # Replace `chosen_price(env, player)` with the actual function extracting the chosen price.
     push!(h, agent.trajectory.container[:action][end])
     return
 end
 
-function Base.push!(h::DDDCPricesPerLastNEpisodes, stage::Union{PreEpisodeStage, PostEpisodeStage, PostExperimentStage}, agent::P, env::DDDCEnv, player::Player) where {P<:AbstractPolicy}
+function Base.push!(
+    h::DDDCPricesPerLastNEpisodes,
+    stage::Union{PreEpisodeStage,PostEpisodeStage,PostExperimentStage},
+    agent::P,
+    env::DDDCEnv,
+    player::Player,
+) where {P<:AbstractPolicy}
     return
 end
 
@@ -79,9 +91,9 @@ function DDDCHook(env::AbstractEnv)
                 DDDCTotalRewardPerLastNEpisodes(;
                     max_steps = env.convergence_threshold + 100,
                 ),
-                DDDCPricesPerLastNEpisodes(;
-                    max_steps = env.convergence_threshold + 100,
-                ),
+                # DDDCPricesPerLastNEpisodes(;
+                #     max_steps = 100,
+                # ),
             ) for p in players(env)
         ),
     )
@@ -96,5 +108,3 @@ Tables.istable(::Type{DDDCTotalRewardPerLastNEpisodes}) = true
 Tables.columnaccess(::Type{DDDCTotalRewardPerLastNEpisodes}) = true
 Tables.columns(h::DDDCTotalRewardPerLastNEpisodes) =
     (; rewards = h.rewards, demand_state_high_vect = h.demand_state_high_vect)
-
-    

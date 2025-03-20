@@ -14,7 +14,7 @@ struct DDDCSummary
     α::Float64
     β::Float64
     is_converged::Vector{Bool}
-    data_demand_digital_params::DataDemandDigitalParams
+    data_demand_digital_params::DDDCExperimentalParams
     convergence_profit::Vector{Float64}
     convergence_profit_demand_high::Vector{Union{Float64,Missing}}
     convergence_profit_demand_low::Vector{Union{Float64,Missing}}
@@ -27,6 +27,7 @@ struct DDDCSummary
     percent_unexplored_states::Vector{Float64}
     action_index::Vector{String}
     action_price::Vector{String}
+
 end
 
 function Base.show(io::IO, s::DDDCSummary)
@@ -45,8 +46,13 @@ function Base.show(io::IO, s::DDDCSummary)
     println(io, "  Price Response MSE: ", s.price_response_to_demand_signal_mse)
     println(io, "  Percent Demand High: ", s.percent_demand_high)
     println(io, "  Percent Unexplored States: ", s.percent_unexplored_states)
-    println(io, "  Action Index: ", s.action_index[1][1:5], "; ", s.action_index[2][1:5])
-    println(io, "  Action Price: ", s.action_price[1][1:10], "; ", s.action_price[2][1:10])
+    # println(io, "  Action Index: ", s.action_index[1][1:5], "; ", s.action_index[2][1:5])
+    # println(io, "  Action Price: ", s.action_price[1][1:10], "; ", s.action_price[2][1:10])
+    println(
+        io,
+        " Trembling Hand Frequency ",
+        s.data_demand_digital_params.trembling_hand_frequency,
+    )
 end
 
 """
@@ -109,6 +115,7 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
 
     is_converged = Bool[]
     percent_unexplored_states = Float64[]
+    @info "Extracting convergence profit"
     convergence_profit = get_convergence_profit_from_hook(hook)
     action_index = String[]
     action_price = String[]
@@ -116,16 +123,23 @@ function economic_summary(env::DDDCEnv, policy::MultiAgentPolicy, hook::Abstract
     for player_ in (Player(1), Player(2))
         push!(is_converged, hook[player_][1].is_converged)
         push!(percent_unexplored_states, mean(hook[player_][1].best_response_vector .== 0))
-        push!(action_index, join(hook[player_][3].prices, ","))
+        if false # TODO: Fix this so that price tracking can be optionally enabled
+            push!(action_index, join(hook[player_][3].prices, ","))
 
-        # Extract the price value for each action
-        action_price_vect_ = [env.price_options[i] for i in hook[player_][3].prices]
-        push!(action_price, join(action_price_vect_, ","))
+            # Extract the price value for each action
+            action_price_vect_ = [env.price_options[i] for i in hook[player_][3].prices]
+            push!(action_price, join(action_price_vect_, ","))
+        else
+            push!(action_index, "")
+            push!(action_price, "")
+        end
     end
 
+    @info "Extracting price vs demand signal counterfactuals"
     price_vs_demand_signal_counterfactuals =
         extract_price_vs_demand_signal_counterfactuals(env, hook)
 
+    @info "Return DDDCSummary"
     return DDDCSummary(
         env.α,
         env.β,
@@ -233,6 +247,10 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
 
     percent_unexplored_states =
         [ex.percent_unexplored_states for ex in exp_list if !(ex isa Exception)]
+    trembling_hand_frequency = [
+        ex.data_demand_digital_params.trembling_hand_frequency for
+        ex in exp_list if !(ex isa Exception)
+    ]
 
     df = DataFrame(
         α = α_result,
@@ -255,6 +273,7 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
         price_response_to_demand_signal_mse = price_response_to_demand_signal_mse,
         percent_demand_high = percent_demand_high,
         percent_unexplored_states = percent_unexplored_states,
+        trembling_hand_frequency = trembling_hand_frequency,
     )
     return df
 end
@@ -356,6 +375,7 @@ function reduce_dddc(df_summary::DataFrame)
             :weak_signal_quality_level,
             :strong_signal_quality_level,
             :frequency_high_demand,
+            :trembling_hand_frequency,
         )
         @combine(
             :profit_mean = mean(:profit_mean),
@@ -526,4 +546,12 @@ function construct_df_summary_dddc(df::DataFrame)
         reduce_dddc # Group by and combine individual runs
     end
     return df_summary
+end
+
+function build_summary_from_raw_arrow_file(arrow_path::String)
+    arrow_path |>
+    Arrow.Table |>
+    DataFrame |>
+    expand_and_extract_dddc |>
+    construct_df_summary_dddc
 end

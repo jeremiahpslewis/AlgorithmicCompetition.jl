@@ -30,18 +30,17 @@ function run_dddc(;
     batch_metadata = (SLURM_ARRAY_JOB_ID = 0, SLURM_ARRAY_TASK_ID = 0),
     debug = false,
     precompile = false,
+    trembling_hand_parameters = [0.0],
 )
     signal_quality_vect = [[true, false]] # With signal_quality_range over both weak and strong, [false, false] case is redundant
 
     frequency_high_demand_range = [0, 0.5, 1.0]
 
-    # if n_grid_increments == 0, then only consider perfect and noisy signal cases
+    # if n_grid_increments == 1, then only consider perfect and noisy signal cases
+    @assert n_grid_increments >= 0 "n_grid_increments must be greater than or equal to 0, is $n_grid_increments"
+    n_grid_increments = n_grid_increments == 0 ? 1 : n_grid_increments
     @info "Running DDDC with n_grid_increments = $n_grid_increments"
-    if n_grid_increments == 0
-        signal_quality_level_range = [0.5, 1.0]
-    else    
-        signal_quality_level_range = Float64.(range(0.5, 1.0, n_grid_increments + 1))
-    end
+    signal_quality_level_range = Float64.(range(0.5, 1.0, n_grid_increments + 1))
 
     @info "Signal quality level range: $signal_quality_level_range"
 
@@ -62,36 +61,38 @@ function run_dddc(;
     δ = 0.95
 
     data_demand_digital_param_set = [
-        DataDemandDigitalParams(
+        DDDCExperimentalParams(
             weak_signal_quality_level = weak_signal_quality_level,
             strong_signal_quality_level = strong_signal_quality_level,
             signal_is_strong = signal_quality_players,
             frequency_high_demand = frequency_high_demand,
-        ) for frequency_high_demand in frequency_high_demand_range for
+            trembling_hand_frequency = trembling_hand_frequency,
+        ) for trembling_hand_frequency in trembling_hand_parameters for
+        frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for
         weak_signal_quality_level in signal_quality_level_range for
         strong_signal_quality_level in signal_quality_level_range if
-        weak_signal_quality_level <= strong_signal_quality_level 
+        weak_signal_quality_level <= strong_signal_quality_level
     ]
 
     # Always run 'missing' signal stochastic demand case, 0.0
     # Always run 'sunspot' joint random signal stochastic demand case -1.0
     signal_quality_joint_vect = [0.0, -1.0]
     data_demand_digital_param_special_set = [
-        DataDemandDigitalParams(
+        DDDCExperimentalParams(
             weak_signal_quality_level = signal_quality_level,
             strong_signal_quality_level = signal_quality_level,
             signal_is_strong = signal_quality_players,
             frequency_high_demand = frequency_high_demand,
-        ) for frequency_high_demand in frequency_high_demand_range for
+            trembling_hand_frequency = trembling_hand_frequency,
+        ) for trembling_hand_frequency in trembling_hand_parameters for
+        frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for
         signal_quality_level in signal_quality_joint_vect
     ]
 
-    data_demand_digital_param_set = [
-        data_demand_digital_param_set...,
-        data_demand_digital_param_special_set...
-    ]
+    data_demand_digital_param_set =
+        [data_demand_digital_param_set..., data_demand_digital_param_special_set...]
 
     hyperparameter_vect = [
         DDDCHyperParameters(
@@ -111,13 +112,11 @@ function run_dddc(;
 
     @info "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times"
 
-    exp_list_ = @showprogress pmap(
-        run_and_extract,
-        hyperparameter_vect;
-        on_error = identity,
-        batch_size = batch_size,
-    )
+    exp_list_ =
+        @showprogress pmap(run_and_extract, hyperparameter_vect; on_error = identity)
     append!(exp_list, exp_list_)
+
+    @info "run_and_extract completed"
 
     folder_name = joinpath(
         "data",
@@ -139,8 +138,13 @@ function run_dddc(;
     if !precompile
         Arrow.write(folder_name * ".arrow", df)
     end
+
+    @info "Extracting summary"
+
     df = expand_and_extract_dddc(df)
     df_summary = construct_df_summary_dddc(df)
+
+    @info "Saving summary to $folder_name"
     if !precompile
         Arrow.write(folder_name * "_df_summary.arrow", df_summary)
     end

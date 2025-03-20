@@ -42,7 +42,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
     action_space::Tuple                     # Action space
     profit_array::Array{Float64,4}          # Profit given price pair as coordinates
 
-    data_demand_digital_params::DataDemandDigitalParams # Parameters for Data/Demand/Digital AIAPC extension
+    data_demand_digital_params::DDDCExperimentalParams # Parameters for Data/Demand/Digital AIAPC extension
 
     reward::Vector{Float64}
 
@@ -51,7 +51,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
         n_prices = length(p.price_options)
         price_index = Vector{Int64}(Int64.(1:n_prices))
         n_players = p.n_players
-        n_state_space = 4 * n_prices^(p.memory_length * n_players) # 2^2 = 4 possible demand states (ground truth and signal)
+        n_state_space = 4 * n_prices^(p.memory_length * n_players) + 1 # 2^2 = 4 possible demand states (ground truth and signal); plus one at end for trembling hand state
 
         state_space = Base.OneTo(Int64(n_state_space))
         action_space = construct_DDDC_action_space(price_index)
@@ -60,8 +60,9 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
         state_space_lookup = construct_DDDC_state_space_lookup(action_space, n_prices)
 
         # Randomly initialize demand signals for previous episode based on high demand frequency
-        is_high_demand_prev_episode = rand() < p.data_demand_digital_params.frequency_high_demand
-        
+        is_high_demand_prev_episode =
+            rand() < p.data_demand_digital_params.frequency_high_demand
+
         is_high_demand_episode = rand() < p.data_demand_digital_params.frequency_high_demand
 
         new(
@@ -155,6 +156,13 @@ RLBase.state(env::DDDCEnv) = nothing
 Return the current state as an integer, mapped from the environment memory.
 """
 function RLBase.state(env::DDDCEnv, player::Player)
+    # Trembling hand state reached with probability env.data_demand_digital_params.trembling_hand_frequency, in which case we return the last state
+    if env.data_demand_digital_params.trembling_hand_frequency > 0.0
+        if rand() < env.data_demand_digital_params.trembling_hand_frequency
+            return env.n_state_space
+        end
+    end
+
     memory_index = env.memory.prices
     # State is defined by memory, as in AIAPC, plus demand signal given to a player
     index_ = player_to_index[player]

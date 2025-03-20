@@ -12,7 +12,7 @@ end
         δ::Float64,
         max_iter::Int,
         competition_solution_dict::Dict{Symbol,CompetitionSolution},
-        data_demand_digital_params::DataDemandDigitalParams;
+        data_demand_digital_params::DDDCExperimentalParams;
         convergence_threshold::Int = Int(1e5),
     )
 
@@ -34,7 +34,7 @@ struct DDDCHyperParameters
     p_Bert_nash_equilibrium::Dict{Symbol,Float64}
     p_monop_opt::Dict{Symbol,Float64}
 
-    data_demand_digital_params::DataDemandDigitalParams
+    data_demand_digital_params::DDDCExperimentalParams
 
     function DDDCHyperParameters(
         α::Float64,
@@ -42,7 +42,7 @@ struct DDDCHyperParameters
         δ::Float64,
         max_iter::Int,
         competition_solution_dict::Dict{Symbol,CompetitionSolution},
-        data_demand_digital_params::DataDemandDigitalParams;
+        data_demand_digital_params::DDDCExperimentalParams;
         convergence_threshold::Int = Int(1e5),
     )
         @assert max_iter > convergence_threshold
@@ -70,20 +70,28 @@ struct DDDCHyperParameters
             demand_mode in [:high, :low]
         )
 
-        p_Bert_nash_equilibrium = [competition_solution_dict[demand_mode].p_Bert_nash_equilibrium for
-        demand_mode in [:high, :low]]
+        p_Bert_nash_equilibrium = [
+            competition_solution_dict[demand_mode].p_Bert_nash_equilibrium for
+            demand_mode in [:high, :low]
+        ]
 
-        p_monop_opt = [competition_solution_dict[demand_mode].p_monop_opt for demand_mode in [:high, :low]]
+        p_monop_opt = [
+            competition_solution_dict[demand_mode].p_monop_opt for
+            demand_mode in [:high, :low]
+        ]
 
         p_range_pad = ξ * (p_monop_opt_max - p_Bert_nash_equilibrium_min)
-        p_pad_extreme_options = [p_Bert_nash_equilibrium_min - p_range_pad, p_monop_opt_max + p_range_pad]
+        p_pad_extreme_options =
+            [p_Bert_nash_equilibrium_min - p_range_pad, p_monop_opt_max + p_range_pad]
 
-        p_mean_high_demand_nash_low_demand_monop = [mean([p_Bert_nash_equilibrium_max, p_monop_opt_min])]
-    
-        price_options = [p_Bert_nash_equilibrium...,
+        p_mean_high_demand_nash_low_demand_monop =
+            [mean([p_Bert_nash_equilibrium_max, p_monop_opt_min])]
+
+        price_options = [
+            p_Bert_nash_equilibrium...,
             p_monop_opt...,
             p_pad_extreme_options...,
-            p_mean_high_demand_nash_low_demand_monop...
+            p_mean_high_demand_nash_low_demand_monop...,
         ]
         sort!(price_options)
 

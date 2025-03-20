@@ -3,10 +3,10 @@ using AlgorithmicCompetition
 using Dates
 using Distributed
 
-ENV["N_PARAMETER_ITERATIONS"] = 100
+ENV["N_PARAMETER_ITERATIONS"] = 1
 ENV["N_GRID_INCREMENTS"] = 0
 ENV["DEBUG"] = 0
-ENV["VERSION"] = "v0.1.2"
+ENV["VERSION"] = "v0.1.3"
 
 params = AlgorithmicCompetition.extract_params_from_environment()
 
@@ -31,7 +31,7 @@ _procs = addprocs(
 
 if params[:n_cores] > 1
     _procs = addprocs(
-        params[:n_cores],
+        params[:n_cores] - 1,
         topology = :master_worker,
         exeflags = ["--threads=1", "--project=$(Base.active_project())"],
     )
@@ -55,6 +55,7 @@ exp_list = AlgorithmicCompetition.run_dddc(
     start_timestamp = now(),
     n_parameter_iterations = params[:n_parameter_iterations],
     n_grid_increments = params[:n_grid_increments],
+    trembling_hand_parameters = [0.0, 0.001, 0.01, 0.1, 0.5, 1.0],
     debug = params[:debug],
 )
 

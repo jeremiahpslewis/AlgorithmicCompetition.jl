@@ -31,7 +31,7 @@ julia -e 'using Pkg; Pkg.activate("."); Pkg.update(); Pkg.instantiate(); Pkg.pre
 mkdir -p log # Log directory for slurm task output
 
 if [[ "$TASK" == "DDDC" ]]; then
-    sbatch src/dddc_slurm_sbatch.sh
+    sbatch src/dddc_pc2_slurm_sbatch.sh
 elif [[ "$TASK" == "AIAPC" ]]; then
     sbatch src/aiapc_slurm_sbatch.sh
 fi

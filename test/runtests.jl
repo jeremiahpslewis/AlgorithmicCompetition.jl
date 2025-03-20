@@ -43,7 +43,7 @@ using AlgorithmicCompetition:
     construct_DDDC_profit_array,
     construct_DDDC_state_space_lookup,
     ConvergenceCheck,
-    DataDemandDigitalParams,
+    DDDCExperimentalParams,
     DDDCEnv,
     DDDCHyperParameters,
     DDDCPolicy,
