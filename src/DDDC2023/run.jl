@@ -1,7 +1,7 @@
 @inline function RLBase.plan!(multiagent::MultiAgentPolicy, env::DDDCEnv)
     @inbounds return CartesianIndex{2}(
         RLBase.plan!(multiagent[Player(1)], env, Player(1)),
-        RLBase.plan!(multiagent[Player(2)], env, Player(2))
+        RLBase.plan!(multiagent[Player(2)], env, Player(2)),
     )
 end
 
@@ -32,7 +32,10 @@ end
 
 Runs the experiment and returns the economic summary.
 """
-@inline function run_and_extract(hyperparameters::DDDCHyperParameters; stop_on_convergence = true)
+@inline function run_and_extract(
+    hyperparameters::DDDCHyperParameters;
+    stop_on_convergence = true,
+)
     @info "Running single simulation with hyperparameters: $hyperparameters"
     economic_summary(run(hyperparameters; stop_on_convergence = stop_on_convergence))
 end

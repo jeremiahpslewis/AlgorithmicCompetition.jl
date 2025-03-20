@@ -67,11 +67,12 @@ function run_dddc(;
             signal_is_strong = signal_quality_players,
             frequency_high_demand = frequency_high_demand,
             trembling_hand_frequency = trembling_hand_frequency,
-        ) for trembling_hand_frequency in trembling_hand_parameters for frequency_high_demand in frequency_high_demand_range for
+        ) for trembling_hand_frequency in trembling_hand_parameters for
+        frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for
         weak_signal_quality_level in signal_quality_level_range for
         strong_signal_quality_level in signal_quality_level_range if
-        weak_signal_quality_level <= strong_signal_quality_level 
+        weak_signal_quality_level <= strong_signal_quality_level
     ]
 
     # Always run 'missing' signal stochastic demand case, 0.0
@@ -83,16 +84,15 @@ function run_dddc(;
             strong_signal_quality_level = signal_quality_level,
             signal_is_strong = signal_quality_players,
             frequency_high_demand = frequency_high_demand,
-            trembling_hand_frequency = trembling_hand_frequency
-        ) for trembling_hand_frequency in trembling_hand_parameters for frequency_high_demand in frequency_high_demand_range for
+            trembling_hand_frequency = trembling_hand_frequency,
+        ) for trembling_hand_frequency in trembling_hand_parameters for
+        frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for
         signal_quality_level in signal_quality_joint_vect
     ]
 
-    data_demand_digital_param_set = [
-        data_demand_digital_param_set...,
-        data_demand_digital_param_special_set...
-    ]
+    data_demand_digital_param_set =
+        [data_demand_digital_param_set..., data_demand_digital_param_special_set...]
 
     hyperparameter_vect = [
         DDDCHyperParameters(
@@ -112,11 +112,8 @@ function run_dddc(;
 
     @info "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times"
 
-    exp_list_ = @showprogress pmap(
-        run_and_extract,
-        hyperparameter_vect;
-        on_error = identity,
-    )
+    exp_list_ =
+        @showprogress pmap(run_and_extract, hyperparameter_vect; on_error = identity)
     append!(exp_list, exp_list_)
 
     @info "run_and_extract completed"

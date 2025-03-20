@@ -42,10 +42,12 @@ function get_demand_signals(
     end
 
     # Manually compute the true signal probability for each player
-    local prob1 = weak_signal_quality_level * (signal_is_strong[1] ? 0.0 : 1.0) +
-                  strong_signal_quality_level * (signal_is_strong[1] ? 1.0 : 0.0)
-    local prob2 = weak_signal_quality_level * (signal_is_strong[2] ? 0.0 : 1.0) +
-                  strong_signal_quality_level * (signal_is_strong[2] ? 1.0 : 0.0)
+    local prob1 =
+        weak_signal_quality_level * (signal_is_strong[1] ? 0.0 : 1.0) +
+        strong_signal_quality_level * (signal_is_strong[1] ? 1.0 : 0.0)
+    local prob2 =
+        weak_signal_quality_level * (signal_is_strong[2] ? 0.0 : 1.0) +
+        strong_signal_quality_level * (signal_is_strong[2] ? 1.0 : 0.0)
     local reveal1 = rand() < prob1
     local reveal2 = rand() < prob2
     local obs1 = (reveal1 == demand_level_is_high)

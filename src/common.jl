@@ -112,7 +112,7 @@ end
 
 function setup_logger(params)
     mkpath(dirname(params[:log_path]))
-    f_logger = FileLogger(params[:log_path]; append=true)
+    f_logger = FileLogger(params[:log_path]; append = true)
     debuglogger = MinLevelLogger(f_logger, Logging.Info)
     global_logger(debuglogger)
     @info "Logger setup complete."

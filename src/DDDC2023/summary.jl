@@ -48,7 +48,11 @@ function Base.show(io::IO, s::DDDCSummary)
     println(io, "  Percent Unexplored States: ", s.percent_unexplored_states)
     # println(io, "  Action Index: ", s.action_index[1][1:5], "; ", s.action_index[2][1:5])
     # println(io, "  Action Price: ", s.action_price[1][1:10], "; ", s.action_price[2][1:10])
-    println(io, " Trembling Hand Frequency ", s.data_demand_digital_params.trembling_hand_frequency)
+    println(
+        io,
+        " Trembling Hand Frequency ",
+        s.data_demand_digital_params.trembling_hand_frequency,
+    )
 end
 
 """
@@ -545,5 +549,9 @@ function construct_df_summary_dddc(df::DataFrame)
 end
 
 function build_summary_from_raw_arrow_file(arrow_path::String)
-    arrow_path |> Arrow.Table |> DataFrame |> expand_and_extract_dddc |> construct_df_summary_dddc
+    arrow_path |>
+    Arrow.Table |>
+    DataFrame |>
+    expand_and_extract_dddc |>
+    construct_df_summary_dddc
 end

@@ -28,9 +28,9 @@ function construct_DDDC_profit_array(
     profit_array = zeros(Float64, n_prices, n_prices, n_players, 2)
     for l in (:high, :low)
         local d = demand_to_index[l]
-        for k in 1:n_players
-            for i in 1:n_prices
-                @inbounds for j in 1:n_prices
+        for k = 1:n_players
+            for i = 1:n_prices
+                @inbounds for j = 1:n_prices
                     profit_array[i, j, k, d] =
                         π(price_options[i], price_options[j], competition_params_dict[l])[k]
                 end

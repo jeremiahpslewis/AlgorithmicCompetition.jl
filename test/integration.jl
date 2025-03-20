@@ -324,7 +324,6 @@ end
         signal_is_strong = [true, false],
         frequency_high_demand = 0.5,
         trembling_hand_frequency = 0.1,
-
     )
 
     hyperparams = DDDCHyperParameters(
@@ -696,7 +695,7 @@ end
 
 @testset "run DDDC multiprocessing code" begin
     _procs = addprocs(
-        Sys.CPU_THREADS-1,
+        Sys.CPU_THREADS - 1,
         topology = :master_worker,
         exeflags = ["--threads=1", "--project=$(Base.active_project())"],
     )
