@@ -15,7 +15,7 @@ module load JuliaHPC   # loading the latest JuliaHPC
 
 # For full version, N_GRID_INCREMENTS=100
 export N_GRID_INCREMENTS=1
-export N_PARAMETER_ITERATIONS=50 # Number of iterations over all parameter sets per job
+export N_PARAMETER_ITERATIONS=1 # Number of iterations over all parameter sets per job
 export VERSION="2025-03-17-dddc-trembling-hand"
 export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
 export DEBUG=0
