@@ -6,9 +6,18 @@ struct COREQPolicy
     signal_policy::MultiAgentPolicy
     defect_policy::MultiAgentPolicy
     compliance_policy::MultiAgentPolicy
+
+    function COREQPolicy(env::COREQEnv)
+        signal_policy = DDDCPolicy(env.signal_env)
+        defect_policy = DDDCPolicy(env.defect_env)
+        compliance_policy = CompliancePolicy(env.compliance_env)
+
+        new(signal_policy, defect_policy, compliance_policy)
+    end
 end
 
-Base.show(io::IO, p::COREQPolicy) = println(io, "COREQPolicy")
+Base.show(io::IO, ::MIME"text/plain", p::COREQPolicy) = print(io, "COREQPolicy")
+Base.show(io::IO, ::MIME"text/plain", p::COREQEnv) = print(io, "COREQEnv")
 
 function CompliancePolicy(env; mode = "baseline") # TODO use type signature ::ComplianceEnv)
     policy = MultiAgentPolicy(
@@ -59,7 +68,7 @@ struct COREQHyperParameters
     data_demand_digital_params::DDDCExperimentalParams
 end
 
-struct COREQEnv <: AbstractEnv # N is profit_array dimension
+struct COREQEnv <: AbstractEnv
     α::Float64                              # Learning parameter
     β::Float64                              # Exploration parameter
     δ::Float64                              # Discount factor
@@ -75,20 +84,49 @@ struct COREQEnv <: AbstractEnv # N is profit_array dimension
     hyperparams::COREQHyperParameters
 
     function COREQEnv(p::COREQHyperParameters)
-        DDDCEnv(
+        competition_params_dict = Dict(
+            :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
+            :high => CompetitionParameters(0.25, -0.25, (2, 2), (1, 1)), # Parameter values aligned with Calvano 2020 Stochastic Demand case
+        )
+
+        competition_solution_dict = Dict(
+            d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low]
+        )
+
+        signal_env = DDDCEnv(
             DDDCHyperParameters(
                 p.α,
                 p.β,
                 p.δ,
                 p.max_iter,
-                p.convergence_threshold,
                 competition_solution_dict,
                 p.data_demand_digital_params,
+                convergence_threshold = p.convergence_threshold,
             ),
         )
-        signal_env = DDDCEnv(p)
-        defect_env = DDDCEnv(p)
-        compliance_env = ComplianceEnv(p)
+
+        defect_dddc_params = DDDCExperimentalParams(
+            weak_signal_quality_level = p.data_demand_digital_params.weak_signal_quality_level,
+            strong_signal_quality_level = p.data_demand_digital_params.strong_signal_quality_level,
+            signal_is_strong = p.data_demand_digital_params.signal_is_strong,
+            frequency_high_demand = p.data_demand_digital_params.frequency_high_demand,
+            trembling_hand_frequency = 1.0, # Only visit trembling hand state, thus ignoring the signal entirely
+        )
+        defect_env = DDDCEnv(
+            DDDCHyperParameters(
+                p.α,
+                p.β,
+                p.δ,
+                p.max_iter,
+                competition_solution_dict,
+                defect_dddc_params,
+                convergence_threshold = p.convergence_threshold,
+            ),
+        )
+
+        # TODO: add compliance env
+        compliance_env = defect_env
+        # compliance_env = ComplianceEnv(p)
 
         new(
             p.α,
@@ -100,7 +138,7 @@ struct COREQEnv <: AbstractEnv # N is profit_array dimension
             signal_env,
             defect_env,
             compliance_env,
-            p,
+            p
         )
     end
 end
