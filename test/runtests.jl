@@ -76,6 +76,8 @@ using AlgorithmicCompetition:
     DDDCPricesPerLastNEpisodes
 using Distributed
 
+debug = true
+
 @testset "AlgorithmicCompetition.jl" begin
     @testset "Paramter tests" begin
         include("alpha_beta.jl")

@@ -548,10 +548,15 @@ function construct_df_summary_dddc(df::DataFrame)
     return df_summary
 end
 
-function build_summary_from_raw_arrow_file(arrow_path::String)
+function read_raw_arrow_file(arrow_path::String)
     arrow_path |>
     Arrow.Table |>
-    DataFrame |>
+    DataFrame
+end
+
+function build_summary_from_raw_arrow_file(arrow_path::String)
+    arrow_path |>
+    read_raw_arrow_file |>
     expand_and_extract_dddc |>
     construct_df_summary_dddc
 end

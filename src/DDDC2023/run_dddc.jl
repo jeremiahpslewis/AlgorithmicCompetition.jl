@@ -31,6 +31,7 @@ function run_dddc(;
     debug = false,
     precompile = false,
     trembling_hand_parameters = [0.0],
+    write_to_file_return_none = false,
 )
     signal_quality_vect = [[true, false]] # With signal_quality_range over both weak and strong, [false, false] case is redundant
 
@@ -43,10 +44,6 @@ function run_dddc(;
     signal_quality_level_range = Float64.(range(0.5, 1.0, n_grid_increments + 1))
 
     @info "Signal quality level range: $signal_quality_level_range"
-
-    if debug
-        signal_quality_level_range = signal_quality_level_range[1:10:end]
-    end
 
     competition_params_dict = Dict(
         :low => CompetitionParameters(0.25, 0.25, (2, 2), (1, 1)),
@@ -125,14 +122,20 @@ function run_dddc(;
 
     # Shuffle hyperparameter_vect, extend according to number of repetitions
     hyperparameter_vect = shuffle(repeat(hyperparameter_vect, n_parameter_iterations))
-    exp_list = DDDCSummary[]
+
+    if debug
+        hyperparameter_vect = hyperparameter_vect[1:10:end]
+    end
 
     @info "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times"
 
-    write_to_file_path = tempdir()
+    write_to_file_path = mktempdir()
 
-    @showprogress pmap(x -> run_and_extract(x, write_to_file_return_none=true, write_to_file_path=write_to_file_path), hyperparameter_vect; on_error = identity)
+    exp_output = @showprogress pmap(x -> run_and_extract(x, write_to_file_return_none=true, write_to_file_path=write_to_file_path, write_to_file_return_none=write_to_file_return_none), hyperparameter_vect; on_error = identity)
 
+    if !write_to_file_return_none
+        return exp_output
+    end
     @info "run_and_extract completed"
 
     folder_name = joinpath(
@@ -149,14 +152,14 @@ function run_dddc(;
         )),
     )
     mkpath(folder_name)
-    @info "Saving $(length(exp_list)) results to $folder_name"
     
     
     single_run_files = readdir(write_to_file_path, join = true)
-    single_run_dfs = build_summary_from_raw_arrow_file.(single_run_files)
+    single_run_dfs = read_raw_arrow_file.(single_run_files)
     all_run_df = vcat(single_run_dfs...)
 
     if !precompile
+        @info "Saving $(nrow(all_run_df)) results to $folder_name"
         Arrow.write(folder_name * ".arrow", all_run_df)
     end
 
