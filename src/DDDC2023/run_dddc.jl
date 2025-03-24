@@ -129,9 +129,9 @@ function run_dddc(;
 
     @info "About to run $(length(hyperparameter_vect) ÷ n_parameter_iterations) parameter settings, each $n_parameter_iterations times"
 
-    exp_list_ =
-        @showprogress pmap(run_and_extract, hyperparameter_vect; on_error = identity)
-    append!(exp_list, exp_list_)
+    write_to_file_path = tempdir()
+
+    @showprogress pmap(x -> run_and_extract(x, write_to_file_return_none=true, write_to_file_path=write_to_file_path), hyperparameter_vect; on_error = identity)
 
     @info "run_and_extract completed"
 
@@ -150,15 +150,19 @@ function run_dddc(;
     )
     mkpath(folder_name)
     @info "Saving $(length(exp_list)) results to $folder_name"
-    df = extract_sim_results(exp_list)
+    
+    
+    single_run_files = readdir(write_to_file_path, join = true)
+    single_run_dfs = build_summary_from_raw_arrow_file.(single_run_files)
+    all_run_df = vcat(single_run_dfs...)
 
     if !precompile
-        Arrow.write(folder_name * ".arrow", df)
+        Arrow.write(folder_name * ".arrow", all_run_df)
     end
 
     @info "Extracting summary"
 
-    df = expand_and_extract_dddc(df)
+    df = expand_and_extract_dddc(all_run_df)
     df_summary = construct_df_summary_dddc(df)
 
     @info "Saving summary to $folder_name"

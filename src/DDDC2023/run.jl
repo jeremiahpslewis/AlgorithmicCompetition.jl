@@ -1,3 +1,5 @@
+using UUIDs
+
 @inline function RLBase.plan!(multiagent::MultiAgentPolicy, env::DDDCEnv)
     @inbounds return CartesianIndex{2}(
         RLBase.plan!(multiagent[Player(1)], env, Player(1)),
@@ -32,10 +34,21 @@ end
 
 Runs the experiment and returns the economic summary.
 """
-@inline function run_and_extract(
+function run_and_extract(
     hyperparameters::DDDCHyperParameters;
     stop_on_convergence = true,
+    write_to_file_return_none = false,
+    write_to_file_path = "data"
 )
     @info "Running single simulation with hyperparameters: $hyperparameters"
-    economic_summary(run(hyperparameters; stop_on_convergence = stop_on_convergence))
+    single_run_output = economic_summary(run(hyperparameters; stop_on_convergence = stop_on_convergence))
+    if write_to_file_return_none
+        single_run_df = extract_sim_results([single_run_output])
+
+        Arrow.write(joinpath(write_to_file_path, UUID.uuid4() * ".arrow"), single_run_df)
+    
+        return nothing
+    else
+        return single_run_output
+    end
 end
