@@ -45,7 +45,7 @@ function run_and_extract(
     if write_to_file_return_none
         single_run_df = extract_sim_results([single_run_output])
 
-        Arrow.write(joinpath(write_to_file_path, UUID.uuid4() * ".arrow"), single_run_df)
+        Arrow.write(joinpath(write_to_file_path, UUIDs.uuid4() * ".arrow"), single_run_df)
     
         return nothing
     else
