@@ -76,8 +76,22 @@ function run_dddc(;
     ]
 
     # Always run 'missing' signal stochastic demand case, 0.0
+    missing_signal_level = 0.0
+    data_demand_digital_param_set_missing_signal = [
+        DDDCExperimentalParams(
+            weak_signal_quality_level = missing_signal_level,
+            strong_signal_quality_level = active_signal_quality_level,
+            signal_is_strong = signal_quality_players,
+            frequency_high_demand = frequency_high_demand,
+            trembling_hand_frequency = trembling_hand_frequency,
+        ) for trembling_hand_frequency in trembling_hand_parameters for
+        frequency_high_demand in frequency_high_demand_range for
+        signal_quality_players in signal_quality_vect for active_signal_quality_level in
+        [signal_quality_level_range..., missing_signal_level]
+    ]
+
     # Always run 'sunspot' joint random signal stochastic demand case -1.0
-    signal_quality_joint_vect = [0.0, -1.0]
+    signal_quality_joint_vect = [-1.0]
     data_demand_digital_param_special_set = [
         DDDCExperimentalParams(
             weak_signal_quality_level = signal_quality_level,
@@ -91,8 +105,11 @@ function run_dddc(;
         signal_quality_level in signal_quality_joint_vect
     ]
 
-    data_demand_digital_param_set =
-        [data_demand_digital_param_set..., data_demand_digital_param_special_set...]
+    data_demand_digital_param_set = [
+        data_demand_digital_param_set...,
+        data_demand_digital_param_set_missing_signal...,
+        data_demand_digital_param_special_set...,
+    ]
 
     hyperparameter_vect = [
         DDDCHyperParameters(

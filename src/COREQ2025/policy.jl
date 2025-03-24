@@ -138,7 +138,7 @@ struct COREQEnv <: AbstractEnv
             signal_env,
             defect_env,
             compliance_env,
-            p
+            p,
         )
     end
 end
