@@ -3,7 +3,7 @@
 #SBATCH --output=log/%A_%a.out
 #SBATCH --error=log/%A_%a.err
 #SBATCH --array=1-20 # Number of iterations over all parameter sets
-#SBATCH --mem-per-cpu=6gb
+#SBATCH --mem-per-cpu=5gb
 #SBATCH --cpus-per-task=64 # 128 core
 #SBATCH --time=1:20:00 # For full run true value should be <13 hours
 #SBATCH --partition=standard
