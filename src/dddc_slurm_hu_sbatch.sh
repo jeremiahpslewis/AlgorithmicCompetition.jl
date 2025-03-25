@@ -5,7 +5,7 @@
 #SBATCH --array=1-5 # Number of iterations over all parameter sets
 #SBATCH --mem-per-cpu=2gb
 #SBATCH --cpus-per-task=64 # 128 core
-#SBATCH --time=3:00:00 # For full run true value should be <13 hours
+#SBATCH --time=4:30:00 # For full run true value should be <13 hours
 #SBATCH --partition=standard
 
 module load julia
