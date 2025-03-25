@@ -31,7 +31,7 @@ function run_dddc(;
     debug = false,
     precompile = false,
     trembling_hand_parameters = [0.0],
-    write_to_file_return_none = false,
+    write_to_file_return_none = true,
 )
     signal_quality_vect = [[true, false]] # With signal_quality_range over both weak and strong, [false, false] case is redundant
 
@@ -172,5 +172,5 @@ function run_dddc(;
     if !precompile
         Arrow.write(folder_name * "_df_summary.arrow", df_summary)
     end
-    return exp_list
+    return df_summary
 end

@@ -2,10 +2,10 @@
 #SBATCH --job-name=array_job
 #SBATCH --output=log/%A_%a.out
 #SBATCH --error=log/%A_%a.err
-#SBATCH --array=1-20 # Number of iterations over all parameter sets
-#SBATCH --mem-per-cpu=6gb
-#SBATCH --cpus-per-task=32 # 128 core
-#SBATCH --time=4:20:00 # For full run true value should be <13 hours
+#SBATCH --array=1 # Number of iterations over all parameter sets
+#SBATCH --mem-per-cpu=2gb
+#SBATCH --cpus-per-task=64 # 128 core
+#SBATCH --time=1:00:00 # For full run true value should be <13 hours
 #SBATCH --partition=standard
 
 module load julia
