@@ -1,5 +1,4 @@
 using UUIDs
-using Printf
 
 @inline function RLBase.plan!(multiagent::MultiAgentPolicy, env::DDDCEnv)
     @inbounds return CartesianIndex{2}(
@@ -43,9 +42,6 @@ function run_and_extract(
 )
     @info "Running single simulation with hyperparameters: $hyperparameters"
     single_run_output = economic_summary(run(hyperparameters; stop_on_convergence = stop_on_convergence))
-
-    @info Printf.@sprintf "Live bytes:  %9.3f MiB\n" Base.gc_live_bytes()/2^20
-    @info Printf.@sprintf "Max. RSS:  %9.3f MiB\n" Sys.maxrss()/2^20
 
     if write_to_file_return_none
         single_run_df = extract_sim_results([single_run_output])
