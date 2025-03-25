@@ -131,7 +131,9 @@ function run_dddc(;
 
     write_to_file_path = mktempdir()
 
-    exp_output = @showprogress pmap(x -> run_and_extract(x, write_to_file_path=write_to_file_path, write_to_file_return_none=write_to_file_return_none), hyperparameter_vect; on_error = identity)
+    @showprogress @distributed for hyperparam_item in hyperparameter_vect
+        nothing = run_and_extract(hyperparam_item, write_to_file_path=write_to_file_path, write_to_file_return_none=write_to_file_return_none)
+    end
 
     if !write_to_file_return_none
         return exp_output
