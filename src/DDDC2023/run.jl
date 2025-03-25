@@ -1,4 +1,5 @@
 using UUIDs
+using Printf
 
 @inline function RLBase.plan!(multiagent::MultiAgentPolicy, env::DDDCEnv)
     @inbounds return CartesianIndex{2}(
