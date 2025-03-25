@@ -17,10 +17,12 @@ using Tidier
 
 use_summary_files = true
 
-arrow_files = readdir(
-    "data/SLURM_ARRAY_JOB_ID=83335_debug=false_model=dddc_version=2025-03-19-dddc-trembling-hand",
+arrow_folders = readdir("data", join=true)
+arrow_folders = filter(y -> occursin("21617768", y), arrow_folders)
+arrow_files = vcat(readdir.(
+    arrow_folders,
     join = true,
-)
+)...)
 arrow_files = filter(y -> occursin(".arrow", y), arrow_files)
 
 if use_summary_files
@@ -39,6 +41,7 @@ mkpath("plots/acai")
 demand_cat(x) =
     x == 1 ? "Always High Demand" :
     x == 0 ? "Always Low Demand" : x == 0.5 ? "High / Low Split" : "Invalid"
+
 function signal_cat(weak_signal_quality_level, strong_signal_quality_level)
     if weak_signal_quality_level == strong_signal_quality_level
         if weak_signal_quality_level == 1
@@ -52,6 +55,10 @@ function signal_cat(weak_signal_quality_level, strong_signal_quality_level)
         end
     elseif strong_signal_quality_level == 1 && weak_signal_quality_level == 0.5
         return "P1 Perfect / P2 Random"
+    elseif strong_signal_quality_level == 1 && weak_signal_quality_level == 0
+        return "P1 Perfect / P2 No Signal"
+    elseif strong_signal_quality_level == 0.5 && weak_signal_quality_level == 0
+        return "P1 Random / P2 No Signal"
     end
 
     error(
@@ -81,6 +88,7 @@ key_viz_data = @chain df_summary begin
                 "Common Random",
                 "P1 Perfect / P2 Random",
                 "Independent Random",
+                "P1 Perfect / P2 No Signal", "P1 Random / P2 No Signal",
             ],
             ordered = true,
         ),
