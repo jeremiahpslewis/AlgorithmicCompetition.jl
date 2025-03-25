@@ -5,7 +5,7 @@
 #SBATCH --array=1-5 # Number of iterations over all parameter sets
 #SBATCH --mem-per-cpu=2gb
 #SBATCH --cpus-per-task=64 # 128 core
-#SBATCH --time=2:00:00 # For full run true value should be <13 hours
+#SBATCH --time=4:30:00 # For full run true value should be <13 hours
 #SBATCH -p normal
 #SBATCH --mail-user=irddcc1@mail.uni-paderborn.de # Where to send mail	
 
@@ -15,7 +15,7 @@ module load JuliaHPC   # loading the latest JuliaHPC
 
 # For full version, N_GRID_INCREMENTS=100
 export N_GRID_INCREMENTS=0
-export N_PARAMETER_ITERATIONS=20 # Number of iterations over all parameter sets per job
+export N_PARAMETER_ITERATIONS=100 # Number of iterations over all parameter sets per job
 export VERSION="2025-03-17-dddc-trembling-hand"
 export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
 export DEBUG=0
