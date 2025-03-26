@@ -84,11 +84,12 @@ key_viz_data = @chain df_summary begin
             signal_cat(weak_signal_quality_level, strong_signal_quality_level),
             levels = [
                 "No Signal",
+                "P1 Perfect / P2 No Signal",
                 "True State",
                 "Common Random",
                 "P1 Perfect / P2 Random",
+                "P1 Random / P2 No Signal",
                 "Independent Random",
-                "P1 Perfect / P2 No Signal", "P1 Random / P2 No Signal",
             ],
             ordered = true,
         ),
