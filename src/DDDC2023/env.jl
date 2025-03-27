@@ -46,6 +46,8 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
 
     reward::Vector{Float64}
 
+    trembling_hand_state::Vector{Bool}      # Trembling hand state for each player
+
     function DDDCEnv(p::DDDCHyperParameters)
         price_options = Vector{Float64}(p.price_options)
         n_prices = length(p.price_options)
@@ -98,6 +100,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
             profit_array,
             p.data_demand_digital_params,
             Float64[0.0, 0.0],
+            Bool[false, false], # Trembling hand state
         )
     end
 end
