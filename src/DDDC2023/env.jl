@@ -46,7 +46,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
 
     reward::Vector{Float64}
 
-    trembling_hand_state::Vector{Bool}      # Trembling hand state for each player
+    is_trembling_hand_episode::Vector{Bool}      # Trembling hand state for each player
 
     function DDDCEnv(p::DDDCHyperParameters)
         price_options = Vector{Float64}(p.price_options)
@@ -154,9 +154,9 @@ Return the current state as an integer, mapped from the environment memory.
 function RLBase.state(env::DDDCEnv, player::Player)
     # State is defined by memory, as in AIAPC, plus demand signal given to a player, except when in trembling hand state, in which case we return the highest state index (simulates lack of information)
 
-    index_ = player_to_index[player]
+    player_index_ = player_to_index[player]
 
-    if env.trembling_hand_state[index_]
+    if env.is_trembling_hand_episode[player_index_]
         return env.n_state_space
     end
 
