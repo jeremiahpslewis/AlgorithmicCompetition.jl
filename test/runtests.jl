@@ -73,7 +73,9 @@ using AlgorithmicCompetition:
     TDLearner,
     TDLearner,
     π,
-    DDDCPricesPerLastNEpisodes
+    DDDCPricesPerLastNEpisodes,
+    _best_action_lookup,
+    get_trembling_hand_state
 using Distributed
 
 debug = true

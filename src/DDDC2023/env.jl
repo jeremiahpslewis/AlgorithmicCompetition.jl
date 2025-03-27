@@ -156,6 +156,7 @@ function RLBase.state(env::DDDCEnv, player::Player)
 
     player_index_ = player_to_index[player]
 
+    # Trembling hand state reached with probability env.data_demand_digital_params.trembling_hand_frequency, in which case we return the highest state index
     if env.is_trembling_hand_episode[player_index_]
         return env.n_state_space
     end

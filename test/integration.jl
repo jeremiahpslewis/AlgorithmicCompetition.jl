@@ -323,7 +323,7 @@ end
         strong_signal_quality_level = 1,
         signal_is_strong = [true, false],
         frequency_high_demand = 0.5,
-        trembling_hand_frequency = 0.1,
+        trembling_hand_frequency = 0.0,
     )
 
     hyperparams = DDDCHyperParameters(
@@ -332,13 +332,13 @@ end
         δ,
         max_iter,
         competition_solution_dict,
-        data_demand_digital_params;
-        convergence_threshold = Int(1e5),
+        data_demand_digital_params
     )
 
     e_out = run(hyperparams; stop_on_convergence = true)
     e_sum = economic_summary(e_out)
 
+    player_ = 1
     for player_ in [1, 2]
         @test e_out.hook[Player(player_)][2].demand_state_high_vect[end] ==
               (e_out.env.memory.demand_state == :high)
@@ -349,6 +349,14 @@ end
         @test mean(rewards[.!demand_state_high_vect]) ≈
               e_sum.convergence_profit_demand_low[player_] atol = 1e-2
         @test mean(e_out.hook[Player(player_)][1].best_response_vector .== 0) < 0.05
+
+        @test mean([get_trembling_hand_state(e_out.env, Player(player_)) for i in 1:1000000]) ≈ e_out.env.data_demand_digital_params.trembling_hand_frequency atol = 1e-2
+
+        # Ensure that _best_action_lookup works for all states
+        @test filter(x-> x == 0, [_best_action_lookup(i, e_out.policy[Player(player_)].policy.learner.approximator.model) for i in 1:e_out.env.n_state_space]) == []
+
+        # Ensure that the policy is updated by the learner, best response vector is never zero for any state
+        @test [i[2] for i in argmax(e_out.policy[Player(player_)].policy.learner.approximator.model, dims=1) if i[1] == 0] == []
     end
 
     @test mean(e_out.env.profit_array[:, :, :, 1]) >
