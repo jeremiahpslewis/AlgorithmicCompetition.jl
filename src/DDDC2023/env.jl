@@ -118,13 +118,6 @@ function RLBase.act!(env::DDDCEnv, price_tuple::CartesianIndex{2})
     env.memory.prices = price_tuple
     env.memory.signals = copy(env.is_high_demand_signals)
     env.memory.demand_state = demand_state
-
-    # Determine whether next episode is a high demand episode and update
-    env.is_high_demand_episode[1] = get_demand_level(env.data_demand_digital_params)
-
-    # Update demand signals
-    env.is_high_demand_signals .=
-        get_demand_signals(env.data_demand_digital_params, env.is_high_demand_episode[1])
     env.is_done[1] = true
 end
 
@@ -156,16 +149,15 @@ RLBase.state(env::DDDCEnv) = nothing
 Return the current state as an integer, mapped from the environment memory.
 """
 function RLBase.state(env::DDDCEnv, player::Player)
-    # Trembling hand state reached with probability env.data_demand_digital_params.trembling_hand_frequency, in which case we return the last state
-    if env.data_demand_digital_params.trembling_hand_frequency > 0.0
-        if rand() < env.data_demand_digital_params.trembling_hand_frequency
-            return env.n_state_space
-        end
+    # State is defined by memory, as in AIAPC, plus demand signal given to a player, except when in trembling hand state, in which case we return the highest state index (simulates lack of information)
+
+    index_ = player_to_index[player]
+
+    if env.trembling_hand_state[index_]
+        return env.n_state_space
     end
 
     memory_index = env.memory.prices
-    # State is defined by memory, as in AIAPC, plus demand signal given to a player
-    index_ = player_to_index[player]
 
     _is_high_demand_signal = env.is_high_demand_signals[index_]
     _demand_signal = _is_high_demand_signal ? :high : :low
@@ -176,7 +168,7 @@ function RLBase.state(env::DDDCEnv, player::Player)
     prev_demand_signal_index = demand_to_index[_prev_demand_signal]
 
     # State space is indexed by: memory (price x price, length 2), current demand signal, previous demand signal
-    env.state_space_lookup[memory_index, demand_signal_index, prev_demand_signal_index]
+    return env.state_space_lookup[memory_index, demand_signal_index, prev_demand_signal_index]
 end
 
 """
@@ -186,8 +178,24 @@ Return whether the episode is done.
 """
 RLBase.is_terminated(env::DDDCEnv) = env.is_done[1]
 
+function get_trembling_hand_state(env::DDDCEnv, player::Player)
+    # Trembling hand state reached with probability env.data_demand_digital_params.trembling_hand_frequency, in which case we return the last state
+    if env.data_demand_digital_params.trembling_hand_frequency > 0.0
+        return rand() < env.data_demand_digital_params.trembling_hand_frequency
+    else
+        return false
+    end
+end
 
 function RLBase.reset!(env::DDDCEnv)
+    # Determine whether next episode is a high demand episode and update
+    env.is_high_demand_episode[1] = get_demand_level(env.data_demand_digital_params)
+
+    # Update demand signals
+    env.is_high_demand_signals .=
+        get_demand_signals(env.data_demand_digital_params, env.is_high_demand_episode[1])
+        
+    env.is_trembling_hand_episode .= [get_trembling_hand_state(env, Player(1)), get_trembling_hand_state(env, Player(2))]
     env.is_done[1] = false
 end
 
