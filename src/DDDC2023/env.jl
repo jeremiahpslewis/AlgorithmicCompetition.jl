@@ -122,6 +122,20 @@ function RLBase.act!(env::DDDCEnv, price_tuple::CartesianIndex{2})
     env.memory.signals = copy(env.is_high_demand_signals)
     env.memory.demand_state = demand_state
     env.is_done[1] = true
+
+    ################################
+    ### Prepare for next episode ###
+    ################################
+
+    # Determine whether next episode is a high demand episode and update
+    env.is_high_demand_episode[1] = get_demand_level(env.data_demand_digital_params)
+
+    # Update demand signals
+    env.is_high_demand_signals .=
+        get_demand_signals(env.data_demand_digital_params, env.is_high_demand_episode[1])
+        
+    env.is_trembling_hand_episode .= [get_trembling_hand_state(env, Player(1)), get_trembling_hand_state(env, Player(2))]
+    
 end
 
 RLBase.action_space(env::DDDCEnv, ::Player) = env.price_index # Choice of price
@@ -192,14 +206,6 @@ function get_trembling_hand_state(env::DDDCEnv, player::Player)
 end
 
 function RLBase.reset!(env::DDDCEnv)
-    # Determine whether next episode is a high demand episode and update
-    env.is_high_demand_episode[1] = get_demand_level(env.data_demand_digital_params)
-
-    # Update demand signals
-    env.is_high_demand_signals .=
-        get_demand_signals(env.data_demand_digital_params, env.is_high_demand_episode[1])
-        
-    env.is_trembling_hand_episode .= [get_trembling_hand_state(env, Player(1)), get_trembling_hand_state(env, Player(2))]
     env.is_done[1] = false
 end
 
