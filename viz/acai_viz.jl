@@ -18,7 +18,8 @@ using Tidier
 use_summary_files = true
 
 arrow_folders = readdir("data", join=true)
-arrow_folders = filter(y -> occursin("21617768", y), arrow_folders)
+arrow_folders = filter(y -> occursin(r"21641789|21641798", y), arrow_folders)
+
 arrow_files = vcat(readdir.(
     arrow_folders,
     join = true,
@@ -121,7 +122,7 @@ end
 
 f1 = draw(
     v1,
-    axis = (; xticklabelrotation = 45),
+    axis = (; xticklabelrotation = 45, yticks = 0:0.2:1, yminorticks = IntervalsBetween(2), yminorticksvisible = true, yminorgridvisible = true),
     figure = (;
         size = (800, 1000),
         title = "Algorithmic Collusion Outcomes by Information Set",
