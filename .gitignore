@@ -35,3 +35,5 @@ data_final/
 *.jld2
 log/*
 data/*
+!data/SLURM_ARRAY_JOB_ID=21641789_debug=false_model=dddc_version=2025-03-17-dddc-trembling-hand
+!data/SLURM_ARRAY_JOB_ID=21641798_debug=false_model=dddc_version=2025-03-17-dddc-trembling-hand
