@@ -68,10 +68,10 @@ function signal_cat(weak_signal_quality_level, strong_signal_quality_level)
 end
 
 edge_cases = [0.5, 1.0, 0.0, -1.0]
-key_viz_data = @chain df_summary begin
-    @filter(
-        (weak_signal_quality_level ∈ !!edge_cases) &
-        (strong_signal_quality_level ∈ !!edge_cases)
+key_viz_data = @eval @chain df_summary begin
+     @filter(
+        (weak_signal_quality_level ∈ $edge_cases) &
+        (strong_signal_quality_level ∈ $edge_cases)
     )
     @filter(
         !(
@@ -82,7 +82,7 @@ key_viz_data = @chain df_summary begin
     )
     @mutate(
         signal_quality_level = categorical(
-            signal_cat(weak_signal_quality_level, strong_signal_quality_level),
+            $signal_cat(weak_signal_quality_level, strong_signal_quality_level),
             levels = [
                 "No Signal",
                 "P1 Perfect / P2 No Signal",
@@ -95,9 +95,12 @@ key_viz_data = @chain df_summary begin
             ordered = true,
         ),
         profit_gain = (profit_gain_min + profit_gain_max) / 2,
-        demand_scenario = demand_cat(frequency_high_demand)
+        demand_scenario = $demand_cat(frequency_high_demand)
     )
-    # @filter(signal_quality_level != "P1 Perfect / P2 Random")
+    @filter(signal_quality_level != "P1 Perfect / P2 Random")
+    @filter(signal_quality_level != "P1 Random / P2 No Signal")
+    @filter(signal_quality_level != "P1 Perfect / P2 No Signal")
+    @filter(trembling_hand_frequency == 0.0) # Only look at trembling hand frequencies > 0.0
     # @filter(signal_quality_level != "True State") # Might be interesting to look at signal-conditional memory, e.g. remember prices and state from last x periods in which signal was same as current...
     @select(
         signal_quality_level,
@@ -115,7 +118,7 @@ v1 = @chain key_viz_data begin
         :profit_gain => "Profit Gain",
         color = :signal_quality_level => nonnumeric => "Demand Signal",
         col = :demand_scenario => nonnumeric => "Demand Environment",
-        row = :trembling_hand_frequency => nonnumeric => "Trembling Hand Frequency",
+        # row = :trembling_hand_frequency => nonnumeric => "Trembling Hand Frequency",
     ) *
     (visual(BarPlot))
 end
@@ -124,7 +127,7 @@ f1 = draw(
     v1,
     axis = (; xticklabelrotation = 45, yticks = 0:0.2:1, yminorticks = IntervalsBetween(2), yminorticksvisible = true, yminorgridvisible = true),
     figure = (;
-        size = (800, 1000),
+        size = (800, 600),
         title = "Algorithmic Collusion Outcomes by Information Set",
         subtitle = "Mean of $(df_summary[1, :n_obs]) simulations per scenario",
         fontsize = 16,
