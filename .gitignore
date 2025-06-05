@@ -30,10 +30,10 @@ settings.json
 *.svg
 !viz/**/*.csv
 data_final/
+*~*
 *.parquet
+*.tar.gz
 *.arrow
 *.jld2
 log/*
-!data/SLURM_ARRAY_JOB_ID=21641789_debug=false_model=dddc_version=2025-03-17-dddc-trembling-hand/*.arrow
-!data/SLURM_ARRAY_JOB_ID=21641798_debug=false_model/**/*.arrow
-=dddc_version=2025-03-17-dddc-trembling-hand/**/*.arrow
+!data/*2025-03-17-dddc-trembling-hand*/**
