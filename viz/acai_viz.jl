@@ -119,13 +119,39 @@ v1 = @chain key_viz_data begin
         :profit_gain => "Profit Gain",
         color = :signal_quality_level => nonnumeric => "Demand Signal",
         col = :demand_scenario => nonnumeric => "Demand Environment",
-        # row = :state_space_tremble_frequency => nonnumeric => "Trembling Hand Frequency",
+        row = :action_space_tremble_frequency => nonnumeric => "(Action) Trembling Hand Frequency",
     ) *
     (visual(BarPlot))
 end
 
 f1 = draw(
     v1,
+    axis = (; xticklabelrotation = 45, yticks = 0:0.2:1, yminorticks = IntervalsBetween(2), yminorticksvisible = true, yminorgridvisible = true),
+    figure = (;
+        size = (800, 1000),
+        title = "Algorithmic Collusion Outcomes by Information Set",
+        subtitle = "Mean of $(df_summary[1, :n_obs]) simulations per scenario",
+        fontsize = 16,
+        xlabel = "Information Set",
+    ),
+)
+save("plots/acai/plot_1_barplot_profit_gain_by_signal_and_demand_scenario.svg", f1)
+
+v1a = @chain key_viz_data begin
+    @filter(action_space_tremble_frequency == 0.0) # Only look at trembling hand frequencies == 0.0
+    data(_) *
+    mapping(
+        :signal_quality_level => nonnumeric => "",
+        :profit_gain => "Profit Gain",
+        color = :signal_quality_level => nonnumeric => "Demand Signal",
+        col = :demand_scenario => nonnumeric => "Demand Environment",
+        row = :action_space_tremble_frequency => nonnumeric => "(Action) Trembling Hand Frequency",
+    ) *
+    (visual(BarPlot))
+end
+
+f1a = draw(
+    v1a,
     axis = (; xticklabelrotation = 45, yticks = 0:0.2:1, yminorticks = IntervalsBetween(2), yminorticksvisible = true, yminorgridvisible = true),
     figure = (;
         size = (800, 600),
@@ -135,7 +161,8 @@ f1 = draw(
         xlabel = "Information Set",
     ),
 )
-save("plots/acai/plot_1_barplot_profit_gain_by_signal_and_demand_scenario.svg", f1)
+save("plots/acai/plot_1a_barplot_profit_gain_by_signal_and_demand_scenario.svg", f1a)
+
 
 v2 = @chain key_viz_data begin
     data(_) *
