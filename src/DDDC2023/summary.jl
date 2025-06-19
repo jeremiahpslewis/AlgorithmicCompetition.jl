@@ -50,8 +50,13 @@ function Base.show(io::IO, s::DDDCSummary)
     # println(io, "  Action Price: ", s.action_price[1][1:10], "; ", s.action_price[2][1:10])
     println(
         io,
-        " Trembling Hand Frequency ",
+        " State Space Trembling Hand Frequency ",
         s.data_demand_digital_params.state_space_tremble_frequency,
+    )
+    println(
+        io,
+        " Action Space Trembling Hand Frequency ",
+        s.data_demand_digital_params.action_space_tremble_frequency,
     )
 end
 
@@ -251,6 +256,10 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
         ex.data_demand_digital_params.state_space_tremble_frequency for
         ex in exp_list if !(ex isa Exception)
     ]
+    action_space_tremble_frequency = [
+        ex.data_demand_digital_params.action_space_tremble_frequency for
+        ex in exp_list if !(ex isa Exception)
+    ]
 
     df = DataFrame(
         α = α_result,
@@ -274,6 +283,7 @@ function extract_sim_results(exp_list::Vector{DDDCSummary})
         percent_demand_high = percent_demand_high,
         percent_unexplored_states = percent_unexplored_states,
         state_space_tremble_frequency = state_space_tremble_frequency,
+        action_space_tremble_frequency = action_space_tremble_frequency,
     )
     return df
 end

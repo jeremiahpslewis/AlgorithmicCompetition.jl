@@ -18,7 +18,7 @@ using Tidier
 use_summary_files = true
 
 arrow_folders = readdir("data", join=true)
-arrow_folders = filter(y -> occursin(r"21641789|21641798", y), arrow_folders)
+arrow_folders = filter(y -> occursin(r"model=dddc_version=2025-06-19", y), arrow_folders)
 
 arrow_files = vcat(readdir.(
     arrow_folders,
@@ -107,7 +107,8 @@ key_viz_data = @eval @chain df_summary begin
         demand_scenario,
         profit_gain,
         profit_mean,
-        state_space_tremble_frequency
+        state_space_tremble_frequency,
+        action_space_tremble_frequency,
     )
 end
 

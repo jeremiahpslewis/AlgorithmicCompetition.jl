@@ -19,7 +19,7 @@ using Arrow
 include("price_diagnostics.jl")
 
 rebuild_summary_files = false
-rebuild_overall_summary = false
+rebuild_overall_summary = true
 df_summary_arrow_cache_path = "data_final/dddc_v0.1.1_data_summary.arrow"
 
 arrow_folders = filter!(
