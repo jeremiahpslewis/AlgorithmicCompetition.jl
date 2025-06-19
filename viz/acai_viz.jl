@@ -15,7 +15,7 @@ using AlgorithmicCompetition
 using Arrow
 using Tidier
 
-use_summary_files = true
+use_summary_files = false
 
 arrow_folders = readdir("data", join=true)
 arrow_folders = filter(y -> occursin(r"model=dddc_version=2025-06-19", y), arrow_folders)
@@ -144,7 +144,7 @@ v2 = @chain key_viz_data begin
         :profit_mean => "Avg. Profit",
         color = :signal_quality_level => nonnumeric => "Demand Signal",
         col = :demand_scenario => nonnumeric => "Demand Environment",
-        row = :state_space_tremble_frequency => nonnumeric => "Trembling Hand Frequency",
+        row = :action_space_tremble_frequency => nonnumeric => "Trembling Hand Frequency",
     ) *
     (visual(BarPlot))
 end

@@ -386,6 +386,7 @@ function reduce_dddc(df_summary::DataFrame)
             :strong_signal_quality_level,
             :frequency_high_demand,
             :state_space_tremble_frequency,
+            :action_space_tremble_frequency,
         )
         @combine(
             :profit_mean = mean(:profit_mean),
