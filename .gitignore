@@ -37,3 +37,4 @@ data_final/
 *.jld2
 log/*
 !data/*2025-03-17-dddc-trembling-hand*/**
+.DS_Store
