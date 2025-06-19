@@ -99,4 +99,8 @@ debug = true
     @testset "Output tests" begin
         include("aiapc_conversion_check.jl")
     end
+
+    @testset "EpsilonSpeedyExplorer tests" begin
+        include("epsilon_speedy_explorer.jl")
+    end
 end
