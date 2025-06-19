@@ -15,6 +15,7 @@
     signal_is_strong::Vector{Bool} = [false, false] # true if signal quality is high
     frequency_high_demand::Float64 = 0.5 # probability of high demand for a given episode
     state_space_tremble_frequency::Float64 = 0.0     # Probability of trembling hand state
+    action_space_tremble_frequency::Float64 = 0.0 # Probability of trembling hand action (minimum frequency at exploration limit)
 end
 
 function get_demand_level(frequency_high_demand::Float64)

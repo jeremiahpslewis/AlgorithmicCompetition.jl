@@ -13,7 +13,7 @@ module load julia
 # For full version, N_GRID_INCREMENTS=100
 export N_GRID_INCREMENTS=0 # Number of grid increments
 export N_PARAMETER_ITERATIONS=100 # Number of iterations over all parameter sets per job
-export VERSION="2025-03-19-dddc-trembling-hand"
+export VERSION="2025-06-19-dddc-state-action-tremble"
 export DEBUG=0
 export JULIA_DEPOT_PATH=/lustre/wiwi/lewisjps/.julia
 export LOG_DIR="/lustre/wiwi/lewisjps/AlgorithmicCompetition.jl/log"

@@ -56,6 +56,7 @@ exp_list = AlgorithmicCompetition.run_dddc(
     n_parameter_iterations = params[:n_parameter_iterations],
     n_grid_increments = params[:n_grid_increments],
     state_space_tremble_parameters = [0.0, 0.001, 0.01, 0.1, 0.5, 1.0],
+    action_space_tremble_parameters = [0.0, 0.001, 0.01, 0.1, 0.5, 1.0],
     debug = params[:debug],
 )
 
