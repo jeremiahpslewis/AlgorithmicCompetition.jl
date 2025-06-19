@@ -52,7 +52,7 @@ function DDDCPolicy(env::DDDCEnv; mode = "baseline")
                         α = env.α,
                         n = 0,
                     ),
-                    explorer = EpsilonSpeedyExplorer(env.β * 1e-5),
+                    explorer = EpsilonSpeedyExplorer2(env.β * 1e-5, min_ϵ = env.data_demand_digital_params.action_space_tremble_frequency),
                 ),
                 Trajectory(
                     CircularArraySARTSTraces(;
