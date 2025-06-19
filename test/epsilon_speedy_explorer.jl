@@ -14,9 +14,9 @@
     
         @testset "get_ϵ" begin
             explorer = EpsilonSpeedyExplorer2(0.1)
-            @test get_ϵ(explorer) ≈ exp(-0.1)
+            @test AlgorithmicCompetition.get_ϵ(explorer) ≈ exp(-0.1)
             explorer.step[] = 10
-            @test get_ϵ(explorer) ≈ exp(-1.0)
+            @test AlgorithmicCompetition.get_ϵ(explorer) ≈ exp(-1.0)
         end
     
         @testset "plan" begin
@@ -65,19 +65,19 @@
     end
     
     @testset "EpsilonSpeedyExplorer2 correctness" begin
-        explorer = RLFarm.EpsilonSpeedyExplorer2(1e-5)
+        explorer = EpsilonSpeedyExplorer2(1e-5)
         explorer.step[] = Int(1e5)
-        @test RLFarm.get_ϵ(explorer) ≈ 0.36787944117144233
+        @test AlgorithmicCompetition.get_ϵ(explorer) ≈ 0.36787944117144233
     end
 
     @testset "EpsilonSpeedyExplorer2 with nonzero min_ϵ" begin
-        explorer2 = EpsilonSpeedyExplorer22(0.1, min_ϵ=0.01)
+        explorer2 = EpsilonSpeedyExplorer2(0.1, min_ϵ=0.01)
         @test explorer2.β == 0.1
         @test explorer2.β_neg == -0.1
         @test explorer2.min_ϵ == 0.01
         @test explorer2.step[] == 1
         @test explorer2.rng === Random.GLOBAL_RNG
-        explorer.step[] = Int(1e100)
-        @test RLFarm.get_ϵ(explorer2) == 0.01
+        explorer2.step[] = Int(1e5)
+        @test AlgorithmicCompetition.get_ϵ(explorer2) == 0.01
     end
 end

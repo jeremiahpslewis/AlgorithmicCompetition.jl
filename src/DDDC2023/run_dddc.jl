@@ -30,7 +30,7 @@ function run_dddc(;
     batch_metadata = (SLURM_ARRAY_JOB_ID = 0, SLURM_ARRAY_TASK_ID = 0),
     debug = false,
     precompile = false,
-    trembling_hand_parameters = [0.0],
+    state_space_tremble_parameters = [0.0],
     write_to_file_return_none = true,
 )
     signal_quality_vect = [[true, false]] # With signal_quality_range over both weak and strong, [false, false] case is redundant
@@ -63,8 +63,8 @@ function run_dddc(;
             strong_signal_quality_level = strong_signal_quality_level,
             signal_is_strong = signal_quality_players,
             frequency_high_demand = frequency_high_demand,
-            trembling_hand_frequency = trembling_hand_frequency,
-        ) for trembling_hand_frequency in trembling_hand_parameters for
+            state_space_tremble_frequency = state_space_tremble_frequency,
+        ) for state_space_tremble_frequency in state_space_tremble_parameters for
         frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for
         weak_signal_quality_level in signal_quality_level_range for
@@ -80,8 +80,8 @@ function run_dddc(;
             strong_signal_quality_level = active_signal_quality_level,
             signal_is_strong = signal_quality_players,
             frequency_high_demand = frequency_high_demand,
-            trembling_hand_frequency = trembling_hand_frequency,
-        ) for trembling_hand_frequency in trembling_hand_parameters for
+            state_space_tremble_frequency = state_space_tremble_frequency,
+        ) for state_space_tremble_frequency in state_space_tremble_parameters for
         frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for active_signal_quality_level in
         [signal_quality_level_range..., missing_signal_level]
@@ -95,8 +95,8 @@ function run_dddc(;
             strong_signal_quality_level = signal_quality_level,
             signal_is_strong = signal_quality_players,
             frequency_high_demand = frequency_high_demand,
-            trembling_hand_frequency = trembling_hand_frequency,
-        ) for trembling_hand_frequency in trembling_hand_parameters for
+            state_space_tremble_frequency = state_space_tremble_frequency,
+        ) for state_space_tremble_frequency in state_space_tremble_parameters for
         frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for
         signal_quality_level in signal_quality_joint_vect

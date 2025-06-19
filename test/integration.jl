@@ -323,7 +323,7 @@ end
         strong_signal_quality_level = 1,
         signal_is_strong = [true, false],
         frequency_high_demand = 0.5,
-        trembling_hand_frequency = 0.0,
+        state_space_tremble_frequency = 0.0,
     )
 
     hyperparams = DDDCHyperParameters(
@@ -350,7 +350,7 @@ end
               e_sum.convergence_profit_demand_low[player_] atol = 1e-2
         @test mean(e_out.hook[Player(player_)][1].best_response_vector .== 0) < 0.05
 
-        @test mean([get_trembling_hand_state(e_out.env, Player(player_)) for i in 1:1000000]) ≈ e_out.env.data_demand_digital_params.trembling_hand_frequency atol = 1e-2
+        @test mean([get_state_space_tremble_state(e_out.env, Player(player_)) for i in 1:1000000]) ≈ e_out.env.data_demand_digital_params.state_space_tremble_frequency atol = 1e-2
 
         # Ensure that _best_action_lookup works for all states
         @test filter(x-> x == 0, [_best_action_lookup(i, e_out.policy[Player(player_)].policy.learner.approximator.model) for i in 1:e_out.env.n_state_space]) == []
@@ -721,7 +721,7 @@ end
             convergence_threshold = Int(1e2),
             n_grid_increments = 1,
             debug = debug,
-            trembling_hand_parameters = [0.0, 0.01],
+            state_space_tremble_parameters = [0.0, 0.01],
         )
     end
     rmprocs(_procs)

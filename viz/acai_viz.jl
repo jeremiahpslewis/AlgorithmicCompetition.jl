@@ -100,14 +100,14 @@ key_viz_data = @eval @chain df_summary begin
     @filter(signal_quality_level != "P1 Perfect / P2 Random")
     @filter(signal_quality_level != "P1 Random / P2 No Signal")
     @filter(signal_quality_level != "P1 Perfect / P2 No Signal")
-    @filter(trembling_hand_frequency == 0.0) # Only look at trembling hand frequencies > 0.0
+    @filter(state_space_tremble_frequency == 0.0) # Only look at trembling hand frequencies > 0.0
     # @filter(signal_quality_level != "True State") # Might be interesting to look at signal-conditional memory, e.g. remember prices and state from last x periods in which signal was same as current...
     @select(
         signal_quality_level,
         demand_scenario,
         profit_gain,
         profit_mean,
-        trembling_hand_frequency
+        state_space_tremble_frequency
     )
 end
 
@@ -118,7 +118,7 @@ v1 = @chain key_viz_data begin
         :profit_gain => "Profit Gain",
         color = :signal_quality_level => nonnumeric => "Demand Signal",
         col = :demand_scenario => nonnumeric => "Demand Environment",
-        # row = :trembling_hand_frequency => nonnumeric => "Trembling Hand Frequency",
+        # row = :state_space_tremble_frequency => nonnumeric => "Trembling Hand Frequency",
     ) *
     (visual(BarPlot))
 end
@@ -143,7 +143,7 @@ v2 = @chain key_viz_data begin
         :profit_mean => "Avg. Profit",
         color = :signal_quality_level => nonnumeric => "Demand Signal",
         col = :demand_scenario => nonnumeric => "Demand Environment",
-        row = :trembling_hand_frequency => nonnumeric => "Trembling Hand Frequency",
+        row = :state_space_tremble_frequency => nonnumeric => "Trembling Hand Frequency",
     ) *
     (visual(BarPlot))
 end

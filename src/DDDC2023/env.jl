@@ -46,7 +46,7 @@ struct DDDCEnv <: AbstractEnv # N is profit_array dimension
 
     reward::Vector{Float64}
 
-    is_trembling_hand_episode::Vector{Bool}      # Trembling hand state for each player
+    is_state_space_tremble_episode::Vector{Bool}      # Trembling hand state for each player
 
     function DDDCEnv(p::DDDCHyperParameters)
         price_options = Vector{Float64}(p.price_options)
@@ -134,7 +134,7 @@ function RLBase.act!(env::DDDCEnv, price_tuple::CartesianIndex{2})
     env.is_high_demand_signals .=
         get_demand_signals(env.data_demand_digital_params, env.is_high_demand_episode[1])
         
-    env.is_trembling_hand_episode .= [get_trembling_hand_state(env, Player(1)), get_trembling_hand_state(env, Player(2))]
+    env.is_state_space_tremble_episode .= [get_state_space_tremble_state(env, Player(1)), get_state_space_tremble_state(env, Player(2))]
     
 end
 
@@ -170,8 +170,8 @@ function RLBase.state(env::DDDCEnv, player::Player)
 
     player_index_ = player_to_index[player]
 
-    # Trembling hand state reached with probability env.data_demand_digital_params.trembling_hand_frequency, in which case we return the highest state index
-    if env.is_trembling_hand_episode[player_index_]
+    # Trembling hand state reached with probability env.data_demand_digital_params.state_space_tremble_frequency, in which case we return the highest state index
+    if env.is_state_space_tremble_episode[player_index_]
         return env.n_state_space
     end
 
@@ -196,10 +196,10 @@ Return whether the episode is done.
 """
 RLBase.is_terminated(env::DDDCEnv) = env.is_done[1]
 
-function get_trembling_hand_state(env::DDDCEnv, player::Player)
-    # Trembling hand state reached with probability env.data_demand_digital_params.trembling_hand_frequency, in which case we return the last state
-    if env.data_demand_digital_params.trembling_hand_frequency > 0.0
-        return rand() < env.data_demand_digital_params.trembling_hand_frequency
+function get_state_space_tremble_state(env::DDDCEnv, player::Player)
+    # Trembling hand state reached with probability env.data_demand_digital_params.state_space_tremble_frequency, in which case we return the last state
+    if env.data_demand_digital_params.state_space_tremble_frequency > 0.0
+        return rand() < env.data_demand_digital_params.state_space_tremble_frequency
     else
         return false
     end

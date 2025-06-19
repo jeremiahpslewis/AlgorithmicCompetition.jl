@@ -23,7 +23,7 @@ struct EpsilonSpeedyExplorer2{R} <: AbstractExplorer
     rng::R
 end
 
-function EpsilonSpeedyExplorer2(β::Float64, min_ϵ::Float64 = 0)
+function EpsilonSpeedyExplorer2(β::Float64; min_ϵ::Float64 = 0.0)
     EpsilonSpeedyExplorer2{typeof(Random.GLOBAL_RNG)}(
         β,
         β * -1,
@@ -34,7 +34,7 @@ function EpsilonSpeedyExplorer2(β::Float64, min_ϵ::Float64 = 0)
 end
 
 function get_ϵ(s::EpsilonSpeedyExplorer2)
-    min(exp(s.β_neg * s.step[]), s.min_ϵ)
+    max(exp(s.β_neg * s.step[]), s.min_ϵ)
 end
 
 """

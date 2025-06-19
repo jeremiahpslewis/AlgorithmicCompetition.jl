@@ -110,7 +110,7 @@ struct COREQEnv <: AbstractEnv
             strong_signal_quality_level = p.data_demand_digital_params.strong_signal_quality_level,
             signal_is_strong = p.data_demand_digital_params.signal_is_strong,
             frequency_high_demand = p.data_demand_digital_params.frequency_high_demand,
-            trembling_hand_frequency = 1.0, # Only visit trembling hand state, thus ignoring the signal entirely
+            state_space_tremble_frequency = 1.0, # Only visit trembling hand state, thus ignoring the signal entirely
         )
         defect_env = DDDCEnv(
             DDDCHyperParameters(

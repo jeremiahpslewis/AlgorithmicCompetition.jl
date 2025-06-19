@@ -75,7 +75,8 @@ using AlgorithmicCompetition:
     π,
     DDDCPricesPerLastNEpisodes,
     _best_action_lookup,
-    get_trembling_hand_state
+    get_state_space_tremble_state,
+    EpsilonSpeedyExplorer2
 using Distributed
 
 debug = true
@@ -100,7 +101,7 @@ debug = true
         include("aiapc_conversion_check.jl")
     end
 
-    @testset "EpsilonSpeedyExplorer tests" begin
+    @testset "EpsilonSpeedyExplorer2 tests" begin
         include("epsilon_speedy_explorer.jl")
     end
 end
