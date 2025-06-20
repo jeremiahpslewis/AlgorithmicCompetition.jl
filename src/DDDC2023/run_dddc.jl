@@ -58,55 +58,111 @@ function run_dddc(;
     β = Float64(4e-1)
     δ = 0.95
 
-    data_demand_digital_param_set = [
+    # Loop over state tremble with constant action tremble = 0.0
+    data_demand_digital_param_set_state = [
         DDDCExperimentalParams(
             weak_signal_quality_level = weak_signal_quality_level,
             strong_signal_quality_level = strong_signal_quality_level,
             signal_is_strong = signal_quality_players,
             frequency_high_demand = frequency_high_demand,
-            state_space_tremble_frequency = state_space_tremble_frequency,
-            action_space_tremble_frequency = action_space_tremble_frequency
-        ) for state_space_tremble_frequency in state_space_tremble_parameters for
-        action_space_tremble_frequency in action_space_tremble_parameters for
+            state_space_tremble_frequency = state_tremble,
+            action_space_tremble_frequency = 0.0
+        ) for state_tremble in state_space_tremble_parameters for
         frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for
         weak_signal_quality_level in signal_quality_level_range for
-        strong_signal_quality_level in signal_quality_level_range if
-        weak_signal_quality_level <= strong_signal_quality_level
+        strong_signal_quality_level in signal_quality_level_range if weak_signal_quality_level <= strong_signal_quality_level
+    ]
+
+    # Loop over action tremble with constant state tremble = 0.0
+    data_demand_digital_param_set_action = [
+        DDDCExperimentalParams(
+            weak_signal_quality_level = weak_signal_quality_level,
+            strong_signal_quality_level = strong_signal_quality_level,
+            signal_is_strong = signal_quality_players,
+            frequency_high_demand = frequency_high_demand,
+            state_space_tremble_frequency = 0.0,
+            action_space_tremble_frequency = action_tremble
+        ) for action_tremble in action_space_tremble_parameters for
+        frequency_high_demand in frequency_high_demand_range for
+        signal_quality_players in signal_quality_vect for
+        weak_signal_quality_level in signal_quality_level_range for
+        strong_signal_quality_level in signal_quality_level_range if weak_signal_quality_level <= strong_signal_quality_level
+    ]
+
+    data_demand_digital_param_set = [
+        data_demand_digital_param_set_state...,
+        data_demand_digital_param_set_action...
     ]
 
     # Always run 'missing' signal stochastic demand case, 0.0
     missing_signal_level = 0.0
-    data_demand_digital_param_set_missing_signal = [
+    data_demand_digital_param_set_missing_signal_state = [
         DDDCExperimentalParams(
             weak_signal_quality_level = missing_signal_level,
             strong_signal_quality_level = active_signal_quality_level,
             signal_is_strong = signal_quality_players,
             frequency_high_demand = frequency_high_demand,
-            state_space_tremble_frequency = state_space_tremble_frequency,
-            action_space_tremble_frequency = action_space_tremble_frequency
-        ) for state_space_tremble_frequency in state_space_tremble_parameters for
-        action_space_tremble_frequency in action_space_tremble_parameters for
+            state_space_tremble_frequency = state_tremble,
+            action_space_tremble_frequency = 0.0
+        ) for state_tremble in state_space_tremble_parameters for
         frequency_high_demand in frequency_high_demand_range for
-        signal_quality_players in signal_quality_vect for active_signal_quality_level in
-        [signal_quality_level_range..., missing_signal_level]
+        signal_quality_players in signal_quality_vect for
+        active_signal_quality_level in [signal_quality_level_range..., missing_signal_level]
+    ]
+
+    data_demand_digital_param_set_missing_signal_action = [
+        DDDCExperimentalParams(
+            weak_signal_quality_level = missing_signal_level,
+            strong_signal_quality_level = active_signal_quality_level,
+            signal_is_strong = signal_quality_players,
+            frequency_high_demand = frequency_high_demand,
+            state_space_tremble_frequency = 0.0,
+            action_space_tremble_frequency = action_tremble
+        ) for action_tremble in action_space_tremble_parameters for
+        frequency_high_demand in frequency_high_demand_range for
+        signal_quality_players in signal_quality_vect for
+        active_signal_quality_level in [signal_quality_level_range..., missing_signal_level]
+    ]
+
+    data_demand_digital_param_set_missing_signal = [
+        data_demand_digital_param_set_missing_signal_state...,
+        data_demand_digital_param_set_missing_signal_action...
     ]
 
     # Always run 'sunspot' joint random signal stochastic demand case -1.0
     signal_quality_joint_vect = [-1.0]
-    data_demand_digital_param_special_set = [
+    data_demand_digital_param_special_set_state = [
         DDDCExperimentalParams(
             weak_signal_quality_level = signal_quality_level,
             strong_signal_quality_level = signal_quality_level,
             signal_is_strong = signal_quality_players,
             frequency_high_demand = frequency_high_demand,
-            state_space_tremble_frequency = state_space_tremble_frequency,
-            action_space_tremble_frequency = action_space_tremble_frequency
-        ) for state_space_tremble_frequency in state_space_tremble_parameters for
-        action_space_tremble_frequency in state_space_tremble_parameters for
+            state_space_tremble_frequency = state_tremble,
+            action_space_tremble_frequency = 0.0
+        ) for state_tremble in state_space_tremble_parameters for
         frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for
         signal_quality_level in signal_quality_joint_vect
+    ]
+
+    data_demand_digital_param_special_set_action = [
+        DDDCExperimentalParams(
+            weak_signal_quality_level = signal_quality_level,
+            strong_signal_quality_level = signal_quality_level,
+            signal_is_strong = signal_quality_players,
+            frequency_high_demand = frequency_high_demand,
+            state_space_tremble_frequency = 0.0,
+            action_space_tremble_frequency = action_tremble
+        ) for action_tremble in action_space_tremble_parameters for
+        frequency_high_demand in frequency_high_demand_range for
+        signal_quality_players in signal_quality_vect for
+        signal_quality_level in signal_quality_joint_vect
+    ]
+
+    data_demand_digital_param_special_set = [
+        data_demand_digital_param_special_set_state...,
+        data_demand_digital_param_special_set_action...
     ]
 
     data_demand_digital_param_set = [
