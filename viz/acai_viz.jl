@@ -18,7 +18,7 @@ using Tidier
 use_summary_files = false
 
 arrow_folders = readdir("data", join=true)
-arrow_folders = filter(y -> occursin(r"model=dddc_version=2025-06-19", y), arrow_folders)
+arrow_folders = filter(y -> occursin(r"808597.*model=dddc_version=2025-06-19", y), arrow_folders)
 
 arrow_files = vcat(readdir.(
     arrow_folders,
