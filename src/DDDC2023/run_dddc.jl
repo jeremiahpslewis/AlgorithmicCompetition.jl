@@ -66,12 +66,13 @@ function run_dddc(;
             signal_is_strong = signal_quality_players,
             frequency_high_demand = frequency_high_demand,
             state_space_tremble_frequency = state_tremble,
-            action_space_tremble_frequency = 0.0
+            action_space_tremble_frequency = action_space_tremble_frequency
         ) for state_tremble in state_space_tremble_parameters for
         frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for
         weak_signal_quality_level in signal_quality_level_range for
-        strong_signal_quality_level in signal_quality_level_range if weak_signal_quality_level <= strong_signal_quality_level
+        strong_signal_quality_level in signal_quality_level_range if weak_signal_quality_level <= strong_signal_quality_level for
+        action_space_tremble_frequency in [0.0, 0.01]
     ]
 
     # Loop over action tremble with constant state tremble = 0.0
@@ -81,13 +82,14 @@ function run_dddc(;
             strong_signal_quality_level = strong_signal_quality_level,
             signal_is_strong = signal_quality_players,
             frequency_high_demand = frequency_high_demand,
-            state_space_tremble_frequency = 0.0,
+            state_space_tremble_frequency = state_space_tremble_frequency,
             action_space_tremble_frequency = action_tremble
         ) for action_tremble in action_space_tremble_parameters for
         frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for
         weak_signal_quality_level in signal_quality_level_range for
-        strong_signal_quality_level in signal_quality_level_range if weak_signal_quality_level <= strong_signal_quality_level
+        strong_signal_quality_level in signal_quality_level_range if weak_signal_quality_level <= strong_signal_quality_level for
+        state_space_tremble_frequency in [0.0, 0.01]
     ]
 
     data_demand_digital_param_set = [
@@ -104,11 +106,12 @@ function run_dddc(;
             signal_is_strong = signal_quality_players,
             frequency_high_demand = frequency_high_demand,
             state_space_tremble_frequency = state_tremble,
-            action_space_tremble_frequency = 0.0
+            action_space_tremble_frequency = action_space_tremble_frequency
         ) for state_tremble in state_space_tremble_parameters for
         frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for
-        active_signal_quality_level in [signal_quality_level_range..., missing_signal_level]
+        active_signal_quality_level in [signal_quality_level_range..., missing_signal_level] for
+        action_space_tremble_frequency in [0.0, 0.01]
     ]
 
     data_demand_digital_param_set_missing_signal_action = [
@@ -117,12 +120,13 @@ function run_dddc(;
             strong_signal_quality_level = active_signal_quality_level,
             signal_is_strong = signal_quality_players,
             frequency_high_demand = frequency_high_demand,
-            state_space_tremble_frequency = 0.0,
+            state_space_tremble_frequency = state_space_tremble_frequency,
             action_space_tremble_frequency = action_tremble
         ) for action_tremble in action_space_tremble_parameters for
         frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for
         active_signal_quality_level in [signal_quality_level_range..., missing_signal_level]
+        for state_space_tremble_frequency in [0.0, 0.01]
     ]
 
     data_demand_digital_param_set_missing_signal = [
@@ -139,11 +143,12 @@ function run_dddc(;
             signal_is_strong = signal_quality_players,
             frequency_high_demand = frequency_high_demand,
             state_space_tremble_frequency = state_tremble,
-            action_space_tremble_frequency = 0.0
+            action_space_tremble_frequency = action_space_tremble_frequency
         ) for state_tremble in state_space_tremble_parameters for
         frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for
-        signal_quality_level in signal_quality_joint_vect
+        signal_quality_level in signal_quality_joint_vect for
+        action_space_tremble_frequency in [0.0, 0.01]
     ]
 
     data_demand_digital_param_special_set_action = [
@@ -152,12 +157,13 @@ function run_dddc(;
             strong_signal_quality_level = signal_quality_level,
             signal_is_strong = signal_quality_players,
             frequency_high_demand = frequency_high_demand,
-            state_space_tremble_frequency = 0.0,
+            state_space_tremble_frequency = state_space_tremble_frequency,
             action_space_tremble_frequency = action_tremble
         ) for action_tremble in action_space_tremble_parameters for
         frequency_high_demand in frequency_high_demand_range for
         signal_quality_players in signal_quality_vect for
-        signal_quality_level in signal_quality_joint_vect
+        signal_quality_level in signal_quality_joint_vect for
+        state_space_tremble_frequency in [0.0, 0.01]
     ]
 
     data_demand_digital_param_special_set = [
