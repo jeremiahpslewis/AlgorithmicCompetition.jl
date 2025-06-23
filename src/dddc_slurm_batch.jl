@@ -46,8 +46,8 @@ else
         max_iter = params[:max_iter],
         convergence_threshold = params[:convergence_threshold],
         debug = params[:debug],
-        state_space_tremble_parameters = [0.0, 0.001, 0.01, 0.05],
-        action_space_tremble_parameters = [0.0, 0.01, 0.05],
+        state_space_tremble_parameters = [0.0, 0.001, 0.01, 0.05, 1.0],
+        action_space_tremble_parameters = [0.0, 0.01, 0.05, 1.0],
     )
 end
 
