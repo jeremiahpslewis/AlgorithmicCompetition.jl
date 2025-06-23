@@ -67,124 +67,140 @@ function signal_cat(weak_signal_quality_level, strong_signal_quality_level)
     )
 end
 
-edge_cases = [0.5, 1.0, 0.0, -1.0]
-key_viz_data = @eval @chain df_summary begin
-     @filter(
-        (weak_signal_quality_level ∈ $edge_cases) &
-        (strong_signal_quality_level ∈ $edge_cases)
-    )
-    @filter(
-        !(
-            (weak_signal_quality_level == 1) &
-            (strong_signal_quality_level == 1) &
-            (frequency_high_demand ∈ [0, 1])
+function generate_viz(df_summary, filter_var, double_filter_var, subset_var)
+    edge_cases = [0.5, 1.0, 0.0, -1.0]
+
+    key_viz_data = @eval @chain df_summary begin
+        @filter(
+            (weak_signal_quality_level ∈ $edge_cases) &
+            (strong_signal_quality_level ∈ $edge_cases)
         )
-    )
-    @mutate(
-        signal_quality_level = categorical(
-            $signal_cat(weak_signal_quality_level, strong_signal_quality_level),
-            levels = [
-                "No Signal",
-                "P1 Perfect / P2 No Signal",
-                "True State",
-                "Common Random",
-                "P1 Perfect / P2 Random",
-                "P1 Random / P2 No Signal",
-                "Independent Random",
-            ],
-            ordered = true,
+        @filter(
+            !(
+                (weak_signal_quality_level == 1) &
+                (strong_signal_quality_level == 1) &
+                (frequency_high_demand ∈ [0, 1])
+            )
+        )
+        @mutate(
+            signal_quality_level = categorical(
+                $signal_cat(weak_signal_quality_level, strong_signal_quality_level),
+                levels = [
+                    "No Signal",
+                    "P1 Perfect / P2 No Signal",
+                    "True State",
+                    "Common Random",
+                    "P1 Perfect / P2 Random",
+                    "P1 Random / P2 No Signal",
+                    "Independent Random",
+                ],
+                ordered = true,
+            ),
+            profit_gain = (profit_gain_min + profit_gain_max) / 2,
+            demand_scenario = $demand_cat(frequency_high_demand)
+        )
+        @filter(signal_quality_level != "P1 Perfect / P2 Random")
+        @filter(signal_quality_level != "P1 Random / P2 No Signal")
+        @filter(signal_quality_level != "P1 Perfect / P2 No Signal")
+        @filter($filter_var == 0.0) # Only look at trembling hand frequencies > 0.0
+        # @filter(signal_quality_level != "True State") # Might be interesting to look at signal-conditional memory, e.g. remember prices and state from last x periods in which signal was same as current...
+        @select(
+            signal_quality_level,
+            demand_scenario,
+            profit_gain,
+            profit_mean,
+            state_space_tremble_frequency,
+            action_space_tremble_frequency,
+        )
+    end
+
+    v1 = @chain key_viz_data begin
+        data(_) *
+        mapping(
+            :signal_quality_level => nonnumeric => "",
+            :profit_gain => "Profit Gain",
+            color = :signal_quality_level => nonnumeric => "Demand Signal",
+            col = :demand_scenario => nonnumeric => "Demand Environment",
+            row = subset_var,
+        ) *
+        (visual(BarPlot))
+    end
+
+    f1 = draw(
+        v1,
+        axis = (; xticklabelrotation = 45, yticks = 0:0.2:1, yminorticks = IntervalsBetween(2), yminorticksvisible = true, yminorgridvisible = true),
+        figure = (;
+            size = (800, 1000),
+            title = "Algorithmic Colflusion Outcomes by Information Set",
+            subtitle = "Mean of $(df_summary[1, :n_obs]) simulations per scenario",
+            fontsize = 16,
+            xlabel = "Information Set",
         ),
-        profit_gain = (profit_gain_min + profit_gain_max) / 2,
-        demand_scenario = $demand_cat(frequency_high_demand)
     )
-    @filter(signal_quality_level != "P1 Perfect / P2 Random")
-    @filter(signal_quality_level != "P1 Random / P2 No Signal")
-    @filter(signal_quality_level != "P1 Perfect / P2 No Signal")
-    @filter(state_space_tremble_frequency == 0.0) # Only look at trembling hand frequencies > 0.0
-    # @filter(signal_quality_level != "True State") # Might be interesting to look at signal-conditional memory, e.g. remember prices and state from last x periods in which signal was same as current...
-    @select(
-        signal_quality_level,
-        demand_scenario,
-        profit_gain,
-        profit_mean,
-        state_space_tremble_frequency,
-        action_space_tremble_frequency,
+    save("plots/acai/plot_1_barplot_profit_gain_by_signal_and_demand_scenario_$double_filter_var.svg", f1)
+
+    v1a = @eval @chain key_viz_data begin
+        @filter($double_filter_var == 0.0) # Only look at trembling hand frequencies == 0.0
+        data(_) *
+        mapping(
+            :signal_quality_level => nonnumeric => "",
+            :profit_gain => "Profit Gain",
+            color = :signal_quality_level => nonnumeric => "Demand Signal",
+            col = :demand_scenario => nonnumeric => "Demand Environment",
+            row = subset_var,
+        ) *
+        (visual(BarPlot))
+    end
+
+    f1a = draw(
+        v1a,
+        axis = (; xticklabelrotation = 45, yticks = 0:0.2:1, yminorticks = IntervalsBetween(2), yminorticksvisible = true, yminorgridvisible = true),
+        figure = (;
+            size = (800, 600),
+            title = "Algorithmic Collusion Outcomes by Information Set",
+            subtitle = "Mean of $(df_summary[1, :n_obs]) simulations per scenario",
+            fontsize = 16,
+            xlabel = "Information Set",
+        ),
     )
+    save("plots/acai/plot_1a_barplot_profit_gain_by_signal_and_demand_scenario_$double_filter_var.svg", f1a)
+
+
+    v2 = @chain key_viz_data begin
+        data(_) *
+        mapping(
+            :signal_quality_level => nonnumeric => "",
+            :profit_mean => "Avg. Profit",
+            color = :signal_quality_level => nonnumeric => "Demand Signal",
+            col = :demand_scenario => nonnumeric => "Demand Environment",
+            row = :action_space_tremble_frequency => nonnumeric => "Trembling Hand Frequency",
+        ) *
+        (visual(BarPlot))
+    end
+
+    f2 = draw(
+        v2,
+        axis = (; xticklabelrotation = 45),
+        figure = (;
+            size = (800, 1000),
+            title = "Algorithmic Collusion Outcomes by Information Set",
+            subtitle = "Mean of $(df_summary[1, :n_obs]) simulations per scenario",
+            fontsize = 16,
+            xlabel = "Information Set",
+        ),
+    )
+    save("plots/acai/plot_2_barplot_avg_profit_by_signal_and_demand_scenario_$double_filter_var.svg", f2)
 end
 
-v1 = @chain key_viz_data begin
-    data(_) *
-    mapping(
-        :signal_quality_level => nonnumeric => "",
-        :profit_gain => "Profit Gain",
-        color = :signal_quality_level => nonnumeric => "Demand Signal",
-        col = :demand_scenario => nonnumeric => "Demand Environment",
-        row = :action_space_tremble_frequency => nonnumeric => "(Action) Trembling Hand Frequency",
-    ) *
-    (visual(BarPlot))
-end
+filter_var = :state_space_tremble_frequency
+double_filter_var = :action_space_tremble_frequency
+subset_var = :action_space_tremble_frequency => nonnumeric => "(Action) Trembling Hand Frequency"
 
-f1 = draw(
-    v1,
-    axis = (; xticklabelrotation = 45, yticks = 0:0.2:1, yminorticks = IntervalsBetween(2), yminorticksvisible = true, yminorgridvisible = true),
-    figure = (;
-        size = (800, 1000),
-        title = "Algorithmic Collusion Outcomes by Information Set",
-        subtitle = "Mean of $(df_summary[1, :n_obs]) simulations per scenario",
-        fontsize = 16,
-        xlabel = "Information Set",
-    ),
-)
-save("plots/acai/plot_1_barplot_profit_gain_by_signal_and_demand_scenario.svg", f1)
-
-v1a = @chain key_viz_data begin
-    @filter(action_space_tremble_frequency == 0.0) # Only look at trembling hand frequencies == 0.0
-    data(_) *
-    mapping(
-        :signal_quality_level => nonnumeric => "",
-        :profit_gain => "Profit Gain",
-        color = :signal_quality_level => nonnumeric => "Demand Signal",
-        col = :demand_scenario => nonnumeric => "Demand Environment",
-        row = :action_space_tremble_frequency => nonnumeric => "(Action) Trembling Hand Frequency",
-    ) *
-    (visual(BarPlot))
-end
-
-f1a = draw(
-    v1a,
-    axis = (; xticklabelrotation = 45, yticks = 0:0.2:1, yminorticks = IntervalsBetween(2), yminorticksvisible = true, yminorgridvisible = true),
-    figure = (;
-        size = (800, 600),
-        title = "Algorithmic Collusion Outcomes by Information Set",
-        subtitle = "Mean of $(df_summary[1, :n_obs]) simulations per scenario",
-        fontsize = 16,
-        xlabel = "Information Set",
-    ),
-)
-save("plots/acai/plot_1a_barplot_profit_gain_by_signal_and_demand_scenario.svg", f1a)
+generate_viz(df_summary, filter_var, double_filter_var, subset_var)
 
 
-v2 = @chain key_viz_data begin
-    data(_) *
-    mapping(
-        :signal_quality_level => nonnumeric => "",
-        :profit_mean => "Avg. Profit",
-        color = :signal_quality_level => nonnumeric => "Demand Signal",
-        col = :demand_scenario => nonnumeric => "Demand Environment",
-        row = :action_space_tremble_frequency => nonnumeric => "Trembling Hand Frequency",
-    ) *
-    (visual(BarPlot))
-end
+filter_var= :action_space_tremble_frequency
+double_filter_var = :state_space_tremble_frequency
+subset_var = :state_space_tremble_frequency => nonnumeric => "(State) Trembling Hand Frequency"
 
-f2 = draw(
-    v2,
-    axis = (; xticklabelrotation = 45),
-    figure = (;
-        size = (800, 1000),
-        title = "Algorithmic Collusion Outcomes by Information Set",
-        subtitle = "Mean of $(df_summary[1, :n_obs]) simulations per scenario",
-        fontsize = 16,
-        xlabel = "Information Set",
-    ),
-)
-save("plots/acai/plot_2_barplot_avg_profit_by_signal_and_demand_scenario.svg", f2)
+generate_viz(df_summary, filter_var, double_filter_var, subset_var)
