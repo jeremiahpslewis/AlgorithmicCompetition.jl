@@ -30,8 +30,11 @@ settings.json
 *.svg
 !viz/**/*.csv
 data_final/
+*~*
 *.parquet
+*.tar.gz
 *.arrow
 *.jld2
 log/*
-data/*
+!data/*2025-03-17-dddc-trembling-hand*/**
+.DS_Store

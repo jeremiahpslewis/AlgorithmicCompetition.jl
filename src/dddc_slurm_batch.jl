@@ -12,7 +12,7 @@ AlgorithmicCompetition.setup_logger(params)
 
 if params[:n_cores] > 1
     _procs = addprocs(
-        params[:n_cores],
+        params[:n_cores] - 1,
         topology = :master_worker,
         exeflags = ["--threads=1", "--project=$(Base.active_project())"],
     )
@@ -46,10 +46,11 @@ else
         max_iter = params[:max_iter],
         convergence_threshold = params[:convergence_threshold],
         debug = params[:debug],
+        state_space_tremble_parameters = [0.0, 0.001, 0.01],
+        action_space_tremble_parameters = [0.0, 0.001, 0.01],
     )
 end
 
 if params[:n_cores] > 1
     rmprocs(_procs)
 end
-

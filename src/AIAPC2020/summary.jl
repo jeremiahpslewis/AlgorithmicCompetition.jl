@@ -66,8 +66,9 @@ end
 Helper function. Returns the prices corresponding to the state passed.
 """
 function get_prices_from_state(env::AIAPCEnv, state)
-    prices = findall(x -> x == state, env.state_space_lookup)[1]
-    return [env.price_options[prices[1]], env.price_options[prices[2]]]
+    idx = findfirst(x -> x == state, env.state_space_lookup)
+    @assert idx !== nothing "State not found in state_space_lookup"
+    return [env.price_options[idx[1]], env.price_options[idx[2]]]
 end
 
 """
@@ -133,27 +134,24 @@ function get_convergence_profit_from_env(
     policy::MultiAgentPolicy,
 ) where {E<:AbstractEnv}
     last_observed_state = get_state_from_memory(env)
-
     visited_states = [last_observed_state]
-
     for i = 1:100
         next_price_set = get_optimal_action(env, policy, last_observed_state)
         next_state = get_state_from_prices(env, next_price_set)
-
-        if next_state ∈ visited_states
+        if next_state in visited_states
             break
         else
             push!(visited_states, next_state)
         end
     end
-
-    profit_vects = get_profit_from_state.((env,), visited_states)
-
-    profit_table = hcat(profit_vects...)'
-
-    mean(profit_table, dims = 1)
+    # Accumulate profit directly to avoid allocation of intermediate arrays
+    first_profit = get_profit_from_state(env, visited_states[1])
+    acc = zeros(eltype(first_profit), length(first_profit))
+    for st in visited_states
+        acc .+= get_profit_from_state(env, st)
+    end
+    return acc ./ length(visited_states)
 end
-
 
 """
     extract_sim_results(exp_list::Vector{AIAPCSummary})
@@ -161,20 +159,25 @@ end
 Extracts the results of a simulation experiment, given a list of AIAPCSummary objects, returns a `DataFrame`.
 """
 function extract_sim_results(exp_list::Vector{AIAPCSummary})
-    α_result = [ex.α for ex in exp_list if !(ex isa Exception)]
-    β_result = [ex.β for ex in exp_list if !(ex isa Exception)]
-    iterations_until_convergence =
-        [ex.iterations_until_convergence[1] for ex in exp_list if !(ex isa Exception)]
-
-    avg_profit_result =
-        [mean(ex.convergence_profit) for ex in exp_list if !(ex isa Exception)]
-    is_converged = [ex.is_converged for ex in exp_list if !(ex isa Exception)]
-    df = DataFrame(
+    filter!(x -> !(x isa Exception), exp_list)
+    n = length(exp_list)
+    α_result = Vector{Float64}(undef, n)
+    β_result = Vector{Float64}(undef, n)
+    iterations_until_convergence = Vector{Int64}(undef, n)
+    avg_profit_result = Vector{Float64}(undef, n)
+    is_converged = Vector{Vector{Bool}}(undef, n)
+    for (i, ex) in enumerate(exp_list)
+        α_result[i] = ex.α
+        β_result[i] = ex.β
+        iterations_until_convergence[i] = ex.iterations_until_convergence[1]
+        avg_profit_result[i] = mean(ex.convergence_profit)
+        is_converged[i] = ex.is_converged
+    end
+    return DataFrame(
         α = α_result,
         β = β_result,
         π_bar = avg_profit_result,
         iterations_until_convergence = iterations_until_convergence,
         is_converged = is_converged,
     )
-    return df
 end

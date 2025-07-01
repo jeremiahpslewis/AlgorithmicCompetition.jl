@@ -43,7 +43,7 @@ using AlgorithmicCompetition:
     construct_DDDC_profit_array,
     construct_DDDC_state_space_lookup,
     ConvergenceCheck,
-    DataDemandDigitalParams,
+    DDDCExperimentalParams,
     DDDCEnv,
     DDDCHyperParameters,
     DDDCPolicy,
@@ -73,8 +73,13 @@ using AlgorithmicCompetition:
     TDLearner,
     TDLearner,
     π,
-    DDDCPricesPerLastNEpisodes
+    DDDCPricesPerLastNEpisodes,
+    _best_action_lookup,
+    get_state_space_tremble_state,
+    EpsilonSpeedyExplorer2
 using Distributed
+
+debug = true
 
 @testset "AlgorithmicCompetition.jl" begin
     @testset "Paramter tests" begin
@@ -94,5 +99,9 @@ using Distributed
     end
     @testset "Output tests" begin
         include("aiapc_conversion_check.jl")
+    end
+
+    @testset "EpsilonSpeedyExplorer2 tests" begin
+        include("epsilon_speedy_explorer.jl")
     end
 end

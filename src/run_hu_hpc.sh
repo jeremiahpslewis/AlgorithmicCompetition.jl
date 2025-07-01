@@ -7,18 +7,15 @@
 
 module load julia
 
-export APPTAINER_CACHEDIR=/lustre/department/lewisjps/apptainer
-# export JULIA_DEPOT_PATH=/scratch/hpc-prf-irddcc/.julia
+export JULIA_DEPOT_PATH=/lustre/wiwi/lewisjps/.julia
 
 cd /lustre/wiwi/lewisjps || exit
 
-[ ! -d 'AlgorithmicCompetition.jl' ] && git clone https://github.com/jeremiahpslewis/AlgorithmicCompetition.jl.git
+[ ! -d 'AlgorithmicCompetition.jl' ] && git clone https://github.com/jeremiahpslewis/AlgorithmicCompetition.jl.git 
 
 cd AlgorithmicCompetition.jl || exit
 
 git pull
-
-# apptainer pull --force docker://ghcr.io/jeremiahpslewis/algorithmiccompetition.jl:main
 
 julia -e 'using Pkg; Pkg.activate("."); Pkg.update(); Pkg.instantiate(); Pkg.precompile()'
 

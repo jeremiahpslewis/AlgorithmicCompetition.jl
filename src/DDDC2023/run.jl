@@ -1,13 +1,13 @@
-# Patch to improve type stability and try to speed things up (avoid generator)
-function RLBase.plan!(multiagent::MultiAgentPolicy, env::DDDCEnv)
-    action_set = CartesianIndex{2}(
+using UUIDs
+
+@inline function RLBase.plan!(multiagent::MultiAgentPolicy, env::DDDCEnv)
+    @inbounds return CartesianIndex{2}(
         RLBase.plan!(multiagent[Player(1)], env, Player(1)),
         RLBase.plan!(multiagent[Player(2)], env, Player(2)),
     )
-    return action_set
 end
 
-function Experiment(env::DDDCEnv; stop_on_convergence = true)
+@inline function Experiment(env::DDDCEnv; stop_on_convergence = true)
     RLCore.Experiment(
         DDDCPolicy(env),
         env,
@@ -16,7 +16,7 @@ function Experiment(env::DDDCEnv; stop_on_convergence = true)
     )
 end
 
-function Base.run(hyperparameters::DDDCHyperParameters; stop_on_convergence = true)
+@inline function Base.run(hyperparameters::DDDCHyperParameters; stop_on_convergence = true)
     env = DDDCEnv(hyperparameters)
     experiment = Experiment(env; stop_on_convergence = stop_on_convergence)
     RLCore._run(
@@ -34,7 +34,22 @@ end
 
 Runs the experiment and returns the economic summary.
 """
-function run_and_extract(hyperparameters::DDDCHyperParameters; stop_on_convergence = true)
+function run_and_extract(
+    hyperparameters::DDDCHyperParameters;
+    stop_on_convergence = true,
+    write_to_file_return_none = false,
+    write_to_file_path = "data"
+)
     @info "Running single simulation with hyperparameters: $hyperparameters"
-    economic_summary(run(hyperparameters; stop_on_convergence = stop_on_convergence))
+    single_run_output = economic_summary(run(hyperparameters; stop_on_convergence = stop_on_convergence))
+
+    if write_to_file_return_none
+        single_run_df = extract_sim_results([single_run_output])
+
+        Arrow.write(joinpath(write_to_file_path, string(UUIDs.uuid4()) * ".arrow"), single_run_df)
+    
+        return nothing
+    else
+        return single_run_output
+    end
 end

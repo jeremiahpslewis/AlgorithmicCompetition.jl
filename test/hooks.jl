@@ -115,7 +115,7 @@ end
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
-    data_demand_digital_params = DataDemandDigitalParams(
+    data_demand_digital_params = DDDCExperimentalParams(
         weak_signal_quality_level = 1,
         strong_signal_quality_level = 1,
         signal_is_strong = [false, false],
@@ -161,7 +161,7 @@ end
     competition_solution_dict =
         Dict(d_ => CompetitionSolution(competition_params_dict[d_]) for d_ in [:high, :low])
 
-    data_demand_digital_params = DataDemandDigitalParams(
+    data_demand_digital_params = DDDCExperimentalParams(
         weak_signal_quality_level = 1,
         strong_signal_quality_level = 1,
         signal_is_strong = [false, false],

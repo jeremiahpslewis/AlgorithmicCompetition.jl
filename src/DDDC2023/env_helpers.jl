@@ -5,7 +5,8 @@ Construct a lookup table from action space to the state space.
 """
 function construct_DDDC_state_space_lookup(action_space, n_prices)
     @assert length(action_space) == n_prices^2 * 4
-    state_space_lookup = reshape(Int64.(1:length(action_space)), n_prices, n_prices, 2, 2)
+    # Use collect to avoid an extra broadcast allocation.
+    state_space_lookup = reshape(collect(1:length(action_space)), n_prices, n_prices, 2, 2)
     return state_space_lookup
 end
 
@@ -25,11 +26,12 @@ function construct_DDDC_profit_array(
     n_prices = length(price_options)
 
     profit_array = zeros(Float64, n_prices, n_prices, n_players, 2)
-    for l in [:high, :low]
+    for l in (:high, :low)
+        local d = demand_to_index[l]
         for k = 1:n_players
             for i = 1:n_prices
-                for j = 1:n_prices
-                    profit_array[i, j, k, demand_to_index[l]] =
+                @inbounds for j = 1:n_prices
+                    profit_array[i, j, k, d] =
                         π(price_options[i], price_options[j], competition_params_dict[l])[k]
                 end
             end
