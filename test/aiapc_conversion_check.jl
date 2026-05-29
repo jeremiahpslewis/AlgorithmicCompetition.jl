@@ -30,14 +30,13 @@ function test_key_AIAPC_points(; n_parameter_iterations = 1000)
         :Δ_π_bar_min => [0.75, 0.7, 0.7, 0.75, 0.6, 0.8, 0.5, 0.5, 0.55],
         :Δ_π_bar_max => [0.9, 0.8, 0.85, 0.9, 1, 0.95, 0.8, 0.75, 0.9],
     )
-    hyperparameter_vect =
-        AIAPCHyperParameters.(
-            test_params[!, :α],
-            test_params[!, :β],
-            (0.95,),
-            (Int(1e9),),
-            (competition_solution_dict,),
-        )
+    hyperparameter_vect = AIAPCHyperParameters.(
+        test_params[!, :α],
+        test_params[!, :β],
+        (0.95,),
+        (Int(1e9),),
+        (competition_solution_dict,),
+    )
     exp_list_ = AIAPCSummary[]
     exp_list = pmap(
         run_and_extract,

@@ -70,7 +70,8 @@ end
 mkpath("plots/dddc")
 
 strong_signal_level = 1.0
-df_summary = AlgorithmicCompetition.reduce_dddc(DataFrame(Arrow.Table(df_summary_arrow_cache_path)))
+df_summary =
+    AlgorithmicCompetition.reduce_dddc(DataFrame(Arrow.Table(df_summary_arrow_cache_path)))
 
 df_post_prob = DataFrame(
     vcat([
@@ -146,8 +147,7 @@ f2 = draw(
 save("plots/dddc/plot_2.svg", f2)
 
 plt20 = @chain df_summary begin
-    @subset(
-        (:strong_signal_quality_level == :weak_signal_quality_level)
+    @subset((:strong_signal_quality_level == :weak_signal_quality_level)
     #     (:weak_signal_quality_level == round(:weak_signal_quality_level; digits = 1))
     )
     @sort(:weak_signal_quality_level)
@@ -186,7 +186,8 @@ save("plots/dddc/plot_20.svg", f20)
 plt21 = @chain df_summary begin
     @subset(
         (:strong_signal_quality_level == :weak_signal_quality_level) &
-        !ismissing(:price_response_to_demand_signal_mse)    )
+        !ismissing(:price_response_to_demand_signal_mse)
+    )
     @sort(:weak_signal_quality_level)
     data(_) *
     mapping(
@@ -211,8 +212,8 @@ plt211 = @chain df_summary begin
     @sort(:weak_signal_quality_level)
     data(_) *
     mapping(
-        :weak_signal_quality_level           => "Symmetric Signal Strength",
-        :frequency_high_demand               => "High Demand Frequency",
+        :weak_signal_quality_level => "Symmetric Signal Strength",
+        :frequency_high_demand => "High Demand Frequency",
         :price_response_to_demand_signal_mse => "Mean Squared Error Price Difference by Demand Signal",
     ) *
     visual(Heatmap)
@@ -231,17 +232,16 @@ plt22 = @chain df_summary begin
         value_name = :profit,
     )
     @subset(
-        (:strong_signal_quality_level == :weak_signal_quality_level) & !ismissing(:profit))
+        (:strong_signal_quality_level == :weak_signal_quality_level) & !ismissing(:profit)
+    )
     @transform(:demand_level = replace(:demand_level, "convergence_profit_demand_" => ""))
     @sort(:weak_signal_quality_level)
-    @transform(
-        :demand_level_str = string("Demand Level: ", :demand_level)
-    )
+    @transform(:demand_level_str = string("Demand Level: ", :demand_level))
     data(_) *
     mapping(
         :weak_signal_quality_level => "Signal Strength",
-        :profit                      => "Average Profit",
-        color = :demand_level_str        => nonnumeric => "Demand Level",
+        :profit => "Average Profit",
+        color = :demand_level_str => nonnumeric => "Demand Level",
         layout = :frequency_high_demand => nonnumeric => "High Demand Frequency",
     ) *
     visual(Lines)
@@ -254,8 +254,10 @@ save("plots/dddc/plot_22.svg", f22)
 
 plt22aa = @chain df_summary begin
     @transform(
-        :profit_gain_demand_high = (:profit_gain_demand_high_max + :profit_gain_demand_high_min) / 2,
-        :profit_gain_demand_low = (:profit_gain_demand_low_max + :profit_gain_demand_low_min) / 2,
+        :profit_gain_demand_high =
+            (:profit_gain_demand_high_max + :profit_gain_demand_high_min) / 2,
+        :profit_gain_demand_low =
+            (:profit_gain_demand_low_max + :profit_gain_demand_low_min) / 2,
         :profit_gain_avg = (:profit_gain_max + :profit_gain_min) / 2,
     )
     stack(
@@ -263,21 +265,19 @@ plt22aa = @chain df_summary begin
         variable_name = :demand_level,
         value_name = :profit_gain,
     )
+    @subset(!((:demand_level == "profit_gain") & (:weak_signal_quality_level ∈ [0.0, 1.0])))
     @subset(
-        !((:demand_level == "profit_gain") & (:weak_signal_quality_level ∈ [0.0, 1.0]))
+        (:strong_signal_quality_level == :weak_signal_quality_level) &
+        !ismissing(:profit_gain)
     )
-    @subset(
-        (:strong_signal_quality_level == :weak_signal_quality_level) & !ismissing(:profit_gain))
     @transform(:demand_level = replace(:demand_level, "profit_gain_demand_" => ""))
     @sort(:weak_signal_quality_level)
-    @transform(
-        :demand_level_str = string("Demand Level: ", :demand_level)
-    )
+    @transform(:demand_level_str = string("Demand Level: ", :demand_level))
     data(_) *
     mapping(
         :weak_signal_quality_level => "Signal Strength",
-        :profit_gain               => "Profit Gain",
-        color = :demand_level_str  => nonnumeric => "Demand Level",
+        :profit_gain => "Profit Gain",
+        color = :demand_level_str => nonnumeric => "Demand Level",
         row = :frequency_high_demand => nonnumeric => "High Demand Frequency",
     ) *
     visual(Lines)
@@ -291,8 +291,10 @@ save("plots/dddc/plot_22aa.svg", f22aa)
 # Mean, max, mean, symmetric
 plt22aaa = @chain df_summary begin
     @transform(
-        :profit_gain_demand_high = (:profit_gain_demand_high_max + :profit_gain_demand_high_min) / 2,
-        :profit_gain_demand_low = (:profit_gain_demand_low_max + :profit_gain_demand_low_min) / 2,
+        :profit_gain_demand_high =
+            (:profit_gain_demand_high_max + :profit_gain_demand_high_min) / 2,
+        :profit_gain_demand_low =
+            (:profit_gain_demand_low_max + :profit_gain_demand_low_min) / 2,
     )
     stack(
         [:profit_gain_demand_high, :profit_gain_demand_low],
@@ -300,25 +302,35 @@ plt22aaa = @chain df_summary begin
         value_name = :profit_gain,
     )
     @subset(!ismissing(:profit_gain))
-    @transform(:min_signal_quality_level = min(:strong_signal_quality_level, :weak_signal_quality_level), :max_signal_quality_level = max(:strong_signal_quality_level, :weak_signal_quality_level), :mean_signal_quality_level = (:strong_signal_quality_level + :weak_signal_quality_level) / 2)
+    @transform(
+        :min_signal_quality_level =
+            min(:strong_signal_quality_level, :weak_signal_quality_level),
+        :max_signal_quality_level =
+            max(:strong_signal_quality_level, :weak_signal_quality_level),
+        :mean_signal_quality_level =
+            (:strong_signal_quality_level + :weak_signal_quality_level) / 2
+    )
     stack(
         [:min_signal_quality_level, :max_signal_quality_level, :mean_signal_quality_level],
         variable_name = :signal_quality_level_type,
         value_name = :signal_quality_level,
     )
-    @groupby(:demand_level, :frequency_high_demand, :signal_quality_level_type, :signal_quality_level)
+    @groupby(
+        :demand_level,
+        :frequency_high_demand,
+        :signal_quality_level_type,
+        :signal_quality_level
+    )
     @combine(:profit_gain = mean(:profit_gain))
     @transform(:demand_level = replace(:demand_level, "profit_gain_demand_" => ""))
     @sort(:signal_quality_level)
-    @transform(
-        :demand_level_str = string("Demand Level: ", :demand_level)
-    )
+    @transform(:demand_level_str = string("Demand Level: ", :demand_level))
     data(_) *
     mapping(
         :signal_quality_level => "Signal Strength",
-        :profit_gain               => "Profit Gain",
+        :profit_gain => "Profit Gain",
         color = :signal_quality_level_type => "Signal Strength",
-        col = :demand_level_str  => nonnumeric => "Demand Level",
+        col = :demand_level_str => nonnumeric => "Demand Level",
         row = :frequency_high_demand => nonnumeric => "High Demand Frequency",
     ) *
     visual(Lines)
@@ -332,8 +344,10 @@ save("plots/dddc/plot_22aaa.svg", f22aa)
 plt22a = @chain df_summary begin
     @subset((:frequency_high_demand == 0.5))
     @transform(
-        :profit_gain_demand_high = (:profit_gain_demand_high_max + :profit_gain_demand_high_min) / 2,
-        :profit_gain_demand_low = (:profit_gain_demand_low_max + :profit_gain_demand_low_min) / 2,
+        :profit_gain_demand_high =
+            (:profit_gain_demand_high_max + :profit_gain_demand_high_min) / 2,
+        :profit_gain_demand_low =
+            (:profit_gain_demand_low_max + :profit_gain_demand_low_min) / 2,
     )
     stack(
         [:profit_gain_demand_high, :profit_gain_demand_low],
@@ -342,15 +356,13 @@ plt22a = @chain df_summary begin
     )
     @transform(:demand_level = replace(:demand_level, "profit_gain_demand_" => ""))
     @sort(:weak_signal_quality_level)
-    @transform(
-        :demand_level_str = string("Demand Level: ", :demand_level)
-    )
+    @transform(:demand_level_str = string("Demand Level: ", :demand_level))
     @subset(:strong_signal_quality_level == round(:strong_signal_quality_level, digits = 1))
     data(_) *
     mapping(
         :weak_signal_quality_level => "Weak Signal Strength",
-        :profit_gain                      => "Average Profit",
-        color = :strong_signal_quality_level        => nonnumeric => "Strong Signal Strength",
+        :profit_gain => "Average Profit",
+        color = :strong_signal_quality_level => nonnumeric => "Strong Signal Strength",
         row = :demand_level_str => nonnumeric => "High Demand Frequency",
     ) *
     visual(Lines)
@@ -388,9 +400,7 @@ save("plots/dddc/plot_22a.svg", f22a)
 # save("plots/dddc/plot_222.svg", f222)
 
 plt221 = @chain df_summary begin
-    @subset(
-        (:strong_signal_quality_level == :weak_signal_quality_level)
-    )
+    @subset((:strong_signal_quality_level == :weak_signal_quality_level))
     stack(
         [:profit_gain_min, :profit_gain_max],
         variable_name = :min_max,
@@ -444,9 +454,7 @@ save("plots/dddc/plot_221.svg", f221)
 # save("plots/dddc/plot_223.svg", f223)
 
 plt23 = @chain df_summary begin
-    @subset(
-        (:strong_signal_quality_level == :weak_signal_quality_level)
-    )
+    @subset((:strong_signal_quality_level == :weak_signal_quality_level))
     @transform(
         :profit_gain_demand_all_min = :profit_gain_min,
         :profit_gain_demand_all_max = :profit_gain_max,
@@ -638,13 +646,7 @@ plt241 = @chain df_asym begin
 end
 
 # NOTE: freq_high_demand == 1 intersect weak_signal_quality_level == 1 is excluded, as the low demand states are never explored, so the price response to demand signal is not defined
-f241 = draw(
-    plt241,
-    axis = (
-        ylabel = "Profit Gain",
-        xticks = 0.5:0.25:1,
-    ),
-)
+f241 = draw(plt241, axis = (ylabel = "Profit Gain", xticks = 0.5:0.25:1))
 save("plots/dddc/plot_241.svg", f241)
 
 plt25 = @chain df_summary begin
@@ -802,8 +804,7 @@ save("plots/dddc/plot_27.svg", f27)
 df_weak_weak_outcomes = @chain df_summary begin
     @subset(
         (:strong_signal_quality_level == :weak_signal_quality_level) &
-        (:frequency_high_demand < 1.0) &
-        (:frequency_high_demand > 0.0) &
+        (:frequency_high_demand < 1.0) & (:frequency_high_demand > 0.0) &
         (:weak_signal_quality_level == round(:weak_signal_quality_level; digits = 1))
     )
     @sort(:frequency_high_demand)
@@ -849,7 +850,7 @@ f3 = draw(plt3, axis = (xticks = 0.0:0.1:1,))
 save("plots/dddc/plot_3.svg", f3)
 
 freq_high_demand = 0.5
-for freq_high_demand = [0.0, 0.5, 1.0]
+for freq_high_demand in [0.0, 0.5, 1.0]
     n_bins_ = 200
     df_summary_rounded = df_summary
     df_summary_weak_weak = @chain df_summary_rounded begin
@@ -881,7 +882,7 @@ for freq_high_demand = [0.0, 0.5, 1.0]
             :profit_gain_delta_strong_player_signal_level_up =
                 :profit_gain_avg_signal_ceil - :profit_gain_strong_signal_player,
             :profit_gain_delta_strong_player_signal_level_down =
-            :profit_gain_avg_signal_floor - :profit_gain_strong_signal_player,
+                :profit_gain_avg_signal_floor - :profit_gain_strong_signal_player,
         )
         # @subset(!ismissing(:profit_gain_strong_signal_player)) # TODO: Remove this once you figure out why missings are in data (or whether they are even in data for fresh runs...)
         @transform(
@@ -955,8 +956,10 @@ for freq_high_demand = [0.0, 0.5, 1.0]
         )
         @transform(:player = occursin("weak", :signal_intervention) ? "weak" : "strong")
         @transform(
-            :signal_intervention =
-                replace(:signal_intervention, r"profit_gain_delta_.*_player_signal_" => "")
+            :signal_intervention = replace(
+                :signal_intervention,
+                r"profit_gain_delta_.*_player_signal_" => "",
+            )
         )
         @transform(:signal_intervention = replace(:signal_intervention, "_" => " "))
         @transform(:signal_intervention = titlecase(:signal_intervention))
@@ -972,7 +975,13 @@ for freq_high_demand = [0.0, 0.5, 1.0]
     end
     plt8 = plt8_partial * visual(Heatmap)
 
-    f8 = draw(plt8, figure = (; title = "Effect of Signal 'Leveling' on Competition", subtitle = "(High Demand Freq. $freq_high_demand)"))
+    f8 = draw(
+        plt8,
+        figure = (;
+            title = "Effect of Signal 'Leveling' on Competition",
+            subtitle = "(High Demand Freq. $freq_high_demand)",
+        ),
+    )
     save("plots/dddc/plot_8__freq_high_demand_$freq_high_demand.svg", f8)
 
     plt8_partial = @chain df_rework begin
@@ -988,8 +997,10 @@ for freq_high_demand = [0.0, 0.5, 1.0]
         )
         @transform(:player = occursin("weak", :signal_intervention) ? "weak" : "strong")
         @transform(
-            :signal_intervention =
-                replace(:signal_intervention, r"profit_gain_delta_.*_player_signal_" => "")
+            :signal_intervention = replace(
+                :signal_intervention,
+                r"profit_gain_delta_.*_player_signal_" => "",
+            )
         )
         @transform(:signal_intervention = replace(:signal_intervention, "_" => " "))
         @transform(:signal_intervention = titlecase(:signal_intervention))
@@ -1005,7 +1016,13 @@ for freq_high_demand = [0.0, 0.5, 1.0]
     end
     plt8a = plt8_partial * visual(Heatmap)
 
-    f8a = draw(plt8a, figure = (; title = "Effect of Signal 'Leveling' on Competition", subtitle = "(High Demand Freq. $freq_high_demand)"))
+    f8a = draw(
+        plt8a,
+        figure = (;
+            title = "Effect of Signal 'Leveling' on Competition",
+            subtitle = "(High Demand Freq. $freq_high_demand)",
+        ),
+    )
     save("plots/dddc/plot_8a__freq_high_demand_$freq_high_demand.svg", f8a)
 
     plt8_1 = plt8_partial * visual(Contour; levels = 4, labels = false)
@@ -1015,15 +1032,14 @@ for freq_high_demand = [0.0, 0.5, 1.0]
             title = "Effect of Signal 'Leveling' on Competition",
             subtitle = "(High Demand Freq. $freq_high_demand)",
         ),
-        axis = (xticks = 0.0:0.2:1,)
+        axis = (xticks = 0.0:0.2:1,),
     )
     save("plots/dddc/plot_81__freq_high_demand_$freq_high_demand.svg", f81)
 
     plt82 = @chain df_rework begin
         @transform(
             :joint_best_information =
-                ((:joint_best_information != "ss") & (:joint_best_information != "dd")) ?
-                    "Disagree" : :joint_best_information
+                ((:joint_best_information != "ss") & (:joint_best_information != "dd")) ? "Disagree" : :joint_best_information
         )
         data(_) *
         mapping(
@@ -1048,8 +1064,14 @@ for freq_high_demand = [0.0, 0.5, 1.0]
             ],
         ),
     )
-    f82 = draw(plt82, figure = (; title = "Best Intervention for Firms", subtitle="(High Demand Freq. $freq_high_demand)"))
-    
+    f82 = draw(
+        plt82,
+        figure = (;
+            title = "Best Intervention for Firms",
+            subtitle = "(High Demand Freq. $freq_high_demand)",
+        ),
+    )
+
     save("plots/dddc/plot_82__freq_high_demand_$freq_high_demand.svg", f82)
 
     plt83 = @chain df_rework begin
@@ -1097,7 +1119,7 @@ end
 f912 = draw(
     plt9,
     figure = (; size = (800, 600), title = "Profit Possibilities Range"),
-    axis = (xticks = 0.0:0.2:1, title = "")
+    axis = (xticks = 0.0:0.2:1, title = ""),
 )
 save("plots/dddc/plot_9.svg", f912)
 
@@ -1135,7 +1157,7 @@ end
 f912a = draw(
     plt9a,
     figure = (; size = (800, 600), title = "Profit Possibilities Range"),
-    axis = (xticks = 0.0:0.2:1, title = "")
+    axis = (xticks = 0.0:0.2:1, title = ""),
 )
 save("plots/dddc/plot_9a.svg", f912a)
 
@@ -1143,16 +1165,29 @@ save("plots/dddc/plot_9a.svg", f912a)
 df_information_summary_b = @chain df_summary begin
     # @subset(:frequency_high_demand == 0.5)
     stack(
-        [:profit_gain_demand_high_weak_signal_player, 
-        :profit_gain_demand_low_weak_signal_player,
-        :profit_gain_demand_high_strong_signal_player,
-        :profit_gain_demand_low_strong_signal_player],
+        [
+            :profit_gain_demand_high_weak_signal_player,
+            :profit_gain_demand_low_weak_signal_player,
+            :profit_gain_demand_high_strong_signal_player,
+            :profit_gain_demand_low_strong_signal_player,
+        ],
         variable_name = :demand_signal_player,
         value_name = :profit_gain_delta,
     )
-    @transform(:signal_player = replace(:demand_signal_player, r"profit_gain_demand_[^_]+_" => ""))
-    @transform(:demand_level = replace(:demand_signal_player, r"profit_gain_demand_([a-z]+)_.*" => s"\1"))
-    @groupby(:frequency_high_demand, :strong_signal_quality_level, :signal_player, :demand_level)
+    @transform(
+        :signal_player =
+            replace(:demand_signal_player, r"profit_gain_demand_[^_]+_" => "")
+    )
+    @transform(
+        :demand_level =
+            replace(:demand_signal_player, r"profit_gain_demand_([a-z]+)_.*" => s"\1")
+    )
+    @groupby(
+        :frequency_high_demand,
+        :strong_signal_quality_level,
+        :signal_player,
+        :demand_level
+    )
     @combine(
         :profit_gain_delta_max = maximum(:profit_gain_delta),
         :profit_gain_delta_min = minimum(:profit_gain_delta),
@@ -1180,7 +1215,7 @@ end
 f912b = draw(
     plt9b,
     figure = (; size = (800, 600), title = "Profit Possibilities Range"),
-    axis = (xticks = 0.0:0.2:1, title = "")
+    axis = (xticks = 0.0:0.2:1, title = ""),
 )
 save("plots/dddc/plot_9b.svg", f912b)
 
@@ -1266,7 +1301,7 @@ f = draw(
     plt_10_1,
     figure = (size = (800, 600), title = "Profit Maximizing Signal Strengths"),
     axis = (xticks = 0.0:0.2:1, yticks = 0.0:0.1:1),
-    legend = (position = :right, title = "")
+    legend = (position = :right, title = ""),
 )
 save("plots/dddc/plot_10_1.svg", f)
 
@@ -1292,14 +1327,11 @@ plt_10_2 = @chain df_profit_max_min_signal_strength begin
     ) *
     visual(Lines)
 end
-f10_2 = draw(
-    plt_10_2,
-    axis = (
-        xticks = 0.0:0.2:1,
-        title = "Profit Minimizing Signal Strength",
-        # subtitle = "(Signal strength capped at 0.9)",
-    ),
-)
+f10_2 = draw(plt_10_2, axis = (
+    xticks = 0.0:0.2:1,
+    title = "Profit Minimizing Signal Strength",
+    # subtitle = "(Signal strength capped at 0.9)",
+))
 save("plots/dddc/plot_10_2.svg", f10_2)
 
 
@@ -1341,7 +1373,10 @@ plt_10_3 = @chain df_profit_max_min_signal_strong begin
         variable_name = :player_situation,
         value_name = :signal_quality_opponent,
     )
-    @transform(:player_situation = replace(:player_situation, "weak_player__signal_quality_for_profit_" => ""))
+    @transform(
+        :player_situation =
+            replace(:player_situation, "weak_player__signal_quality_for_profit_" => "")
+    )
     @sort(:strong_signal_quality_level)
     data(_) *
     mapping(
@@ -1351,14 +1386,11 @@ plt_10_3 = @chain df_profit_max_min_signal_strong begin
     ) *
     visual(Lines)
 end
-f10_3 = draw(
-    plt_10_3,
-    axis = (
-        xticks = 0.0:0.2:1,
-        title = "Profit Minimizing Signal Strength",
-        # subtitle = "(Signal strength capped at 0.9)",
-    ),
-)
+f10_3 = draw(plt_10_3, axis = (
+    xticks = 0.0:0.2:1,
+    title = "Profit Minimizing Signal Strength",
+    # subtitle = "(Signal strength capped at 0.9)",
+))
 save("plots/dddc/plot_10_3.svg", f10_3)
 
 plt_10_4 = @chain df_profit_max_min_signal_weak begin
@@ -1371,7 +1403,12 @@ plt_10_4 = @chain df_profit_max_min_signal_weak begin
         variable_name = :player_situation,
         value_name = :signal_quality_opponent,
     )
-    @transform(:player_situation = replace(:player_situation, "strong_player__signal_quality_for_profit_" => ""))
+    @transform(
+        :player_situation = replace(
+            :player_situation,
+            "strong_player__signal_quality_for_profit_" => "",
+        )
+    )
     @sort(:weak_signal_quality_level)
     data(_) *
     mapping(
@@ -1397,9 +1434,12 @@ df_profit_by_weak_signal_level = @chain df_summary begin
     @combine(
         :profit_gain_strong_10pct = quantile(:profit_gain_strong_signal_player, 0.1),
         :profit_gain_strong_90pct = quantile(:profit_gain_strong_signal_player, 0.9),
-        :profit_gain_weak_10pct   = quantile(:profit_gain_weak_signal_player, 0.1),
-        :profit_gain_weak_90pct   = quantile(:profit_gain_weak_signal_player, 0.9),
-        :profit_gain_avg_10pct    = quantile((:profit_gain_strong_signal_player + :profit_gain_weak_signal_player) / 2, 0.1),
+        :profit_gain_weak_10pct = quantile(:profit_gain_weak_signal_player, 0.1),
+        :profit_gain_weak_90pct = quantile(:profit_gain_weak_signal_player, 0.9),
+        :profit_gain_avg_10pct = quantile(
+            (:profit_gain_strong_signal_player + :profit_gain_weak_signal_player) / 2,
+            0.1,
+        ),
     )
 end
 
@@ -1411,12 +1451,24 @@ df_summary_weak_signal_summary = @chain df_summary begin
     )
     @groupby(:weak_signal_quality_level)
     @combine(
-        :signal_for_strong_player_profit_max_lower_bound = minimum(:strong_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_strong_90pct]),
-        :signal_for_strong_player_profit_max_upper_bound = maximum(:strong_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_strong_90pct]),
-        :signal_for_weak_player_profit_max_lower_bound   = minimum(:strong_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_weak_90pct]),
-        :signal_for_weak_player_profit_max_upper_bound   = maximum(:strong_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_weak_90pct]),
-        :signal_for_profit_min_upper_bound  = maximum(:strong_signal_quality_level[(:profit_gain_weak_signal_player + :profit_gain_strong_signal_player) / 2 .<= :profit_gain_avg_10pct]),
-        :signal_for_profit_min_lower_bound  = minimum(:strong_signal_quality_level[(:profit_gain_weak_signal_player + :profit_gain_strong_signal_player) / 2 .<= :profit_gain_avg_10pct]),
+        :signal_for_strong_player_profit_max_lower_bound = minimum(
+            :strong_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_strong_90pct],
+        ),
+        :signal_for_strong_player_profit_max_upper_bound = maximum(
+            :strong_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_strong_90pct],
+        ),
+        :signal_for_weak_player_profit_max_lower_bound = minimum(
+            :strong_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_weak_90pct],
+        ),
+        :signal_for_weak_player_profit_max_upper_bound = maximum(
+            :strong_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_weak_90pct],
+        ),
+        :signal_for_profit_min_upper_bound = maximum(
+            :strong_signal_quality_level[(:profit_gain_weak_signal_player+:profit_gain_strong_signal_player)/2 .<= :profit_gain_avg_10pct],
+        ),
+        :signal_for_profit_min_lower_bound = minimum(
+            :strong_signal_quality_level[(:profit_gain_weak_signal_player+:profit_gain_strong_signal_player)/2 .<= :profit_gain_avg_10pct],
+        ),
     )
 end
 
@@ -1448,11 +1500,11 @@ plt_11_1 = @chain df_combined begin
     @sort(:weak_signal_quality_level)
     data(_) *
     mapping(
-        :weak_signal_quality_level  => "Weak Signal Strength",
+        :weak_signal_quality_level => "Weak Signal Strength",
         :lower_bound,
-        lower = :lower_bound         => "Lower Bound",
-        upper = :upper_bound         => "Upper Bound",
-        color = :player              => nonnumeric => "Profit Maximizing for:"
+        lower = :lower_bound => "Lower Bound",
+        upper = :upper_bound => "Upper Bound",
+        color = :player => nonnumeric => "Profit Maximizing for:",
     ) *
     visual(LinesFill)
 end
@@ -1462,8 +1514,8 @@ f11_1 = draw(
     axis = (
         xticks = 0.5:0.1:1,
         yticks = 0.5:0.1:1,
-        title = "Signal Strength for Profit Maximization"
-    )
+        title = "Signal Strength for Profit Maximization",
+    ),
 )
 
 ################################################################################
@@ -1474,9 +1526,12 @@ df_profit_by_strong_signal_level = @chain df_summary begin
     @combine(
         :profit_gain_strong_10pct = quantile(:profit_gain_strong_signal_player, 0.1),
         :profit_gain_strong_90pct = quantile(:profit_gain_strong_signal_player, 0.9),
-        :profit_gain_weak_10pct   = quantile(:profit_gain_weak_signal_player, 0.1),
-        :profit_gain_weak_90pct   = quantile(:profit_gain_weak_signal_player, 0.9),
-        :profit_gain_avg_10pct    = quantile((:profit_gain_strong_signal_player + :profit_gain_weak_signal_player) / 2, 0.1),        
+        :profit_gain_weak_10pct = quantile(:profit_gain_weak_signal_player, 0.1),
+        :profit_gain_weak_90pct = quantile(:profit_gain_weak_signal_player, 0.9),
+        :profit_gain_avg_10pct = quantile(
+            (:profit_gain_strong_signal_player + :profit_gain_weak_signal_player) / 2,
+            0.1,
+        ),
     )
 end
 
@@ -1488,12 +1543,24 @@ df_summary_strong_signal_summary = @chain df_summary begin
     )
     @groupby(:strong_signal_quality_level)
     @combine(
-        :signal_for_strong_player_profit_max_lower_bound = minimum(:weak_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_strong_90pct]),
-        :signal_for_strong_player_profit_max_upper_bound = maximum(:weak_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_strong_90pct]),
-        :signal_for_weak_player_profit_max_lower_bound   = minimum(:weak_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_weak_90pct]),
-        :signal_for_weak_player_profit_max_upper_bound   = maximum(:weak_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_weak_90pct]),
-        :signal_for_profit_min_upper_bound  = maximum(:weak_signal_quality_level[(:profit_gain_weak_signal_player + :profit_gain_strong_signal_player) / 2 .<= :profit_gain_avg_10pct]),
-        :signal_for_profit_min_lower_bound  = minimum(:weak_signal_quality_level[(:profit_gain_weak_signal_player + :profit_gain_strong_signal_player) / 2 .<= :profit_gain_avg_10pct]),
+        :signal_for_strong_player_profit_max_lower_bound = minimum(
+            :weak_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_strong_90pct],
+        ),
+        :signal_for_strong_player_profit_max_upper_bound = maximum(
+            :weak_signal_quality_level[:profit_gain_strong_signal_player .>= :profit_gain_strong_90pct],
+        ),
+        :signal_for_weak_player_profit_max_lower_bound = minimum(
+            :weak_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_weak_90pct],
+        ),
+        :signal_for_weak_player_profit_max_upper_bound = maximum(
+            :weak_signal_quality_level[:profit_gain_weak_signal_player .>= :profit_gain_weak_90pct],
+        ),
+        :signal_for_profit_min_upper_bound = maximum(
+            :weak_signal_quality_level[(:profit_gain_weak_signal_player+:profit_gain_strong_signal_player)/2 .<= :profit_gain_avg_10pct],
+        ),
+        :signal_for_profit_min_lower_bound = minimum(
+            :weak_signal_quality_level[(:profit_gain_weak_signal_player+:profit_gain_strong_signal_player)/2 .<= :profit_gain_avg_10pct],
+        ),
     )
 end
 
@@ -1533,11 +1600,11 @@ plt_11_2 = @chain df_combined_strong begin
     @sort(:strong_signal_quality_level)
     data(_) *
     mapping(
-        :strong_signal_quality_level  => "Strong Signal Strength",
+        :strong_signal_quality_level => "Strong Signal Strength",
         :lower_bound,
-        lower = :lower_bound           => "Lower Bound",
-        upper = :upper_bound           => "Upper Bound",
-        color = :player                => nonnumeric => "Profit Maximizing for:"
+        lower = :lower_bound => "Lower Bound",
+        upper = :upper_bound => "Upper Bound",
+        color = :player => nonnumeric => "Profit Maximizing for:",
     ) *
     visual(LinesFill)
 end
@@ -1547,6 +1614,6 @@ f11_2 = draw(
     axis = (
         xticks = 0.5:0.1:1,
         yticks = 0.5:0.1:1,
-        title = "Signal Strength for Profit Maximization (Strong Signals)"
-    )
+        title = "Signal Strength for Profit Maximization (Strong Signals)",
+    ),
 )
