@@ -15,14 +15,17 @@ using AlgorithmicCompetition
 using Arrow
 using Tidier
 
-arrow_files = readdir("data/SLURM_ARRAY_JOB_ID=0_debug=false_model=dddc_version=v0.1.2", join = true)
+arrow_files =
+    readdir("data/SLURM_ARRAY_JOB_ID=0_debug=false_model=dddc_version=v0.1.2", join = true)
 arrow_files = filter(y -> occursin("df_summary.arrow", y), arrow_files)
 df_full = vcat(DataFrame.(Arrow.Table.(arrow_files))...)
 df_summary = AlgorithmicCompetition.reduce_dddc(df_full)
 
 mkpath("plots/acai")
 
-demand_cat(x) = x == 1 ? "Always High Demand" : x == 0 ? "Always Low Demand" : x == 0.5 ? "High / Low Split" : "Invalid"
+demand_cat(x) =
+    x == 1 ? "Always High Demand" :
+    x == 0 ? "Always Low Demand" : x == 0.5 ? "High / Low Split" : "Invalid"
 function signal_cat(weak_signal_quality_level, strong_signal_quality_level)
     if weak_signal_quality_level == strong_signal_quality_level
         if weak_signal_quality_level == 1
@@ -38,15 +41,35 @@ function signal_cat(weak_signal_quality_level, strong_signal_quality_level)
         return "P1 Perfect / P2 Random"
     end
 
-    error("Invalid signal quality level: $weak_signal_quality_level, $strong_signal_quality_level")
+    error(
+        "Invalid signal quality level: $weak_signal_quality_level, $strong_signal_quality_level",
+    )
 end
 
 edge_cases = [0.5, 1.0, 0.0, -1.0]
 key_viz_data = @chain df_summary begin
-    @filter((weak_signal_quality_level ∈ !!edge_cases) & (strong_signal_quality_level ∈ !!edge_cases))
-    @filter(!((weak_signal_quality_level == 1) & (strong_signal_quality_level == 1) & (frequency_high_demand ∈ [0, 1])))
+    @filter(
+        (weak_signal_quality_level ∈ !!edge_cases) &
+        (strong_signal_quality_level ∈ !!edge_cases)
+    )
+    @filter(
+        !(
+            (weak_signal_quality_level == 1) & (strong_signal_quality_level == 1) &
+            (frequency_high_demand ∈ [0, 1])
+        )
+    )
     @mutate(
-        signal_quality_level = categorical(signal_cat(weak_signal_quality_level, strong_signal_quality_level), levels=["No Signal", "True State", "Common Random", "P1 Perfect / P2 Random", "Independent Random"], ordered=true),
+        signal_quality_level = categorical(
+            signal_cat(weak_signal_quality_level, strong_signal_quality_level),
+            levels = [
+                "No Signal",
+                "True State",
+                "Common Random",
+                "P1 Perfect / P2 Random",
+                "Independent Random",
+            ],
+            ordered = true,
+        ),
         profit_gain = (profit_gain_min + profit_gain_max) / 2,
         demand_scenario = demand_cat(frequency_high_demand)
     )
@@ -66,8 +89,17 @@ v1 = @chain key_viz_data begin
     (visual(BarPlot))
 end
 
-f1 = draw(v1, axis = (; xticklabelrotation = 45),
-figure = (; size = (800, 400), title = "Algorithmic Collusion Outcomes by Information Set", subtitle="Mean of $(df_summary[1, :n_obs]) simulations per scenario", fontsize = 16, xlabel = "Information Set"))
+f1 = draw(
+    v1,
+    axis = (; xticklabelrotation = 45),
+    figure = (;
+        size = (800, 400),
+        title = "Algorithmic Collusion Outcomes by Information Set",
+        subtitle = "Mean of $(df_summary[1, :n_obs]) simulations per scenario",
+        fontsize = 16,
+        xlabel = "Information Set",
+    ),
+)
 save("plots/acai/plot_1_barplot_profit_gain_by_signal_and_demand_scenario.svg", f1)
 
 v2 = @chain key_viz_data begin
@@ -81,6 +113,15 @@ v2 = @chain key_viz_data begin
     (visual(BarPlot))
 end
 
-f2 = draw(v2, axis = (; xticklabelrotation = 45),
-figure = (; size = (800, 400), title = "Algorithmic Collusion Outcomes by Information Set", subtitle="Mean of $(df_summary[1, :n_obs]) simulations per scenario", fontsize = 16, xlabel = "Information Set"))
+f2 = draw(
+    v2,
+    axis = (; xticklabelrotation = 45),
+    figure = (;
+        size = (800, 400),
+        title = "Algorithmic Collusion Outcomes by Information Set",
+        subtitle = "Mean of $(df_summary[1, :n_obs]) simulations per scenario",
+        fontsize = 16,
+        xlabel = "Information Set",
+    ),
+)
 save("plots/acai/plot_2_barplot_avg_profit_by_signal_and_demand_scenario.svg", f2)
