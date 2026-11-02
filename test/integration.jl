@@ -276,8 +276,7 @@ end
     rewards = [e_out.hook[player_][2].rewards...]
     @test mean(rewards[demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_high[1] atol =
         1e-2
-    @test mean(rewards[.!demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_low[1] atol =
-        1e-2
+    @test mean(rewards[.!demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_low[1] atol = 1e-2
     @test mean(e_out.env.profit_array[:, :, :, 1]) >
           mean(e_out.env.profit_array[:, :, :, 2])
     @test 0.45 < e_sum.percent_demand_high < 0.65
@@ -345,8 +344,8 @@ end
         rewards = [e_out.hook[Player(player_)][2].rewards...]
         @test mean(rewards[demand_state_high_vect]) ≈
               e_sum.convergence_profit_demand_high[player_] atol = 1e-2
-        @test mean(rewards[.!demand_state_high_vect]) ≈
-              e_sum.convergence_profit_demand_low[player_] atol = 1e-2
+        @test mean(rewards[.!demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_low[player_] atol =
+            1e-2
         @test mean(e_out.hook[Player(player_)][1].best_response_vector .== 0) < 0.05
     end
 
@@ -417,8 +416,7 @@ end
     rewards = [e_out.hook[Player(1)][2].rewards...]
     @test mean(rewards[demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_high[1] atol =
         1e-2
-    @test mean(rewards[.!demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_low[1] atol =
-        1e-2
+    @test mean(rewards[.!demand_state_high_vect]) ≈ e_sum.convergence_profit_demand_low[1] atol = 1e-2
     @test mean(e_out.env.profit_array[:, :, :, 1]) >
           mean(e_out.env.profit_array[:, :, :, 2])
     @test 0.45 < e_sum.percent_demand_high < 0.55

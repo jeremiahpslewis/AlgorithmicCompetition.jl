@@ -45,9 +45,8 @@ df = @chain df begin
         :identical_and_correct = all(:is_high_demand == :demand_signals)
     )
     @transform(
-        :minority_demand_state =
-            (:is_high_demand & (:frequency_high_demand > 0.5)) |
-            (!:is_high_demand & (:frequency_high_demand <= 0.5))
+        :minority_demand_state = (:is_high_demand & (:frequency_high_demand > 0.5)) |
+                                 (!:is_high_demand & (:frequency_high_demand <= 0.5))
     )
     # @subset(:minority_demand_state)
 end
@@ -67,22 +66,22 @@ end
 
 df = @chain df_raw begin
     @transform(
-        :prob_high_signal =
-            :signal_strength * :frequency_high_demand +
-            (1 - :signal_strength) * (1 - :frequency_high_demand)
+        :prob_high_signal = :signal_strength * :frequency_high_demand +
+                            (1 - :signal_strength) * (1 - :frequency_high_demand)
     )
     @transform(
-        :prob_low_signal =
-            :signal_strength * (1 - :frequency_high_demand) +
-            (1 - :signal_strength) * :frequency_high_demand
+        :prob_low_signal = :signal_strength * (1 - :frequency_high_demand) +
+                           (1 - :signal_strength) * :frequency_high_demand
     )
     @transform(
-        :post_prob_high_demand__cond_high_signal =
-            :signal_strength * :frequency_high_demand / :prob_high_signal
+        :post_prob_high_demand__cond_high_signal = :signal_strength *
+                                                   :frequency_high_demand /
+                                                   :prob_high_signal
     )
     @transform(
-        :post_prob_high_demand__cond_low_signal =
-            :signal_strength * (1 - :frequency_high_demand) / :prob_low_signal
+        :post_prob_high_demand__cond_low_signal = :signal_strength *
+                                                  (1 - :frequency_high_demand) /
+                                                  :prob_low_signal
     )
     stack(
         [:post_prob_high_demand__cond_high_signal, :post_prob_high_demand__cond_low_signal],
@@ -95,9 +94,11 @@ df = @chain df_raw begin
     )
     @transform(:signal = replace(:signal, "post_prob_high_demand__cond_" => ""))
     @transform(
-        :weighted_probability_combined =
-            :probability_combined *
-            ifelse(:signal == "high_signal", :prob_high_signal, :prob_low_signal)
+        :weighted_probability_combined = :probability_combined * ifelse(
+            :signal == "high_signal",
+            :prob_high_signal,
+            :prob_low_signal,
+        )
     )
     @sort(:frequency_high_demand)
 end
